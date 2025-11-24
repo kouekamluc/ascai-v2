@@ -1,12 +1,14 @@
 """
 Views for accounts app.
 """
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, FormView
 from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
+from django.conf import settings
 from django.http import JsonResponse
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from .models import User
@@ -44,41 +46,49 @@ class LoginView(FormView):
     template_name = 'accounts/login.html'
     success_url = reverse_lazy('core:home')
     
+    def dispatch(self, request, *args, **kwargs):
+        """Redirect if user is already authenticated."""
+        if request.user.is_authenticated:
+            return redirect(self.success_url)
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_success_url(self):
+        """Get the success URL with proper language prefix."""
+        # Get the current language from the request
+        current_language = get_language()
+        
+        # Build the home URL based on language prefix setting
+        # Since prefix_default_language=False, only non-default languages get prefix
+        if current_language != settings.LANGUAGE_CODE:
+            # Non-default language: add language prefix
+            return f'/{current_language}/'
+        else:
+            # Default language: no prefix
+            return '/'
+    
     def form_valid(self, form):
         """Handle valid login."""
         user = form.get_user()
         
-        # Check if user is approved
-        if not user.is_approved:
-            messages.error(
-                self.request,
-                _('Your account is pending admin approval. Please wait for approval before logging in.')
-            )
-            return self.form_invalid(form)
-        
-        # Check if user is active
-        if not user.is_active:
-            messages.error(
-                self.request,
-                _('Your account is inactive. Please contact an administrator.')
-            )
-            return self.form_invalid(form)
-        
+        # Authenticate the user
         login(self.request, user)
         messages.success(self.request, _('Welcome back, {}!').format(user.username))
+        
+        # Get the redirect URL with proper language prefix
+        redirect_url = self.get_success_url()
         
         # Handle HTMX requests
         if self.request.headers.get('HX-Request'):
             return JsonResponse({
                 'success': True,
-                'redirect': str(self.success_url)
+                'redirect': redirect_url
             })
         
-        return super().form_valid(form)
+        return redirect(redirect_url)
     
     def form_invalid(self, form):
         """Handle invalid form submission."""
-        messages.error(self.request, _('Invalid username or password.'))
+        # Error messages are already added by the form's clean method
         return super().form_invalid(form)
 
 

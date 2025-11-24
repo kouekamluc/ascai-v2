@@ -30,10 +30,17 @@ class UserAdmin(BaseUserAdmin):
     
     actions = ['approve_users', 'reject_users']
     
+    def save_model(self, request, obj, form, change):
+        """Override save to auto-approve superusers and staff."""
+        if obj.is_superuser or obj.is_staff:
+            obj.is_approved = True
+            obj.is_active = True
+        super().save_model(request, obj, form, change)
+    
     def approve_users(self, request, queryset):
-        """Approve selected users."""
-        updated = queryset.update(is_approved=True)
-        self.message_user(request, f'{updated} user(s) approved successfully.')
+        """Approve selected users and activate them."""
+        updated = queryset.update(is_approved=True, is_active=True)
+        self.message_user(request, f'{updated} user(s) approved and activated successfully.')
     approve_users.short_description = _('Approve selected users')
     
     def reject_users(self, request, queryset):

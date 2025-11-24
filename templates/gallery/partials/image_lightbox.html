@@ -1,10 +1,14 @@
 {% load i18n %}
-<div class="bg-white rounded-lg overflow-hidden">
-    <img src="{{ image.image.url }}" alt="{{ image.caption|default:'' }}" class="max-w-full max-h-[80vh] object-contain mx-auto">
-    {% if image.caption %}
-    <div class="p-4 bg-black bg-opacity-50">
-        <p class="text-white text-center">{{ image.caption }}</p>
+<div class="bg-white rounded-lg overflow-hidden shadow-2xl">
+    <div class="relative">
+        <img src="{{ image.image.url }}" 
+             alt="{{ image.caption|default:'' }}" 
+             class="max-w-full max-h-[85vh] w-auto h-auto object-contain mx-auto block">
+        {% if image.caption %}
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-6">
+            <p class="text-white text-center text-lg font-medium">{{ image.caption }}</p>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 

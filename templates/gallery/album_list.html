@@ -5,53 +5,77 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold mb-8">{% trans 'Gallery' %}</h1>
+    <!-- Header Section -->
+    <div class="mb-12 text-center">
+        <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-cameroon-green to-cameroon-green/80 bg-clip-text text-transparent">
+            {% trans 'Gallery' %}
+        </h1>
+        <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+            {% trans 'Explore our collection of photos and videos from events, activities, and community gatherings' %}
+        </p>
+    </div>
     
     <!-- Video Section -->
     {% if videos %}
-    <section class="mb-12">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold">{% trans 'Videos' %}</h2>
-            <a href="{% url 'gallery:video_list' %}" class="text-cameroon-green hover:underline">
-                {% trans 'View All Videos' %} →
+    <section class="mb-16">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">{% trans 'Featured Videos' %}</h2>
+                <p class="text-gray-600">{% trans 'Watch our latest video content' %}</p>
+            </div>
+            <a href="{% url 'gallery:video_list' %}" 
+               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cameroon-green to-cameroon-green/90 text-white rounded-lg hover:from-cameroon-green/90 hover:to-cameroon-green/80 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium">
+                {% trans 'View All Videos' %}
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
             </a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for video in videos %}
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+            <div class="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
                  onclick="openVideoModal('{{ video.get_embed_url }}', '{{ video.title|escapejs }}')">
-                <div class="relative aspect-video bg-gray-200">
+                <div class="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
                     {% if video.thumbnail %}
-                    <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                    <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     {% elif video.video_type == 'youtube' %}
-                    <img src="{{ video.get_thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/640x360?text=Video'">
+                    <img src="{{ video.get_thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/640x360?text=Video'">
                     {% else %}
-                    <div class="w-full h-full flex items-center justify-center bg-gray-800">
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
                         <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
                         </svg>
                     </div>
                     {% endif %}
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <button 
-                        onclick="openVideoModal('{{ video.get_embed_url }}', '{{ video.title|escapejs }}')"
-                        class="bg-black bg-opacity-50 rounded-full p-4 hover:bg-opacity-70 transition">
-                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
-                        </svg>
-                    </button>
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                        <div class="bg-white/90 rounded-full p-4 group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                            <svg class="w-10 h-10 text-cameroon-green" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="absolute top-3 right-3">
+                        <span class="px-2 py-1 bg-black/70 text-white text-xs font-semibold rounded-full backdrop-blur-sm">
+                            {% if video.video_type == 'youtube' %}YouTube{% else %}Vimeo{% endif %}
+                        </span>
+                    </div>
                 </div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold mb-1">{{ video.title }}</h3>
+                <div class="p-6">
+                    <h3 class="text-lg font-bold mb-2 text-gray-900 group-hover:text-cameroon-green transition-colors duration-200 line-clamp-2">
+                        {{ video.title }}
+                    </h3>
                     {% if video.description %}
-                    <p class="text-gray-600 text-sm line-clamp-2">{{ video.description }}</p>
+                    <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ video.description }}</p>
                     {% endif %}
-                    <button 
-                        onclick="openVideoModal('{{ video.get_embed_url }}', '{{ video.title|escapejs }}')"
-                        class="mt-2 text-cameroon-green hover:underline text-sm">
-                        {% trans 'Watch Video' %}
-                    </button>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">{{ video.created_at|date:"d M Y" }}</span>
+                        <span class="inline-flex items-center text-cameroon-green text-sm font-medium group-hover:underline">
+                            {% trans 'Watch' %}
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </span>
+                    </div>
                 </div>
             </div>
             {% endfor %}
@@ -61,32 +85,61 @@
     
     <!-- Photo Albums Section -->
     <section>
-        <h2 class="text-2xl font-semibold mb-6">{% trans 'Photo Albums' %}</h2>
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">{% trans 'Photo Albums' %}</h2>
+            <p class="text-gray-600">{% trans 'Browse through our photo collections' %}</p>
+        </div>
         
         {% if albums %}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
             {% for album in albums %}
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-                {% if album.cover_image %}
-                <a href="{% url 'gallery:album_detail' album.pk %}">
-                    <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="w-full h-48 object-cover">
+            <div class="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                <a href="{% url 'gallery:album_detail' album.pk %}" class="block">
+                    <div class="relative aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
+                        {% if album.cover_image %}
+                        <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-cameroon-green/10 to-cameroon-green/5">
+                            <svg class="w-20 h-20 text-cameroon-green/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <div class="p-4 w-full text-white">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span class="text-sm font-medium">{% trans 'View Album' %}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </a>
-                {% endif %}
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2">
-                        <a href="{% url 'gallery:album_detail' album.pk %}" class="hover:text-cameroon-green">
-                            {{ album.title }}
-                        </a>
+                <div class="p-5">
+                    <h3 class="text-lg font-bold mb-2 text-gray-900 group-hover:text-cameroon-green transition-colors duration-200">
+                        <a href="{% url 'gallery:album_detail' album.pk %}">{{ album.title }}</a>
                     </h3>
                     {% if album.description %}
-                    <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ album.description }}</p>
+                    <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ album.description }}</p>
                     {% endif %}
-                    {% if album.event %}
-                    <p class="text-xs text-gray-500 mb-2">
-                        <span class="font-semibold">{% trans 'Event' %}:</span> {{ album.event.title }}
-                    </p>
-                    {% endif %}
-                    <p class="text-gray-600 text-sm">{{ album.created_at|date:"d M Y" }}</p>
+                    <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                        {% if album.event %}
+                        <span class="inline-flex items-center px-2 py-1 bg-cameroon-green/10 text-cameroon-green rounded-full">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            {{ album.event.title|truncatewords:3 }}
+                        </span>
+                        {% endif %}
+                        <span class="inline-flex items-center">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            {{ album.created_at|date:"d M Y" }}
+                        </span>
+                    </div>
                 </div>
             </div>
             {% endfor %}
@@ -94,15 +147,33 @@
         
         <!-- Pagination -->
         {% if is_paginated %}
-        <div class="flex justify-center items-center space-x-2">
+        <div class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
             {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}" 
-               class="px-4 py-2 bg-cameroon-green text-white rounded hover:bg-opacity-90">
+               class="inline-flex items-center px-6 py-3 bg-white border-2 border-cameroon-green text-cameroon-green rounded-lg hover:bg-cameroon-green hover:text-white transition-all duration-200 shadow-md hover:shadow-lg font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
                 {% trans 'Previous' %}
             </a>
             {% endif %}
             
-            <span class="text-gray-600">
+            <div class="flex items-center space-x-2">
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="px-4 py-2 bg-gradient-to-r from-cameroon-green to-cameroon-green/90 text-white rounded-lg font-semibold shadow-md">
+                        {{ num }}
+                    </span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" 
+                       class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:border-cameroon-green hover:text-cameroon-green transition-all duration-200 font-medium">
+                        {{ num }}
+                    </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <span class="text-gray-600 text-sm">
                 {% blocktrans with page=page_obj.number pages=page_obj.paginator.num_pages %}
                 Page {{ page }} of {{ pages }}
                 {% endblocktrans %}
@@ -110,15 +181,22 @@
             
             {% if page_obj.has_next %}
             <a href="?page={{ page_obj.next_page_number }}" 
-               class="px-4 py-2 bg-cameroon-green text-white rounded hover:bg-opacity-90">
+               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cameroon-green to-cameroon-green/90 text-white rounded-lg hover:from-cameroon-green/90 hover:to-cameroon-green/80 transition-all duration-200 shadow-md hover:shadow-lg font-medium">
                 {% trans 'Next' %}
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
             </a>
             {% endif %}
         </div>
         {% endif %}
         {% else %}
-        <div class="bg-white rounded-lg shadow-md p-8 text-center">
-            <p class="text-gray-500">{% trans 'No albums available.' %}</p>
+        <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="text-gray-500 text-lg font-medium">{% trans 'No albums available yet.' %}</p>
+            <p class="text-gray-400 text-sm mt-2">{% trans 'Check back soon for new photo albums!' %}</p>
         </div>
         {% endif %}
     </section>
@@ -126,17 +204,17 @@
 
 <!-- Video Modal -->
 <div id="video-modal" 
-     class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-50"
+     class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden items-center justify-center z-50 p-4"
      onclick="if(event.target === this) { closeVideoModal(); }">
-    <div class="max-w-4xl w-full p-4 relative">
+    <div class="max-w-5xl w-full relative">
         <button 
             onclick="closeVideoModal()"
-            class="absolute top-2 right-2 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2">
+            class="absolute -top-12 right-0 text-white hover:text-gray-300 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 transition-all duration-200">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
-        <div class="bg-black rounded-lg overflow-hidden">
+        <div class="bg-black rounded-xl overflow-hidden shadow-2xl">
             <div class="aspect-video">
                 <iframe id="video-iframe" 
                         src="" 
@@ -146,8 +224,8 @@
                         class="w-full h-full">
                 </iframe>
             </div>
-            <div class="p-4">
-                <h3 id="video-title" class="text-white text-lg font-semibold"></h3>
+            <div class="p-6 bg-gradient-to-b from-black to-gray-900">
+                <h3 id="video-title" class="text-white text-xl font-bold"></h3>
             </div>
         </div>
     </div>
@@ -155,17 +233,33 @@
 
 <script>
 function openVideoModal(embedUrl, title) {
-    document.getElementById('video-iframe').src = embedUrl;
-    document.getElementById('video-title').textContent = title;
-    document.getElementById('video-modal').classList.remove('hidden');
-    document.getElementById('video-modal').classList.add('flex');
+    const modal = document.getElementById('video-modal');
+    const iframe = document.getElementById('video-iframe');
+    const titleEl = document.getElementById('video-title');
+    
+    iframe.src = embedUrl;
+    titleEl.textContent = title;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeVideoModal() {
-    document.getElementById('video-iframe').src = '';
-    document.getElementById('video-modal').classList.add('hidden');
-    document.getElementById('video-modal').classList.remove('flex');
+    const modal = document.getElementById('video-modal');
+    const iframe = document.getElementById('video-iframe');
+    
+    iframe.src = '';
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
 }
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeVideoModal();
+    }
+});
 </script>
 {% endblock %}
 
