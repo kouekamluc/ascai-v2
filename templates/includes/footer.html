@@ -1,0 +1,50 @@
+{% load i18n %}
+<footer class="bg-gray-800 text-white mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- About -->
+            <div>
+                <h3 class="text-lg font-semibold mb-4">{% trans 'About ASCAI Lazio' %}</h3>
+                <p class="text-gray-300 text-sm">
+                    {% trans 'Association of Cameroonian Students and Academics in the Lazio Region, Italy.' %}
+                </p>
+            </div>
+            
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-semibold mb-4">{% trans 'Quick Links' %}</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{% url 'students:index' %}" class="text-gray-300 hover:text-white transition">{% trans 'Students' %}</a></li>
+                    <li><a href="{% url 'scholarships:index' %}" class="text-gray-300 hover:text-white transition">{% trans 'Scholarships' %}</a></li>
+                    <li><a href="{% url 'universities:index' %}" class="text-gray-300 hover:text-white transition">{% trans 'Universities' %}</a></li>
+                    <li><a href="{% url 'community:index' %}" class="text-gray-300 hover:text-white transition">{% trans 'Community' %}</a></li>
+                </ul>
+            </div>
+            
+            <!-- Resources -->
+            <div>
+                <h3 class="text-lg font-semibold mb-4">{% trans 'Resources' %}</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{% url 'downloads:index' %}" class="text-gray-300 hover:text-white transition">{% trans 'Downloads' %}</a></li>
+                    <li><a href="{% url 'gallery:index' %}" class="text-gray-300 hover:text-white transition">{% trans 'Gallery' %}</a></li>
+                    <li><a href="{% url 'diaspora:index' %}" class="text-gray-300 hover:text-white transition">{% trans 'Diaspora News' %}</a></li>
+                    <li><a href="{% url 'contact:index' %}" class="text-gray-300 hover:text-white transition">{% trans 'Contact Us' %}</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact Info -->
+            <div>
+                <h3 class="text-lg font-semibold mb-4">{% trans 'Contact' %}</h3>
+                <p class="text-gray-300 text-sm">
+                    {% trans 'Lazio Region, Italy' %}<br>
+                    {% trans 'Email: info@ascailazio.org' %}
+                </p>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-300">
+            <p>&copy; {% now "Y" %} ASCAI Lazio. {% trans 'All rights reserved.' %}</p>
+        </div>
+    </div>
+</footer>
+

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'News' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">{% trans 'News' %}</h1>
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form hx-get="{% url 'diaspora:news_list' %}" hx-target="#news-list" hx-trigger="change" method="get">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <select name="category" class="px-4 py-2 border border-gray-300 rounded-lg">
+                    <option value="">{% trans 'All Categories' %}</option>
+                    <option value="general">{% trans 'General' %}</option>
+                    <option value="academic">{% trans 'Academic' %}</option>
+                    <option value="cultural">{% trans 'Cultural' %}</option>
+                    <option value="integration">{% trans 'Integration' %}</option>
+                    <option value="success_story">{% trans 'Success Story' %}</option>
+                    <option value="announcement">{% trans 'Announcement' %}</option>
+                </select>
+                <select name="language" class="px-4 py-2 border border-gray-300 rounded-lg">
+                    <option value="">{% trans 'All Languages' %}</option>
+                    <option value="en">{% trans 'English' %}</option>
+                    <option value="fr">{% trans 'French' %}</option>
+                </select>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">{% trans 'Filter' %}</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- News List -->
+    <div id="news-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for news in news_list %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+            {% if news.image %}
+            <img src="{{ news.image.url }}" alt="{{ news.title }}" class="w-full h-48 object-cover">
+            {% endif %}
+            <div class="p-6">
+                <span class="text-sm text-gray-500">{{ news.published_at|date:"d M Y" }}</span>
+                <h3 class="text-xl font-semibold mt-2 mb-2">
+                    <a href="{% url 'diaspora:news_detail' news.slug %}" class="hover:text-blue-600">
+                        {{ news.title }}
+                    </a>
+                </h3>
+                <p class="text-gray-600">{{ news.content|truncatewords:20|striptags }}</p>
+                <span class="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
+                    {{ news.get_category_display }}
+                </span>
+            </div>
+        </div>
+        {% empty %}
+        <p class="col-span-3 text-center text-gray-500">{% trans 'No news found.' %}</p>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="mt-8 flex justify-center">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-gray-200 rounded-lg mr-2 hover:bg-gray-300">{% trans 'Previous' %}</a>
+        {% endif %}
+        <span class="px-4 py-2">{% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-gray-200 rounded-lg ml-2 hover:bg-gray-300">{% trans 'Next' %}</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

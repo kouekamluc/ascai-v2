@@ -1,0 +1,30 @@
+{% load i18n %}
+{% for university in universities %}
+<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+    {% if university.logo %}
+    <img src="{{ university.logo.url }}" alt="{{ university.name }}" class="w-full h-32 object-contain bg-gray-100">
+    {% endif %}
+    <div class="p-6">
+        <h3 class="text-xl font-semibold mb-2">
+            <a href="{% url 'universities:detail' university.slug %}" class="hover:text-blue-600">
+                {{ university.name }}
+            </a>
+        </h3>
+        <p class="text-gray-600 text-sm mb-2">{{ university.get_city_display }}</p>
+        <p class="text-gray-700">{{ university.description|truncatewords:20 }}</p>
+        {% if user.is_authenticated %}
+        <form hx-post="{% url 'universities:toggle_save' university.slug %}" hx-target="this" hx-swap="outerHTML" class="mt-4">
+            {% csrf_token %}
+            {% if university.id in saved_university_ids %}
+            <button type="submit" class="text-red-600 hover:text-red-800">{% trans 'Remove from Favorites' %}</button>
+            {% else %}
+            <button type="submit" class="text-blue-600 hover:text-blue-800">{% trans 'Save to Favorites' %}</button>
+            {% endif %}
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% empty %}
+<p>{% trans 'No universities found.' %}</p>
+{% endfor %}
+

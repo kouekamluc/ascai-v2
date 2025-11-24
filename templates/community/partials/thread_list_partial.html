@@ -1,0 +1,33 @@
+{% load i18n %}
+{% for thread in threads %}
+<div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+    <div class="flex items-start justify-between">
+        <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+                {% if thread.is_pinned %}
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold">📌 {% trans 'Pinned' %}</span>
+                {% endif %}
+                <span class="text-sm text-gray-500">{{ thread.category.name }}</span>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">
+                <a href="{% url 'community:thread_detail' thread.slug %}" class="hover:text-blue-600">
+                    {{ thread.title }}
+                </a>
+            </h3>
+            <p class="text-gray-600 mb-4">{{ thread.content|truncatewords:30|striptags }}</p>
+            <div class="flex items-center gap-4 text-sm text-gray-500">
+                <span>👤 {{ thread.author.username }}</span>
+                <span>📅 {{ thread.created_at|date:"d M Y" }}</span>
+                <span>👁️ {{ thread.views_count }} {% trans 'views' %}</span>
+                <span>💬 {{ thread.post_count }} {% trans 'replies' %}</span>
+                <span>👍 {{ thread.upvotes_count }} {% trans 'upvotes' %}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="bg-white rounded-lg shadow-md p-8 text-center">
+    <p class="text-gray-500">{% trans 'No threads found.' %}</p>
+</div>
+{% endfor %}
+

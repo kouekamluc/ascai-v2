@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Orientation' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">{% trans 'Student Orientation & Advice' %}</h1>
+    
+    <div class="space-y-6">
+        <section class="bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Academic Success Tips' %}</h2>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li>{% trans 'Attend classes regularly and take detailed notes' %}</li>
+                <li>{% trans 'Build relationships with professors and classmates' %}</li>
+                <li>{% trans 'Utilize university libraries and study resources' %}</li>
+                <li>{% trans 'Join study groups and academic clubs' %}</li>
+                <li>{% trans 'Seek help early if you\'re struggling with coursework' %}</li>
+            </ul>
+        </section>
+        
+        <section class="bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Time Management' %}</h2>
+            <p class="text-gray-700 mb-4">
+                {% trans 'Balancing academic work, part-time jobs, and personal life requires good time management. Create a schedule and prioritize your tasks.' %}
+            </p>
+        </section>
+        
+        <section class="bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Language Learning' %}</h2>
+            <p class="text-gray-700 mb-4">
+                {% trans 'Improving your Italian language skills will help with both academic success and daily life. Consider taking language courses or joining conversation groups.' %}
+            </p>
+        </section>
+        
+        <section class="bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Financial Planning' %}</h2>
+            <p class="text-gray-700 mb-4">
+                {% trans 'Create a budget for your expenses. Explore scholarship opportunities and part-time work options. Check our' %}
+                <a href="{% url 'scholarships:index' %}" class="text-blue-600 hover:underline">{% trans 'Scholarships section' %}</a>
+                {% trans 'for funding opportunities.' %}
+            </p>
+        </section>
+        
+        <section class="bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Mentorship Program' %}</h2>
+            <p class="text-gray-700 mb-4">
+                {% trans 'Our mentorship program connects new students with experienced mentors who can provide guidance and support. Visit our' %}
+                <a href="{% url 'mentorship:index' %}" class="text-blue-600 hover:underline">{% trans 'Mentorship section' %}</a>
+                {% trans 'to find a mentor.' %}
+            </p>
+        </section>
+        
+        <section class="bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Community Support' %}</h2>
+            <p class="text-gray-700 mb-4">
+                {% trans 'Join our community forum to ask questions, share experiences, and connect with other Cameroonian students in Lazio.' %}
+            </p>
+            <a href="{% url 'community:index' %}" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                {% trans 'Visit Community Forum' %}
+            </a>
+        </section>
+    </div>
+</div>
+{% endblock %}
+

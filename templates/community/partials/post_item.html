@@ -1,0 +1,24 @@
+{% load i18n %}
+<div class="border-b border-gray-200 pb-6 last:border-b-0">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-blue-600 font-semibold">{{ post.author.username|first|upper }}</span>
+        </div>
+        <div>
+            <p class="font-semibold">{{ post.author.username }}</p>
+            <p class="text-sm text-gray-500">{{ post.created_at|date:"d M Y, H:i" }}</p>
+        </div>
+    </div>
+    <div class="prose max-w-none mb-4">
+        {{ post.content|linebreaks }}
+    </div>
+    <form hx-post="{% url 'community:upvote_post' post.id %}" hx-target="#upvote-post-{{ post.id }}" hx-swap="outerHTML" class="inline">
+        {% csrf_token %}
+        <div id="upvote-post-{{ post.id }}">
+            <button type="submit" class="text-gray-600 hover:text-gray-800 text-sm">
+                👍 {% trans 'Upvote' %} ({{ post.upvotes_count }})
+            </button>
+        </div>
+    </form>
+</div>
+

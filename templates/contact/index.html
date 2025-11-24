@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Contact Us' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">{% trans 'Contact Us' %}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Contact Form -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Send us a Message' %}</h2>
+            
+            <form method="post" hx-post="{% url 'contact:index' %}" hx-target="#contact-form-container" hx-swap="innerHTML">
+                {% csrf_token %}
+                <div id="contact-form-container">
+                    {% include 'contact/partials/contact_form.html' with form=form %}
+                </div>
+            </form>
+        </div>
+        
+        <!-- Contact Information -->
+        <div>
+            <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+                <h2 class="text-2xl font-semibold mb-4">{% trans 'Contact Information' %}</h2>
+                <p class="mb-4">
+                    <strong>{% trans 'ASCAI Lazio' %}</strong><br>
+                    {% trans 'Lazio Region, Italy' %}
+                </p>
+                <p class="mb-4">
+                    <strong>{% trans 'Email:' %}</strong> info@ascailazio.org
+                </p>
+            </div>
+            
+            <!-- Google Maps placeholder -->
+            <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
+                <p class="text-gray-500">{% trans 'Map will be integrated here' %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

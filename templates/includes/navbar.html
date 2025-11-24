@@ -1,0 +1,86 @@
+{% load i18n static %}
+<nav class="bg-white shadow-lg sticky top-0 z-40" x-data="{ mobileMenuOpen: false }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'core:home' %}" class="flex items-center">
+                    <span class="text-2xl font-bold text-blue-600">ASCAI Lazio</span>
+                </a>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex md:items-center md:space-x-4">
+                <a href="{% url 'core:home' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Home' %}</a>
+                <a href="{% url 'students:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Students' %}</a>
+                <a href="{% url 'diaspora:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Diaspora' %}</a>
+                <a href="{% url 'community:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Community' %}</a>
+                <a href="{% url 'mentorship:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Mentorship' %}</a>
+                <a href="{% url 'universities:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Universities' %}</a>
+                <a href="{% url 'scholarships:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Scholarships' %}</a>
+                <a href="{% url 'gallery:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Gallery' %}</a>
+                <a href="{% url 'downloads:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Downloads' %}</a>
+                <a href="{% url 'contact:index' %}" class="px-3 py-2 text-gray-700 hover:text-blue-600 transition">{% trans 'Contact' %}</a>
+                
+                <!-- Language Switcher -->
+                {% include 'includes/language_switcher.html' %}
+                
+                <!-- User Menu -->
+                {% if user.is_authenticated %}
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-blue-600">
+                            <span>{{ user.username }}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{% trans 'Profile' %}</a>
+                            {% if user.is_admin %}
+                                <a href="{% url 'admin:index' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{% trans 'Admin' %}</a>
+                            {% endif %}
+                            <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{% trans 'Logout' %}</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition">{% trans 'Login' %}</a>
+                    <a href="{% url 'accounts:register' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">{% trans 'Register' %}</a>
+                {% endif %}
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-700 hover:text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" x-cloak class="md:hidden border-t border-gray-200">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="{% url 'core:home' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Home' %}</a>
+            <a href="{% url 'students:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Students' %}</a>
+            <a href="{% url 'diaspora:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Diaspora' %}</a>
+            <a href="{% url 'community:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Community' %}</a>
+            <a href="{% url 'mentorship:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Mentorship' %}</a>
+            <a href="{% url 'universities:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Universities' %}</a>
+            <a href="{% url 'scholarships:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Scholarships' %}</a>
+            <a href="{% url 'gallery:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Gallery' %}</a>
+            <a href="{% url 'downloads:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Downloads' %}</a>
+            <a href="{% url 'contact:index' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Contact' %}</a>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'accounts:profile' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Profile' %}</a>
+                <a href="{% url 'accounts:logout' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Logout' %}</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Login' %}</a>
+                <a href="{% url 'accounts:register' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">{% trans 'Register' %}</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+

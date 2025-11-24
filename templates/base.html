@@ -1,0 +1,52 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% trans 'ASCAI Lazio - Association of Cameroonian Students and Academics in the Lazio Region, Italy' %}">
+    <title>{% block title %}{% trans 'ASCAI Lazio' %}{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN (development) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Alpine.js for interactive components -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        [x-cloak] { display: none !important; }
+        .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
+        .htmx-request .htmx-indicator { opacity: 1; }
+        .htmx-request.htmx-indicator { opacity: 1; }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Navigation -->
+    {% include 'includes/navbar.html' %}
+    
+    <!-- Messages -->
+    {% include 'includes/messages.html' %}
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    {% include 'includes/footer.html' %}
+    
+    <!-- HTMX Indicator -->
+    <div id="htmx-indicator" class="htmx-indicator fixed top-0 left-0 right-0 bg-blue-600 text-white py-2 text-center z-50">
+        <span>{% trans 'Loading...' %}</span>
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

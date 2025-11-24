@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ university.name }} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div class="flex items-start justify-between mb-6">
+            <div class="flex items-center gap-6">
+                {% if university.logo %}
+                <img src="{{ university.logo.url }}" alt="{{ university.name }}" class="w-24 h-24 object-contain">
+                {% endif %}
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">{{ university.name }}</h1>
+                    <p class="text-xl text-gray-600">{{ university.get_city_display }}</p>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+            <form hx-post="{% url 'universities:toggle_save' university.slug %}" hx-target="#save-button" hx-swap="outerHTML">
+                {% csrf_token %}
+                <div id="save-button">
+                    {% if is_saved %}
+                    <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        {% trans 'Remove from Favorites' %}
+                    </button>
+                    {% else %}
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        {% trans 'Save to Favorites' %}
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+            {% endif %}
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {% if university.address %}
+            <div>
+                <h3 class="font-semibold mb-2">{% trans 'Address' %}</h3>
+                <p class="text-gray-600">{{ university.address }}</p>
+            </div>
+            {% endif %}
+            {% if university.website %}
+            <div>
+                <h3 class="font-semibold mb-2">{% trans 'Website' %}</h3>
+                <a href="{{ university.website }}" target="_blank" class="text-blue-600 hover:underline">{{ university.website }}</a>
+            </div>
+            {% endif %}
+            {% if university.email %}
+            <div>
+                <h3 class="font-semibold mb-2">{% trans 'Email' %}</h3>
+                <a href="mailto:{{ university.email }}" class="text-blue-600 hover:underline">{{ university.email }}</a>
+            </div>
+            {% endif %}
+            {% if university.phone %}
+            <div>
+                <h3 class="font-semibold mb-2">{% trans 'Phone' %}</h3>
+                <p class="text-gray-600">{{ university.phone }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-6">
+            <h3 class="font-semibold mb-2">{% trans 'Description' %}</h3>
+            <p class="text-gray-700">{{ university.description|linebreaks }}</p>
+        </div>
+        
+        {% if university.tuition_range_min or university.tuition_range_max %}
+        <div class="mb-6">
+            <h3 class="font-semibold mb-2">{% trans 'Tuition Range' %}</h3>
+            <p class="text-gray-700">
+                {% if university.tuition_range_min and university.tuition_range_max %}
+                €{{ university.tuition_range_min }} - €{{ university.tuition_range_max }}
+                {% elif university.tuition_range_min %}
+                {% trans 'From' %} €{{ university.tuition_range_min }}
+                {% elif university.tuition_range_max %}
+                {% trans 'Up to' %} €{{ university.tuition_range_max }}
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+        
+        {% if university.languages %}
+        <div class="mb-6">
+            <h3 class="font-semibold mb-2">{% trans 'Languages of Instruction' %}</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for language in university.languages %}
+                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">{{ language }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if university.degree_types %}
+        <div class="mb-6">
+            <h3 class="font-semibold mb-2">{% trans 'Degree Types' %}</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for degree in university.degree_types %}
+                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">{{ degree }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if university.fields_of_study %}
+        <div class="mb-6">
+            <h3 class="font-semibold mb-2">{% trans 'Fields of Study' %}</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for field in university.fields_of_study %}
+                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">{{ field }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Programs -->
+    {% if programs %}
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-3xl font-bold mb-6">{% trans 'Programs' %}</h2>
+        <div class="space-y-4">
+            {% for program in programs %}
+            <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                <h3 class="text-xl font-semibold mb-2">{{ program.name }}</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">{% trans 'Degree:' %}</span>
+                        <span class="font-semibold">{{ program.get_degree_type_display }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">{% trans 'Field:' %}</span>
+                        <span class="font-semibold">{{ program.field }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">{% trans 'Duration:' %}</span>
+                        <span class="font-semibold">{{ program.duration_years }} {% trans 'years' %}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">{% trans 'Language:' %}</span>
+                        <span class="font-semibold">{{ program.get_language_display }}</span>
+                    </div>
+                </div>
+                {% if program.tuition %}
+                <p class="mt-2 text-gray-700"><strong>{% trans 'Tuition:' %}</strong> €{{ program.tuition }}</p>
+                {% endif %}
+                {% if program.description %}
+                <p class="mt-2 text-gray-600">{{ program.description|truncatewords:30 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

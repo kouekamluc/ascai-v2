@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Diaspora' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">{% trans 'Diaspora' %}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Latest News -->
+        <div>
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Latest News' %}</h2>
+            {% if latest_news %}
+                {% for news in latest_news %}
+                <div class="bg-white rounded-lg shadow p-4 mb-4">
+                    <h3><a href="{% url 'diaspora:news_detail' news.slug %}" class="text-blue-600 hover:underline">{{ news.title }}</a></h3>
+                    <p class="text-sm text-gray-500">{{ news.published_at|date:"d M Y" }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>{% trans 'No news available.' %}</p>
+            {% endif %}
+            <a href="{% url 'diaspora:news_list' %}" class="text-blue-600 hover:underline">{% trans 'View All News' %}</a>
+        </div>
+        
+        <!-- Upcoming Events -->
+        <div>
+            <h2 class="text-2xl font-semibold mb-4">{% trans 'Upcoming Events' %}</h2>
+            {% if upcoming_events %}
+                {% for event in upcoming_events %}
+                <div class="bg-white rounded-lg shadow p-4 mb-4">
+                    <h3><a href="{% url 'diaspora:event_detail' event.slug %}" class="text-blue-600 hover:underline">{{ event.title }}</a></h3>
+                    <p class="text-sm text-gray-500">{{ event.start_datetime|date:"d M Y, H:i" }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>{% trans 'No upcoming events.' %}</p>
+            {% endif %}
+            <a href="{% url 'diaspora:event_list' %}" class="text-blue-600 hover:underline">{% trans 'View All Events' %}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

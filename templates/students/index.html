@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Students' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">{% trans 'Student Resources' %}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="{% url 'students:living_guide' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <h2 class="text-xl font-semibold mb-2">{% trans 'Living & Studying in Lazio' %}</h2>
+            <p class="text-gray-600">{% trans 'Comprehensive guide for students in the Lazio region.' %}</p>
+        </a>
+        
+        <a href="{% url 'universities:index' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <h2 class="text-xl font-semibold mb-2">{% trans 'Universities in Lazio' %}</h2>
+            <p class="text-gray-600">{% trans 'Search and explore universities in the region.' %}</p>
+        </a>
+        
+        <a href="{% url 'students:enrollment_process' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <h2 class="text-xl font-semibold mb-2">{% trans 'Enrollment Process' %}</h2>
+            <p class="text-gray-600">{% trans 'Step-by-step guide to university enrollment.' %}</p>
+        </a>
+        
+        <a href="{% url 'scholarships:index' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <h2 class="text-xl font-semibold mb-2">{% trans 'Scholarships' %}</h2>
+            <p class="text-gray-600">{% trans 'Find funding opportunities including DISCO Lazio.' %}</p>
+        </a>
+        
+        <a href="{% url 'students:orientation' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <h2 class="text-xl font-semibold mb-2">{% trans 'Orientation Advice' %}</h2>
+            <p class="text-gray-600">{% trans 'Get guidance for your academic journey.' %}</p>
+        </a>
+        
+        <a href="{% url 'downloads:index' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <h2 class="text-xl font-semibold mb-2">{% trans 'Downloads' %}</h2>
+            <p class="text-gray-600">{% trans 'Access important documents and forms.' %}</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,11 @@
+{% load i18n %}
+{% if has_upvoted %}
+<button type="submit" class="text-blue-600 hover:text-blue-800 text-sm">
+    👍 {% trans 'Upvoted' %} ({{ post.upvotes_count }})
+</button>
+{% else %}
+<button type="submit" class="text-gray-600 hover:text-gray-800 text-sm">
+    👍 {% trans 'Upvote' %} ({{ post.upvotes_count }})
+</button>
+{% endif %}
+

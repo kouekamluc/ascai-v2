@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Events' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">{% trans 'Events' %}</h1>
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form method="get" class="flex gap-4">
+            <select name="date_filter" class="px-4 py-2 border border-gray-300 rounded-lg">
+                <option value="upcoming" {% if request.GET.date_filter == 'upcoming' %}selected{% endif %}>{% trans 'Upcoming' %}</option>
+                <option value="past" {% if request.GET.date_filter == 'past' %}selected{% endif %}>{% trans 'Past Events' %}</option>
+            </select>
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">{% trans 'Filter' %}</button>
+        </form>
+    </div>
+    
+    <!-- Event List -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for event in events %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+            {% if event.image %}
+            <img src="{{ event.image.url }}" alt="{{ event.title }}" class="w-full h-48 object-cover">
+            {% endif %}
+            <div class="p-6">
+                <div class="text-sm text-gray-500 mb-2">
+                    📅 {{ event.start_datetime|date:"d M Y, H:i" }}
+                </div>
+                <h3 class="text-xl font-semibold mb-2">
+                    <a href="{% url 'diaspora:event_detail' event.slug %}" class="hover:text-blue-600">
+                        {{ event.title }}
+                    </a>
+                </h3>
+                <p class="text-gray-600 mb-2">{{ event.description|truncatewords:15|striptags }}</p>
+                <p class="text-sm text-gray-500">📍 {{ event.location }}</p>
+                {% if event.registration_required %}
+                <span class="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
+                    {% trans 'Registration Required' %}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="col-span-3 text-center text-gray-500">{% trans 'No events found.' %}</p>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="mt-8 flex justify-center">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-gray-200 rounded-lg mr-2 hover:bg-gray-300">{% trans 'Previous' %}</a>
+        {% endif %}
+        <span class="px-4 py-2">{% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-gray-200 rounded-lg ml-2 hover:bg-gray-300">{% trans 'Next' %}</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

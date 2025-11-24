@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ thread.title }} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Thread -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+            {% if thread.is_pinned %}
+            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs">📌 {% trans 'Pinned' %}</span>
+            {% endif %}
+            {% if thread.is_locked %}
+            <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">🔒 {% trans 'Locked' %}</span>
+            {% endif %}
+            <span class="text-sm text-gray-500">{{ thread.category.name }}</span>
+        </div>
+        
+        <h1 class="text-3xl font-bold mb-4">{{ thread.title }}</h1>
+        
+        <div class="flex items-center gap-4 mb-6 text-sm text-gray-500">
+            <span>👤 {{ thread.author.username }}</span>
+            <span>📅 {{ thread.created_at|date:"d M Y, H:i" }}</span>
+            <span>👁️ {{ thread.views_count }} {% trans 'views' %}</span>
+            <span>👍 {{ thread.upvotes_count }} {% trans 'upvotes' %}</span>
+        </div>
+        
+        <div class="prose max-w-none mb-6">
+            {{ thread.content|linebreaks }}
+        </div>
+        
+        <div class="flex gap-4">
+            <form hx-post="{% url 'community:upvote_thread' thread.slug %}" hx-target="#upvote-thread" hx-swap="outerHTML">
+                {% csrf_token %}
+                <div id="upvote-thread">
+                    {% if has_upvoted_thread %}
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        👍 {% trans 'Upvoted' %} ({{ thread.upvotes_count }})
+                    </button>
+                    {% else %}
+                    <button type="submit" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                        👍 {% trans 'Upvote' %} ({{ thread.upvotes_count }})
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+        <!-- Posts/Replies -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Replies' %} ({{ posts|length }})</h2>
+        
+        <div id="posts-container" class="space-y-6 mb-6">
+            {% for post in posts %}
+            <div class="border-b border-gray-200 pb-6 last:border-b-0">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-blue-600 font-semibold">{{ post.author.username|first|upper }}</span>
+                    </div>
+                    <div>
+                        <p class="font-semibold">{{ post.author.username }}</p>
+                        <p class="text-sm text-gray-500">{{ post.created_at|date:"d M Y, H:i" }}</p>
+                    </div>
+                    {% if post.is_solution %}
+                    <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">✅ {% trans 'Solution' %}</span>
+                    {% endif %}
+                </div>
+                <div class="prose max-w-none mb-4">
+                    {{ post.content|linebreaks }}
+                </div>
+                <form hx-post="{% url 'community:upvote_post' post.id %}" hx-target="#upvote-post-{{ post.id }}" hx-swap="outerHTML" class="inline">
+                    {% csrf_token %}
+                    <div id="upvote-post-{{ post.id }}">
+                        {% if post.id in upvoted_post_ids %}
+                        <button type="submit" class="text-blue-600 hover:text-blue-800 text-sm">
+                            👍 {% trans 'Upvoted' %} ({{ post.upvotes_count }})
+                        </button>
+                        {% else %}
+                        <button type="submit" class="text-gray-600 hover:text-gray-800 text-sm">
+                            👍 {% trans 'Upvote' %} ({{ post.upvotes_count }})
+                        </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            {% empty %}
+            <p class="text-gray-500">{% trans 'No replies yet.' %}</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Reply Form -->
+        {% if user.is_authenticated and not thread.is_locked %}
+        <div class="border-t border-gray-200 pt-6">
+            <h3 class="text-xl font-semibold mb-4">{% trans 'Reply' %}</h3>
+            <form method="post" hx-post="{% url 'community:thread_detail' thread.slug %}" hx-target="#posts-container" hx-swap="beforeend" hx-on::after-request="this.reset()">
+                {% csrf_token %}
+                <textarea name="content" rows="5" required class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4" placeholder="{% trans 'Your reply...' %}"></textarea>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    {% trans 'Post Reply' %}
+                </button>
+            </form>
+        </div>
+        {% elif thread.is_locked %}
+        <div class="border-t border-gray-200 pt-6">
+            <p class="text-gray-500">{% trans 'This thread is locked. New replies cannot be posted.' %}</p>
+        </div>
+        {% else %}
+        <div class="border-t border-gray-200 pt-6">
+            <p class="text-gray-500">
+                <a href="{% url 'accounts:login' %}" class="text-blue-600 hover:underline">{% trans 'Login' %}</a>
+                {% trans 'to reply to this thread.' %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ news.title }} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <article class="bg-white rounded-lg shadow-md p-8">
+        {% if news.image %}
+        <img src="{{ news.image.url }}" alt="{{ news.title }}" class="w-full h-64 object-cover rounded-lg mb-6">
+        {% endif %}
+        
+        <div class="mb-4">
+            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                {{ news.get_category_display }}
+            </span>
+            <span class="text-gray-500 text-sm ml-4">{{ news.published_at|date:"d M Y, H:i" }}</span>
+        </div>
+        
+        <h1 class="text-4xl font-bold mb-4">{{ news.title }}</h1>
+        
+        {% if news.author %}
+        <p class="text-gray-600 mb-6">
+            {% trans 'By' %} <strong>{{ news.author.get_full_name|default:news.author.username }}</strong>
+        </p>
+        {% endif %}
+        
+        <div class="prose max-w-none">
+            {{ news.content|safe }}
+        </div>
+    </article>
+    
+    <!-- Related News -->
+    {% if related_news %}
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Related News' %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for related in related_news %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                {% if related.image %}
+                <img src="{{ related.image.url }}" alt="{{ related.title }}" class="w-full h-32 object-cover">
+                {% endif %}
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold">
+                        <a href="{% url 'diaspora:news_detail' related.slug %}" class="hover:text-blue-600">
+                            {{ related.title }}
+                        </a>
+                    </h3>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

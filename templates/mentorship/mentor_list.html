@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Mentors' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold">{% trans 'Find a Mentor' %}</h1>
+        {% if user.is_authenticated and user.role == 'mentor' %}
+        <a href="{% url 'mentorship:profile_create' %}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            {% trans 'Create Mentor Profile' %}
+        </a>
+        {% endif %}
+    </div>
+    
+    <!-- Search -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form method="get">
+            <input type="text" name="search" placeholder="{% trans 'Search mentors...' %}" value="{{ request.GET.search }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </form>
+    </div>
+    
+    <!-- Mentor List -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for mentor in mentors %}
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center gap-4 mb-4">
+                {% if mentor.user.avatar %}
+                <img src="{{ mentor.user.avatar.url }}" alt="{{ mentor.user.username }}" class="w-16 h-16 rounded-full">
+                {% else %}
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl text-blue-600">{{ mentor.user.username|first|upper }}</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h3 class="text-xl font-semibold">{{ mentor.user.get_full_name|default:mentor.user.username }}</h3>
+                    <p class="text-sm text-gray-500">⭐ {{ mentor.rating|default:"0.0" }} / 5.0</p>
+                </div>
+            </div>
+            
+            <p class="text-blue-600 font-semibold mb-2">{{ mentor.specialization }}</p>
+            <p class="text-gray-600 text-sm mb-4">{{ mentor.bio|truncatewords:20 }}</p>
+            
+            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                <span>💼 {{ mentor.years_experience }} {% trans 'years experience' %}</span>
+                <span>👥 {{ mentor.students_helped }} {% trans 'students helped' %}</span>
+            </div>
+            
+            <div class="mb-4">
+                {% if mentor.availability_status == 'available' %}
+                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">✅ {% trans 'Available' %}</span>
+                {% elif mentor.availability_status == 'busy' %}
+                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">⏳ {% trans 'Busy' %}</span>
+                {% else %}
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">❌ {% trans 'Unavailable' %}</span>
+                {% endif %}
+            </div>
+            
+            {% if user.is_authenticated and user.role == 'student' and mentor.availability_status == 'available' %}
+            <a href="{% url 'mentorship:request_create' mentor.pk %}" class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                {% trans 'Request Mentorship' %}
+            </a>
+            {% else %}
+            <a href="{% url 'mentorship:mentor_detail' mentor.pk %}" class="block w-full text-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                {% trans 'View Profile' %}
+            </a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="col-span-3 bg-white rounded-lg shadow-md p-8 text-center">
+            <p class="text-gray-500">{% trans 'No mentors found.' %}</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="mt-8 flex justify-center">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-gray-200 rounded-lg mr-2 hover:bg-gray-300">{% trans 'Previous' %}</a>
+        {% endif %}
+        <span class="px-4 py-2">{% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-gray-200 rounded-lg ml-2 hover:bg-gray-300">{% trans 'Next' %}</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Universities' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">{% trans 'Universities in Lazio' %}</h1>
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form hx-get="{% url 'universities:index' %}" hx-target="#university-list" hx-trigger="change, keyup delay:500ms" hx-indicator="#loading">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">{% trans 'City' %}</label>
+                    <select name="city" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="">{% trans 'All Cities' %}</option>
+                        <option value="rome">{% trans 'Rome' %}</option>
+                        <option value="cassino">{% trans 'Cassino' %}</option>
+                        <option value="viterbo">{% trans 'Viterbo' %}</option>
+                        <option value="latina">{% trans 'Latina' %}</option>
+                        <option value="frosinone">{% trans 'Frosinone' %}</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-1">{% trans 'Search' %}</label>
+                    <input type="text" name="search" placeholder="{% trans 'Search...' %}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- University List -->
+    <div id="university-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% include 'universities/partials/university_list_partial.html' %}
+    </div>
+    
+    <div id="loading" class="htmx-indicator text-center py-4">
+        <p>{% trans 'Loading...' %}</p>
+    </div>
+</div>
+{% endblock %}
+

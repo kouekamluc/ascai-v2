@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Gallery' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">{% trans 'Photo Gallery' %}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for album in albums %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+            {% if album.cover_image %}
+            <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="w-full h-48 object-cover">
+            {% endif %}
+            <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2">
+                    <a href="{% url 'gallery:album_detail' album.pk %}" class="hover:text-blue-600">
+                        {{ album.title }}
+                    </a>
+                </h3>
+                <p class="text-gray-600 text-sm">{{ album.created_at|date:"d M Y" }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <p>{% trans 'No albums available.' %}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

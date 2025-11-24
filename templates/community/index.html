@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Community Forum' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold">{% trans 'Community Forum' %}</h1>
+        {% if user.is_authenticated %}
+        <a href="{% url 'community:thread_create' %}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            {% trans 'New Thread' %}
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for category in categories %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-2">{{ category.name }}</h2>
+            <p class="text-gray-600 mb-4">{{ category.description|truncatewords:15 }}</p>
+            <p class="text-sm text-gray-500">{{ category.thread_count }} {% trans 'threads' %}</p>
+            <a href="{% url 'community:thread_list' %}?category={{ category.slug }}" class="text-blue-600 hover:underline mt-4 inline-block">
+                {% trans 'View Threads' %} →
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
