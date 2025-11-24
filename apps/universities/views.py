@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django.core.paginator import Paginator
 from .models import University, UniversityProgram, SavedUniversity
 
 
@@ -36,19 +37,36 @@ class UniversityListView(ListView):
             queryset = queryset.filter(city=city)
         
         if degree_type:
-            queryset = queryset.filter(degree_types__contains=[degree_type])
+            # JSON field contains check - check if the list contains the value
+            queryset = queryset.filter(degree_types__contains=degree_type)
         
         if field:
-            queryset = queryset.filter(fields_of_study__contains=[field])
+            queryset = queryset.filter(fields_of_study__contains=field)
         
         if language:
-            queryset = queryset.filter(languages__contains=[language])
+            queryset = queryset.filter(languages__contains=language)
         
         if tuition_min:
-            queryset = queryset.filter(tuition_range_max__gte=tuition_min)
+            try:
+                tuition_min_val = float(tuition_min)
+                # University has tuition in range if max >= min filter OR min <= min filter
+                queryset = queryset.filter(
+                    Q(tuition_range_max__gte=tuition_min_val) | 
+                    Q(tuition_range_min__lte=tuition_min_val)
+                )
+            except (ValueError, TypeError):
+                pass
         
         if tuition_max:
-            queryset = queryset.filter(tuition_range_min__lte=tuition_max)
+            try:
+                tuition_max_val = float(tuition_max)
+                # University has tuition in range if min <= max filter OR max <= max filter
+                queryset = queryset.filter(
+                    Q(tuition_range_min__lte=tuition_max_val) | 
+                    Q(tuition_range_max__lte=tuition_max_val)
+                )
+            except (ValueError, TypeError):
+                pass
         
         if search:
             queryset = queryset.filter(
@@ -62,7 +80,7 @@ class UniversityListView(ListView):
     def get_template_names(self):
         """Return different template for HTMX requests."""
         if self.request.headers.get('HX-Request'):
-            return 'universities/partials/university_list_partial.html'
+            return ['universities/partials/university_list_partial.html']
         return super().get_template_names()
     
     def get_context_data(self, **kwargs):
@@ -98,12 +116,16 @@ class UniversityDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['programs'] = self.object.programs.all()
         context['is_saved'] = False
+        context['can_save'] = False
         
         if self.request.user.is_authenticated:
-            context['is_saved'] = SavedUniversity.objects.filter(
-                user=self.request.user,
-                university=self.object
-            ).exists()
+            # Only students can save universities
+            context['can_save'] = hasattr(self.request.user, 'is_student') and self.request.user.is_student
+            if context['can_save']:
+                context['is_saved'] = SavedUniversity.objects.filter(
+                    user=self.request.user,
+                    university=self.object
+                ).exists()
         
         return context
 
@@ -111,7 +133,17 @@ class UniversityDetailView(DetailView):
 @login_required
 @require_http_methods(["POST"])
 def toggle_save_university(request, slug):
-    """Toggle save/unsave university (HTMX endpoint)."""
+    """Toggle save/unsave university (HTMX endpoint). Only students can save."""
+    # Check if user is a student
+    if not hasattr(request.user, 'is_student') or not request.user.is_student:
+        if request.headers.get('HX-Request'):
+            return render(request, 'universities/partials/save_button.html', {
+                'university': get_object_or_404(University, slug=slug),
+                'is_saved': False,
+                'error': _('Only students can save universities to favorites.')
+            })
+        return JsonResponse({'error': _('Only students can save universities to favorites.')}, status=403)
+    
     university = get_object_or_404(University, slug=slug)
     saved, created = SavedUniversity.objects.get_or_create(
         user=request.user,

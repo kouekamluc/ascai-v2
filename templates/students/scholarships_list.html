@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Scholarships Available to Students' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-4">{% trans 'Scholarships Available to Students' %}</h1>
+        <p class="text-lg text-gray-600">
+            {% trans 'Find funding opportunities including DISCO Lazio and other scholarships to support your studies in Lazio.' %}
+        </p>
+    </div>
+
+    <!-- HTMX Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form hx-get="{% url 'students:scholarships_list' %}" hx-target="#scholarship-list" hx-trigger="change, keyup delay:500ms" hx-indicator="#loading">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">{% trans 'Filter by Type' %}</label>
+                    <select name="is_disco_lazio" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="">{% trans 'All Scholarships' %}</option>
+                        <option value="true">{% trans 'DISCO Lazio Only' %}</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-1">{% trans 'Search' %}</label>
+                    <input type="text" name="search" placeholder="{% trans 'Search scholarships...' %}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- DISCO Lazio Highlight -->
+    <div class="bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-bold mb-2">{% trans 'DISCO Lazio Scholarships' %}</h2>
+                <p class="text-gray-700">
+                    {% trans 'Special regional scholarships for students in Lazio. Check out our dedicated' %}
+                    <a href="{% url 'scholarships:disco_lazio' %}" class="text-cameroon-green hover:underline font-semibold">{% trans 'DISCO Lazio section' %}</a>
+                    {% trans 'for more information.' %}
+                </p>
+            </div>
+            <a href="{% url 'scholarships:disco_lazio' %}" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 whitespace-nowrap">
+                {% trans 'Learn More →' %}
+            </a>
+        </div>
+    </div>
+
+    <!-- Scholarship List -->
+    <div id="scholarship-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% include 'students/partials/scholarship_list_partial.html' %}
+    </div>
+
+    <div id="loading" class="htmx-indicator text-center py-4">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cameroon-green"></div>
+        <p class="mt-2 text-gray-600">{% trans 'Loading...' %}</p>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="bg-white rounded-lg shadow-md p-8 mt-8">
+        <h2 class="text-2xl font-bold mb-4">{% trans 'Scholarship Application Tips' %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Before Applying' %}</h3>
+                <ul class="text-gray-700 space-y-1 text-sm">
+                    <li>• {% trans 'Read eligibility criteria carefully' %}</li>
+                    <li>• {% trans 'Check application deadlines' %}</li>
+                    <li>• {% trans 'Gather required documents early' %}</li>
+                    <li>• {% trans 'Prepare a strong motivation letter' %}</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Application Process' %}</h3>
+                <ul class="text-gray-700 space-y-1 text-sm">
+                    <li>• {% trans 'Submit complete applications' %}</li>
+                    <li>• {% trans 'Follow all instructions precisely' %}</li>
+                    <li>• {% trans 'Keep copies of all documents' %}</li>
+                    <li>• {% trans 'Track application status' %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Guide -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'students:index' %}" class="inline-block px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans '← Back to Complete Guide' %}
+        </a>
+    </div>
+</div>
+{% endblock %}
+

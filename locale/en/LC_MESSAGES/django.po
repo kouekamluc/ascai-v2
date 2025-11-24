@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ASCAI Lazio 1.0\n"
@@ -17,3 +16,684 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+# Contact Page Translations
+msgid "Contact Us"
+msgstr "Contact Us"
+
+msgid "We would love to hear from you. Send us a message and we will respond as soon as possible."
+msgstr "We would love to hear from you. Send us a message and we will respond as soon as possible."
+
+msgid "Send us a Message"
+msgstr "Send us a Message"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Subject"
+msgstr "Subject"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Send Message"
+msgstr "Send Message"
+
+msgid "Contact Information"
+msgstr "Contact Information"
+
+msgid "Office Address"
+msgstr "Office Address"
+
+msgid "ASCAI Lazio"
+msgstr "ASCAI Lazio"
+
+msgid "Lazio Region"
+msgstr "Lazio Region"
+
+msgid "Rome, Italy"
+msgstr "Rome, Italy"
+
+msgid "Office Hours"
+msgstr "Office Hours"
+
+msgid "Monday - Friday"
+msgstr "Monday - Friday"
+
+msgid "Saturday"
+msgstr "Saturday"
+
+msgid "Sunday"
+msgstr "Sunday"
+
+msgid "Closed"
+msgstr "Closed"
+
+msgid "ASCAI Lazio Location"
+msgstr "ASCAI Lazio Location"
+
+msgid "Thank you!"
+msgstr "Thank you!"
+
+msgid "Your message has been sent successfully. We will get back to you soon."
+msgstr "Your message has been sent successfully. We will get back to you soon."
+
+msgid "Message Sent!"
+msgstr "Message Sent!"
+
+msgid "Thank you for contacting us. We will get back to you as soon as possible."
+msgstr "Thank you for contacting us. We will get back to you as soon as possible."
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Message Sent"
+msgstr "Message Sent"
+
+msgid "Message Sent Successfully!"
+msgstr "Message Sent Successfully!"
+
+msgid "Return to Home"
+msgstr "Return to Home"
+
+msgid "Thank you for your message! We will get back to you soon."
+msgstr "Thank you for your message! We will get back to you soon."
+
+# Universities Module Translations
+msgid "Universities"
+msgstr "Universities"
+
+msgid "Universities in Lazio"
+msgstr "Universities in Lazio"
+
+msgid "Search Universities"
+msgstr "Search Universities"
+
+msgid "Search by name, city, or description..."
+msgstr "Search by name, city, or description..."
+
+msgid "City"
+msgstr "City"
+
+msgid "All Cities"
+msgstr "All Cities"
+
+msgid "Rome"
+msgstr "Rome"
+
+msgid "Cassino"
+msgstr "Cassino"
+
+msgid "Viterbo"
+msgstr "Viterbo"
+
+msgid "Latina"
+msgstr "Latina"
+
+msgid "Frosinone"
+msgstr "Frosinone"
+
+msgid "Rieti"
+msgstr "Rieti"
+
+msgid "Degree Level"
+msgstr "Degree Level"
+
+msgid "All Degrees"
+msgstr "All Degrees"
+
+msgid "Bachelor"
+msgstr "Bachelor"
+
+msgid "Master"
+msgstr "Master"
+
+msgid "PhD"
+msgstr "PhD"
+
+msgid "Field of Study"
+msgstr "Field of Study"
+
+msgid "All Fields"
+msgstr "All Fields"
+
+msgid "Engineering"
+msgstr "Engineering"
+
+msgid "Medicine"
+msgstr "Medicine"
+
+msgid "Law"
+msgstr "Law"
+
+msgid "Business"
+msgstr "Business"
+
+msgid "Arts"
+msgstr "Arts"
+
+msgid "Sciences"
+msgstr "Sciences"
+
+msgid "Min Tuition (€)"
+msgstr "Min Tuition (€)"
+
+msgid "Max Tuition (€)"
+msgstr "Max Tuition (€)"
+
+msgid "Min"
+msgstr "Min"
+
+msgid "Max"
+msgstr "Max"
+
+msgid "Clear Filters"
+msgstr "Clear Filters"
+
+msgid "Loading..."
+msgstr "Loading..."
+
+msgid "No universities found"
+msgstr "No universities found"
+
+msgid "Try adjusting your filters or search terms."
+msgstr "Try adjusting your filters or search terms."
+
+msgid "Save to Favorites"
+msgstr "Save to Favorites"
+
+msgid "Remove from Favorites"
+msgstr "Remove from Favorites"
+
+msgid "View Details"
+msgstr "View Details"
+
+msgid "Tuition:"
+msgstr "Tuition:"
+
+msgid "From"
+msgstr "From"
+
+msgid "Up to"
+msgstr "Up to"
+
+msgid "Address"
+msgstr "Address"
+
+msgid "Website"
+msgstr "Website"
+
+msgid "Phone"
+msgstr "Phone"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Tuition Range"
+msgstr "Tuition Range"
+
+msgid "Languages of Instruction"
+msgstr "Languages of Instruction"
+
+msgid "Degree Types"
+msgstr "Degree Types"
+
+msgid "Fields of Study"
+msgstr "Fields of Study"
+
+msgid "Programs"
+msgstr "Programs"
+
+msgid "Degree:"
+msgstr "Degree:"
+
+msgid "Field:"
+msgstr "Field:"
+
+msgid "Duration:"
+msgstr "Duration:"
+
+msgid "Language:"
+msgstr "Language:"
+
+msgid "years"
+msgstr "years"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "of"
+msgstr "of"
+
+msgid "Previous"
+msgstr "Previous"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "Only students can save universities to favorites."
+msgstr "Only students can save universities to favorites."
+
+# Navigation and Common Strings
+msgid "Home"
+msgstr "Home"
+
+msgid "Students"
+msgstr "Students"
+
+msgid "Diaspora"
+msgstr "Diaspora"
+
+msgid "Community"
+msgstr "Community"
+
+msgid "Mentorship"
+msgstr "Mentorship"
+
+msgid "Scholarships"
+msgstr "Scholarships"
+
+msgid "Gallery"
+msgstr "Gallery"
+
+msgid "Downloads"
+msgstr "Downloads"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Profile"
+msgstr "Profile"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Welcome to ASCAI Lazio"
+msgstr "Welcome to ASCAI Lazio"
+
+msgid "Association of Cameroonian Students and Academics in the Lazio Region, Italy"
+msgstr "Association of Cameroonian Students and Academics in the Lazio Region, Italy"
+
+msgid "Join Community"
+msgstr "Join Community"
+
+msgid "Cameroonians in Lazio"
+msgstr "Cameroonians in Lazio"
+
+msgid "The Cameroonian community in Lazio, Italy, represents a vibrant and growing diaspora of students, academics, and professionals. Our community is dedicated to supporting one another through academic excellence, cultural preservation, and mutual assistance."
+msgstr "The Cameroonian community in Lazio, Italy, represents a vibrant and growing diaspora of students, academics, and professionals. Our community is dedicated to supporting one another through academic excellence, cultural preservation, and mutual assistance."
+
+msgid "ASCAI Lazio serves as a bridge connecting Cameroonian students and academics across universities in Rome and the wider Lazio region. We provide essential resources, mentorship opportunities, and a supportive network to help our members thrive in their academic and professional journeys."
+msgstr "ASCAI Lazio serves as a bridge connecting Cameroonian students and academics across universities in Rome and the wider Lazio region. We provide essential resources, mentorship opportunities, and a supportive network to help our members thrive in their academic and professional journeys."
+
+msgid "Through cultural events, academic workshops, and community initiatives, we celebrate our heritage while embracing our role in the Italian academic and social landscape."
+msgstr "Through cultural events, academic workshops, and community initiatives, we celebrate our heritage while embracing our role in the Italian academic and social landscape."
+
+msgid "Our Community"
+msgstr "Our Community"
+
+msgid "Students across major universities in Lazio"
+msgstr "Students across major universities in Lazio"
+
+msgid "Academics and researchers in various fields"
+msgstr "Academics and researchers in various fields"
+
+msgid "Professionals contributing to Italian society"
+msgstr "Professionals contributing to Italian society"
+
+msgid "Cultural ambassadors promoting diversity"
+msgstr "Cultural ambassadors promoting diversity"
+
+msgid "Our Mission"
+msgstr "Our Mission"
+
+msgid "Academic Support"
+msgstr "Academic Support"
+
+msgid "Supporting Cameroonian students in Lazio with information, guidance, and resources."
+msgstr "Supporting Cameroonian students in Lazio with information, guidance, and resources."
+
+msgid "Community Unity"
+msgstr "Community Unity"
+
+msgid "Promoting diaspora unity, cultural exchange, and integration."
+msgstr "Promoting diaspora unity, cultural exchange, and integration."
+
+msgid "Opportunities"
+msgstr "Opportunities"
+
+msgid "Providing mentorship, orientation, and scholarship opportunities."
+msgstr "Providing mentorship, orientation, and scholarship opportunities."
+
+msgid "Latest News"
+msgstr "Latest News"
+
+msgid "View All"
+msgstr "View All"
+
+msgid "Loading news..."
+msgstr "Loading news..."
+
+msgid "Upcoming Events"
+msgstr "Upcoming Events"
+
+msgid "Loading events..."
+msgstr "Loading events..."
+
+msgid "Registration Required"
+msgstr "Registration Required"
+
+msgid "Success Stories"
+msgstr "Success Stories"
+
+msgid "Loading stories..."
+msgstr "Loading stories..."
+
+msgid "Read More"
+msgstr "Read More"
+
+msgid "Join Our Community"
+msgstr "Join Our Community"
+
+msgid "Connect with fellow Cameroonian students and academics in Lazio"
+msgstr "Connect with fellow Cameroonian students and academics in Lazio"
+
+msgid "Register Now"
+msgstr "Register Now"
+
+msgid "Studying in Lazio – Complete Guide"
+msgstr "Studying in Lazio – Complete Guide"
+
+msgid "Studying in Lazio"
+msgstr "Studying in Lazio"
+
+msgid "Complete Guide"
+msgstr "Complete Guide"
+
+msgid "Your comprehensive resource for studying, living, and thriving in the Lazio region of Italy. Find universities, scholarships, programs, and essential information for Cameroonian students."
+msgstr "Your comprehensive resource for studying, living, and thriving in the Lazio region of Italy. Find universities, scholarships, programs, and essential information for Cameroonian students."
+
+msgid "Active Scholarships"
+msgstr "Active Scholarships"
+
+msgid "Resources & Documents"
+msgstr "Resources & Documents"
+
+msgid "Enrollment Process"
+msgstr "Enrollment Process"
+
+msgid "University Enrollment Process in Lazio"
+msgstr "University Enrollment Process in Lazio"
+
+msgid "Step 1: Choose Your University and Program"
+msgstr "Step 1: Choose Your University and Program"
+
+msgid "Research universities and programs that match your interests and qualifications. Visit our"
+msgstr "Research universities and programs that match your interests and qualifications. Visit our"
+
+msgid "Universities Directory"
+msgstr "Universities Directory"
+
+msgid "for detailed information."
+msgstr "for detailed information."
+
+msgid "Step 2: Check Admission Requirements"
+msgstr "Step 2: Check Admission Requirements"
+
+msgid "Each university and program has specific admission requirements. Common requirements include:"
+msgstr "Each university and program has specific admission requirements. Common requirements include:"
+
+msgid "Academic transcripts"
+msgstr "Academic transcripts"
+
+msgid "Language proficiency certificates (Italian/English)"
+msgstr "Language proficiency certificates (Italian/English)"
+
+msgid "Entrance exams (for some programs)"
+msgstr "Entrance exams (for some programs)"
+
+msgid "Motivation letter"
+msgstr "Motivation letter"
+
+msgid "Letters of recommendation"
+msgstr "Letters of recommendation"
+
+msgid "Testimonials"
+msgstr "Testimonials"
+
+msgid "Testimonials from Cameroonians in Lazio"
+msgstr "Testimonials from Cameroonians in Lazio"
+
+msgid "Read about the experiences of Cameroonians living and studying in Lazio, Italy."
+msgstr "Read about the experiences of Cameroonians living and studying in Lazio, Italy."
+
+msgid "All Languages"
+msgstr "All Languages"
+
+msgid "English"
+msgstr "English"
+
+msgid "French"
+msgstr "French"
+
+msgid "Filter"
+msgstr "Filter"
+
+# Footer Translations
+msgid "About ASCAI Lazio"
+msgstr "About ASCAI Lazio"
+
+msgid "Association of Cameroonian Students and Academics in the Lazio Region, Italy."
+msgstr "Association of Cameroonian Students and Academics in the Lazio Region, Italy."
+
+msgid "Quick Links"
+msgstr "Quick Links"
+
+msgid "Resources"
+msgstr "Resources"
+
+msgid "Diaspora News"
+msgstr "Diaspora News"
+
+msgid "Lazio Region, Italy"
+msgstr "Lazio Region, Italy"
+
+msgid "All rights reserved."
+msgstr "All rights reserved."
+
+# Scholarships Translations
+msgid "DISCO Lazio Scholarships"
+msgstr "DISCO Lazio Scholarships"
+
+msgid "This is a DISCO Lazio scholarship opportunity."
+msgstr "This is a DISCO Lazio scholarship opportunity."
+
+msgid "Remove"
+msgstr "Remove"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Application Deadline:"
+msgstr "Application Deadline:"
+
+msgid "Eligibility Criteria"
+msgstr "Eligibility Criteria"
+
+msgid "Requirements Document"
+msgstr "Requirements Document"
+
+msgid "Download Requirements PDF"
+msgstr "Download Requirements PDF"
+
+msgid "Apply Now"
+msgstr "Apply Now"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Search scholarships..."
+msgstr "Search scholarships..."
+
+msgid "Level"
+msgstr "Level"
+
+msgid "All Levels"
+msgstr "All Levels"
+
+msgid "Bachelor's Degree"
+msgstr "Bachelor's Degree"
+
+msgid "Master's Degree"
+msgstr "Master's Degree"
+
+msgid "Region"
+msgstr "Region"
+
+msgid "All Regions"
+msgstr "All Regions"
+
+msgid "Lazio"
+msgstr "Lazio"
+
+msgid "Other"
+msgstr "Other"
+
+msgid "Deadline"
+msgstr "Deadline"
+
+msgid "All Deadlines"
+msgstr "All Deadlines"
+
+msgid "Upcoming"
+msgstr "Upcoming"
+
+msgid "This Month"
+msgstr "This Month"
+
+msgid "Past Deadlines"
+msgstr "Past Deadlines"
+
+msgid "DISCO Lazio Scholarships Only"
+msgstr "DISCO Lazio Scholarships Only"
+
+msgid "Deadline:"
+msgstr "Deadline:"
+
+msgid "Learn More"
+msgstr "Learn More"
+
+msgid "No scholarships found."
+msgstr "No scholarships found."
+
+msgid "Discover funding opportunities through the DISCO Lazio program for students in the Lazio region."
+msgstr "Discover funding opportunities through the DISCO Lazio program for students in the Lazio region."
+
+msgid "About DISCO Lazio"
+msgstr "About DISCO Lazio"
+
+msgid "DISCO Lazio is a regional scholarship program designed to support students pursuing higher education in the Lazio region of Italy."
+msgstr "DISCO Lazio is a regional scholarship program designed to support students pursuing higher education in the Lazio region of Italy."
+
+msgid "These scholarships are awarded based on financial need and academic merit. Eligible students can receive financial support to cover tuition fees and living expenses."
+msgstr "These scholarships are awarded based on financial need and academic merit. Eligible students can receive financial support to cover tuition fees and living expenses."
+
+msgid "Available DISCO Lazio Scholarships"
+msgstr "Available DISCO Lazio Scholarships"
+
+msgid "No DISCO Lazio scholarships available at this time."
+msgstr "No DISCO Lazio scholarships available at this time."
+
+# Community Translations
+msgid "Community Forum"
+msgstr "Community Forum"
+
+msgid "Connect, share, and learn with the ASCAI community"
+msgstr "Connect, share, and learn with the ASCAI community"
+
+msgid "New Thread"
+msgstr "New Thread"
+
+msgid "threads"
+msgstr "threads"
+
+msgid "View Threads"
+msgstr "View Threads"
+
+msgid "No categories available yet."
+msgstr "No categories available yet."
+
+msgid "Forum Threads"
+msgstr "Forum Threads"
+
+msgid "Filter by Category"
+msgstr "Filter by Category"
+
+msgid "All Categories"
+msgstr "All Categories"
+
+msgid "Search threads..."
+msgstr "Search threads..."
+
+msgid "Pinned"
+msgstr "Pinned"
+
+msgid "Locked"
+msgstr "Locked"
+
+msgid "views"
+msgstr "views"
+
+# Mentorship Translations
+msgid "Mentor Dashboard"
+msgstr "Mentor Dashboard"
+
+msgid "You need to create a mentor profile first."
+msgstr "You need to create a mentor profile first."
+
+msgid "Create Mentor Profile"
+msgstr "Create Mentor Profile"
+
+msgid "Total Requests"
+msgstr "Total Requests"
+
+msgid "Pending Requests"
+msgstr "Pending Requests"
+
+msgid "Students Helped"
+msgstr "Students Helped"
+
+msgid "Mentorship Requests"
+msgstr "Mentorship Requests"
+
+msgid "No mentorship requests yet."
+msgstr "No mentorship requests yet."
+
+msgid "Mentor"
+msgstr "Mentor"
+
+msgid "Student"
+msgstr "Student"
+
+msgid "Initial Message"
+msgstr "Initial Message"
+
+msgid "Messages"
+msgstr "Messages"
+
+msgid "Waiting for mentor to accept your request."
+msgstr "Waiting for mentor to accept your request."
+
+msgid "This request has been closed."
+msgstr "This request has been closed."

@@ -9,14 +9,17 @@ from .models import Scholarship, SavedScholarship
 @admin.register(Scholarship)
 class ScholarshipAdmin(admin.ModelAdmin):
     """Admin interface for Scholarship model."""
-    list_display = ['title', 'provider', 'amount', 'currency', 'is_disco_lazio', 'status', 'application_deadline', 'created_at']
-    list_filter = ['status', 'is_disco_lazio', 'currency', 'created_at']
+    list_display = ['title', 'provider', 'amount', 'currency', 'level', 'region', 'is_disco_lazio', 'status', 'application_deadline', 'created_at']
+    list_filter = ['status', 'is_disco_lazio', 'level', 'region', 'currency', 'created_at']
     search_fields = ['title', 'provider', 'description']
     prepopulated_fields = {'slug': ('title',)}
     
     fieldsets = (
         (_('Basic Information'), {
             'fields': ('title', 'slug', 'provider', 'description', 'is_disco_lazio')
+        }),
+        (_('Classification'), {
+            'fields': ('level', 'region')
         }),
         (_('Funding Information'), {
             'fields': ('amount', 'currency')

@@ -13,8 +13,8 @@
                 {% if user.avatar %}
                     <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="w-32 h-32 rounded-full mx-auto mb-4">
                 {% else %}
-                    <div class="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                        <span class="text-4xl text-blue-600">{{ user.username|first|upper }}</span>
+                    <div class="w-32 h-32 rounded-full bg-cameroon-green/10 flex items-center justify-center mx-auto mb-4">
+                        <span class="text-4xl text-cameroon-green">{{ user.username|first|upper }}</span>
                     </div>
                 {% endif %}
             </div>

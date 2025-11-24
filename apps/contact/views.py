@@ -24,16 +24,38 @@ class ContactView(FormView):
         
         # Send email
         try:
+            # Prepare email content
+            email_body = f"""
+New contact form submission from ASCAI Lazio website:
+
+From: {submission.name}
+Email: {submission.email}
+{f'Phone: {submission.phone}' if submission.phone else ''}
+Subject: {submission.subject}
+
+Message:
+{submission.message}
+
+---
+This message was sent from the ASCAI Lazio contact form.
+Submitted on: {submission.created_at.strftime('%Y-%m-%d %H:%M:%S')}
+"""
+            
+            # Get contact email from settings (defaults to info@ascailazio.org)
+            contact_email = getattr(settings, 'CONTACT_EMAIL', 'info@ascailazio.org')
+            
             send_mail(
                 subject=f"ASCAI Lazio Contact: {submission.subject}",
-                message=f"From: {submission.name} ({submission.email})\n\n{submission.message}",
+                message=email_body.strip(),
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                recipient_list=[contact_email],
                 fail_silently=False,
             )
         except Exception as e:
             # Log error but don't fail the submission
-            pass
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to send contact email: {str(e)}")
         
         # Handle HTMX requests
         if self.request.headers.get('HX-Request'):

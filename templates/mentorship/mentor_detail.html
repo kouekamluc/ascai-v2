@@ -10,20 +10,20 @@
             {% if mentor.user.avatar %}
             <img src="{{ mentor.user.avatar.url }}" alt="{{ mentor.user.username }}" class="w-24 h-24 rounded-full">
             {% else %}
-            <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
-                <span class="text-4xl text-blue-600">{{ mentor.user.username|first|upper }}</span>
+            <div class="w-24 h-24 bg-cameroon-green/10 rounded-full flex items-center justify-center">
+                <span class="text-4xl text-cameroon-green">{{ mentor.user.username|first|upper }}</span>
             </div>
             {% endif %}
             <div>
                 <h1 class="text-3xl font-bold">{{ mentor.user.get_full_name|default:mentor.user.username }}</h1>
-                <p class="text-xl text-blue-600 font-semibold">{{ mentor.specialization }}</p>
+                <p class="text-xl text-cameroon-green font-semibold">{{ mentor.specialization }}</p>
                 <p class="text-gray-600">⭐ {{ mentor.rating|default:"0.0" }} / 5.0</p>
             </div>
         </div>
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="text-center p-4 bg-blue-50 rounded-lg">
-                <p class="text-2xl font-bold text-blue-600">{{ mentor.years_experience }}</p>
+            <div class="text-center p-4 bg-cameroon-green/10 rounded-lg">
+                <p class="text-2xl font-bold text-cameroon-green">{{ mentor.years_experience }}</p>
                 <p class="text-sm text-gray-600">{% trans 'Years Experience' %}</p>
             </div>
             <div class="text-center p-4 bg-green-50 rounded-lg">
@@ -52,12 +52,12 @@
         
         {% if user.is_authenticated and user.role == 'student' and mentor.availability_status == 'available' %}
             {% if not has_request %}
-        <a href="{% url 'mentorship:request_create' mentor.pk %}" class="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+        <a href="{% url 'mentorship:request_create' mentor.pk %}" class="inline-block px-8 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 font-semibold">
             {% trans 'Request Mentorship' %}
         </a>
             {% else %}
-            <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p class="text-blue-800">{% trans 'You have already sent a mentorship request to this mentor.' %}</p>
+            <div class="p-4 bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg">
+                <p class="text-cameroon-green">{% trans 'You have already sent a mentorship request to this mentor.' %}</p>
             </div>
             {% endif %}
         {% endif %}

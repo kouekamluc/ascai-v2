@@ -1,0 +1,72 @@
+{% load i18n %}
+{% for university in universities %}
+<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+    {% if university.logo %}
+    <img src="{{ university.logo.url }}" alt="{{ university.name }}" class="w-full h-32 object-contain bg-gray-100">
+    {% else %}
+    <div class="w-full h-32 bg-cameroon-green/10 flex items-center justify-center">
+        <svg class="w-12 h-12 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+    </div>
+    {% endif %}
+    <div class="p-6">
+        <h3 class="text-xl font-semibold mb-2">
+            <a href="{% url 'universities:detail' university.slug %}" class="hover:text-cameroon-green">
+                {{ university.name }}
+            </a>
+        </h3>
+        <p class="text-gray-600 text-sm mb-2">
+            <span class="inline-flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                {{ university.get_city_display }}
+            </span>
+        </p>
+        <p class="text-gray-700 text-sm mb-4">{{ university.description|truncatewords:20 }}</p>
+        
+        {% if university.degree_types %}
+        <div class="flex flex-wrap gap-2 mb-4">
+            {% for degree in university.degree_types|slice:":3" %}
+            <span class="px-2 py-1 bg-cameroon-green/10 text-cameroon-green rounded text-xs">{{ degree }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="flex items-center justify-between">
+            <a href="{% url 'universities:detail' university.slug %}" class="text-cameroon-green hover:underline font-semibold">
+                {% trans 'View Details →' %}
+            </a>
+            {% if user.is_authenticated %}
+            <form hx-post="{% url 'universities:toggle_save' university.slug %}" hx-target="this" hx-swap="outerHTML">
+                {% csrf_token %}
+                {% if university.id in saved_university_ids %}
+                <button type="submit" class="text-red-600 hover:text-red-800 text-sm">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+                {% else %}
+                <button type="submit" class="text-gray-400 hover:text-cameroon-green text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </button>
+                {% endif %}
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="col-span-full text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans 'No universities found' %}</h3>
+    <p class="mt-1 text-sm text-gray-500">{% trans 'Try adjusting your filters to see more results.' %}</p>
+</div>
+{% endfor %}
+

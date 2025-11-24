@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Videos' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-6">
+        <a href="{% url 'gallery:index' %}" class="text-cameroon-green hover:underline mb-4 inline-block">
+            ← {% trans 'Back to Gallery' %}
+        </a>
+    </div>
+    
+    <h1 class="text-4xl font-bold mb-8">{% trans 'Videos' %}</h1>
+    
+    {% if videos %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {% for video in videos %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+            <div class="relative aspect-video bg-gray-200">
+                {% if video.thumbnail %}
+                <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-full object-cover">
+                {% elif video.video_type == 'youtube' %}
+                <img src="{{ video.get_thumbnail_url }}" alt="{{ video.title }}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/640x360?text=Video'">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center bg-gray-800">
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                    </svg>
+                </div>
+                {% endif %}
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <button 
+                        onclick="openVideoModal('{{ video.get_embed_url }}', '{{ video.title|escapejs }}')"
+                        class="bg-black bg-opacity-50 rounded-full p-4 hover:bg-opacity-70 transition">
+                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="text-lg font-semibold mb-2">{{ video.title }}</h3>
+                {% if video.description %}
+                <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ video.description }}</p>
+                {% endif %}
+                {% if video.event %}
+                <p class="text-xs text-gray-500 mb-2">
+                    <span class="font-semibold">{% trans 'Event' %}:</span>
+                    <a href="{% url 'diaspora:event_detail' video.event.slug %}" class="text-cameroon-green hover:underline">
+                        {{ video.event.title }}
+                    </a>
+                </p>
+                {% endif %}
+                <p class="text-gray-500 text-xs">{{ video.created_at|date:"d M Y" }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="flex justify-center items-center space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" 
+           class="px-4 py-2 bg-cameroon-green text-white rounded hover:bg-opacity-90">
+            {% trans 'Previous' %}
+        </a>
+        {% endif %}
+        
+        <span class="text-gray-600">
+            {% blocktrans with page=page_obj.number pages=page_obj.paginator.num_pages %}
+            Page {{ page }} of {{ pages }}
+            {% endblocktrans %}
+        </span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" 
+           class="px-4 py-2 bg-cameroon-green text-white rounded hover:bg-opacity-90">
+            {% trans 'Next' %}
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <p class="text-gray-500">{% trans 'No videos available.' %}</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Video Modal -->
+<div id="video-modal" 
+     class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-50"
+     onclick="if(event.target === this) { closeVideoModal(); }">
+    <div class="max-w-4xl w-full p-4 relative">
+        <button 
+            onclick="closeVideoModal()"
+            class="absolute top-2 right-2 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <div class="bg-black rounded-lg overflow-hidden">
+            <div class="aspect-video">
+                <iframe id="video-iframe" 
+                        src="" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                        class="w-full h-full">
+                </iframe>
+            </div>
+            <div class="p-4">
+                <h3 id="video-title" class="text-white text-lg font-semibold"></h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openVideoModal(embedUrl, title) {
+    document.getElementById('video-iframe').src = embedUrl;
+    document.getElementById('video-title').textContent = title;
+    document.getElementById('video-modal').classList.remove('hidden');
+    document.getElementById('video-modal').classList.add('flex');
+}
+
+function closeVideoModal() {
+    document.getElementById('video-iframe').src = '';
+    document.getElementById('video-modal').classList.add('hidden');
+    document.getElementById('video-modal').classList.remove('flex');
+}
+</script>
+{% endblock %}
+

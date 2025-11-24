@@ -5,20 +5,64 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="hero-section text-white py-20 relative">
+    <div class="absolute inset-0 bg-black/20"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center">
             <h1 class="text-4xl md:text-5xl font-bold mb-4">{% trans 'Welcome to ASCAI Lazio' %}</h1>
-            <p class="text-xl mb-8 text-blue-100">
+            <p class="text-xl mb-8 text-white/90">
                 {% trans 'Association of Cameroonian Students and Academics in the Lazio Region, Italy' %}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{% url 'accounts:register' %}" class="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">
+                <a href="{% url 'accounts:register' %}" class="px-6 py-3 bg-cameroon-red text-white rounded-lg font-semibold hover:bg-red-700 transition">
                     {% trans 'Join Community' %}
                 </a>
-                <a href="{% url 'students:index' %}" class="px-6 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">
-                    {% trans 'Learn More' %}
+                <a href="{% url 'accounts:register' %}" class="px-6 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-cameroon-green transition">
+                    {% trans 'Register' %}
                 </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Introduction to Cameroonians in Lazio -->
+<section class="py-16 bg-gradient-to-b from-white to-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-cameroon-green">
+                    {% trans 'Cameroonians in Lazio' %}
+                </h2>
+                <p class="text-lg text-gray-700 mb-4">
+                    {% trans 'The Cameroonian community in Lazio, Italy, represents a vibrant and growing diaspora of students, academics, and professionals. Our community is dedicated to supporting one another through academic excellence, cultural preservation, and mutual assistance.' %}
+                </p>
+                <p class="text-lg text-gray-700 mb-4">
+                    {% trans 'ASCAI Lazio serves as a bridge connecting Cameroonian students and academics across universities in Rome and the wider Lazio region. We provide essential resources, mentorship opportunities, and a supportive network to help our members thrive in their academic and professional journeys.' %}
+                </p>
+                <p class="text-lg text-gray-700">
+                    {% trans 'Through cultural events, academic workshops, and community initiatives, we celebrate our heritage while embracing our role in the Italian academic and social landscape.' %}
+                </p>
+            </div>
+            <div class="bg-cameroon-green/10 rounded-lg p-8 border border-cameroon-green/20">
+                <h3 class="text-2xl font-semibold mb-4 text-cameroon-green">{% trans 'Our Community' %}</h3>
+                <ul class="space-y-3 text-gray-700">
+                    <li class="flex items-start">
+                        <span class="text-cameroon-green mr-3">✓</span>
+                        <span>{% trans 'Students across major universities in Lazio' %}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-cameroon-green mr-3">✓</span>
+                        <span>{% trans 'Academics and researchers in various fields' %}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-cameroon-green mr-3">✓</span>
+                        <span>{% trans 'Professionals contributing to Italian society' %}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-cameroon-green mr-3">✓</span>
+                        <span>{% trans 'Cultural ambassadors promoting diversity' %}</span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -29,19 +73,19 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-center mb-12">{% trans 'Our Mission' %}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center p-6 bg-blue-50 rounded-lg">
+            <div class="text-center p-6 bg-cameroon-green/10 rounded-lg border border-cameroon-green/20">
                 <div class="text-4xl mb-4">🎓</div>
-                <h3 class="text-xl font-semibold mb-2">{% trans 'Academic Support' %}</h3>
+                <h3 class="text-xl font-semibold mb-2 text-cameroon-green">{% trans 'Academic Support' %}</h3>
                 <p class="text-gray-600">{% trans 'Supporting Cameroonian students in Lazio with information, guidance, and resources.' %}</p>
             </div>
-            <div class="text-center p-6 bg-blue-50 rounded-lg">
+            <div class="text-center p-6 bg-cameroon-green/10 rounded-lg border border-cameroon-green/20">
                 <div class="text-4xl mb-4">🤝</div>
-                <h3 class="text-xl font-semibold mb-2">{% trans 'Community Unity' %}</h3>
+                <h3 class="text-xl font-semibold mb-2 text-cameroon-green">{% trans 'Community Unity' %}</h3>
                 <p class="text-gray-600">{% trans 'Promoting diaspora unity, cultural exchange, and integration.' %}</p>
             </div>
-            <div class="text-center p-6 bg-blue-50 rounded-lg">
+            <div class="text-center p-6 bg-cameroon-green/10 rounded-lg border border-cameroon-green/20">
                 <div class="text-4xl mb-4">💼</div>
-                <h3 class="text-xl font-semibold mb-2">{% trans 'Opportunities' %}</h3>
+                <h3 class="text-xl font-semibold mb-2 text-cameroon-green">{% trans 'Opportunities' %}</h3>
                 <p class="text-gray-600">{% trans 'Providing mentorship, orientation, and scholarship opportunities.' %}</p>
             </div>
         </div>
@@ -54,11 +98,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-3xl font-bold">{% trans 'Latest News' %}</h2>
-            <a href="{% url 'diaspora:news_list' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+            <a href="{% url 'diaspora:news_list' %}" class="text-cameroon-green hover:text-cameroon-red font-semibold">
                 {% trans 'View All' %} →
             </a>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="news-container">
             {% for news in latest_news %}
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                 {% if news.image %}
@@ -67,7 +111,7 @@
                 <div class="p-6">
                     <span class="text-sm text-gray-500">{{ news.published_at|date:"d M Y" }}</span>
                     <h3 class="text-xl font-semibold mt-2 mb-2">
-                        <a href="{% url 'diaspora:news_detail' news.slug %}" class="hover:text-blue-600">
+                        <a href="{% url 'diaspora:news_detail' news.slug %}" class="hover:text-cameroon-green">
                             {{ news.title }}
                         </a>
                     </h3>
@@ -75,6 +119,11 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+        <!-- HTMX Loading Indicator for News -->
+        <div class="htmx-indicator text-center py-4">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cameroon-green"></div>
+            <p class="mt-2 text-gray-600">{% trans 'Loading news...' %}</p>
         </div>
     </div>
 </section>
@@ -86,11 +135,14 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-3xl font-bold">{% trans 'Upcoming Events' %}</h2>
-            <a href="{% url 'diaspora:event_list' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+            <a href="{% url 'diaspora:event_list' %}" class="text-cameroon-green hover:text-cameroon-red font-semibold">
                 {% trans 'View All' %} →
             </a>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div 
+            id="events-container"
+            class="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
             {% for event in upcoming_events %}
             <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition">
                 {% if event.image %}
@@ -101,13 +153,13 @@
                         📅 {{ event.start_datetime|date:"d M Y, H:i" }}
                     </div>
                     <h3 class="text-xl font-semibold mb-2">
-                        <a href="{% url 'diaspora:event_detail' event.slug %}" class="hover:text-blue-600">
+                        <a href="{% url 'diaspora:event_detail' event.slug %}" class="hover:text-cameroon-green">
                             {{ event.title }}
                         </a>
                     </h3>
                     <p class="text-gray-600 mb-4">{{ event.description|truncatewords:15|striptags }}</p>
                     {% if event.registration_required %}
-                    <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
+                    <span class="inline-block px-3 py-1 bg-cameroon-yellow/20 text-cameroon-yellow text-sm rounded-full border border-cameroon-yellow/30">
                         {% trans 'Registration Required' %}
                     </span>
                     {% endif %}
@@ -115,6 +167,24 @@
             </div>
             {% endfor %}
         </div>
+        <!-- HTMX Loading Indicator for Events -->
+        <div class="htmx-indicator text-center py-4">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cameroon-green"></div>
+            <p class="mt-2 text-gray-600">{% trans 'Loading events...' %}</p>
+        </div>
+        <!-- Load More Button (HTMX Infinite Scroll) -->
+        {% if upcoming_events|length >= 6 %}
+        <div class="text-center mt-8" id="load-more-events">
+            <div 
+                hx-get="{% url 'core:events_load_more' %}?offset=6"
+                hx-trigger="revealed"
+                hx-swap="afterend"
+                hx-indicator=".htmx-indicator"
+            >
+                <!-- Auto-loads when scrolled into view -->
+            </div>
+        </div>
+        {% endif %}
     </div>
 </section>
 {% endif %}
@@ -124,7 +194,7 @@
 <section class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-center mb-12">{% trans 'Success Stories' %}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container">
             {% for story in success_stories %}
             <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
                 {% if story.image %}
@@ -132,24 +202,29 @@
                 {% endif %}
                 <h3 class="text-xl font-semibold mb-2">{{ story.title }}</h3>
                 <p class="text-gray-600">{{ story.content|truncatewords:25|striptags }}</p>
-                <a href="{% url 'diaspora:news_detail' story.slug %}" class="text-blue-600 hover:text-blue-800 font-semibold mt-4 inline-block">
+                <a href="{% url 'diaspora:news_detail' story.slug %}" class="text-cameroon-green hover:text-cameroon-red font-semibold mt-4 inline-block">
                     {% trans 'Read More' %} →
                 </a>
             </div>
             {% endfor %}
+        </div>
+        <!-- HTMX Loading Indicator for Success Stories -->
+        <div class="htmx-indicator text-center py-4">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cameroon-green"></div>
+            <p class="mt-2 text-gray-600">{% trans 'Loading stories...' %}</p>
         </div>
     </div>
 </section>
 {% endif %}
 
 <!-- CTA Section -->
-<section class="py-16 bg-blue-600 text-white">
+<section class="py-16 bg-cameroon-green text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl font-bold mb-4">{% trans 'Join Our Community' %}</h2>
-        <p class="text-xl mb-8 text-blue-100">
+        <p class="text-xl mb-8 text-white/90">
             {% trans 'Connect with fellow Cameroonian students and academics in Lazio' %}
         </p>
-        <a href="{% url 'accounts:register' %}" class="inline-block px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">
+        <a href="{% url 'accounts:register' %}" class="inline-block px-8 py-3 bg-cameroon-red text-white rounded-lg font-semibold hover:bg-red-700 transition">
             {% trans 'Register Now' %}
         </a>
     </div>

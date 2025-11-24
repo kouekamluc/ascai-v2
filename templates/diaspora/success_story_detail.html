@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ story.title }} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <article class="bg-white rounded-lg shadow-lg p-8">
+        {% if story.featured_image %}
+        <div class="mb-8 -mx-8 -mt-8">
+            <img src="{{ story.featured_image.url }}" alt="{{ story.title }}" class="w-full h-96 object-cover">
+        </div>
+        {% endif %}
+        
+        <h1 class="text-4xl font-bold mb-6 text-gray-900">{{ story.title }}</h1>
+        
+        <div class="mb-6 p-4 bg-cameroon-green/5 border-l-4 border-cameroon-green rounded-lg">
+            <p class="text-lg text-gray-900">
+                <strong>{{ story.person_name }}</strong>
+                {% if story.person_title %}
+                <span class="text-gray-700"> - {{ story.person_title }}</span>
+                {% endif %}
+            </p>
+        </div>
+        
+        <div class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-cameroon-green prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 mb-6">
+            {{ story.story|safe }}
+        </div>
+        
+        <!-- Additional Images -->
+        {% if story.additional_images.all %}
+        <div class="mt-8 pt-8 border-t border-gray-200">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">{% trans 'Gallery' %}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for image in story.additional_images.all %}
+                <div class="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                    <img src="{{ image.image.url }}" alt="{{ image.caption|default:story.title }}" class="w-full h-64 object-cover">
+                    {% if image.caption %}
+                    <p class="text-sm text-gray-600 mt-3 px-2">{{ image.caption }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </article>
+    
+    <!-- Related Stories -->
+    {% if related_stories %}
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Related Success Stories' %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for related in related_stories %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                {% if related.featured_image %}
+                <img src="{{ related.featured_image.url }}" alt="{{ related.title }}" class="w-full h-32 object-cover">
+                {% endif %}
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold">
+                        <a href="{% url 'diaspora:success_story_detail' related.slug %}" class="hover:text-cameroon-green">
+                            {{ related.title }}
+                        </a>
+                    </h3>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

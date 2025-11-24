@@ -5,24 +5,38 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-4xl font-bold">{% trans 'Community Forum' %}</h1>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">{% trans 'Community Forum' %}</h1>
+            <p class="text-gray-600">{% trans 'Connect, share, and learn with the ASCAI community' %}</p>
+        </div>
         {% if user.is_authenticated %}
-        <a href="{% url 'community:thread_create' %}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <a href="{% url 'community:thread_create' %}" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition-colors duration-200 font-medium shadow-md hover:shadow-lg">
             {% trans 'New Thread' %}
         </a>
         {% endif %}
     </div>
     
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for category in categories %}
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold mb-2">{{ category.name }}</h2>
-            <p class="text-gray-600 mb-4">{{ category.description|truncatewords:15 }}</p>
-            <p class="text-sm text-gray-500">{{ category.thread_count }} {% trans 'threads' %}</p>
-            <a href="{% url 'community:thread_list' %}?category={{ category.slug }}" class="text-blue-600 hover:underline mt-4 inline-block">
-                {% trans 'View Threads' %} →
+        <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 p-6 border border-gray-100 hover:border-cameroon-green/20">
+            <div class="flex items-start justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-900">{{ category.name }}</h2>
+                <span class="px-3 py-1 bg-cameroon-green/10 text-cameroon-green rounded-full text-xs font-medium">
+                    {{ category.thread_count }} {% trans 'threads' %}
+                </span>
+            </div>
+            <p class="text-gray-600 mb-6 min-h-[3rem]">{{ category.description|truncatewords:15 }}</p>
+            <a href="{% url 'community:thread_list' %}?category={{ category.slug }}" class="inline-flex items-center text-cameroon-green hover:text-cameroon-green/80 font-medium transition-colors duration-200 group">
+                {% trans 'View Threads' %}
+                <svg class="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
             </a>
+        </div>
+        {% empty %}
+        <div class="col-span-full bg-white rounded-lg shadow-md p-12 text-center">
+            <p class="text-gray-500 text-lg">{% trans 'No categories available yet.' %}</p>
         </div>
         {% endfor %}
     </div>

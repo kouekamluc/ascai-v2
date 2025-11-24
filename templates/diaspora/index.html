@@ -5,41 +5,283 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold mb-8">{% trans 'Diaspora' %}</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Latest News -->
-        <div>
-            <h2 class="text-2xl font-semibold mb-4">{% trans 'Latest News' %}</h2>
-            {% if latest_news %}
-                {% for news in latest_news %}
-                <div class="bg-white rounded-lg shadow p-4 mb-4">
-                    <h3><a href="{% url 'diaspora:news_detail' news.slug %}" class="text-blue-600 hover:underline">{{ news.title }}</a></h3>
-                    <p class="text-sm text-gray-500">{{ news.published_at|date:"d M Y" }}</p>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>{% trans 'No news available.' %}</p>
-            {% endif %}
-            <a href="{% url 'diaspora:news_list' %}" class="text-blue-600 hover:underline">{% trans 'View All News' %}</a>
-        </div>
-        
-        <!-- Upcoming Events -->
-        <div>
-            <h2 class="text-2xl font-semibold mb-4">{% trans 'Upcoming Events' %}</h2>
-            {% if upcoming_events %}
-                {% for event in upcoming_events %}
-                <div class="bg-white rounded-lg shadow p-4 mb-4">
-                    <h3><a href="{% url 'diaspora:event_detail' event.slug %}" class="text-blue-600 hover:underline">{{ event.title }}</a></h3>
-                    <p class="text-sm text-gray-500">{{ event.start_datetime|date:"d M Y, H:i" }}</p>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>{% trans 'No upcoming events.' %}</p>
-            {% endif %}
-            <a href="{% url 'diaspora:event_list' %}" class="text-blue-600 hover:underline">{% trans 'View All Events' %}</a>
-        </div>
+    <!-- Hero Section -->
+    <div class="text-center mb-16">
+        <h1 class="text-5xl font-bold mb-4 text-cameroon-green">{% trans 'Diaspora Community' %}</h1>
+        <p class="text-xl text-gray-700 max-w-3xl mx-auto">{% trans 'Connect with Cameroonians in Lazio, discover success stories, and learn about life in Italy.' %}</p>
     </div>
+    
+    <!-- Latest News Section -->
+    <section class="mb-16">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">{% trans 'Latest News' %}</h2>
+            <a href="{% url 'diaspora:news_list' %}" class="text-cameroon-green hover:text-cameroon-green/80 font-semibold transition-colors flex items-center gap-2">
+                {% trans 'View All News' %}
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+        {% if latest_news %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for news in latest_news %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                {% if news.image %}
+                <div class="relative h-48 overflow-hidden">
+                    <img src="{{ news.image.url }}" alt="{{ news.title }}" class="w-full h-full object-cover">
+                </div>
+                {% else %}
+                <div class="h-48 bg-gradient-to-br from-cameroon-green/20 to-cameroon-green/5 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-cameroon-green/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                    </svg>
+                </div>
+                {% endif %}
+                <div class="p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-sm text-gray-500">{{ news.published_at|date:"d M Y" }}</span>
+                        <span class="px-2 py-1 bg-cameroon-green/10 text-cameroon-green text-xs rounded-full font-medium">
+                            {{ news.get_category_display }}
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 line-clamp-2">
+                        <a href="{% url 'diaspora:news_detail' news.slug %}" class="text-gray-900 hover:text-cameroon-green transition-colors">
+                            {{ news.title }}
+                        </a>
+                    </h3>
+                    <p class="text-gray-600 line-clamp-3">{{ news.content|truncatewords:20|striptags }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+            </svg>
+            <p class="text-gray-500 text-lg">{% trans 'No news available.' %}</p>
+        </div>
+        {% endif %}
+    </section>
+    
+    <!-- Upcoming Events Section -->
+    <section class="mb-16">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">{% trans 'Upcoming Events' %}</h2>
+            <a href="{% url 'diaspora:event_list' %}" class="text-cameroon-green hover:text-cameroon-green/80 font-semibold transition-colors flex items-center gap-2">
+                {% trans 'View All Events' %}
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+        {% if upcoming_events %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for event in upcoming_events %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                {% if event.image %}
+                <div class="relative h-48 overflow-hidden">
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="w-full h-full object-cover">
+                </div>
+                {% else %}
+                <div class="h-48 bg-gradient-to-br from-cameroon-red/20 to-cameroon-red/5 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-cameroon-red/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                {% endif %}
+                <div class="p-6">
+                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                        <svg class="w-4 h-4 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>{{ event.start_datetime|date:"d M Y, H:i" }}</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 line-clamp-2">
+                        <a href="{% url 'diaspora:event_detail' event.slug %}" class="text-gray-900 hover:text-cameroon-green transition-colors">
+                            {{ event.title }}
+                        </a>
+                    </h3>
+                    <p class="text-gray-600 mb-3 line-clamp-2">{{ event.description|truncatewords:20|striptags }}</p>
+                    <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>{{ event.location }}</span>
+                    </div>
+                    {% if event.registration_required %}
+                    <span class="inline-block mt-3 px-3 py-1 bg-cameroon-green/10 text-cameroon-green text-xs rounded-full font-medium">
+                        {% trans 'Registration Required' %}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="text-gray-500 text-lg">{% trans 'No upcoming events.' %}</p>
+        </div>
+        {% endif %}
+    </section>
+    
+    <!-- Success Stories Section -->
+    <section class="mb-16">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">{% trans 'Success Stories' %}</h2>
+            <a href="{% url 'diaspora:success_story_list' %}" class="text-cameroon-green hover:text-cameroon-green/80 font-semibold transition-colors flex items-center gap-2">
+                {% trans 'View All Stories' %}
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+        {% if featured_success_stories %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for story in featured_success_stories %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                {% if story.featured_image %}
+                <div class="relative h-48 overflow-hidden">
+                    <img src="{{ story.featured_image.url }}" alt="{{ story.title }}" class="w-full h-full object-cover">
+                </div>
+                {% else %}
+                <div class="h-48 bg-gradient-to-br from-cameroon-yellow/20 to-cameroon-yellow/5 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-cameroon-yellow/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                </div>
+                {% endif %}
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-3 line-clamp-2">
+                        <a href="{% url 'diaspora:success_story_detail' story.slug %}" class="text-gray-900 hover:text-cameroon-green transition-colors">
+                            {{ story.title }}
+                        </a>
+                    </h3>
+                    <p class="text-gray-700 font-medium mb-2">{{ story.person_name }}{% if story.person_title %} - {{ story.person_title }}{% endif %}</p>
+                    <p class="text-gray-600 line-clamp-3">{{ story.story|truncatewords:25|striptags }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+            </svg>
+            <p class="text-gray-500 text-lg">{% trans 'No success stories available.' %}</p>
+        </div>
+        {% endif %}
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="mb-16">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">{% trans 'Testimonials from Cameroonians in Lazio' %}</h2>
+            <a href="{% url 'diaspora:testimonial_list' %}" class="text-cameroon-green hover:text-cameroon-green/80 font-semibold transition-colors flex items-center gap-2">
+                {% trans 'View All Testimonials' %}
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+        {% if featured_testimonials %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for testimonial in featured_testimonials %}
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center mb-4">
+                    {% if testimonial.image %}
+                    <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" class="w-16 h-16 rounded-full object-cover mr-4 ring-2 ring-cameroon-green/20">
+                    {% else %}
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-cameroon-green to-cameroon-green/80 flex items-center justify-center mr-4 ring-2 ring-cameroon-green/20">
+                        <span class="text-2xl text-white font-semibold">{{ testimonial.name|first|upper }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-900">{{ testimonial.name }}</h3>
+                        {% if testimonial.title %}
+                        <p class="text-sm text-gray-600">{{ testimonial.title }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <svg class="w-8 h-8 text-cameroon-green/30 mb-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-10z"/>
+                    </svg>
+                    <p class="text-gray-700 italic line-clamp-4">"{{ testimonial.testimonial|truncatewords:35 }}"</p>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-gray-500 pt-4 border-t border-gray-100">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>{{ testimonial.location }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+            <p class="text-gray-500 text-lg">{% trans 'No testimonials available.' %}</p>
+        </div>
+        {% endif %}
+    </section>
+    
+    <!-- Life in Italy Section -->
+    <section class="mb-16">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">{% trans 'Life in Italy' %}</h2>
+            <a href="{% url 'diaspora:life_in_italy_list' %}" class="text-cameroon-green hover:text-cameroon-green/80 font-semibold transition-colors flex items-center gap-2">
+                {% trans 'View All Articles' %}
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+        {% if featured_life_in_italy %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for article in featured_life_in_italy %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                {% if article.image %}
+                <div class="relative h-48 overflow-hidden">
+                    <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-full object-cover">
+                </div>
+                {% else %}
+                <div class="h-48 bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+                {% endif %}
+                <div class="p-6">
+                    <span class="inline-block px-3 py-1 bg-cameroon-green/10 text-cameroon-green text-xs rounded-full font-medium mb-3">
+                        {{ article.get_category_display }}
+                    </span>
+                    <h3 class="text-xl font-semibold mb-3 line-clamp-2">
+                        <a href="{% url 'diaspora:life_in_italy_detail' article.slug %}" class="text-gray-900 hover:text-cameroon-green transition-colors">
+                            {{ article.title }}
+                        </a>
+                    </h3>
+                    <p class="text-gray-600 line-clamp-3">{{ article.content|truncatewords:25|striptags }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <p class="text-gray-500 text-lg">{% trans 'No articles available.' %}</p>
+        </div>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}
 

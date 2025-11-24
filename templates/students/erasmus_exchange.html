@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Erasmus & Exchange Programs' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-4">{% trans 'Erasmus & Exchange Programs' %}</h1>
+        <p class="text-lg text-gray-600">
+            {% trans 'Information about Erasmus+ and international exchange programs available to students in Lazio universities.' %}
+        </p>
+    </div>
+
+    <!-- Erasmus+ Overview -->
+    <section class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <div class="flex items-center mb-6">
+            <div class="w-16 h-16 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                <svg class="w-8 h-8 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold">{% trans 'Erasmus+ Program' %}</h2>
+        </div>
+        <p class="text-gray-700 mb-4">
+            {% trans 'Erasmus+ is the European Union\'s program to support education, training, youth, and sport in Europe. It provides opportunities for students to study, train, and gain experience abroad.' %}
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div>
+                <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Benefits' %}</h3>
+                <ul class="text-gray-700 space-y-2">
+                    <li>• {% trans 'Study abroad for 3-12 months' %}</li>
+                    <li>• {% trans 'Monthly grant to cover living costs' %}</li>
+                    <li>• {% trans 'Tuition fees waived at host university' %}</li>
+                    <li>• {% trans 'Academic recognition of studies abroad' %}</li>
+                    <li>• {% trans 'Language support and cultural integration' %}</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Eligibility' %}</h3>
+                <ul class="text-gray-700 space-y-2">
+                    <li>• {% trans 'Enrolled in a higher education institution' %}</li>
+                    <li>• {% trans 'At least in second year of studies' %}</li>
+                    <li>• {% trans 'Your university must have an Erasmus+ agreement' %}</li>
+                    <li>• {% trans 'Meet academic requirements set by your university' %}</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Exchange Programs -->
+    <section class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <h2 class="text-3xl font-bold mb-6">{% trans 'International Exchange Programs' %}</h2>
+        <p class="text-gray-700 mb-6">
+            {% trans 'Many universities in Lazio participate in bilateral exchange agreements with universities worldwide, offering students opportunities to study abroad.' %}
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="font-semibold mb-3">{% trans 'Bilateral Agreements' %}</h3>
+                <p class="text-gray-700 text-sm mb-4">
+                    {% trans 'Direct exchange agreements between Lazio universities and partner institutions worldwide.' %}
+                </p>
+                <ul class="text-gray-700 space-y-1 text-sm">
+                    <li>• {% trans 'Semester or full-year exchanges' %}</li>
+                    <li>• {% trans 'Tuition fee waivers' %}</li>
+                    <li>• {% trans 'Credit transfer arrangements' %}</li>
+                </ul>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="font-semibold mb-3">{% trans 'Summer Programs' %}</h3>
+                <p class="text-gray-700 text-sm mb-4">
+                    {% trans 'Short-term study abroad opportunities during summer months.' %}
+                </p>
+                <ul class="text-gray-700 space-y-1 text-sm">
+                    <li>• {% trans '4-8 week programs' %}</li>
+                    <li>• {% trans 'Intensive language courses' %}</li>
+                    <li>• {% trans 'Cultural immersion experiences' %}</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Apply -->
+    <section class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <h2 class="text-3xl font-bold mb-6">{% trans 'How to Apply' %}</h2>
+        <div class="space-y-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-8 h-8 bg-cameroon-green text-white rounded-full flex items-center justify-center font-bold mr-4">1</div>
+                <div>
+                    <h3 class="font-semibold mb-2">{% trans 'Check Your University\'s International Office' %}</h3>
+                    <p class="text-gray-700 text-sm">
+                        {% trans 'Contact your university\'s international relations or mobility office to learn about available exchange programs and partnerships.' %}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-8 h-8 bg-cameroon-green text-white rounded-full flex items-center justify-center font-bold mr-4">2</div>
+                <div>
+                    <h3 class="font-semibold mb-2">{% trans 'Review Eligibility Requirements' %}</h3>
+                    <p class="text-gray-700 text-sm">
+                        {% trans 'Each program has specific requirements including GPA, language proficiency, and academic standing. Ensure you meet all criteria.' %}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-8 h-8 bg-cameroon-green text-white rounded-full flex items-center justify-center font-bold mr-4">3</div>
+                <div>
+                    <h3 class="font-semibold mb-2">{% trans 'Prepare Application Documents' %}</h3>
+                    <p class="text-gray-700 text-sm">
+                        {% trans 'Gather transcripts, language certificates, motivation letter, and letters of recommendation. Check specific requirements for each program.' %}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-8 h-8 bg-cameroon-green text-white rounded-full flex items-center justify-center font-bold mr-4">4</div>
+                <div>
+                    <h3 class="font-semibold mb-2">{% trans 'Submit Application Before Deadline' %}</h3>
+                    <p class="text-gray-700 text-sm">
+                        {% trans 'Exchange programs typically have early application deadlines. Submit your complete application well in advance.' %}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-8 h-8 bg-cameroon-green text-white rounded-full flex items-center justify-center font-bold mr-4">5</div>
+                <div>
+                    <h3 class="font-semibold mb-2">{% trans 'Prepare for Your Exchange' %}</h3>
+                    <p class="text-gray-700 text-sm">
+                        {% trans 'Once accepted, complete visa requirements, arrange accommodation, and attend pre-departure orientation sessions.' %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Useful Links -->
+    <section class="bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg p-8 mb-8">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Useful Links & Resources' %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a href="https://erasmus-plus.ec.europa.eu/" target="_blank" rel="noopener noreferrer" class="bg-white rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Erasmus+ Official Website' %}</div>
+                <div class="text-sm text-gray-600">{% trans 'Official information about the Erasmus+ program' %}</div>
+            </a>
+            <a href="https://www.study-in-italy.it/" target="_blank" rel="noopener noreferrer" class="bg-white rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Study in Italy' %}</div>
+                <div class="text-sm text-gray-600">{% trans 'Information for international students in Italy' %}</div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact Information -->
+    <section class="bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-2xl font-bold mb-4">{% trans 'Need Help?' %}</h2>
+        <p class="text-gray-700 mb-4">
+            {% trans 'For questions about exchange programs, contact your university\'s international office or reach out to ASCAI Lazio for guidance and support.' %}
+        </p>
+        <div class="flex gap-4">
+            <a href="{% url 'contact:index' %}" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                {% trans 'Contact Us' %}
+            </a>
+            <a href="{% url 'community:index' %}" class="px-6 py-3 border border-cameroon-green text-cameroon-green rounded-lg hover:bg-cameroon-green/10">
+                {% trans 'Ask in Forum' %}
+            </a>
+        </div>
+    </section>
+
+    <!-- Back to Guide -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'students:index' %}" class="inline-block px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans '← Back to Complete Guide' %}
+        </a>
+    </div>
+</div>
+{% endblock %}
+

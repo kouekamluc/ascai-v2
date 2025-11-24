@@ -1,30 +1,220 @@
 {% load i18n %}
-{% for university in universities %}
-<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-    {% if university.logo %}
-    <img src="{{ university.logo.url }}" alt="{{ university.name }}" class="w-full h-32 object-contain bg-gray-100">
-    {% endif %}
-    <div class="p-6">
-        <h3 class="text-xl font-semibold mb-2">
-            <a href="{% url 'universities:detail' university.slug %}" class="hover:text-blue-600">
-                {{ university.name }}
-            </a>
-        </h3>
-        <p class="text-gray-600 text-sm mb-2">{{ university.get_city_display }}</p>
-        <p class="text-gray-700">{{ university.description|truncatewords:20 }}</p>
-        {% if user.is_authenticated %}
-        <form hx-post="{% url 'universities:toggle_save' university.slug %}" hx-target="this" hx-swap="outerHTML" class="mt-4">
-            {% csrf_token %}
-            {% if university.id in saved_university_ids %}
-            <button type="submit" class="text-red-600 hover:text-red-800">{% trans 'Remove from Favorites' %}</button>
-            {% else %}
-            <button type="submit" class="text-blue-600 hover:text-blue-800">{% trans 'Save to Favorites' %}</button>
-            {% endif %}
-        </form>
+<div id="university-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+{% if page_obj %}
+    {% for university in page_obj %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+        {% if university.logo %}
+        <img src="{{ university.logo.url }}" alt="{{ university.name }}" class="w-full h-32 object-contain bg-gray-100">
+        {% else %}
+        <div class="w-full h-32 bg-gradient-to-br from-cameroon-green/10 to-cameroon-green/5 flex items-center justify-center">
+            <span class="text-4xl font-bold text-cameroon-green/30">{{ university.name|first }}</span>
+        </div>
         {% endif %}
+        <div class="p-6">
+            <h3 class="text-xl font-semibold mb-2">
+                <a href="{% url 'universities:detail' university.slug %}" class="hover:text-cameroon-green transition">
+                    {{ university.name }}
+                </a>
+            </h3>
+            <p class="text-gray-600 text-sm mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                {{ university.get_city_display }}
+            </p>
+            <p class="text-gray-700 text-sm mb-4 line-clamp-3">{{ university.description|truncatewords:25 }}</p>
+            
+            <!-- Degree Types -->
+            {% if university.degree_types %}
+            <div class="flex flex-wrap gap-2 mb-4">
+                {% for degree in university.degree_types|slice:":3" %}
+                <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                    {{ degree }}
+                </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Tuition Range -->
+            {% if university.tuition_range_min or university.tuition_range_max %}
+            <p class="text-sm text-gray-600 mb-4">
+                <span class="font-semibold">{% trans 'Tuition:' %}</span>
+                {% if university.tuition_range_min and university.tuition_range_max %}
+                €{{ university.tuition_range_min }} - €{{ university.tuition_range_max }}
+                {% elif university.tuition_range_min %}
+                {% trans 'From' %} €{{ university.tuition_range_min }}
+                {% elif university.tuition_range_max %}
+                {% trans 'Up to' %} €{{ university.tuition_range_max }}
+                {% endif %}
+            </p>
+            {% endif %}
+            
+            <!-- Save to Favorites (Students Only) -->
+            {% if user.is_authenticated and user.is_student %}
+            <form hx-post="{% url 'universities:toggle_save' university.slug %}" 
+                  hx-target="#save-btn-{{ university.id }}" 
+                  hx-swap="outerHTML" 
+                  class="mt-4">
+                {% csrf_token %}
+                <div id="save-btn-{{ university.id }}">
+                    {% if university.id in saved_university_ids %}
+                    <button type="submit" class="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-medium flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                        </svg>
+                        {% trans 'Remove from Favorites' %}
+                    </button>
+                    {% else %}
+                    <button type="submit" class="w-full px-4 py-2 bg-cameroon-green/10 text-cameroon-green rounded-lg hover:bg-cameroon-green/20 transition text-sm font-medium flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        {% trans 'Save to Favorites' %}
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+            {% endif %}
+            
+            <a href="{% url 'universities:detail' university.slug %}" 
+               class="mt-4 inline-block w-full text-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition text-sm font-medium">
+                {% trans 'View Details' %}
+            </a>
+        </div>
     </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans 'No universities found' %}</h3>
+        <p class="mt-1 text-sm text-gray-500">{% trans 'Try adjusting your filters or search terms.' %}</p>
+    </div>
+    {% endfor %}
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="col-span-full mt-8 flex justify-center">
+        <nav class="flex space-x-2">
+            {% if page_obj.has_previous %}
+            <a hx-get="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if filter_city %}&city={{ filter_city }}{% endif %}{% if filter_degree_type %}&degree_type={{ filter_degree_type }}{% endif %}{% if filter_field %}&field={{ filter_field }}{% endif %}{% if filter_tuition_min %}&tuition_min={{ filter_tuition_min }}{% endif %}{% if filter_tuition_max %}&tuition_max={{ filter_tuition_max }}{% endif %}"
+               hx-target="#university-list-container"
+               hx-push-url="true"
+               hx-indicator="#loading"
+               class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                {% trans 'Previous' %}
+            </a>
+            {% endif %}
+            
+            <span class="px-4 py-2 bg-cameroon-green text-white rounded-lg">
+                {% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a hx-get="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if filter_city %}&city={{ filter_city }}{% endif %}{% if filter_degree_type %}&degree_type={{ filter_degree_type }}{% endif %}{% if filter_field %}&field={{ filter_field }}{% endif %}{% if filter_tuition_min %}&tuition_min={{ filter_tuition_min }}{% endif %}{% if filter_tuition_max %}&tuition_max={{ filter_tuition_max }}{% endif %}"
+               hx-target="#university-list-container"
+               hx-push-url="true"
+               hx-indicator="#loading"
+               class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                {% trans 'Next' %}
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+{% else %}
+    {% for university in universities %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+        {% if university.logo %}
+        <img src="{{ university.logo.url }}" alt="{{ university.name }}" class="w-full h-32 object-contain bg-gray-100">
+        {% else %}
+        <div class="w-full h-32 bg-gradient-to-br from-cameroon-green/10 to-cameroon-green/5 flex items-center justify-center">
+            <span class="text-4xl font-bold text-cameroon-green/30">{{ university.name|first }}</span>
+        </div>
+        {% endif %}
+        <div class="p-6">
+            <h3 class="text-xl font-semibold mb-2">
+                <a href="{% url 'universities:detail' university.slug %}" class="hover:text-cameroon-green transition">
+                    {{ university.name }}
+                </a>
+            </h3>
+            <p class="text-gray-600 text-sm mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                {{ university.get_city_display }}
+            </p>
+            <p class="text-gray-700 text-sm mb-4 line-clamp-3">{{ university.description|truncatewords:25 }}</p>
+            
+            <!-- Degree Types -->
+            {% if university.degree_types %}
+            <div class="flex flex-wrap gap-2 mb-4">
+                {% for degree in university.degree_types|slice:":3" %}
+                <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                    {{ degree }}
+                </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Tuition Range -->
+            {% if university.tuition_range_min or university.tuition_range_max %}
+            <p class="text-sm text-gray-600 mb-4">
+                <span class="font-semibold">{% trans 'Tuition:' %}</span>
+                {% if university.tuition_range_min and university.tuition_range_max %}
+                €{{ university.tuition_range_min }} - €{{ university.tuition_range_max }}
+                {% elif university.tuition_range_min %}
+                {% trans 'From' %} €{{ university.tuition_range_min }}
+                {% elif university.tuition_range_max %}
+                {% trans 'Up to' %} €{{ university.tuition_range_max }}
+                {% endif %}
+            </p>
+            {% endif %}
+            
+            <!-- Save to Favorites (Students Only) -->
+            {% if user.is_authenticated and user.is_student %}
+            <form hx-post="{% url 'universities:toggle_save' university.slug %}" 
+                  hx-target="#save-btn-{{ university.id }}" 
+                  hx-swap="outerHTML" 
+                  class="mt-4">
+                {% csrf_token %}
+                <div id="save-btn-{{ university.id }}">
+                    {% if university.id in saved_university_ids %}
+                    <button type="submit" class="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-medium flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                        </svg>
+                        {% trans 'Remove from Favorites' %}
+                    </button>
+                    {% else %}
+                    <button type="submit" class="w-full px-4 py-2 bg-cameroon-green/10 text-cameroon-green rounded-lg hover:bg-cameroon-green/20 transition text-sm font-medium flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        {% trans 'Save to Favorites' %}
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+            {% endif %}
+            
+            <a href="{% url 'universities:detail' university.slug %}" 
+               class="mt-4 inline-block w-full text-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition text-sm font-medium">
+                {% trans 'View Details' %}
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans 'No universities found' %}</h3>
+        <p class="mt-1 text-sm text-gray-500">{% trans 'Try adjusting your filters or search terms.' %}</p>
+    </div>
+    {% endfor %}
+{% endif %}
 </div>
-{% empty %}
-<p>{% trans 'No universities found.' %}</p>
-{% endfor %}
 

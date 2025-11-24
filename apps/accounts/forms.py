@@ -14,7 +14,7 @@ class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',
             'placeholder': _('Email address')
         })
     )
@@ -23,7 +23,7 @@ class CustomUserCreationForm(UserCreationForm):
         required=False,
         max_length=20,
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',
             'placeholder': _('Phone number (optional)')
         })
     )
@@ -31,7 +31,7 @@ class CustomUserCreationForm(UserCreationForm):
     role = forms.ChoiceField(
         choices=[('student', _('Student')), ('mentor', _('Mentor'))],
         widget=forms.Select(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent'
         })
     )
     
@@ -39,7 +39,7 @@ class CustomUserCreationForm(UserCreationForm):
         choices=User.LANGUAGE_CHOICES,
         initial='en',
         widget=forms.Select(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent'
         })
     )
     
@@ -48,7 +48,7 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2', 'phone', 'role', 'language_preference')
         widgets = {
             'username': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',
                 'placeholder': _('Username')
             }),
         }
@@ -58,7 +58,7 @@ class CustomUserCreationForm(UserCreationForm):
         for field_name, field in self.fields.items():
             if field_name.startswith('password'):
                 field.widget.attrs.update({
-                    'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                    'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',
                     'placeholder': field.label
                 })
     
@@ -78,14 +78,14 @@ class CustomAuthenticationForm(AuthenticationForm):
     """
     username = forms.CharField(
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',
             'placeholder': _('Username')
         })
     )
     
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',
             'placeholder': _('Password')
         })
     )

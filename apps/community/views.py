@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.urls import reverse_lazy
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 from django.utils.translation import gettext_lazy as _
 from .models import ForumCategory, ForumThread, ForumPost, ThreadUpvote, PostUpvote
 from .forms import ThreadForm, PostForm
@@ -55,6 +55,8 @@ class ThreadListView(ListView):
         category_slug = self.request.GET.get('category')
         if category_slug:
             context['category'] = get_object_or_404(ForumCategory, slug=category_slug)
+        # Add all categories for filter UI
+        context['categories'] = ForumCategory.objects.all().order_by('order', 'name')
         return context
     
     def get_template_names(self):
@@ -72,6 +74,15 @@ class ThreadDetailView(DetailView):
     
     def get_queryset(self):
         return ForumThread.objects.select_related('author', 'category').prefetch_related('posts__author')
+    
+    def get_object(self, queryset=None):
+        """Increment views count when thread is viewed."""
+        obj = super().get_object(queryset)
+        # Increment views count
+        ForumThread.objects.filter(pk=obj.pk).update(views_count=F('views_count') + 1)
+        # Refresh from database to get updated count
+        obj.refresh_from_db()
+        return obj
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -93,6 +104,9 @@ class ThreadDetailView(DetailView):
             context['has_upvoted_thread'] = False
             context['upvoted_post_ids'] = []
         
+        # Pass user to context for moderation checks
+        context['user'] = self.request.user
+        
         return context
     
     def post(self, request, *args, **kwargs):
@@ -112,7 +126,21 @@ class ThreadDetailView(DetailView):
             ForumThread.objects.filter(pk=self.object.pk).update(updated_at=timezone.now())
             context = self.get_context_data(**kwargs)
             context['post'] = post
-            return render(request, 'community/partials/post_item.html', {'post': post, 'user': request.user})
+            # Get upvoted post IDs for the new post
+            if request.user.is_authenticated:
+                upvoted_post_ids = list(
+                    PostUpvote.objects.filter(
+                        user=request.user,
+                        post__thread=self.object
+                    ).values_list('post_id', flat=True)
+                )
+            else:
+                upvoted_post_ids = []
+            return render(request, 'community/partials/post_item.html', {
+                'post': post, 
+                'user': request.user,
+                'upvoted_post_ids': upvoted_post_ids
+            })
         return JsonResponse({'error': _('Invalid form data.')}, status=400)
 
 
@@ -183,4 +211,83 @@ def upvote_post(request, post_id):
         })
     
     return JsonResponse({'upvoted': has_upvoted, 'count': post.upvotes_count})
+
+
+@login_required
+@require_http_methods(["POST"])
+def toggle_thread_pin(request, slug):
+    """Toggle thread pin status (Admin only)."""
+    if not request.user.is_staff:
+        return JsonResponse({'error': _('Permission denied.')}, status=403)
+    
+    thread = get_object_or_404(ForumThread, slug=slug)
+    thread.is_pinned = not thread.is_pinned
+    thread.save()
+    
+    if request.headers.get('HX-Request'):
+        return render(request, 'community/partials/moderation_buttons.html', {
+            'thread': thread,
+            'user': request.user
+        })
+    
+    return JsonResponse({'pinned': thread.is_pinned})
+
+
+@login_required
+@require_http_methods(["POST"])
+def toggle_thread_lock(request, slug):
+    """Toggle thread lock status (Admin only)."""
+    if not request.user.is_staff:
+        return JsonResponse({'error': _('Permission denied.')}, status=403)
+    
+    thread = get_object_or_404(ForumThread, slug=slug)
+    thread.is_locked = not thread.is_locked
+    thread.save()
+    
+    if request.headers.get('HX-Request'):
+        return render(request, 'community/partials/moderation_buttons.html', {
+            'thread': thread,
+            'user': request.user
+        })
+    
+    return JsonResponse({'locked': thread.is_locked})
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_thread(request, slug):
+    """Delete thread (Admin only)."""
+    if not request.user.is_staff:
+        return JsonResponse({'error': _('Permission denied.')}, status=403)
+    
+    thread = get_object_or_404(ForumThread, slug=slug)
+    thread.delete()
+    
+    # For HTMX requests, return a redirect response
+    if request.headers.get('HX-Request'):
+        from django.http import HttpResponse
+        response = HttpResponse('')
+        response['HX-Redirect'] = reverse_lazy('community:thread_list')
+        return response
+    
+    return redirect('community:thread_list')
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_post(request, post_id):
+    """Delete post (Admin only)."""
+    if not request.user.is_staff:
+        return JsonResponse({'error': _('Permission denied.')}, status=403)
+    
+    post = get_object_or_404(ForumPost, id=post_id)
+    thread = post.thread
+    post.delete()
+    
+    if request.headers.get('HX-Request'):
+        # Return empty string to remove the element
+        from django.http import HttpResponse
+        return HttpResponse('')
+    
+    return redirect('community:thread_detail', slug=thread.slug)
 

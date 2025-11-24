@@ -11,7 +11,8 @@ from .views import (
     StudentDashboardView,
     RequestDetailView,
     accept_request,
-    reject_request
+    reject_request,
+    get_messages
 )
 
 app_name = 'mentorship'
@@ -27,5 +28,6 @@ urlpatterns = [
     path('requests/<int:pk>/', RequestDetailView.as_view(), name='request_detail'),
     path('requests/<int:request_id>/accept/', accept_request, name='accept_request'),
     path('requests/<int:request_id>/reject/', reject_request, name='reject_request'),
+    path('requests/<int:request_id>/messages/', get_messages, name='get_messages'),
 ]
 

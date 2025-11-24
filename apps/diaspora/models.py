@@ -151,3 +151,215 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse('diaspora:event_detail', kwargs={'slug': self.slug})
 
+
+class Testimonial(models.Model):
+    """
+    Testimonial model for testimonials from Cameroonians in Lazio.
+    """
+    LANGUAGE_CHOICES = [
+        ('en', _('English')),
+        ('fr', _('Français')),
+    ]
+    
+    name = models.CharField(max_length=200, verbose_name=_('Name'))
+    title = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_('Title/Position'),
+        help_text=_('e.g., "Student at Sapienza University" or "Software Engineer"')
+    )
+    testimonial = models.TextField(verbose_name=_('Testimonial'))
+    image = models.ImageField(
+        upload_to='testimonials/',
+        blank=True,
+        null=True,
+        verbose_name=_('Photo')
+    )
+    location = models.CharField(
+        max_length=200,
+        default='Lazio, Italy',
+        verbose_name=_('Location')
+    )
+    is_featured = models.BooleanField(
+        default=False,
+        verbose_name=_('Featured'),
+        help_text=_('Featured testimonials appear on the main diaspora page.')
+    )
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name=_('Is Published')
+    )
+    language = models.CharField(
+        max_length=2,
+        choices=LANGUAGE_CHOICES,
+        default='en',
+        verbose_name=_('Language')
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = _('Testimonial')
+        verbose_name_plural = _('Testimonials')
+        ordering = ['-is_featured', '-created_at']
+    
+    def __str__(self):
+        return f"{self.name} - {self.title or 'Testimonial'}"
+
+
+class SuccessStory(models.Model):
+    """
+    Success story model with images for diaspora success stories.
+    """
+    LANGUAGE_CHOICES = [
+        ('en', _('English')),
+        ('fr', _('Français')),
+    ]
+    
+    title = models.CharField(max_length=200, verbose_name=_('Title'))
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    person_name = models.CharField(max_length=200, verbose_name=_('Person Name'))
+    person_title = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_('Person Title/Position')
+    )
+    story = models.TextField(verbose_name=_('Success Story'))
+    featured_image = models.ImageField(
+        upload_to='success_stories/',
+        blank=True,
+        null=True,
+        verbose_name=_('Featured Image')
+    )
+    additional_images = models.ManyToManyField(
+        'SuccessStoryImage',
+        blank=True,
+        related_name='success_stories',
+        verbose_name=_('Additional Images')
+    )
+    is_featured = models.BooleanField(
+        default=False,
+        verbose_name=_('Featured'),
+        help_text=_('Featured stories appear on the main diaspora page.')
+    )
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name=_('Is Published')
+    )
+    language = models.CharField(
+        max_length=2,
+        choices=LANGUAGE_CHOICES,
+        default='en',
+        verbose_name=_('Language')
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = _('Success Story')
+        verbose_name_plural = _('Success Stories')
+        ordering = ['-is_featured', '-created_at']
+    
+    def __str__(self):
+        return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse('diaspora:success_story_detail', kwargs={'slug': self.slug})
+
+
+class SuccessStoryImage(models.Model):
+    """
+    Additional images for success stories.
+    """
+    image = models.ImageField(
+        upload_to='success_stories/additional/',
+        verbose_name=_('Image')
+    )
+    caption = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_('Caption')
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = _('Success Story Image')
+        verbose_name_plural = _('Success Story Images')
+    
+    def __str__(self):
+        return self.caption or f"Image {self.id}"
+
+
+class LifeInItaly(models.Model):
+    """
+    Information about life in Italy (bureaucracy, health, documents).
+    """
+    CATEGORY_CHOICES = [
+        ('bureaucracy', _('Bureaucracy')),
+        ('health', _('Healthcare')),
+        ('documents', _('Documents & Permits')),
+        ('housing', _('Housing')),
+        ('work', _('Work & Employment')),
+        ('education', _('Education')),
+        ('transportation', _('Transportation')),
+        ('other', _('Other')),
+    ]
+    
+    LANGUAGE_CHOICES = [
+        ('en', _('English')),
+        ('fr', _('Français')),
+    ]
+    
+    title = models.CharField(max_length=200, verbose_name=_('Title'))
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default='other',
+        verbose_name=_('Category')
+    )
+    content = models.TextField(verbose_name=_('Content'))
+    image = models.ImageField(
+        upload_to='life_in_italy/',
+        blank=True,
+        null=True,
+        verbose_name=_('Image')
+    )
+    is_featured = models.BooleanField(
+        default=False,
+        verbose_name=_('Featured'),
+        help_text=_('Featured articles appear on the main diaspora page.')
+    )
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name=_('Is Published')
+    )
+    language = models.CharField(
+        max_length=2,
+        choices=LANGUAGE_CHOICES,
+        default='en',
+        verbose_name=_('Language')
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = _('Life in Italy')
+        verbose_name_plural = _('Life in Italy Articles')
+        ordering = ['-is_featured', '-created_at']
+    
+    def __str__(self):
+        return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse('diaspora:life_in_italy_detail', kwargs={'slug': self.slug})

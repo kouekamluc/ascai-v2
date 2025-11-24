@@ -24,6 +24,9 @@ class ScholarshipListView(ListView):
         
         is_disco = self.request.GET.get('is_disco_lazio')
         search = self.request.GET.get('search')
+        level = self.request.GET.get('level')
+        region = self.request.GET.get('region')
+        deadline_filter = self.request.GET.get('deadline')
         
         if is_disco == 'true':
             queryset = queryset.filter(is_disco_lazio=True)
@@ -34,6 +37,30 @@ class ScholarshipListView(ListView):
                 Q(provider__icontains=search) |
                 Q(description__icontains=search)
             )
+        
+        if level and level != 'all':
+            queryset = queryset.filter(level=level)
+        
+        if region and region != 'all':
+            queryset = queryset.filter(region=region)
+        
+        # Deadline filtering
+        if deadline_filter:
+            today = timezone.now().date()
+            if deadline_filter == 'upcoming':
+                # Scholarships with deadlines in the future
+                queryset = queryset.filter(application_deadline__gte=today)
+            elif deadline_filter == 'this_month':
+                # Deadlines within the next 30 days
+                from datetime import timedelta
+                next_month = today + timedelta(days=30)
+                queryset = queryset.filter(
+                    application_deadline__gte=today,
+                    application_deadline__lte=next_month
+                )
+            elif deadline_filter == 'past':
+                # Past deadlines
+                queryset = queryset.filter(application_deadline__lt=today)
         
         return queryset.order_by('-created_at')
     
@@ -51,6 +78,13 @@ class ScholarshipListView(ListView):
             )
         else:
             context['saved_scholarship_ids'] = []
+        
+        # Add filter values to context for template
+        context['current_level'] = self.request.GET.get('level', 'all')
+        context['current_region'] = self.request.GET.get('region', 'all')
+        context['current_deadline'] = self.request.GET.get('deadline', '')
+        context['current_search'] = self.request.GET.get('search', '')
+        context['current_disco'] = self.request.GET.get('is_disco_lazio', '')
         
         return context
 

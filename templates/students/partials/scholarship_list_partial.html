@@ -1,0 +1,68 @@
+{% load i18n %}
+{% for scholarship in scholarships %}
+<div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+    {% if scholarship.is_disco_lazio %}
+    <div class="mb-4">
+        <span class="px-3 py-1 bg-cameroon-green text-white rounded-full text-xs font-semibold">DISCO Lazio</span>
+    </div>
+    {% endif %}
+    
+    <h3 class="text-xl font-semibold mb-2">
+        <a href="{% url 'scholarships:detail' scholarship.slug %}" class="hover:text-cameroon-green">
+            {{ scholarship.title }}
+        </a>
+    </h3>
+    
+    <p class="text-gray-600 text-sm mb-2">
+        <span class="font-semibold">{% trans 'Provider:' %}</span> {{ scholarship.provider }}
+    </p>
+    
+    {% if scholarship.amount %}
+    <p class="text-gray-700 mb-3">
+        <span class="text-2xl font-bold text-cameroon-green">{{ scholarship.amount }} {{ scholarship.currency }}</span>
+    </p>
+    {% endif %}
+    
+    <p class="text-gray-700 text-sm mb-4">{{ scholarship.description|truncatewords:20 }}</p>
+    
+    {% if scholarship.application_deadline %}
+    <p class="text-sm text-gray-600 mb-4">
+        <span class="font-semibold">{% trans 'Deadline:' %}</span>
+        {{ scholarship.application_deadline|date:"d M Y" }}
+    </p>
+    {% endif %}
+    
+    <div class="flex items-center justify-between">
+        <a href="{% url 'scholarships:detail' scholarship.slug %}" class="text-cameroon-green hover:underline font-semibold text-sm">
+            {% trans 'View Details →' %}
+        </a>
+        {% if user.is_authenticated %}
+        <form hx-post="{% url 'scholarships:toggle_save' scholarship.slug %}" hx-target="this" hx-swap="outerHTML">
+            {% csrf_token %}
+            {% if scholarship.id in saved_scholarship_ids %}
+            <button type="submit" class="text-red-600 hover:text-red-800 text-sm">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
+            {% else %}
+            <button type="submit" class="text-gray-400 hover:text-cameroon-green text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+            </button>
+            {% endif %}
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% empty %}
+<div class="col-span-full text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">{% trans 'No scholarships found' %}</h3>
+    <p class="mt-1 text-sm text-gray-500">{% trans 'Try adjusting your filters to see more results.' %}</p>
+</div>
+{% endfor %}
+

@@ -9,35 +9,116 @@
     
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <form hx-get="{% url 'universities:index' %}" hx-target="#university-list" hx-trigger="change, keyup delay:500ms" hx-indicator="#loading">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form hx-get="{% url 'universities:index' %}" 
+              hx-target="#university-list-container" 
+              hx-trigger="change from:select, keyup delay:500ms from:input[name='search'], change from:input[type='number']" 
+              hx-indicator="#loading"
+              hx-push-url="true"
+              hx-swap="innerHTML">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <!-- Search -->
+                <div class="lg:col-span-2">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Search Universities' %}</label>
+                    <input type="text" 
+                           id="search"
+                           name="search" 
+                           value="{{ search_query }}"
+                           placeholder="{% trans 'Search by name, city, or description...' %}" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                </div>
+                
+                <!-- City Filter -->
                 <div>
-                    <label class="block text-sm font-medium mb-1">{% trans 'City' %}</label>
-                    <select name="city" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <label for="city" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'City' %}</label>
+                    <select id="city" 
+                            name="city" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
                         <option value="">{% trans 'All Cities' %}</option>
-                        <option value="rome">{% trans 'Rome' %}</option>
-                        <option value="cassino">{% trans 'Cassino' %}</option>
-                        <option value="viterbo">{% trans 'Viterbo' %}</option>
-                        <option value="latina">{% trans 'Latina' %}</option>
-                        <option value="frosinone">{% trans 'Frosinone' %}</option>
+                        <option value="rome" {% if filter_city == 'rome' %}selected{% endif %}>{% trans 'Rome' %}</option>
+                        <option value="cassino" {% if filter_city == 'cassino' %}selected{% endif %}>{% trans 'Cassino' %}</option>
+                        <option value="viterbo" {% if filter_city == 'viterbo' %}selected{% endif %}>{% trans 'Viterbo' %}</option>
+                        <option value="latina" {% if filter_city == 'latina' %}selected{% endif %}>{% trans 'Latina' %}</option>
+                        <option value="frosinone" {% if filter_city == 'frosinone' %}selected{% endif %}>{% trans 'Frosinone' %}</option>
+                        <option value="rieti" {% if filter_city == 'rieti' %}selected{% endif %}>{% trans 'Rieti' %}</option>
                     </select>
                 </div>
                 
+                <!-- Degree Type Filter -->
                 <div>
-                    <label class="block text-sm font-medium mb-1">{% trans 'Search' %}</label>
-                    <input type="text" name="search" placeholder="{% trans 'Search...' %}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <label for="degree_type" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Degree Level' %}</label>
+                    <select id="degree_type" 
+                            name="degree_type" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                        <option value="">{% trans 'All Degrees' %}</option>
+                        <option value="Bachelor" {% if filter_degree_type == 'Bachelor' %}selected{% endif %}>{% trans 'Bachelor' %}</option>
+                        <option value="Master" {% if filter_degree_type == 'Master' %}selected{% endif %}>{% trans 'Master' %}</option>
+                        <option value="PhD" {% if filter_degree_type == 'PhD' %}selected{% endif %}>{% trans 'PhD' %}</option>
+                    </select>
                 </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Field of Study Filter -->
+                <div>
+                    <label for="field" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Field of Study' %}</label>
+                    <select id="field" 
+                            name="field" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                        <option value="">{% trans 'All Fields' %}</option>
+                        <option value="Engineering" {% if filter_field == 'Engineering' %}selected{% endif %}>{% trans 'Engineering' %}</option>
+                        <option value="Medicine" {% if filter_field == 'Medicine' %}selected{% endif %}>{% trans 'Medicine' %}</option>
+                        <option value="Law" {% if filter_field == 'Law' %}selected{% endif %}>{% trans 'Law' %}</option>
+                        <option value="Business" {% if filter_field == 'Business' %}selected{% endif %}>{% trans 'Business' %}</option>
+                        <option value="Arts" {% if filter_field == 'Arts' %}selected{% endif %}>{% trans 'Arts' %}</option>
+                        <option value="Sciences" {% if filter_field == 'Sciences' %}selected{% endif %}>{% trans 'Sciences' %}</option>
+                    </select>
+                </div>
+                
+                <!-- Tuition Min -->
+                <div>
+                    <label for="tuition_min" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Min Tuition (€)' %}</label>
+                    <input type="number" 
+                           id="tuition_min"
+                           name="tuition_min" 
+                           value="{{ filter_tuition_min }}"
+                           placeholder="{% trans 'Min' %}" 
+                           min="0"
+                           step="100"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                </div>
+                
+                <!-- Tuition Max -->
+                <div>
+                    <label for="tuition_max" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Max Tuition (€)' %}</label>
+                    <input type="number" 
+                           id="tuition_max"
+                           name="tuition_max" 
+                           value="{{ filter_tuition_max }}"
+                           placeholder="{% trans 'Max' %}" 
+                           min="0"
+                           step="100"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                </div>
+            </div>
+            
+            <!-- Clear Filters Button -->
+            <div class="mt-4 flex justify-end">
+                <a href="{% url 'universities:index' %}" 
+                   class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 underline">
+                    {% trans 'Clear Filters' %}
+                </a>
             </div>
         </form>
     </div>
     
     <!-- University List -->
-    <div id="university-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div id="university-list-container">
         {% include 'universities/partials/university_list_partial.html' %}
     </div>
     
     <div id="loading" class="htmx-indicator text-center py-4">
-        <p>{% trans 'Loading...' %}</p>
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cameroon-green"></div>
+        <p class="mt-2 text-gray-600">{% trans 'Loading...' %}</p>
     </div>
 </div>
 {% endblock %}

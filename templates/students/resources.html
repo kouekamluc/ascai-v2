@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Resources & Downloads' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-4">{% trans 'Resources & Downloads' %}</h1>
+        <p class="text-lg text-gray-600">
+            {% trans 'Access PDF documents, forms, guidelines, and useful links for students studying in Lazio.' %}
+        </p>
+    </div>
+
+    <!-- HTMX Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form hx-get="{% url 'students:resources' %}" hx-target="#resources-list" hx-trigger="change, keyup delay:500ms" hx-indicator="#loading">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">{% trans 'Category' %}</label>
+                    <select name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="">{% trans 'All Categories' %}</option>
+                        <option value="reddito" {% if filter_category == 'reddito' %}selected{% endif %}>{% trans 'Reddìto Forms' %}</option>
+                        <option value="enrollment" {% if filter_category == 'enrollment' %}selected{% endif %}>{% trans 'Enrollment Documents' %}</option>
+                        <option value="visa" {% if filter_category == 'visa' %}selected{% endif %}>{% trans 'Visa-Related Documents' %}</option>
+                        <option value="guidelines" {% if filter_category == 'guidelines' %}selected{% endif %}>{% trans 'ASCAI Lazio Guidelines' %}</option>
+                        <option value="other" {% if filter_category == 'other' %}selected{% endif %}>{% trans 'Other' %}</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-1">{% trans 'Search' %}</label>
+                    <input type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search documents...' %}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resources List -->
+    <div id="resources-list" class="space-y-4">
+        {% include 'students/partials/resources_list_partial.html' %}
+    </div>
+
+    <div id="loading" class="htmx-indicator text-center py-4">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cameroon-green"></div>
+        <p class="mt-2 text-gray-600">{% trans 'Loading...' %}</p>
+    </div>
+
+    <!-- Useful Links Section -->
+    <div class="bg-white rounded-lg shadow-md p-8 mt-8">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Useful Links' %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="https://www.miur.gov.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Ministry of Education (MIUR)' %}</div>
+                <div class="text-sm text-gray-600">{% trans 'Official Italian education ministry website' %}</div>
+            </a>
+            <a href="https://www.study-in-italy.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Study in Italy' %}</div>
+                <div class="text-sm text-gray-600">{% trans 'Information for international students' %}</div>
+            </a>
+            <a href="https://www.esteri.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Italian Ministry of Foreign Affairs' %}</div>
+                <div class="text-sm text-gray-600">{% trans 'Visa and consular information' %}</div>
+            </a>
+            <a href="https://www.poliziadistato.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Italian Police' %}</div>
+                <div class="text-sm text-gray-600">{% trans 'Residence permit information' %}</div>
+            </a>
+            <a href="https://www.sanita.regione.lazio.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Lazio Regional Health Service' %}</div>
+                <div class="text-sm text-gray-600">{% trans 'Healthcare information for students' %}</div>
+            </a>
+            <a href="https://erasmus-plus.ec.europa.eu/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Erasmus+ Program' %}</div>
+                <div class="text-sm text-gray-600">{% trans 'European exchange program information' %}</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Back to Guide -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'students:index' %}" class="inline-block px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans '← Back to Complete Guide' %}
+        </a>
+    </div>
+</div>
+{% endblock %}
+

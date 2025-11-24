@@ -1,0 +1,14 @@
+{% load i18n %}
+{% for message in messages %}
+<div class="flex {% if message.sender == user %}justify-end{% else %}justify-start{% endif %}" id="message-{{ message.pk }}">
+    <div class="max-w-lg {% if message.sender == user %}bg-cameroon-green text-white{% else %}bg-gray-100 text-gray-800{% endif %} rounded-lg p-4">
+        <p class="text-sm {% if message.sender == user %}text-white/80{% else %}text-gray-500{% endif %} mb-1">
+            {{ message.sender.username }} • {{ message.created_at|date:"d M Y, H:i" }}
+        </p>
+        <p>{{ message.content|linebreaks }}</p>
+    </div>
+</div>
+{% empty %}
+<p class="text-gray-500 text-center">{% trans 'No messages yet. Start the conversation!' %}</p>
+{% endfor %}
+

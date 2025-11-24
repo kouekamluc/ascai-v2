@@ -5,16 +5,37 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-6">
+        <a href="{% url 'gallery:index' %}" class="text-cameroon-green hover:underline mb-4 inline-block">
+            ← {% trans 'Back to Gallery' %}
+        </a>
+    </div>
+    
     <h1 class="text-4xl font-bold mb-4">{{ album.title }}</h1>
     
     {% if album.description %}
     <p class="text-gray-600 mb-6">{{ album.description }}</p>
     {% endif %}
     
+    {% if album.event %}
+    <div class="mb-6">
+        <span class="text-sm text-gray-500">
+            <span class="font-semibold">{% trans 'Related Event' %}:</span>
+            <a href="{% url 'diaspora:event_detail' album.event.slug %}" class="text-cameroon-green hover:underline">
+                {{ album.event.title }}
+            </a>
+        </span>
+    </div>
+    {% endif %}
+    
     {% if images %}
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {% for image in images %}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer" onclick="openLightbox('{{ image.image.url }}', '{{ image.caption }}')">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+             hx-get="{% url 'gallery:image_lightbox' image.id %}"
+             hx-target="#lightbox-container"
+             hx-swap="innerHTML"
+             hx-on::after-request="document.getElementById('lightbox-modal').classList.remove('hidden');">
             <img src="{{ image.image.url }}" alt="{{ image.caption|default:album.title }}" class="w-full h-48 object-cover">
             {% if image.caption %}
             <div class="p-2">
@@ -31,26 +52,20 @@
     {% endif %}
 </div>
 
-<!-- Lightbox Modal -->
-<div id="lightbox" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-50" onclick="closeLightbox()">
-    <div class="max-w-4xl max-h-full p-4">
-        <img id="lightbox-image" src="" alt="" class="max-w-full max-h-full rounded-lg">
-        <p id="lightbox-caption" class="text-white text-center mt-4"></p>
+<!-- HTMX Lightbox Modal -->
+<div id="lightbox-modal" 
+     class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-50"
+     hx-on::click="if(event.target === this) { this.classList.add('hidden'); }">
+    <div class="max-w-4xl max-h-full p-4 relative">
+        <button 
+            onclick="document.getElementById('lightbox-modal').classList.add('hidden')"
+            class="absolute top-2 right-2 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <div id="lightbox-container"></div>
     </div>
 </div>
-
-<script>
-function openLightbox(imageUrl, caption) {
-    document.getElementById('lightbox-image').src = imageUrl;
-    document.getElementById('lightbox-caption').textContent = caption || '';
-    document.getElementById('lightbox').classList.remove('hidden');
-    document.getElementById('lightbox').classList.add('flex');
-}
-
-function closeLightbox() {
-    document.getElementById('lightbox').classList.add('hidden');
-    document.getElementById('lightbox').classList.remove('flex');
-}
-</script>
 {% endblock %}
 

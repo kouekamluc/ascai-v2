@@ -25,6 +25,19 @@ class Scholarship(models.Model):
         ('USD', _('USD ($)')),
     ]
     
+    LEVEL_CHOICES = [
+        ('bachelor', _('Bachelor\'s Degree')),
+        ('master', _('Master\'s Degree')),
+        ('phd', _('PhD')),
+        ('all', _('All Levels')),
+    ]
+    
+    REGION_CHOICES = [
+        ('lazio', _('Lazio')),
+        ('all', _('All Regions')),
+        ('other', _('Other')),
+    ]
+    
     title = models.CharField(max_length=200, verbose_name=_('Title'))
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     provider = models.CharField(max_length=200, verbose_name=_('Provider'))
@@ -45,6 +58,20 @@ class Scholarship(models.Model):
     eligibility_criteria = models.TextField(verbose_name=_('Eligibility Criteria'))
     application_deadline = models.DateField(null=True, blank=True, verbose_name=_('Application Deadline'))
     application_url = models.URLField(blank=True, null=True, verbose_name=_('Application URL'))
+    level = models.CharField(
+        max_length=20,
+        choices=LEVEL_CHOICES,
+        default='all',
+        verbose_name=_('Level'),
+        help_text=_('Education level this scholarship is for')
+    )
+    region = models.CharField(
+        max_length=20,
+        choices=REGION_CHOICES,
+        default='all',
+        verbose_name=_('Region'),
+        help_text=_('Region this scholarship applies to')
+    )
     is_disco_lazio = models.BooleanField(
         default=False,
         verbose_name=_('DISCO Lazio Scholarship'),

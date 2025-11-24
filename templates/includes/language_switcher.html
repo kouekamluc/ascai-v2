@@ -1,9 +1,9 @@
-{% load i18n %}
+{% load i18n i18n_utils %}
 {% get_current_language as CURRENT_LANGUAGE %}
 {% get_available_languages as LANGUAGES %}
 
 <div class="relative" x-data="{ open: false }">
-    <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-blue-600">
+    <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-cameroon-green">
         <span>{% if CURRENT_LANGUAGE == 'en' %}🇬🇧{% else %}🇫🇷{% endif %}</span>
         <span class="uppercase">{{ CURRENT_LANGUAGE }}</span>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,14 +13,18 @@
     
     <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50">
         {% for lang_code, lang_name in LANGUAGES %}
-            <form action="{% url 'set_language' %}" method="post" class="inline">
-                {% csrf_token %}
-                <input type="hidden" name="language" value="{{ lang_code }}">
-                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
-                    <span>{% if lang_code == 'en' %}🇬🇧{% else %}🇫🇷{% endif %}</span>
-                    <span>{{ lang_name }}</span>
-                </button>
-            </form>
+            {% if lang_code != CURRENT_LANGUAGE %}
+                <form action="{% url 'set_language' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="language" value="{{ lang_code }}">
+                    {% translate_current_url lang_code as translated_url %}
+                    <input type="hidden" name="next" value="{{ translated_url }}">
+                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
+                        <span>{% if lang_code == 'en' %}🇬🇧{% else %}🇫🇷{% endif %}</span>
+                        <span>{{ lang_name }}</span>
+                    </button>
+                </form>
+            {% endif %}
         {% endfor %}
     </div>
 </div>

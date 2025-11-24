@@ -31,26 +31,27 @@
     <div class="bg-white rounded-lg shadow-md p-8 mb-6">
         <h2 class="text-2xl font-bold mb-6">{% trans 'Messages' %}</h2>
         
-        <div id="messages-container" class="space-y-4 mb-6">
-            {% for message in messages %}
-            <div class="flex {% if message.sender == user %}justify-end{% else %}justify-start{% endif %}">
-                <div class="max-w-lg {% if message.sender == user %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-800{% endif %} rounded-lg p-4">
-                    <p class="text-sm {% if message.sender == user %}text-blue-100{% else %}text-gray-500{% endif %} mb-1">
-                        {{ message.sender.username }} • {{ message.created_at|date:"d M Y, H:i" }}
-                    </p>
-                    <p>{{ message.content|linebreaks }}</p>
-                </div>
-            </div>
-            {% empty %}
-            <p class="text-gray-500 text-center">{% trans 'No messages yet. Start the conversation!' %}</p>
-            {% endfor %}
+        <div id="messages-container" 
+             class="space-y-4 mb-6 max-h-96 overflow-y-auto"
+             hx-get="{% url 'mentorship:get_messages' request.pk %}"
+             hx-trigger="every 5s"
+             hx-swap="innerHTML"
+             hx-target="this">
+            {% include 'mentorship/partials/messages_list.html' %}
         </div>
         
         {% if request.status == 'accepted' %}
-        <form method="post" hx-post="{% url 'mentorship:request_detail' request.pk %}" hx-target="#messages-container" hx-swap="beforeend" hx-on::after-request="this.reset()">
+        <form method="post" 
+              hx-post="{% url 'mentorship:request_detail' request.pk %}" 
+              hx-target="#messages-container" 
+              hx-swap="beforeend"
+              hx-on::after-request="this.reset(); document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight;">
             {% csrf_token %}
-            <textarea name="content" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4" placeholder="{% trans 'Type your message...' %}"></textarea>
-            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            {{ form.content }}
+            {% if form.content.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.content.errors }}</p>
+            {% endif %}
+            <button type="submit" class="mt-4 px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
                 {% trans 'Send Message' %}
             </button>
         </form>
@@ -64,6 +65,18 @@
         </div>
         {% endif %}
     </div>
+    
+    {% if request.status == 'accepted' %}
+    <script>
+        // Auto-scroll to bottom on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('messages-container');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    </script>
+    {% endif %}
 </div>
 {% endblock %}
 

@@ -3,7 +3,7 @@ Admin configuration for diaspora app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import News, Event
+from .models import News, Event, Testimonial, SuccessStory, SuccessStoryImage, LifeInItaly
 
 
 @admin.register(News)
@@ -57,4 +57,99 @@ class EventAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = ['created_at']
+
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    """Admin interface for Testimonial model."""
+    list_display = ['name', 'title', 'location', 'is_featured', 'is_published', 'language', 'created_at']
+    list_filter = ['is_featured', 'is_published', 'language', 'created_at']
+    search_fields = ['name', 'title', 'testimonial']
+    list_editable = ['is_featured', 'is_published']
+    
+    fieldsets = (
+        (_('Personal Information'), {
+            'fields': ('name', 'title', 'location', 'image')
+        }),
+        (_('Content'), {
+            'fields': ('testimonial', 'language')
+        }),
+        (_('Publication'), {
+            'fields': ('is_featured', 'is_published')
+        }),
+        (_('Dates'), {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+
+
+
+
+@admin.register(SuccessStoryImage)
+class SuccessStoryImageAdmin(admin.ModelAdmin):
+    """Admin interface for SuccessStoryImage model."""
+    list_display = ['caption', 'created_at']
+    search_fields = ['caption']
+
+
+@admin.register(SuccessStory)
+class SuccessStoryAdmin(admin.ModelAdmin):
+    """Admin interface for SuccessStory model."""
+    list_display = ['title', 'person_name', 'is_featured', 'is_published', 'language', 'created_at']
+    list_filter = ['is_featured', 'is_published', 'language', 'created_at']
+    search_fields = ['title', 'person_name', 'person_title', 'story']
+    prepopulated_fields = {'slug': ('title',)}
+    list_editable = ['is_featured', 'is_published']
+    filter_horizontal = ['additional_images']
+    
+    fieldsets = (
+        (_('Story Information'), {
+            'fields': ('title', 'slug', 'person_name', 'person_title', 'language')
+        }),
+        (_('Content'), {
+            'fields': ('story', 'featured_image')
+        }),
+        (_('Additional Images'), {
+            'fields': ('additional_images',),
+            'classes': ('collapse',)
+        }),
+        (_('Publication'), {
+            'fields': ('is_featured', 'is_published')
+        }),
+        (_('Dates'), {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(LifeInItaly)
+class LifeInItalyAdmin(admin.ModelAdmin):
+    """Admin interface for LifeInItaly model."""
+    list_display = ['title', 'category', 'is_featured', 'is_published', 'language', 'created_at']
+    list_filter = ['category', 'is_featured', 'is_published', 'language', 'created_at']
+    search_fields = ['title', 'content']
+    prepopulated_fields = {'slug': ('title',)}
+    list_editable = ['is_featured', 'is_published']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        (_('Content'), {
+            'fields': ('title', 'slug', 'category', 'content', 'image', 'language')
+        }),
+        (_('Publication'), {
+            'fields': ('is_featured', 'is_published')
+        }),
+        (_('Dates'), {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
 

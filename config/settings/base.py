@@ -6,7 +6,7 @@ from pathlib import Path
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-production')
@@ -96,6 +96,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = config('DEFAULT_LANGUAGE', default='en')
 TIME_ZONE = 'Europe/Rome'
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
 
 LANGUAGES = [
@@ -160,6 +161,7 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ASCAI Lazio <noreply@ascailazio.org>')
+CONTACT_EMAIL = config('CONTACT_EMAIL', default='info@ascailazio.org')
 
 # CKEditor Configuration
 CKEDITOR_UPLOAD_PATH = 'uploads/'

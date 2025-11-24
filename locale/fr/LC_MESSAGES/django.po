@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ASCAI Lazio 1.0\n"
@@ -17,3 +16,684 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+# Contact Page Translations
+msgid "Contact Us"
+msgstr "Contactez-nous"
+
+msgid "We would love to hear from you. Send us a message and we will respond as soon as possible."
+msgstr "Nous serions ravis d'avoir de vos nouvelles. Envoyez-nous un message et nous vous répondrons dans les plus brefs délais."
+
+msgid "Send us a Message"
+msgstr "Envoyez-nous un message"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Subject"
+msgstr "Sujet"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Send Message"
+msgstr "Envoyer le message"
+
+msgid "Contact Information"
+msgstr "Informations de contact"
+
+msgid "Office Address"
+msgstr "Adresse du bureau"
+
+msgid "ASCAI Lazio"
+msgstr "ASCAI Lazio"
+
+msgid "Lazio Region"
+msgstr "Région du Latium"
+
+msgid "Rome, Italy"
+msgstr "Rome, Italie"
+
+msgid "Office Hours"
+msgstr "Heures de bureau"
+
+msgid "Monday - Friday"
+msgstr "Lundi - Vendredi"
+
+msgid "Saturday"
+msgstr "Samedi"
+
+msgid "Sunday"
+msgstr "Dimanche"
+
+msgid "Closed"
+msgstr "Fermé"
+
+msgid "ASCAI Lazio Location"
+msgstr "Localisation ASCAI Lazio"
+
+msgid "Thank you!"
+msgstr "Merci !"
+
+msgid "Your message has been sent successfully. We will get back to you soon."
+msgstr "Votre message a été envoyé avec succès. Nous vous répondrons bientôt."
+
+msgid "Message Sent!"
+msgstr "Message envoyé !"
+
+msgid "Thank you for contacting us. We will get back to you as soon as possible."
+msgstr "Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais."
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Message Sent"
+msgstr "Message envoyé"
+
+msgid "Message Sent Successfully!"
+msgstr "Message envoyé avec succès !"
+
+msgid "Return to Home"
+msgstr "Retour à l'accueil"
+
+msgid "Thank you for your message! We will get back to you soon."
+msgstr "Merci pour votre message ! Nous vous répondrons bientôt."
+
+# Universities Module Translations
+msgid "Universities"
+msgstr "Universités"
+
+msgid "Universities in Lazio"
+msgstr "Universités du Latium"
+
+msgid "Search Universities"
+msgstr "Rechercher des universités"
+
+msgid "Search by name, city, or description..."
+msgstr "Rechercher par nom, ville ou description..."
+
+msgid "City"
+msgstr "Ville"
+
+msgid "All Cities"
+msgstr "Toutes les villes"
+
+msgid "Rome"
+msgstr "Rome"
+
+msgid "Cassino"
+msgstr "Cassino"
+
+msgid "Viterbo"
+msgstr "Viterbo"
+
+msgid "Latina"
+msgstr "Latina"
+
+msgid "Frosinone"
+msgstr "Frosinone"
+
+msgid "Rieti"
+msgstr "Rieti"
+
+msgid "Degree Level"
+msgstr "Niveau de diplôme"
+
+msgid "All Degrees"
+msgstr "Tous les diplômes"
+
+msgid "Bachelor"
+msgstr "Licence"
+
+msgid "Master"
+msgstr "Master"
+
+msgid "PhD"
+msgstr "Doctorat"
+
+msgid "Field of Study"
+msgstr "Domaine d'études"
+
+msgid "All Fields"
+msgstr "Tous les domaines"
+
+msgid "Engineering"
+msgstr "Ingénierie"
+
+msgid "Medicine"
+msgstr "Médecine"
+
+msgid "Law"
+msgstr "Droit"
+
+msgid "Business"
+msgstr "Commerce"
+
+msgid "Arts"
+msgstr "Arts"
+
+msgid "Sciences"
+msgstr "Sciences"
+
+msgid "Min Tuition (€)"
+msgstr "Frais min. (€)"
+
+msgid "Max Tuition (€)"
+msgstr "Frais max. (€)"
+
+msgid "Min"
+msgstr "Min"
+
+msgid "Max"
+msgstr "Max"
+
+msgid "Clear Filters"
+msgstr "Effacer les filtres"
+
+msgid "Loading..."
+msgstr "Chargement..."
+
+msgid "No universities found"
+msgstr "Aucune université trouvée"
+
+msgid "Try adjusting your filters or search terms."
+msgstr "Essayez d'ajuster vos filtres ou termes de recherche."
+
+msgid "Save to Favorites"
+msgstr "Enregistrer dans les favoris"
+
+msgid "Remove from Favorites"
+msgstr "Retirer des favoris"
+
+msgid "View Details"
+msgstr "Voir les détails"
+
+msgid "Tuition:"
+msgstr "Frais de scolarité :"
+
+msgid "From"
+msgstr "À partir de"
+
+msgid "Up to"
+msgstr "Jusqu'à"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Website"
+msgstr "Site web"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Tuition Range"
+msgstr "Fourchette de frais"
+
+msgid "Languages of Instruction"
+msgstr "Langues d'enseignement"
+
+msgid "Degree Types"
+msgstr "Types de diplômes"
+
+msgid "Fields of Study"
+msgstr "Domaines d'études"
+
+msgid "Programs"
+msgstr "Programmes"
+
+msgid "Degree:"
+msgstr "Diplôme :"
+
+msgid "Field:"
+msgstr "Domaine :"
+
+msgid "Duration:"
+msgstr "Durée :"
+
+msgid "Language:"
+msgstr "Langue :"
+
+msgid "years"
+msgstr "ans"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "of"
+msgstr "sur"
+
+msgid "Previous"
+msgstr "Précédent"
+
+msgid "Next"
+msgstr "Suivant"
+
+msgid "Only students can save universities to favorites."
+msgstr "Seuls les étudiants peuvent enregistrer des universités dans les favoris."
+
+# Navigation and Common Strings
+msgid "Home"
+msgstr "Accueil"
+
+msgid "Students"
+msgstr "Étudiants"
+
+msgid "Diaspora"
+msgstr "Diaspora"
+
+msgid "Community"
+msgstr "Communauté"
+
+msgid "Mentorship"
+msgstr "Mentorat"
+
+msgid "Scholarships"
+msgstr "Bourses"
+
+msgid "Gallery"
+msgstr "Galerie"
+
+msgid "Downloads"
+msgstr "Téléchargements"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Login"
+msgstr "Connexion"
+
+msgid "Register"
+msgstr "S'inscrire"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Logout"
+msgstr "Déconnexion"
+
+msgid "Admin"
+msgstr "Administration"
+
+msgid "Welcome to ASCAI Lazio"
+msgstr "Bienvenue à ASCAI Lazio"
+
+msgid "Association of Cameroonian Students and Academics in the Lazio Region, Italy"
+msgstr "Association des Étudiants et Universitaires Camerounais de la Région du Latium, Italie"
+
+msgid "Join Community"
+msgstr "Rejoindre la communauté"
+
+msgid "Cameroonians in Lazio"
+msgstr "Camerounais dans le Latium"
+
+msgid "The Cameroonian community in Lazio, Italy, represents a vibrant and growing diaspora of students, academics, and professionals. Our community is dedicated to supporting one another through academic excellence, cultural preservation, and mutual assistance."
+msgstr "La communauté camerounaise dans le Latium, en Italie, représente une diaspora dynamique et croissante d'étudiants, d'universitaires et de professionnels. Notre communauté est dédiée à s'entraider grâce à l'excellence académique, la préservation culturelle et l'assistance mutuelle."
+
+msgid "ASCAI Lazio serves as a bridge connecting Cameroonian students and academics across universities in Rome and the wider Lazio region. We provide essential resources, mentorship opportunities, and a supportive network to help our members thrive in their academic and professional journeys."
+msgstr "ASCAI Lazio sert de pont reliant les étudiants et universitaires camerounais dans les universités de Rome et de la région du Latium. Nous fournissons des ressources essentielles, des opportunités de mentorat et un réseau de soutien pour aider nos membres à réussir dans leurs parcours académiques et professionnels."
+
+msgid "Through cultural events, academic workshops, and community initiatives, we celebrate our heritage while embracing our role in the Italian academic and social landscape."
+msgstr "Grâce aux événements culturels, aux ateliers académiques et aux initiatives communautaires, nous célébrons notre patrimoine tout en embrassant notre rôle dans le paysage académique et social italien."
+
+msgid "Our Community"
+msgstr "Notre communauté"
+
+msgid "Students across major universities in Lazio"
+msgstr "Étudiants dans les principales universités du Latium"
+
+msgid "Academics and researchers in various fields"
+msgstr "Universitaires et chercheurs dans divers domaines"
+
+msgid "Professionals contributing to Italian society"
+msgstr "Professionnels contribuant à la société italienne"
+
+msgid "Cultural ambassadors promoting diversity"
+msgstr "Ambassadeurs culturels promouvant la diversité"
+
+msgid "Our Mission"
+msgstr "Notre mission"
+
+msgid "Academic Support"
+msgstr "Soutien académique"
+
+msgid "Supporting Cameroonian students in Lazio with information, guidance, and resources."
+msgstr "Soutenir les étudiants camerounais dans le Latium avec des informations, des conseils et des ressources."
+
+msgid "Community Unity"
+msgstr "Unité communautaire"
+
+msgid "Promoting diaspora unity, cultural exchange, and integration."
+msgstr "Promouvoir l'unité de la diaspora, les échanges culturels et l'intégration."
+
+msgid "Opportunities"
+msgstr "Opportunités"
+
+msgid "Providing mentorship, orientation, and scholarship opportunities."
+msgstr "Fournir des opportunités de mentorat, d'orientation et de bourses."
+
+msgid "Latest News"
+msgstr "Dernières nouvelles"
+
+msgid "View All"
+msgstr "Voir tout"
+
+msgid "Loading news..."
+msgstr "Chargement des nouvelles..."
+
+msgid "Upcoming Events"
+msgstr "Événements à venir"
+
+msgid "Loading events..."
+msgstr "Chargement des événements..."
+
+msgid "Registration Required"
+msgstr "Inscription requise"
+
+msgid "Success Stories"
+msgstr "Histoires de succès"
+
+msgid "Loading stories..."
+msgstr "Chargement des histoires..."
+
+msgid "Read More"
+msgstr "Lire la suite"
+
+msgid "Join Our Community"
+msgstr "Rejoignez notre communauté"
+
+msgid "Connect with fellow Cameroonian students and academics in Lazio"
+msgstr "Connectez-vous avec d'autres étudiants et universitaires camerounais dans le Latium"
+
+msgid "Register Now"
+msgstr "S'inscrire maintenant"
+
+msgid "Studying in Lazio – Complete Guide"
+msgstr "Étudier dans le Latium – Guide complet"
+
+msgid "Studying in Lazio"
+msgstr "Étudier dans le Latium"
+
+msgid "Complete Guide"
+msgstr "Guide complet"
+
+msgid "Your comprehensive resource for studying, living, and thriving in the Lazio region of Italy. Find universities, scholarships, programs, and essential information for Cameroonian students."
+msgstr "Votre ressource complète pour étudier, vivre et prospérer dans la région du Latium en Italie. Trouvez des universités, des bourses, des programmes et des informations essentielles pour les étudiants camerounais."
+
+msgid "Active Scholarships"
+msgstr "Bourses actives"
+
+msgid "Resources & Documents"
+msgstr "Ressources et documents"
+
+msgid "Enrollment Process"
+msgstr "Processus d'inscription"
+
+msgid "University Enrollment Process in Lazio"
+msgstr "Processus d'inscription universitaire dans le Latium"
+
+msgid "Step 1: Choose Your University and Program"
+msgstr "Étape 1 : Choisissez votre université et votre programme"
+
+msgid "Research universities and programs that match your interests and qualifications. Visit our"
+msgstr "Recherchez des universités et des programmes qui correspondent à vos intérêts et qualifications. Visitez notre"
+
+msgid "Universities Directory"
+msgstr "Répertoire des universités"
+
+msgid "for detailed information."
+msgstr "pour des informations détaillées."
+
+msgid "Step 2: Check Admission Requirements"
+msgstr "Étape 2 : Vérifiez les conditions d'admission"
+
+msgid "Each university and program has specific admission requirements. Common requirements include:"
+msgstr "Chaque université et programme a des conditions d'admission spécifiques. Les exigences courantes incluent :"
+
+msgid "Academic transcripts"
+msgstr "Relevés de notes académiques"
+
+msgid "Language proficiency certificates (Italian/English)"
+msgstr "Certificats de compétence linguistique (italien/anglais)"
+
+msgid "Entrance exams (for some programs)"
+msgstr "Examens d'entrée (pour certains programmes)"
+
+msgid "Motivation letter"
+msgstr "Lettre de motivation"
+
+msgid "Letters of recommendation"
+msgstr "Lettres de recommandation"
+
+msgid "Testimonials"
+msgstr "Témoignages"
+
+msgid "Testimonials from Cameroonians in Lazio"
+msgstr "Témoignages de Camerounais dans le Latium"
+
+msgid "Read about the experiences of Cameroonians living and studying in Lazio, Italy."
+msgstr "Lisez les expériences de Camerounais vivant et étudiant dans le Latium, en Italie."
+
+msgid "All Languages"
+msgstr "Toutes les langues"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "French"
+msgstr "Français"
+
+msgid "Filter"
+msgstr "Filtrer"
+
+# Footer Translations
+msgid "About ASCAI Lazio"
+msgstr "À propos d'ASCAI Lazio"
+
+msgid "Association of Cameroonian Students and Academics in the Lazio Region, Italy."
+msgstr "Association des Étudiants et Universitaires Camerounais de la Région du Latium, Italie."
+
+msgid "Quick Links"
+msgstr "Liens rapides"
+
+msgid "Resources"
+msgstr "Ressources"
+
+msgid "Diaspora News"
+msgstr "Actualités de la diaspora"
+
+msgid "Lazio Region, Italy"
+msgstr "Région du Latium, Italie"
+
+msgid "All rights reserved."
+msgstr "Tous droits réservés."
+
+# Scholarships Translations
+msgid "DISCO Lazio Scholarships"
+msgstr "Bourses DISCO Lazio"
+
+msgid "This is a DISCO Lazio scholarship opportunity."
+msgstr "Il s'agit d'une opportunité de bourse DISCO Lazio."
+
+msgid "Remove"
+msgstr "Retirer"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Application Deadline:"
+msgstr "Date limite de candidature :"
+
+msgid "Eligibility Criteria"
+msgstr "Critères d'éligibilité"
+
+msgid "Requirements Document"
+msgstr "Document des exigences"
+
+msgid "Download Requirements PDF"
+msgstr "Télécharger le PDF des exigences"
+
+msgid "Apply Now"
+msgstr "Postuler maintenant"
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "Search scholarships..."
+msgstr "Rechercher des bourses..."
+
+msgid "Level"
+msgstr "Niveau"
+
+msgid "All Levels"
+msgstr "Tous les niveaux"
+
+msgid "Bachelor's Degree"
+msgstr "Licence"
+
+msgid "Master's Degree"
+msgstr "Master"
+
+msgid "Region"
+msgstr "Région"
+
+msgid "All Regions"
+msgstr "Toutes les régions"
+
+msgid "Lazio"
+msgstr "Latium"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Deadline"
+msgstr "Date limite"
+
+msgid "All Deadlines"
+msgstr "Toutes les dates limites"
+
+msgid "Upcoming"
+msgstr "À venir"
+
+msgid "This Month"
+msgstr "Ce mois-ci"
+
+msgid "Past Deadlines"
+msgstr "Dates limites passées"
+
+msgid "DISCO Lazio Scholarships Only"
+msgstr "Bourses DISCO Lazio uniquement"
+
+msgid "Deadline:"
+msgstr "Date limite :"
+
+msgid "Learn More"
+msgstr "En savoir plus"
+
+msgid "No scholarships found."
+msgstr "Aucune bourse trouvée."
+
+msgid "Discover funding opportunities through the DISCO Lazio program for students in the Lazio region."
+msgstr "Découvrez les opportunités de financement grâce au programme DISCO Lazio pour les étudiants de la région du Latium."
+
+msgid "About DISCO Lazio"
+msgstr "À propos de DISCO Lazio"
+
+msgid "DISCO Lazio is a regional scholarship program designed to support students pursuing higher education in the Lazio region of Italy."
+msgstr "DISCO Lazio est un programme de bourses régional conçu pour soutenir les étudiants poursuivant des études supérieures dans la région du Latium en Italie."
+
+msgid "These scholarships are awarded based on financial need and academic merit. Eligible students can receive financial support to cover tuition fees and living expenses."
+msgstr "Ces bourses sont attribuées en fonction des besoins financiers et du mérite académique. Les étudiants éligibles peuvent recevoir un soutien financier pour couvrir les frais de scolarité et les frais de subsistance."
+
+msgid "Available DISCO Lazio Scholarships"
+msgstr "Bourses DISCO Lazio disponibles"
+
+msgid "No DISCO Lazio scholarships available at this time."
+msgstr "Aucune bourse DISCO Lazio disponible pour le moment."
+
+# Community Translations
+msgid "Community Forum"
+msgstr "Forum communautaire"
+
+msgid "Connect, share, and learn with the ASCAI community"
+msgstr "Connectez-vous, partagez et apprenez avec la communauté ASCAI"
+
+msgid "New Thread"
+msgstr "Nouveau fil"
+
+msgid "threads"
+msgstr "fils"
+
+msgid "View Threads"
+msgstr "Voir les fils"
+
+msgid "No categories available yet."
+msgstr "Aucune catégorie disponible pour le moment."
+
+msgid "Forum Threads"
+msgstr "Fils du forum"
+
+msgid "Filter by Category"
+msgstr "Filtrer par catégorie"
+
+msgid "All Categories"
+msgstr "Toutes les catégories"
+
+msgid "Search threads..."
+msgstr "Rechercher des fils..."
+
+msgid "Pinned"
+msgstr "Épinglé"
+
+msgid "Locked"
+msgstr "Verrouillé"
+
+msgid "views"
+msgstr "vues"
+
+# Mentorship Translations
+msgid "Mentor Dashboard"
+msgstr "Tableau de bord du mentor"
+
+msgid "You need to create a mentor profile first."
+msgstr "Vous devez d'abord créer un profil de mentor."
+
+msgid "Create Mentor Profile"
+msgstr "Créer un profil de mentor"
+
+msgid "Total Requests"
+msgstr "Demandes totales"
+
+msgid "Pending Requests"
+msgstr "Demandes en attente"
+
+msgid "Students Helped"
+msgstr "Étudiants aidés"
+
+msgid "Mentorship Requests"
+msgstr "Demandes de mentorat"
+
+msgid "No mentorship requests yet."
+msgstr "Aucune demande de mentorat pour le moment."
+
+msgid "Mentor"
+msgstr "Mentor"
+
+msgid "Student"
+msgstr "Étudiant"
+
+msgid "Initial Message"
+msgstr "Message initial"
+
+msgid "Messages"
+msgstr "Messages"
+
+msgid "Waiting for mentor to accept your request."
+msgstr "En attente que le mentor accepte votre demande."
+
+msgid "This request has been closed."
+msgstr "Cette demande a été fermée."

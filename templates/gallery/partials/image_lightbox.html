@@ -1,0 +1,10 @@
+{% load i18n %}
+<div class="bg-white rounded-lg overflow-hidden">
+    <img src="{{ image.image.url }}" alt="{{ image.caption|default:'' }}" class="max-w-full max-h-[80vh] object-contain mx-auto">
+    {% if image.caption %}
+    <div class="p-4 bg-black bg-opacity-50">
+        <p class="text-white text-center">{{ image.caption }}</p>
+    </div>
+    {% endif %}
+</div>
+

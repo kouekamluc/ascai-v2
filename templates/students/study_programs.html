@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Study Programs Overview' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-4">{% trans 'Study Programs Overview' %}</h1>
+        <p class="text-lg text-gray-600">
+            {% trans 'Discover the wide range of Bachelor, Master, and PhD programs available across universities in the Lazio region.' %}
+        </p>
+    </div>
+
+    <!-- Degree Type Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ total_bachelor }}</div>
+            <div class="text-xl font-semibold mb-2">{% trans 'Bachelor Programs' %}</div>
+            <p class="text-gray-600 text-sm">{% trans 'Undergraduate degree programs typically lasting 3 years' %}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ total_master }}</div>
+            <div class="text-xl font-semibold mb-2">{% trans 'Master Programs' %}</div>
+            <p class="text-gray-600 text-sm">{% trans 'Graduate degree programs typically lasting 2 years' %}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ total_phd }}</div>
+            <div class="text-xl font-semibold mb-2">{% trans 'PhD Programs' %}</div>
+            <p class="text-gray-600 text-sm">{% trans 'Doctoral research programs typically lasting 3-4 years' %}</p>
+        </div>
+    </div>
+
+    <!-- Bachelor Programs -->
+    <section class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold">{% trans 'Bachelor Programs' %}</h2>
+            <a href="{% url 'students:universities_list' %}?degree_type=Bachelor" class="text-cameroon-green hover:underline font-semibold">
+                {% trans 'View All →' %}
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for program in bachelor_programs %}
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">{{ program.name }}</h3>
+                <p class="text-gray-600 text-sm mb-2">{{ program.university.name }}</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-2 py-1 bg-cameroon-green/10 text-cameroon-green rounded text-xs">{{ program.get_degree_type_display }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">{{ program.field }}</span>
+                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">{{ program.get_language_display }}</span>
+                </div>
+                <p class="text-gray-700 text-sm mb-4">{{ program.description|truncatewords:15 }}</p>
+                <a href="{% url 'universities:detail' program.university.slug %}" class="text-cameroon-green hover:underline font-semibold text-sm">
+                    {% trans 'View University →' %}
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8 text-gray-500">
+                {% trans 'No bachelor programs available at this time.' %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Master Programs -->
+    <section class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold">{% trans 'Master Programs' %}</h2>
+            <a href="{% url 'students:universities_list' %}?degree_type=Master" class="text-cameroon-green hover:underline font-semibold">
+                {% trans 'View All →' %}
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for program in master_programs %}
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">{{ program.name }}</h3>
+                <p class="text-gray-600 text-sm mb-2">{{ program.university.name }}</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-2 py-1 bg-cameroon-green/10 text-cameroon-green rounded text-xs">{{ program.get_degree_type_display }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">{{ program.field }}</span>
+                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">{{ program.get_language_display }}</span>
+                </div>
+                <p class="text-gray-700 text-sm mb-4">{{ program.description|truncatewords:15 }}</p>
+                <a href="{% url 'universities:detail' program.university.slug %}" class="text-cameroon-green hover:underline font-semibold text-sm">
+                    {% trans 'View University →' %}
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8 text-gray-500">
+                {% trans 'No master programs available at this time.' %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- PhD Programs -->
+    <section class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold">{% trans 'PhD Programs' %}</h2>
+            <a href="{% url 'students:universities_list' %}?degree_type=PhD" class="text-cameroon-green hover:underline font-semibold">
+                {% trans 'View All →' %}
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for program in phd_programs %}
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">{{ program.name }}</h3>
+                <p class="text-gray-600 text-sm mb-2">{{ program.university.name }}</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-2 py-1 bg-cameroon-green/10 text-cameroon-green rounded text-xs">{{ program.get_degree_type_display }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">{{ program.field }}</span>
+                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">{{ program.get_language_display }}</span>
+                </div>
+                <p class="text-gray-700 text-sm mb-4">{{ program.description|truncatewords:15 }}</p>
+                <a href="{% url 'universities:detail' program.university.slug %}" class="text-cameroon-green hover:underline font-semibold text-sm">
+                    {% trans 'View University →' %}
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8 text-gray-500">
+                {% trans 'No PhD programs available at this time.' %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Additional Information -->
+    <div class="bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg p-8">
+        <h2 class="text-2xl font-bold mb-4">{% trans 'Program Information' %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-semibold mb-2">{% trans 'Bachelor Programs' %}</h3>
+                <ul class="text-gray-700 space-y-1 text-sm">
+                    <li>• {% trans 'Typically 3 years duration' %}</li>
+                    <li>• {% trans 'Entry requirements: High school diploma or equivalent' %}</li>
+                    <li>• {% trans 'Language requirements vary by program' %}</li>
+                    <li>• {% trans 'May require entrance exams for competitive programs' %}</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-2">{% trans 'Master Programs' %}</h3>
+                <ul class="text-gray-700 space-y-1 text-sm">
+                    <li>• {% trans 'Typically 2 years duration' %}</li>
+                    <li>• {% trans 'Entry requirements: Bachelor degree or equivalent' %}</li>
+                    <li>• {% trans 'May require specific prerequisites' %}</li>
+                    <li>• {% trans 'Thesis or final project required' %}</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-2">{% trans 'PhD Programs' %}</h3>
+                <ul class="text-gray-700 space-y-1 text-sm">
+                    <li>• {% trans 'Typically 3-4 years duration' %}</li>
+                    <li>• {% trans 'Entry requirements: Master degree or equivalent' %}</li>
+                    <li>• {% trans 'Research-focused programs' %}</li>
+                    <li>• {% trans 'Dissertation defense required' %}</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-2">{% trans 'Application Process' %}</h3>
+                <ul class="text-gray-700 space-y-1 text-sm">
+                    <li>• {% trans 'Check university-specific deadlines' %}</li>
+                    <li>• {% trans 'Prepare required documents' %}</li>
+                    <li>• {% trans 'Submit application through university portal' %}</li>
+                    <li>• {% trans 'See our' %} <a href="{% url 'students:enrollment_process' %}" class="text-cameroon-green hover:underline">{% trans 'Enrollment Guide' %}</a> {% trans 'for details' %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Guide -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'students:index' %}" class="inline-block px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans '← Back to Complete Guide' %}
+        </a>
+    </div>
+</div>
+{% endblock %}
+

@@ -8,7 +8,7 @@
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-4xl font-bold">{% trans 'Find a Mentor' %}</h1>
         {% if user.is_authenticated and user.role == 'mentor' %}
-        <a href="{% url 'mentorship:profile_create' %}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <a href="{% url 'mentorship:profile_create' %}" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
             {% trans 'Create Mentor Profile' %}
         </a>
         {% endif %}
@@ -29,8 +29,8 @@
                 {% if mentor.user.avatar %}
                 <img src="{{ mentor.user.avatar.url }}" alt="{{ mentor.user.username }}" class="w-16 h-16 rounded-full">
                 {% else %}
-                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl text-blue-600">{{ mentor.user.username|first|upper }}</span>
+                <div class="w-16 h-16 bg-cameroon-green/10 rounded-full flex items-center justify-center">
+                    <span class="text-2xl text-cameroon-green">{{ mentor.user.username|first|upper }}</span>
                 </div>
                 {% endif %}
                 <div>
@@ -39,7 +39,7 @@
                 </div>
             </div>
             
-            <p class="text-blue-600 font-semibold mb-2">{{ mentor.specialization }}</p>
+            <p class="text-cameroon-green font-semibold mb-2">{{ mentor.specialization }}</p>
             <p class="text-gray-600 text-sm mb-4">{{ mentor.bio|truncatewords:20 }}</p>
             
             <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
@@ -58,7 +58,7 @@
             </div>
             
             {% if user.is_authenticated and user.role == 'student' and mentor.availability_status == 'available' %}
-            <a href="{% url 'mentorship:request_create' mentor.pk %}" class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <a href="{% url 'mentorship:request_create' mentor.pk %}" class="block w-full text-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
                 {% trans 'Request Mentorship' %}
             </a>
             {% else %}

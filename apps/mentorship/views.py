@@ -72,6 +72,13 @@ class MentorshipRequestCreateView(LoginRequiredMixin, CreateView):
     form_class = MentorshipRequestForm
     template_name = 'mentorship/request_create.html'
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mentor = get_object_or_404(MentorProfile, id=self.kwargs['mentor_id'])
+        context['mentor'] = mentor
+        context['mentor_id'] = self.kwargs['mentor_id']
+        return context
+    
     def form_valid(self, form):
         mentor = get_object_or_404(MentorProfile, id=self.kwargs['mentor_id'])
         form.instance.student = self.request.user
@@ -90,8 +97,11 @@ class MentorDashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         mentor_profile = getattr(self.request.user, 'mentor_profile', None)
         if mentor_profile:
-            context['requests'] = mentor_profile.requests.all().order_by('-created_at')
+            all_requests = mentor_profile.requests.all().order_by('-created_at')
+            context['requests'] = all_requests
             context['mentor_profile'] = mentor_profile
+            context['pending_count'] = all_requests.filter(status='pending').count()
+            context['accepted_count'] = all_requests.filter(status='accepted').count()
         return context
 
 
@@ -122,21 +132,32 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['messages'] = self.object.messages.all().order_by('created_at')
+        context['form'] = MentorshipMessageForm()
         return context
     
     def post(self, request, *args, **kwargs):
         """Handle message creation via HTMX."""
         self.object = self.get_object()
+        
+        # Only allow messages if request is accepted
+        if self.object.status != 'accepted':
+            return JsonResponse({'error': _('Request must be accepted to send messages.')}, status=400)
+        
         form = MentorshipMessageForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
             message.request = self.object
             message.sender = request.user
             message.save()
-            return render(request, 'mentorship/partials/message_item.html', {
-                'message': message,
-                'user': request.user
-            })
+            
+            # Return message item for HTMX
+            if request.headers.get('HX-Request'):
+                return render(request, 'mentorship/partials/message_item.html', {
+                    'message': message,
+                    'user': request.user
+                })
+            return redirect('mentorship:request_detail', pk=self.object.pk)
+        
         return JsonResponse({'error': _('Invalid form data.')}, status=400)
 
 
@@ -154,6 +175,12 @@ def accept_request(request, request_id):
     mentorship_request.status = 'accepted'
     mentorship_request.responded_at = timezone.now()
     mentorship_request.save()
+    
+    # Return HTMX-compatible HTML fragment
+    if request.headers.get('HX-Request'):
+        return render(request, 'mentorship/partials/request_item.html', {
+            'request': mentorship_request
+        })
     return JsonResponse({'status': 'accepted'})
 
 
@@ -171,5 +198,31 @@ def reject_request(request, request_id):
     mentorship_request.status = 'rejected'
     mentorship_request.responded_at = timezone.now()
     mentorship_request.save()
+    
+    # Return HTMX-compatible HTML fragment
+    if request.headers.get('HX-Request'):
+        return render(request, 'mentorship/partials/request_item.html', {
+            'request': mentorship_request
+        })
     return JsonResponse({'status': 'rejected'})
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_messages(request, request_id):
+    """Get messages for a mentorship request (HTMX polling endpoint)."""
+    mentorship_request = get_object_or_404(
+        MentorshipRequest,
+        id=request_id
+    )
+    
+    # Verify user has access
+    if mentorship_request.student != request.user and mentorship_request.mentor.user != request.user:
+        return JsonResponse({'error': _('Access denied.')}, status=403)
+    
+    messages = mentorship_request.messages.all().order_by('created_at')
+    return render(request, 'mentorship/partials/messages_list.html', {
+        'messages': messages,
+        'user': request.user
+    })
 

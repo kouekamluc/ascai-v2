@@ -9,6 +9,24 @@
     
     <!-- Tailwind CSS CDN (development) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cameroon: {
+                            green: '#007A5E',
+                            red: '#CE1126',
+                            yellow: '#FCD116',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- ASCAI Design System CSS -->
+    <link rel="stylesheet" href="{% static 'css/ascai-design-system.css' %}">
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
@@ -42,7 +60,7 @@
     {% include 'includes/footer.html' %}
     
     <!-- HTMX Indicator -->
-    <div id="htmx-indicator" class="htmx-indicator fixed top-0 left-0 right-0 bg-blue-600 text-white py-2 text-center z-50">
+    <div id="htmx-indicator" class="htmx-indicator fixed top-0 left-0 right-0 bg-cameroon-green text-white py-2 text-center z-50">
         <span>{% trans 'Loading...' %}</span>
     </div>
     

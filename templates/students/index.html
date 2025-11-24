@@ -1,42 +1,167 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans 'Students' %} - ASCAI Lazio{% endblock %}
+{% block title %}{% trans 'Studying in Lazio – Complete Guide' %} - ASCAI Lazio{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold mb-8">{% trans 'Student Resources' %}</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <a href="{% url 'students:living_guide' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <h2 class="text-xl font-semibold mb-2">{% trans 'Living & Studying in Lazio' %}</h2>
-            <p class="text-gray-600">{% trans 'Comprehensive guide for students in the Lazio region.' %}</p>
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold mb-4 text-cameroon-green">{% trans 'Studying in Lazio' %}</h1>
+        <p class="text-2xl text-gray-700 mb-2">{% trans 'Complete Guide' %}</p>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+            {% trans 'Your comprehensive resource for studying, living, and thriving in the Lazio region of Italy. Find universities, scholarships, programs, and essential information for Cameroonian students.' %}
+        </p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ universities_count }}</div>
+            <div class="text-gray-600">{% trans 'Universities' %}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ scholarships_count }}</div>
+            <div class="text-gray-600">{% trans 'Active Scholarships' %}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ documents_count }}</div>
+            <div class="text-gray-600">{% trans 'Resources & Documents' %}</div>
+        </div>
+    </div>
+
+    <!-- Main Sections Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <!-- Universities -->
+        <a href="{% url 'students:universities_list' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold">{% trans 'Universities in Lazio' %}</h2>
+            </div>
+            <p class="text-gray-600 mb-4">{% trans 'Explore universities in Rome, Viterbo, Cassino, and other cities. Filter by city, program, tuition, and language.' %}</p>
+            <span class="text-cameroon-green font-semibold">{% trans 'Browse Universities →' %}</span>
         </a>
-        
-        <a href="{% url 'universities:index' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <h2 class="text-xl font-semibold mb-2">{% trans 'Universities in Lazio' %}</h2>
-            <p class="text-gray-600">{% trans 'Search and explore universities in the region.' %}</p>
+
+        <!-- Study Programs -->
+        <a href="{% url 'students:study_programs' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold">{% trans 'Study Programs Overview' %}</h2>
+            </div>
+            <p class="text-gray-600 mb-4">{% trans 'Discover Bachelor, Master, and PhD programs available across Lazio universities.' %}</p>
+            <span class="text-cameroon-green font-semibold">{% trans 'View Programs →' %}</span>
         </a>
-        
-        <a href="{% url 'students:enrollment_process' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <h2 class="text-xl font-semibold mb-2">{% trans 'Enrollment Process' %}</h2>
-            <p class="text-gray-600">{% trans 'Step-by-step guide to university enrollment.' %}</p>
+
+        <!-- Erasmus & Exchange -->
+        <a href="{% url 'students:erasmus_exchange' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold">{% trans 'Erasmus & Exchange' %}</h2>
+            </div>
+            <p class="text-gray-600 mb-4">{% trans 'Information about Erasmus+ and international exchange programs in Lazio.' %}</p>
+            <span class="text-cameroon-green font-semibold">{% trans 'Learn More →' %}</span>
         </a>
-        
-        <a href="{% url 'scholarships:index' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <h2 class="text-xl font-semibold mb-2">{% trans 'Scholarships' %}</h2>
-            <p class="text-gray-600">{% trans 'Find funding opportunities including DISCO Lazio.' %}</p>
+
+        <!-- Scholarships -->
+        <a href="{% url 'students:scholarships_list' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold">{% trans 'Scholarships' %}</h2>
+            </div>
+            <p class="text-gray-600 mb-4">{% trans 'Find funding opportunities including DISCO Lazio and other scholarships available to students.' %}</p>
+            <span class="text-cameroon-green font-semibold">{% trans 'Browse Scholarships →' %}</span>
         </a>
-        
-        <a href="{% url 'students:orientation' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <h2 class="text-xl font-semibold mb-2">{% trans 'Orientation Advice' %}</h2>
-            <p class="text-gray-600">{% trans 'Get guidance for your academic journey.' %}</p>
+
+        <!-- Enrollment Process -->
+        <a href="{% url 'students:enrollment_process' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold">{% trans 'Enrollment Process' %}</h2>
+            </div>
+            <p class="text-gray-600 mb-4">{% trans 'Step-by-step guide to university enrollment in Lazio, including visa and residence permit information.' %}</p>
+            <span class="text-cameroon-green font-semibold">{% trans 'View Guide →' %}</span>
         </a>
-        
-        <a href="{% url 'downloads:index' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <h2 class="text-xl font-semibold mb-2">{% trans 'Downloads' %}</h2>
-            <p class="text-gray-600">{% trans 'Access important documents and forms.' %}</p>
+
+        <!-- Orientation & Advice -->
+        <a href="{% url 'students:orientation' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold">{% trans 'Orientation & Advice' %}</h2>
+            </div>
+            <p class="text-gray-600 mb-4">{% trans 'Essential advice for new students arriving in Lazio, including academic success tips and cultural integration.' %}</p>
+            <span class="text-cameroon-green font-semibold">{% trans 'Get Advice →' %}</span>
         </a>
+
+        <!-- Living Guide -->
+        <a href="{% url 'students:living_guide' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold">{% trans 'Living in Lazio' %}</h2>
+            </div>
+            <p class="text-gray-600 mb-4">{% trans 'Comprehensive guide covering accommodation, cost of living, transportation, healthcare, and cultural integration.' %}</p>
+            <span class="text-cameroon-green font-semibold">{% trans 'Read Guide →' %}</span>
+        </a>
+
+        <!-- Resources & Downloads -->
+        <a href="{% url 'students:resources' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold">{% trans 'Resources & Downloads' %}</h2>
+            </div>
+            <p class="text-gray-600 mb-4">{% trans 'Access PDF documents, forms, guidelines, and useful links for students.' %}</p>
+            <span class="text-cameroon-green font-semibold">{% trans 'View Resources →' %}</span>
+        </a>
+    </div>
+
+    <!-- Quick Links Section -->
+    <div class="bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg p-8 mb-12">
+        <h2 class="text-2xl font-bold mb-6 text-center">{% trans 'Quick Links' %}</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a href="{% url 'universities:index' %}" class="text-center p-4 bg-white rounded-lg hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green">{% trans 'Full University Directory' %}</div>
+            </a>
+            <a href="{% url 'scholarships:index' %}" class="text-center p-4 bg-white rounded-lg hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green">{% trans 'All Scholarships' %}</div>
+            </a>
+            <a href="{% url 'community:index' %}" class="text-center p-4 bg-white rounded-lg hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green">{% trans 'Community Forum' %}</div>
+            </a>
+            <a href="{% url 'mentorship:index' %}" class="text-center p-4 bg-white rounded-lg hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green">{% trans 'Find a Mentor' %}</div>
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

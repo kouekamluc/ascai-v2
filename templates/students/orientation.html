@@ -1,66 +1,276 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans 'Orientation' %} - ASCAI Lazio{% endblock %}
+{% block title %}{% trans 'Orientation & Advice for New Students' %} - ASCAI Lazio{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold mb-8">{% trans 'Student Orientation & Advice' %}</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-4">{% trans 'Orientation & Advice for New Students' %}</h1>
+        <p class="text-lg text-gray-600">
+            {% trans 'Essential guidance and tips for Cameroonian students arriving in Lazio to help you succeed academically and integrate smoothly into Italian life.' %}
+        </p>
+    </div>
     
-    <div class="space-y-6">
-        <section class="bg-white rounded-lg shadow-md p-8">
-            <h2 class="text-2xl font-semibold mb-4">{% trans 'Academic Success Tips' %}</h2>
-            <ul class="list-disc list-inside text-gray-700 space-y-2">
-                <li>{% trans 'Attend classes regularly and take detailed notes' %}</li>
-                <li>{% trans 'Build relationships with professors and classmates' %}</li>
-                <li>{% trans 'Utilize university libraries and study resources' %}</li>
-                <li>{% trans 'Join study groups and academic clubs' %}</li>
-                <li>{% trans 'Seek help early if you\'re struggling with coursework' %}</li>
-            </ul>
-        </section>
-        
-        <section class="bg-white rounded-lg shadow-md p-8">
-            <h2 class="text-2xl font-semibold mb-4">{% trans 'Time Management' %}</h2>
-            <p class="text-gray-700 mb-4">
-                {% trans 'Balancing academic work, part-time jobs, and personal life requires good time management. Create a schedule and prioritize your tasks.' %}
-            </p>
-        </section>
-        
-        <section class="bg-white rounded-lg shadow-md p-8">
-            <h2 class="text-2xl font-semibold mb-4">{% trans 'Language Learning' %}</h2>
-            <p class="text-gray-700 mb-4">
-                {% trans 'Improving your Italian language skills will help with both academic success and daily life. Consider taking language courses or joining conversation groups.' %}
-            </p>
-        </section>
-        
-        <section class="bg-white rounded-lg shadow-md p-8">
-            <h2 class="text-2xl font-semibold mb-4">{% trans 'Financial Planning' %}</h2>
-            <p class="text-gray-700 mb-4">
-                {% trans 'Create a budget for your expenses. Explore scholarship opportunities and part-time work options. Check our' %}
-                <a href="{% url 'scholarships:index' %}" class="text-blue-600 hover:underline">{% trans 'Scholarships section' %}</a>
-                {% trans 'for funding opportunities.' %}
-            </p>
-        </section>
-        
-        <section class="bg-white rounded-lg shadow-md p-8">
-            <h2 class="text-2xl font-semibold mb-4">{% trans 'Mentorship Program' %}</h2>
-            <p class="text-gray-700 mb-4">
-                {% trans 'Our mentorship program connects new students with experienced mentors who can provide guidance and support. Visit our' %}
-                <a href="{% url 'mentorship:index' %}" class="text-blue-600 hover:underline">{% trans 'Mentorship section' %}</a>
-                {% trans 'to find a mentor.' %}
-            </p>
-        </section>
-        
-        <section class="bg-white rounded-lg shadow-md p-8">
-            <h2 class="text-2xl font-semibold mb-4">{% trans 'Community Support' %}</h2>
-            <p class="text-gray-700 mb-4">
-                {% trans 'Join our community forum to ask questions, share experiences, and connect with other Cameroonian students in Lazio.' %}
-            </p>
-            <a href="{% url 'community:index' %}" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                {% trans 'Visit Community Forum' %}
-            </a>
-        </section>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- First Steps -->
+            <section class="bg-white rounded-lg shadow-md p-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold">{% trans 'First Steps Upon Arrival' %}</h2>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans '1. Residence Permit (Permesso di Soggiorno)' %}</h3>
+                        <p class="text-gray-700 text-sm mb-2">
+                            {% trans 'Apply within 8 days of arrival at the local Questura (police station). Required documents include:' %}
+                        </p>
+                        <ul class="text-gray-700 text-sm space-y-1 ml-4 list-disc">
+                            <li>{% trans 'Valid passport and visa' %}</li>
+                            <li>{% trans 'University enrollment certificate' %}</li>
+                            <li>{% trans 'Health insurance proof' %}</li>
+                            <li>{% trans 'Proof of financial means' %}</li>
+                            <li>{% trans 'Accommodation certificate' %}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans '2. Health Insurance Registration' %}</h3>
+                        <p class="text-gray-700 text-sm">
+                            {% trans 'Register with the Italian National Health Service (SSN) or obtain private health insurance. This is essential for accessing healthcare services.' %}
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans '3. Tax Code (Codice Fiscale)' %}</h3>
+                        <p class="text-gray-700 text-sm">
+                            {% trans 'Obtain your Italian tax code (codice fiscale) from the Agenzia delle Entrate. This is required for many administrative procedures.' %}
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans '4. Bank Account' %}</h3>
+                        <p class="text-gray-700 text-sm">
+                            {% trans 'Open a bank account to receive scholarships, pay bills, and manage finances. Bring your passport, residence permit, and tax code.' %}
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Academic Success -->
+            <section class="bg-white rounded-lg shadow-md p-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold">{% trans 'Academic Success Tips' %}</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Class Attendance' %}</h3>
+                        <ul class="text-gray-700 text-sm space-y-1">
+                            <li>• {% trans 'Attend classes regularly' %}</li>
+                            <li>• {% trans 'Take detailed notes' %}</li>
+                            <li>• {% trans 'Participate in discussions' %}</li>
+                            <li>• {% trans 'Ask questions when needed' %}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Study Resources' %}</h3>
+                        <ul class="text-gray-700 text-sm space-y-1">
+                            <li>• {% trans 'Utilize university libraries' %}</li>
+                            <li>• {% trans 'Access online learning platforms' %}</li>
+                            <li>• {% trans 'Join study groups' %}</li>
+                            <li>• {% trans 'Use academic support services' %}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Building Relationships' %}</h3>
+                        <ul class="text-gray-700 text-sm space-y-1">
+                            <li>• {% trans 'Connect with professors during office hours' %}</li>
+                            <li>• {% trans 'Build friendships with classmates' %}</li>
+                            <li>• {% trans 'Join academic clubs and societies' %}</li>
+                            <li>• {% trans 'Network with international students' %}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Seeking Help' %}</h3>
+                        <ul class="text-gray-700 text-sm space-y-1">
+                            <li>• {% trans 'Don\'t hesitate to ask for help' %}</li>
+                            <li>• {% trans 'Use tutoring services if available' %}</li>
+                            <li>• {% trans 'Contact student support services' %}</li>
+                            <li>• {% trans 'Reach out to ASCAI Lazio community' %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Language Learning -->
+            <section class="bg-white rounded-lg shadow-md p-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold">{% trans 'Language Learning' %}</h2>
+                </div>
+                <p class="text-gray-700 mb-4">
+                    {% trans 'Improving your Italian language skills is crucial for academic success and daily life integration. Here are some strategies:' %}
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Formal Learning' %}</h3>
+                        <ul class="text-gray-700 text-sm space-y-1">
+                            <li>• {% trans 'Take Italian language courses at your university' %}</li>
+                            <li>• {% trans 'Enroll in intensive language programs' %}</li>
+                            <li>• {% trans 'Use language learning apps (Duolingo, Babbel)' %}</li>
+                            <li>• {% trans 'Attend language exchange meetups' %}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Immersion' %}</h3>
+                        <ul class="text-gray-700 text-sm space-y-1">
+                            <li>• {% trans 'Practice with Italian speakers daily' %}</li>
+                            <li>• {% trans 'Watch Italian TV shows and movies' %}</li>
+                            <li>• {% trans 'Read Italian newspapers and books' %}</li>
+                            <li>• {% trans 'Join conversation groups' %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Financial Planning -->
+            <section class="bg-white rounded-lg shadow-md p-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold">{% trans 'Financial Planning' %}</h2>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Create a Budget' %}</h3>
+                        <p class="text-gray-700 text-sm mb-2">
+                            {% trans 'Track your income and expenses. Typical monthly costs include:' %}
+                        </p>
+                        <ul class="text-gray-700 text-sm space-y-1 ml-4 list-disc">
+                            <li>{% trans 'Accommodation: €300-600' %}</li>
+                            <li>{% trans 'Food: €200-300' %}</li>
+                            <li>{% trans 'Transportation: €30-50' %}</li>
+                            <li>{% trans 'Utilities: €50-100' %}</li>
+                            <li>{% trans 'Personal expenses: €100-200' %}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-cameroon-green">{% trans 'Funding Sources' %}</h3>
+                        <ul class="text-gray-700 text-sm space-y-1">
+                            <li>• <a href="{% url 'students:scholarships_list' %}" class="text-cameroon-green hover:underline">{% trans 'Scholarships' %}</a> - {% trans 'Apply for DISCO Lazio and other funding' %}</li>
+                            <li>• {% trans 'Part-time work (up to 20 hours/week for non-EU students)' %}</li>
+                            <li>• {% trans 'Family support' %}</li>
+                            <li>• {% trans 'Student loans (if eligible)' %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Time Management -->
+            <section class="bg-white rounded-lg shadow-md p-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold">{% trans 'Time Management' %}</h2>
+                </div>
+                <p class="text-gray-700 mb-4">
+                    {% trans 'Balancing academic work, part-time jobs, and personal life requires effective time management:' %}
+                </p>
+                <ul class="text-gray-700 space-y-2">
+                    <li>• {% trans 'Create a weekly schedule with all commitments' %}</li>
+                    <li>• {% trans 'Prioritize tasks by importance and deadlines' %}</li>
+                    <li>• {% trans 'Set aside dedicated study time each day' %}</li>
+                    <li>• {% trans 'Use productivity apps to track tasks' %}</li>
+                    <li>• {% trans 'Take regular breaks to avoid burnout' %}</li>
+                    <li>• {% trans 'Learn to say no to non-essential activities' %}</li>
+                </ul>
+            </section>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Quick Links -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-semibold mb-4">{% trans 'Quick Links' %}</h3>
+                <ul class="space-y-3">
+                    <li>
+                        <a href="{% url 'students:enrollment_process' %}" class="text-cameroon-green hover:underline flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            {% trans 'Enrollment Process' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'students:living_guide' %}" class="text-cameroon-green hover:underline flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            {% trans 'Living in Lazio' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'students:scholarships_list' %}" class="text-cameroon-green hover:underline flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            {% trans 'Scholarships' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'students:resources' %}" class="text-cameroon-green hover:underline flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            {% trans 'Resources & Downloads' %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Support Services -->
+            <div class="bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">{% trans 'Get Support' %}</h3>
+                <div class="space-y-3">
+                    <a href="{% url 'mentorship:index' %}" class="block px-4 py-3 bg-white rounded-lg hover:shadow-md transition text-center font-semibold text-cameroon-green">
+                        {% trans 'Find a Mentor' %}
+                    </a>
+                    <a href="{% url 'community:index' %}" class="block px-4 py-3 bg-white rounded-lg hover:shadow-md transition text-center font-semibold text-cameroon-green">
+                        {% trans 'Community Forum' %}
+                    </a>
+                    <a href="{% url 'contact:index' %}" class="block px-4 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition text-center font-semibold">
+                        {% trans 'Contact ASCAI Lazio' %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Guide -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'students:index' %}" class="inline-block px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans '← Back to Complete Guide' %}
+        </a>
     </div>
 </div>
 {% endblock %}
+
 
