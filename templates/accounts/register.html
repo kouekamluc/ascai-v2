@@ -22,7 +22,7 @@
             
             <!-- Form Container -->
             <div class="px-8 py-8">
-                <form method="post" action="{% url 'accounts:register' %}" class="space-y-6">
+                <form method="post" action="{% url 'account_signup' %}" class="space-y-6">
                     {% csrf_token %}
                     
                     <!-- Form-level errors (non-field errors) -->
@@ -295,7 +295,7 @@
                     <p class="text-gray-600 text-sm mb-2">
                         {% trans 'Already have an account?' %}
                     </p>
-                    <a href="{% url 'accounts:login' %}" class="inline-flex items-center gap-2 text-cameroon-green hover:text-cameroon-red font-semibold transition-colors duration-200 group">
+                    <a href="{% url 'account_login' %}" class="inline-flex items-center gap-2 text-cameroon-green hover:text-cameroon-red font-semibold transition-colors duration-200 group">
                         <span>{% trans 'Sign in here' %}</span>
                         <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

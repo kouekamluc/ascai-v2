@@ -28,6 +28,12 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     
+    # Django Allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    
     # Local apps
     'apps.accounts',
     'apps.core',
@@ -40,6 +46,7 @@ INSTALLED_APPS = [
     'apps.gallery',
     'apps.downloads',
     'apps.contact',
+    'apps.dashboard',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +57,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -173,10 +181,41 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-# Login/Logout URLs
-LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'core:home'
+# Login/Logout URLs (using allauth)
+LOGIN_URL = 'account_login'
+LOGIN_REDIRECT_URL = 'dashboard:home'
 LOGOUT_REDIRECT_URL = 'core:home'
+
+# Django Allauth Configuration
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    # Custom backend with approval check (must be first)
+    'apps.accounts.backends.ApprovalRequiredBackend',
+    # Django default backend
+    'django.contrib.auth.backends.ModelBackend',
+    # Allauth backend
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Allauth Account Settings
+# New settings format (django-allauth >= 0.57.0)
+ACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomAccountAdapter'
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_LOGOUT_ON_GET = False
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_SIGNUP_REDIRECT_URL = 'account_email_verification_sent'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'dashboard:home'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = 'account_login'
+ACCOUNT_PASSWORD_MIN_LENGTH = 8
+ACCOUNT_RATE_LIMITS = {
+    'login_failed': '5/5m',  # 5 attempts per 5 minutes
+}
 
 # Session Configuration
 SESSION_COOKIE_AGE = 86400  # 24 hours

@@ -12,4 +12,6 @@ python-decouple>=3.8
 django-filter>=23.5
 dj-database-url>=2.1.0
 babel>=2.17.0
+django-allauth>=0.57.0
+qrcode[pil]>=7.4.2
 

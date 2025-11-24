@@ -74,8 +74,15 @@ class LoginView(FormView):
         login(self.request, user)
         messages.success(self.request, _('Welcome back, {}!').format(user.username))
         
-        # Get the redirect URL with proper language prefix
-        redirect_url = self.get_success_url()
+        # Redirect to dashboard if approved, otherwise home
+        if user.is_approved or user.is_superuser:
+            redirect_url = '/dashboard/'
+            current_language = get_language()
+            if current_language != settings.LANGUAGE_CODE:
+                redirect_url = f'/{current_language}/dashboard/'
+        else:
+            # Get the redirect URL with proper language prefix
+            redirect_url = self.get_success_url()
         
         # Handle HTMX requests
         if self.request.headers.get('HX-Request'):

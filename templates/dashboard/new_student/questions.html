@@ -1,0 +1,52 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'My Questions' %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-900">{% trans 'Student Questions' %}</h2>
+        <a href="{% url 'dashboard:student_question_create' %}" class="px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans 'Ask a Question' %}
+        </a>
+    </div>
+    
+    {% if questions %}
+    <div class="space-y-4">
+        {% for question in questions %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">{{ question.subject }}</h3>
+                {% if question.is_resolved %}
+                <span class="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800">
+                    {% trans 'Resolved' %}
+                </span>
+                {% else %}
+                <span class="px-3 py-1 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800">
+                    {% trans 'Pending' %}
+                </span>
+                {% endif %}
+            </div>
+            <p class="text-gray-700 mb-4">{{ question.question }}</p>
+            {% if question.admin_response %}
+            <div class="border-t border-gray-200 pt-4">
+                <p class="text-sm font-medium text-gray-900 mb-2">{% trans 'Response:' %}</p>
+                <p class="text-gray-700">{{ question.admin_response }}</p>
+            </div>
+            {% endif %}
+            <p class="text-sm text-gray-500 mt-4">{{ question.created_at|date:"M d, Y" }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <p class="text-gray-500 mb-4">{% trans 'No questions yet.' %}</p>
+        <a href="{% url 'dashboard:student_question_create' %}" class="px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans 'Ask Your First Question' %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

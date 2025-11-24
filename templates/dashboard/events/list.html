@@ -1,0 +1,81 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'Upcoming Events' %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">{% trans 'Upcoming Events' %}</h2>
+            <p class="text-sm text-gray-600 mt-1">{% trans 'Discover and register for upcoming events' %}</p>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for event in events %}
+        <div class="dashboard-card overflow-hidden group cursor-pointer" onclick="{% if event.id not in registered_event_ids and event.registration_required %}window.location.href='{% url 'dashboard:event_register' event.id %}'{% endif %}">
+            {% if event.image %}
+            <div class="relative h-48 overflow-hidden rounded-t-xl mb-4 -mx-6 -mt-6">
+                <img src="{{ event.image.url }}" alt="{{ event.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            </div>
+            {% endif %}
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-cameroon-green transition-colors">{{ event.title }}</h3>
+                <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ event.description|truncatewords:20 }}</p>
+                <div class="space-y-2 text-sm mb-4">
+                    <p class="flex items-center text-gray-600">
+                        <svg class="w-4 h-4 mr-2 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        {{ event.start_datetime|date:"M d, Y H:i" }}
+                    </p>
+                    <p class="flex items-center text-gray-600">
+                        <svg class="w-4 h-4 mr-2 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        {{ event.location }}
+                    </p>
+                </div>
+                <div class="pt-4 border-t border-gray-100">
+                    {% if event.id in registered_event_ids %}
+                    <span class="badge badge-success">
+                        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        {% trans 'Registered' %}
+                    </span>
+                    {% else %}
+                        {% if event.registration_required %}
+                        <button class="btn-primary w-full">
+                            {% trans 'Register Now' %}
+                        </button>
+                        {% else %}
+                        <span class="text-sm text-gray-500 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            {% trans 'No registration required' %}
+                        </span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-3 dashboard-card">
+            <div class="empty-state">
+                <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p class="text-gray-500">{% trans 'No upcoming events.' %}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

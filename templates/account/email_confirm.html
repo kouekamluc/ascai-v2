@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Confirm Email' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-gradient-to-br from-gray-50 via-white to-cameroon-green/5">
+    <div class="w-full max-w-md">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+            {% if confirmation %}
+                <!-- Header with gradient - Success state -->
+                <div class="bg-gradient-to-r from-cameroon-green to-cameroon-green/80 px-8 py-6 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h1 class="text-3xl font-bold text-white mb-2">{% trans 'Confirm Email Address' %}</h1>
+                    <p class="text-cameroon-green/90 text-sm">{% trans 'Verify your email to complete registration' %}</p>
+                </div>
+                
+                <!-- Content -->
+                <div class="px-8 py-8">
+                    <div class="text-center mb-6">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
+                            <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        
+                        <p class="text-gray-700 text-base mb-4 leading-relaxed">
+                            {% trans 'Please confirm that' %} <strong class="text-cameroon-green">{{ confirmation.email_address.email }}</strong> {% trans 'is an email address for user' %} <strong class="text-cameroon-green">{{ confirmation.email_address.user }}</strong>.
+                        </p>
+                    </div>
+                    
+                    <!-- Email info box -->
+                    <div class="bg-cameroon-green/5 border border-cameroon-green/20 rounded-lg p-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-cameroon-green flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-600">{% trans 'Email to confirm:' %}</p>
+                                <p class="text-cameroon-green font-semibold">{{ confirmation.email_address.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirm button -->
+                    <form method="post" action="{% url 'account_confirm_email' confirmation.key %}" class="space-y-4">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full bg-cameroon-green text-white py-3 rounded-lg font-semibold hover:bg-cameroon-green/90 transition-all duration-200 shadow-md hover:shadow-lg">
+                            {% trans 'Confirm Email' %}
+                        </button>
+                    </form>
+                    
+                    <!-- Info -->
+                    <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                            <p class="text-sm text-blue-700">
+                                {% trans 'Once you confirm your email, your account will be activated and pending admin approval.' %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Header with gradient - Error state -->
+                <div class="bg-gradient-to-r from-red-600 to-red-500 px-8 py-6 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <h1 class="text-3xl font-bold text-white mb-2">{% trans 'Invalid Confirmation Link' %}</h1>
+                    <p class="text-white/90 text-sm">{% trans 'This link is expired or invalid' %}</p>
+                </div>
+                
+                <!-- Content -->
+                <div class="px-8 py-8">
+                    <div class="text-center mb-6">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4">
+                            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        
+                        <p class="text-gray-700 text-base mb-6 leading-relaxed">
+                            {% trans 'This email confirmation link has expired or is invalid. Please request a new confirmation email.' %}
+                        </p>
+                    </div>
+                    
+                    <!-- Error info box -->
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                            <div>
+                                <p class="text-sm font-semibold text-red-900 mb-1">{% trans 'Link Expired' %}</p>
+                                <p class="text-sm text-red-700">
+                                    {% trans 'Email confirmation links expire after 7 days for security reasons.' %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action buttons -->
+                    <div class="flex flex-col gap-3">
+                        <a href="{% url 'account_email' %}" class="w-full text-center px-6 py-3 bg-cameroon-green text-white rounded-lg font-semibold hover:bg-cameroon-green/90 transition-all duration-200 shadow-md hover:shadow-lg">
+                            {% trans 'Request New Confirmation Email' %}
+                        </a>
+                        <a href="{% url 'account_login' %}" class="w-full text-center px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all duration-200">
+                            {% trans 'Go to Login' %}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

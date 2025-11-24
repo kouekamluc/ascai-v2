@@ -1,0 +1,270 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% trans 'ASCAI Lazio Reserved Area - Private Dashboard' %}">
+    <title>{% block title %}{% trans 'Dashboard' %} - ASCAI Lazio{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cameroon: {
+                            green: '#007A5E',
+                            red: '#CE1126',
+                            yellow: '#FCD116',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- ASCAI Design System CSS -->
+    <link rel="stylesheet" href="{% static 'css/ascai-design-system.css' %}">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
+        .htmx-request .htmx-indicator { opacity: 1; }
+        
+        /* Enhanced Dashboard Styles */
+        .dashboard-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            border: 1px solid #f3f4f6;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        .dashboard-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 122, 94, 0.2);
+        }
+        
+        .dashboard-card-header {
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-primary {
+            padding: 0.625rem 1.5rem;
+            background: linear-gradient(to right, #007A5E, rgba(0, 122, 94, 0.9));
+            color: white;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: scale(1.02);
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            padding: 0.625rem 1.5rem;
+            background-color: white;
+            border: 2px solid #d1d5db;
+            color: #374151;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .btn-secondary:hover {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+        }
+        
+        .btn-danger {
+            padding: 0.625rem 1.5rem;
+            background: linear-gradient(to right, #dc2626, #b91c1c);
+            color: white;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-danger:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .form-textarea {
+            resize: none;
+        }
+        .form-input:focus, .form-textarea:focus {
+            ring: 2px;
+            ring-color: rgba(0, 122, 94, 0.2);
+            border-color: #007A5E;
+        }
+        
+        .stat-card {
+            background: linear-gradient(to bottom right, white, #f9fafb);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            border-left-width: 4px;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .badge-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-gray {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        
+        .link-primary {
+            color: #007A5E;
+            font-weight: 500;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+        .link-primary:hover {
+            color: rgba(0, 122, 94, 0.8);
+            text-decoration: underline;
+        }
+        
+        .section-divider {
+            border-top: 1px solid #e5e7eb;
+            margin: 1.5rem 0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+        
+        .empty-state-icon {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1rem;
+            color: #9ca3af;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen" x-data="{ sidebarOpen: false }">
+    <!-- Messages -->
+    {% include 'includes/messages.html' %}
+    
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        {% include 'dashboard/partials/sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            {% include 'dashboard/partials/header.html' %}
+            
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 via-white to-gray-50 p-4 sm:p-6 lg:p-8">
+                <!-- Breadcrumbs -->
+                {% if breadcrumbs %}
+                <nav class="mb-6" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-2 text-sm">
+                        <li>
+                            <a href="{% url 'dashboard:home' %}" class="text-gray-500 hover:text-cameroon-green transition-colors font-medium">
+                                {% trans 'Dashboard' %}
+                            </a>
+                        </li>
+                        {% for crumb in breadcrumbs %}
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mx-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            {% if crumb.url %}
+                            <a href="{{ crumb.url }}" class="text-gray-500 hover:text-cameroon-green transition-colors font-medium">{{ crumb.name }}</a>
+                            {% else %}
+                            <span class="text-gray-900 font-semibold">{{ crumb.name }}</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </nav>
+                {% endif %}
+                
+                <!-- Page Title -->
+                {% block page_title %}
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{% block page_heading %}{% endblock %}</h1>
+                    <p class="text-gray-600">{% block page_description %}{% endblock %}</p>
+                </div>
+                {% endblock %}
+                
+                <!-- Content -->
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    
+    <!-- HTMX Indicator -->
+    <div id="htmx-indicator" class="htmx-indicator fixed top-0 left-0 right-0 bg-cameroon-green text-white py-2 text-center z-50">
+        <span>{% trans 'Loading...' %}</span>
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

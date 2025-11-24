@@ -1,0 +1,90 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'Submit Your Story' %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-card max-w-3xl mx-auto">
+    <div class="dashboard-card-header">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">{% trans 'Submit Your Story' %}</h2>
+            <p class="text-gray-600 mt-2 leading-relaxed">{% trans 'Share your success story with the ASCAI community. Your story will be reviewed by our team before publication.' %}</p>
+        </div>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            <div>
+                <label for="{{ form.title.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ form.title.label }}
+                    {% if form.title.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" value="{{ form.title.value|default:'' }}" class="form-input" placeholder="{% trans 'Enter story title' %}">
+                {% if form.title.errors %}
+                <p class="mt-1 text-sm text-red-600 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ form.title.errors.0 }}
+                </p>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.story.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ form.story.label }}
+                    {% if form.story.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                <textarea name="{{ form.story.name }}" id="{{ form.story.id_for_label }}" class="form-textarea" rows="10" placeholder="{% trans 'Tell us your story...' %}">{{ form.story.value|default:'' }}</textarea>
+                {% if form.story.errors %}
+                <p class="mt-1 text-sm text-red-600 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ form.story.errors.0 }}
+                </p>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.documents.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ form.documents.label }} ({% trans 'Optional' %})
+                </label>
+                <input type="file" name="{{ form.documents.name }}" id="{{ form.documents.id_for_label }}" class="form-input" multiple>
+                {% if form.documents.errors %}
+                <p class="mt-1 text-sm text-red-600 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ form.documents.errors.0 }}
+                </p>
+                {% endif %}
+            </div>
+            
+            <div class="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <input type="checkbox" name="{{ form.is_anonymous.name }}" id="{{ form.is_anonymous.id_for_label }}" {% if form.is_anonymous.value %}checked{% endif %} class="w-5 h-5 text-cameroon-green border-gray-300 rounded focus:ring-cameroon-green">
+                <label for="{{ form.is_anonymous.id_for_label }}" class="ml-3 text-sm font-medium text-gray-700">
+                    {{ form.is_anonymous.label }}
+                </label>
+            </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'dashboard:stories_list' %}" class="btn-secondary">
+                {% trans 'Cancel' %}
+            </a>
+            <button type="submit" class="btn-primary">
+                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+                {% trans 'Submit Story' %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

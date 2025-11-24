@@ -18,7 +18,9 @@ urlpatterns = [
 # Language-prefixed URLs
 urlpatterns += i18n_patterns(
     path('', include('apps.core.urls')),
-    path('accounts/', include('apps.accounts.urls')),
+    path('accounts/', include('allauth.urls')),  # Django allauth URLs - must be before accounts.urls
+    path('accounts/', include('apps.accounts.urls')),  # Custom accounts URLs (profile, etc.)
+    path('dashboard/', include('apps.dashboard.urls')),
     path('students/', include('apps.students.urls')),
     path('diaspora/', include('apps.diaspora.urls')),
     path('community/', include('apps.community.urls')),

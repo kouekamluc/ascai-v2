@@ -1,0 +1,72 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'Community Groups' %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">{% trans 'Community Groups' %}</h2>
+            <p class="text-sm text-gray-600 mt-1">{% trans 'Join groups and connect with other members' %}</p>
+        </div>
+    </div>
+    
+    {% if user_groups %}
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <h3 class="text-xl font-bold text-gray-900">{% trans 'My Groups' %}</h3>
+            <p class="text-sm text-gray-600 mt-1">{% trans 'Groups you are a member of' %}</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for group in user_groups %}
+            <div class="border-2 border-cameroon-green/20 rounded-xl p-5 bg-gradient-to-br from-cameroon-green/5 to-white hover:border-cameroon-green/40 hover:shadow-md transition-all duration-200">
+                <h4 class="font-bold text-lg text-gray-900 mb-2">{{ group.name }}</h4>
+                <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ group.description|truncatewords:20 }}</p>
+                <a href="{% url 'dashboard:group_detail' group.slug %}" class="link-primary font-semibold text-sm">
+                    {% trans 'View Group' %} →
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for group in groups %}
+        <div class="dashboard-card group cursor-pointer" onclick="window.location.href='{% url 'dashboard:group_detail' group.slug %}'">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-cameroon-green/20 to-cameroon-green/10 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-cameroon-green transition-colors">{{ group.name }}</h3>
+            <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ group.description|truncatewords:15 }}</p>
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                <span class="text-sm text-gray-600 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    {{ group.member_count }} {% trans 'members' %}
+                </span>
+                <span class="text-cameroon-green font-semibold text-sm group-hover:translate-x-1 transition-transform">
+                    {% trans 'View' %} →
+                </span>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-3 dashboard-card">
+            <div class="empty-state">
+                <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <p class="text-gray-500">{% trans 'No groups available.' %}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

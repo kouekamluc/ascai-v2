@@ -1,0 +1,110 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{{ ticket.subject }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="dashboard-card">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+            <div class="flex-1">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ ticket.subject }}</h2>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        {% trans 'Created' %}: {{ ticket.created_at|date:"F d, Y H:i" }}
+                    </span>
+                    {% if ticket.updated_at != ticket.created_at %}
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        {% trans 'Updated' %}: {{ ticket.updated_at|date:"F d, Y H:i" }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <span class="badge {% if ticket.status == 'open' %}badge-warning{% elif ticket.status == 'resolved' %}badge-success{% elif ticket.status == 'closed' %}badge-gray{% else %}badge-info{% endif %} text-sm">
+                {{ ticket.get_status_display }}
+            </span>
+        </div>
+        
+        <div class="mb-6 p-4 bg-gradient-to-r from-cameroon-green/5 to-cameroon-green/10 rounded-xl border-l-4 border-cameroon-green">
+            <h3 class="text-lg font-semibold mb-3 text-gray-900">{% trans 'Your Message' %}</h3>
+            <p class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ ticket.message }}</p>
+        </div>
+        
+        {% if ticket.admin_response %}
+        <div class="section-divider"></div>
+        <div class="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border-l-4 border-blue-500">
+            <h3 class="text-lg font-semibold mb-3 text-gray-900">{% trans 'Admin Response' %}</h3>
+            <p class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ ticket.admin_response }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Replies Section -->
+    {% if replies %}
+    <div class="dashboard-card">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">{% trans 'Conversation' %}</h3>
+        <div class="space-y-4">
+            {% for reply in replies %}
+            <div class="border-l-4 {% if reply.is_admin_reply %}border-blue-500 bg-blue-50/50{% else %}border-cameroon-green bg-cameroon-green/5{% endif %} pl-6 pr-4 py-4 rounded-r-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br {% if reply.is_admin_reply %}from-blue-500 to-blue-600{% else %}from-cameroon-green to-cameroon-green/80{% endif %} flex items-center justify-center text-white font-bold">
+                            {% if reply.is_admin_reply %}
+                                A
+                            {% else %}
+                                {{ reply.author.username|first|upper }}
+                            {% endif %}
+                        </div>
+                        <span class="font-semibold text-gray-900">
+                            {% if reply.is_admin_reply %}
+                                {% trans 'Admin' %}
+                            {% else %}
+                                {{ reply.author.get_display_name }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <span class="text-sm text-gray-500">{{ reply.created_at|date:"F d, Y H:i" }}</span>
+                </div>
+                <p class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ reply.message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Reply Form -->
+    {% if ticket.status != 'closed' %}
+    <div class="dashboard-card">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">{% trans 'Add Reply' %}</h3>
+        <form method="post" action="{% url 'dashboard:ticket_reply' ticket.pk %}">
+            {% csrf_token %}
+            <textarea name="message" id="id_message" class="form-textarea" rows="5" placeholder="{% trans 'Type your reply here...' %}"></textarea>
+            <div class="mt-6 flex justify-end gap-4">
+                <a href="{% url 'dashboard:tickets_list' %}" class="btn-secondary">
+                    {% trans 'Back to Tickets' %}
+                </a>
+                <button type="submit" class="btn-primary">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    {% trans 'Send Reply' %}
+                </button>
+            </div>
+        </form>
+    </div>
+    {% else %}
+    <div class="flex justify-end">
+        <a href="{% url 'dashboard:tickets_list' %}" class="btn-secondary">
+            {% trans 'Back to Tickets' %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

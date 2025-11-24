@@ -1,0 +1,68 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'Mentorship Dashboard' %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {% if user.is_mentor %}
+        {% if needs_profile %}
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <p class="text-yellow-800 mb-4">{% trans 'You need to create a mentor profile first.' %}</p>
+            <a href="{% url 'mentorship:profile_create' %}" class="px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                {% trans 'Create Mentor Profile' %}
+            </a>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">{% trans 'Mentor Dashboard' %}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-600">{% trans 'Total Requests' %}</p>
+                    <p class="text-2xl font-bold text-cameroon-green">{{ requests.count }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-600">{% trans 'Pending Requests' %}</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ requests|length }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-600">{% trans 'Students Helped' %}</p>
+                    <p class="text-2xl font-bold text-green-600">{{ mentor_profile.students_helped }}</p>
+                </div>
+            </div>
+            <a href="{% url 'mentorship:mentor_dashboard' %}" class="text-cameroon-green hover:underline">
+                {% trans 'View Full Mentor Dashboard' %} →
+            </a>
+        </div>
+        {% endif %}
+    {% endif %}
+    
+    {% if user.is_student %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">{% trans 'My Mentorship Requests' %}</h2>
+        {% if my_requests %}
+        <div class="space-y-4">
+            {% for request in my_requests %}
+            <div class="border border-gray-200 rounded-lg p-4">
+                <h3 class="font-semibold text-gray-900">{{ request.subject }}</h3>
+                <p class="text-sm text-gray-600 mt-1">{{ request.message|truncatewords:20 }}</p>
+                <div class="flex items-center justify-between mt-3">
+                    <span class="text-sm text-gray-500">{{ request.get_status_display }}</span>
+                    <a href="{% url 'mentorship:request_detail' request.pk %}" class="text-cameroon-green hover:underline">
+                        {% trans 'View Details' %} →
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 mb-4">{% trans 'No mentorship requests yet.' %}</p>
+        <a href="{% url 'mentorship:index' %}" class="px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans 'Find a Mentor' %}
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
