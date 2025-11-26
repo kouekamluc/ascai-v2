@@ -24,7 +24,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=kouekamkamgouluc@gmail.com
-EMAIL_HOST_PASSWORD=xswhkmxtkehslifj
+EMAIL_HOST_PASSWORD=your-16-char-app-password
 DEFAULT_FROM_EMAIL=ASCAI Lazio <kouekamkamgouluc@gmail.com>
 CONTACT_EMAIL=info@ascailazio.org
 ```
@@ -52,7 +52,7 @@ EMAIL_HOST_PASSWORD=xswh kmxt kehs lifj
 
 ✅ **Correct:**
 ```
-EMAIL_HOST_PASSWORD=xswhkmxtkehslifj
+EMAIL_HOST_PASSWORD=your-16-char-app-password
 ```
 
 **Fix:** Make sure App Password has NO spaces.

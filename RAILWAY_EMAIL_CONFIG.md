@@ -24,13 +24,13 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=kouekamkamgouluc@gmail.com
-EMAIL_HOST_PASSWORD=xswhkmxtkehslifj
+EMAIL_HOST_PASSWORD=your-16-char-app-password
 DEFAULT_FROM_EMAIL=ASCAI Lazio <kouekamkamgouluc@gmail.com>
 CONTACT_EMAIL=info@ascailazio.org
 ```
 
 **⚠️ IMPORTANT NOTES:**
-- Use the **exact same App Password** that works locally (`xswhkmxtkehslifj`)
+- Use your Gmail App Password (16 characters, no spaces)
 - **NO SPACES** in the password
 - Make sure the email address is complete (`@gmail.com`, not `@gmail`)
 
@@ -89,7 +89,7 @@ CSRF_TRUSTED_ORIGINS=https://your-app-name.up.railway.app
 - [ ] `EMAIL_PORT=587`
 - [ ] `EMAIL_USE_TLS=True`
 - [ ] `EMAIL_HOST_USER=kouekamkamgouluc@gmail.com`
-- [ ] `EMAIL_HOST_PASSWORD=xswhkmxtkehslifj` (your App Password)
+- [ ] `EMAIL_HOST_PASSWORD=your-16-char-app-password` (your App Password)
 - [ ] `DEFAULT_FROM_EMAIL=ASCAI Lazio <kouekamkamgouluc@gmail.com>`
 - [ ] `CONTACT_EMAIL=info@ascailazio.org`
 
