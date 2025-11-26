@@ -44,6 +44,7 @@ EMAIL_HOST_PASSWORD=your-16-char-app-password
 DEFAULT_FROM_EMAIL=ASCAI Lazio <your-email@gmail.com>
 CONTACT_EMAIL=info@ascailazio.org
 ```
+**⚠️ For Gmail:** Remove ALL spaces from the App Password! Google shows `abcd efgh ijkl mnop` → Use `abcdefghijklmnop`
 
 ## Testing Commands
 
@@ -59,7 +60,7 @@ python manage.py test_email your-email@example.com --subject "My Test Subject"
 
 | Issue | Solution |
 |-------|----------|
-| Authentication failed | Check credentials, for Gmail use App Password |
+| Authentication failed | Check credentials, for Gmail use App Password **WITHOUT SPACES** |
 | Connection timeout | Verify SMTP host/port, check firewall |
 | Emails in spam | Verify domain, add SPF/DKIM records |
 | Rate limit exceeded | Check provider limits, upgrade plan |

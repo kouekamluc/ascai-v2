@@ -39,9 +39,14 @@ class UserAdmin(BaseUserAdmin):
     
     def save_model(self, request, obj, form, change):
         """Override save to auto-approve superusers and staff."""
-        if obj.is_superuser or obj.is_staff:
-            obj.is_approved = True
+        # Superusers must always be staff and active
+        if obj.is_superuser:
+            obj.is_staff = True
             obj.is_active = True
+            obj.is_approved = True
+        elif obj.is_staff:
+            obj.is_active = True
+            obj.is_approved = True
         super().save_model(request, obj, form, change)
     
     def approve_users(self, request, queryset):

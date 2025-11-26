@@ -76,6 +76,10 @@ run_migrations() {
 # Run migrations with error handling
 run_migrations
 
+# Ensure admin user exists and has correct permissions
+echo "Ensuring admin user exists..."
+python manage.py create_admin --update || echo "⚠ Warning: Could not create/update admin user, but continuing..."
+
 # Compile translation files before collecting static files
 echo "Compiling translation files..."
 if python manage.py compilemessages --noinput 2>/dev/null; then

@@ -184,6 +184,19 @@ class User(AbstractUser):
     def get_display_name(self):
         """Return full name if available, otherwise username."""
         return self.full_name or self.username
+    
+    def save(self, *args, **kwargs):
+        """
+        Override save to ensure superusers always have is_staff=True.
+        This is required for Django admin access.
+        """
+        # Superusers must always be staff to access admin
+        if self.is_superuser:
+            self.is_staff = True
+            self.is_active = True
+            self.is_approved = True
+        
+        super().save(*args, **kwargs)
 
 
 class UserDocument(models.Model):

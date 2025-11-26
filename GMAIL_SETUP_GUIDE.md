@@ -25,6 +25,8 @@ Gmail requires 2-Factor Authentication (2FA) to generate App Passwords. If you d
 ### Step 2: Generate an App Password
 
 > **Quick Summary:** You need to create an App Password (not your regular Gmail password). Just enter any name when prompted and copy the 16-character password that Google generates.
+> 
+> **⚠️ CRITICAL:** When Google shows you the password like `abcd efgh ijkl mnop` (with spaces), you **MUST REMOVE ALL SPACES** when using it. Use it as `abcdefghijklmnop` (16 characters, no spaces)!
 
 **Method 1: Direct Link (Easiest)**
 1. Go directly to: [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
@@ -62,8 +64,8 @@ Once you're on the App Passwords page, you'll see a form. Here's what to do:
 7. **IMPORTANT**: Google will show you a 16-character password
    - It will look like: `abcd efgh ijkl mnop` (with spaces, grouped in 4s)
    - **Copy this password immediately** - you won't be able to see it again!
-   - You can remove the spaces when using it (spaces are optional)
-   - Example: `abcd efgh ijkl mnop` can be used as `abcdefghijklmnop`
+   - **⚠️ REMOVE ALL SPACES when using it** - The password should be 16 characters with NO spaces
+   - Example: Google shows `abcd efgh ijkl mnop` → Use `abcdefghijklmnop` (no spaces!)
 
 **If you can't find App Passwords:**
 - Make sure 2-Step Verification is **ON** (Step 1)
@@ -110,7 +112,9 @@ CONTACT_EMAIL=info@ascailazio.org
 
 **Replace:**
 - `yourname@gmail.com` with your actual Gmail address
-- `abcdefghijklmnop` with your actual 16-character App Password (spaces optional)
+- `abcdefghijklmnop` with your actual 16-character App Password **WITHOUT SPACES**
+  - If Google shows: `abcd efgh ijkl mnop`
+  - Use in config: `abcdefghijklmnop` (remove all spaces!)
 
 #### For Railway (Production):
 
@@ -129,6 +133,10 @@ EMAIL_HOST_PASSWORD=abcdefghijklmnop
 DEFAULT_FROM_EMAIL=ASCAI Lazio <yourname@gmail.com>
 CONTACT_EMAIL=info@ascailazio.org
 ```
+
+**⚠️ Important:** When setting `EMAIL_HOST_PASSWORD` in Railway, use the App Password **WITHOUT SPACES**:
+- Google shows: `abcd efgh ijkl mnop` (with spaces)
+- Use in Railway: `abcdefghijklmnop` (no spaces!)
 
 ### Step 5: Test Your Configuration
 
@@ -184,9 +192,10 @@ Replace `your-email@example.com` with an email address where you want to receive
 
 #### "Username and Password not accepted"
 - Make sure you're using the **App Password**, not your regular Gmail password
+- **⚠️ REMOVE ALL SPACES from the App Password** - Google shows it with spaces like `abcd efgh ijkl mnop`, but you must use it as `abcdefghijklmnop` (no spaces!)
 - Verify 2-Factor Authentication is enabled
 - Generate a new App Password if needed
-- Double-check you copied the entire 16-character password correctly
+- Double-check you copied all 16 characters correctly (without spaces)
 
 #### "Connection refused" or "Connection timeout"
 - Check your firewall isn't blocking port 587

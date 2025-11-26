@@ -31,13 +31,14 @@ class Command(BaseCommand):
                     user = User.objects.get(username=username)
                     user.set_password(password)
                     user.email = email
+                    # Set superuser attributes (save() will ensure is_staff=True)
                     user.is_superuser = True
-                    user.is_staff = True
+                    user.is_staff = True  # Explicitly set, though save() will ensure it
                     user.is_active = True
                     user.role = 'admin'
                     user.is_approved = True
                     user.email_verified = True
-                    user.save()
+                    user.save()  # This will trigger the model's save() method
                     self.stdout.write(
                         self.style.SUCCESS(
                             f'✓ Successfully updated admin user "{username}"'
@@ -57,13 +58,14 @@ class Command(BaseCommand):
                     email=email,
                     password=password,
                 )
+                # Set superuser attributes (save() will ensure is_staff=True)
                 user.is_superuser = True
-                user.is_staff = True
+                user.is_staff = True  # Explicitly set, though save() will ensure it
                 user.is_active = True
                 user.role = 'admin'
                 user.is_approved = True
                 user.email_verified = True
-                user.save()
+                user.save()  # This will trigger the model's save() method
                 self.stdout.write(
                     self.style.SUCCESS(
                         f'✓ Successfully created admin user "{username}"'
