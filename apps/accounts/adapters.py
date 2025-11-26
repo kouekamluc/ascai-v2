@@ -231,9 +231,9 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             logger.error("=" * 60)
             logger.error(error_msg)
             logger.error("=" * 60)
-            # In production, this is a critical error - raise it
-            if not settings.DEBUG:
-                raise Exception(error_msg)
+            # Log the error but don't break signup - let the parent method handle it
+            # The email will fail but user signup can still complete
+            # Admin can check logs and fix email configuration
         
         try:
             # Test connection if using SMTP
