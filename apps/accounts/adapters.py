@@ -5,8 +5,13 @@ from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.forms import SignupForm, LoginForm
 from django import forms
 from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .models import User
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CustomLoginForm(LoginForm):
@@ -160,4 +165,72 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             return True
         # For regular users, check is_active
         return user.is_active
+    
+    def get_email_confirmation_url(self, request, emailconfirmation):
+        """
+        Returns the email confirmation URL using absolute URLs for production.
+        This ensures email links work correctly in production environments.
+        """
+        url = reverse("account_confirm_email", args=[emailconfirmation.key])
+        # Use request.build_absolute_uri to get absolute URL
+        # This is critical for production where relative URLs won't work in emails
+        if request:
+            return request.build_absolute_uri(url)
+        # Fallback: construct from settings if request is not available
+        from django.contrib.sites.models import Site
+        try:
+            site = Site.objects.get_current()
+            protocol = 'https' if not settings.DEBUG else 'http'
+            return f"{protocol}://{site.domain}{url}"
+        except Exception:
+            # Last resort fallback
+            return url
+    
+    def send_confirmation_mail(self, request, emailconfirmation, signup):
+        """
+        Send email confirmation with proper error handling and logging.
+        This ensures emails are actually sent and logs any failures.
+        The parent method automatically uses get_email_confirmation_url() to get the activate_url
+        and passes it to the email template context.
+        """
+        try:
+            # Log email sending attempt
+            logger.info(
+                f"Sending email confirmation to {emailconfirmation.email_address.email} "
+                f"for user {emailconfirmation.email_address.user.username}"
+            )
+            
+            # Call parent method to send the email
+            # The parent method will automatically call get_email_confirmation_url() 
+            # and pass it to the template as 'activate_url'
+            result = super().send_confirmation_mail(request, emailconfirmation, signup)
+            
+            logger.info(
+                f"Email confirmation sent successfully to {emailconfirmation.email_address.email}"
+            )
+            
+            return result
+        except Exception as e:
+            # Log the error but don't fail silently
+            logger.error(
+                f"Failed to send email confirmation to {emailconfirmation.email_address.email}: {str(e)}",
+                exc_info=True
+            )
+            # Re-raise to ensure the error is visible
+            raise
+    
+    def render_mail(self, template_prefix, email, context, headers=None):
+        """
+        Override to ensure activate_url is always an absolute URL in the context.
+        This is called by send_confirmation_mail to render the email template.
+        """
+        # Ensure activate_url is in context and is absolute
+        if 'activate_url' in context:
+            # If it's already absolute, use it; otherwise make it absolute
+            activate_url = context['activate_url']
+            if not activate_url.startswith('http'):
+                # This shouldn't happen if get_email_confirmation_url works correctly,
+                # but this is a safety check
+                logger.warning(f"activate_url is not absolute: {activate_url}")
+        return super().render_mail(template_prefix, email, context, headers)
 

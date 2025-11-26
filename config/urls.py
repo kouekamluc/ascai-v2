@@ -9,6 +9,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import set_language
 from config import admin as custom_admin
 from apps.core.views import HealthCheckView
+from apps.accounts.views import CustomConfirmEmailView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -21,7 +22,10 @@ urlpatterns = [
 # Language-prefixed URLs
 urlpatterns += i18n_patterns(
     path('', include('apps.core.urls')),
-    path('accounts/', include('allauth.urls')),  # Django allauth URLs - must be before accounts.urls
+    # Override allauth's email confirmation view with our styled version
+    # This must come before allauth URLs to take precedence
+    path('accounts/confirm-email/<str:key>/', CustomConfirmEmailView.as_view(), name='account_confirm_email'),
+    path('accounts/', include('allauth.urls')),  # Django allauth URLs
     path('accounts/', include('apps.accounts.urls')),  # Custom accounts URLs (profile, etc.)
     path('dashboard/', include('apps.dashboard.urls')),
     path('students/', include('apps.students.urls')),

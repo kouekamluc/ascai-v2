@@ -132,6 +132,11 @@ if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
             f"(Host: {EMAIL_HOST}, Port: {EMAIL_PORT})"
         )
 
+# Note: Site domain should be updated after deployment using:
+# python manage.py update_site_domain --domain your-app-name.up.railway.app
+# This ensures email confirmation URLs use the correct domain.
+# The adapter will use request.build_absolute_uri() which works with ALLOWED_HOSTS.
+
 # Logging - Enhanced for production debugging
 LOGGING = {
     'version': 1,
@@ -166,6 +171,11 @@ LOGGING = {
         'django.security': {
             'handlers': ['console'],
             'level': 'ERROR',
+            'propagate': False,
+        },
+        'apps.accounts.adapters': {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': False,
         },
     },

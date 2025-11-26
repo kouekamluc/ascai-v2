@@ -10,6 +10,8 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _, get_language
 from django.conf import settings
 from django.http import JsonResponse
+from allauth.account.views import ConfirmEmailView
+from allauth.account.models import EmailConfirmation
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from .models import User
 
@@ -105,4 +107,29 @@ def profile(request):
     return render(request, 'accounts/profile.html', {
         'user': request.user
     })
+
+
+class CustomConfirmEmailView(ConfirmEmailView):
+    """
+    Custom email confirmation view that shows a styled success page.
+    """
+    def post(self, *args, **kwargs):
+        """Handle email confirmation POST request."""
+        # Get the confirmation object before processing
+        self.object = self.get_object()
+        
+        # Call parent method to confirm email
+        response = super().post(*args, **kwargs)
+        
+        # If confirmation was successful, show styled success page
+        # Refresh the object to get updated verification status
+        if self.object:
+            self.object.email_address.refresh_from_db()
+            if self.object.email_address.verified:
+                return render(self.request, 'account/email_confirmed.html', {
+                    'email_address': self.object.email_address,
+                    'user': self.object.email_address.user
+                })
+        
+        return response
 
