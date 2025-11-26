@@ -180,7 +180,7 @@ python manage.py collectstatic --noinput
 
 ## 📦 Key Dependencies
 
-- Django 4.2+
+- Django 4.2+ / 5.2
 - PostgreSQL (via psycopg2-binary)
 - Tailwind CSS (via CDN)
 - HTMX (via CDN)
@@ -196,4 +196,9 @@ python manage.py collectstatic --noinput
 - Secure password validation
 - HTTPS redirect in production (configurable)
 - Secure session cookies in production
+
+
+
+
+
 

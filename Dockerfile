@@ -18,7 +18,7 @@ RUN pip install --upgrade pip \
 
 COPY . .
 
-RUN chmod +x scripts/entrypoint.sh
+RUN chmod +x scripts/entrypoint.sh scripts/predeploy.sh
 
 EXPOSE 8000
 

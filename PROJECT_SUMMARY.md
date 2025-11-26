@@ -62,7 +62,7 @@ The ASCAI Lazio platform is a comprehensive, production-ready web application bu
 
 ## 🛠️ Technology Stack
 
-- **Backend**: Django 4.2+ (server-side rendering)
+- **Backend**: Django 4.2+ / 5.2 (server-side rendering)
 - **Frontend**: Django Templates + Tailwind CSS + HTMX
 - **Database**: PostgreSQL
 - **Storage**: AWS S3 (production) / Local (development)
@@ -150,4 +150,9 @@ For issues or questions, refer to the documentation files or contact the develop
 **Platform Version**: 1.0  
 **Last Updated**: 2024  
 **Status**: Production Ready ✅
+
+
+
+
+
 
