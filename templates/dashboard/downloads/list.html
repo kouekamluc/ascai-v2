@@ -1,0 +1,71 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'Reserved Downloads' %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">{% trans 'Private Documents' %}</h2>
+            <p class="text-sm text-gray-600 mt-1">{% trans 'Access reserved documents and resources' %}</p>
+        </div>
+        <a href="{% url 'dashboard:downloads_saved' %}" class="btn-secondary">
+            <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+            </svg>
+            {% trans 'My Saved Documents' %}
+        </a>
+    </div>
+    
+    {% if documents %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for document in documents %}
+        <div class="dashboard-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-cameroon-green/20 to-cameroon-green/10 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <span class="badge badge-info text-xs">{{ document.get_category_display }}</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">{{ document.title }}</h3>
+            <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ document.description|truncatewords:15 }}</p>
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                <a href="{% url 'dashboard:document_download' document.pk %}" class="btn-primary text-sm py-2 px-4">
+                    <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    {% trans 'Download' %}
+                </a>
+                {% if document.id not in saved_document_ids %}
+                <a href="{% url 'dashboard:document_save' document.pk %}" class="text-gray-500 hover:text-cameroon-green transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                </a>
+                {% else %}
+                <span class="text-cameroon-green">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="dashboard-card">
+        <div class="empty-state">
+            <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="text-gray-500">{% trans 'No documents available.' %}</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

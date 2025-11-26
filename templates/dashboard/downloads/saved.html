@@ -1,0 +1,38 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'My Saved Documents' %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {% if saved_documents %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for saved in saved_documents %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ saved.document.title }}</h3>
+            <p class="text-sm text-gray-600 mb-4">{{ saved.document.description|truncatewords:15 }}</p>
+            <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-500">{{ saved.saved_at|date:"M d, Y" }}</span>
+                <a href="{% url 'dashboard:document_download' saved.document.pk %}" class="text-cameroon-green hover:underline">
+                    {% trans 'Download' %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <p class="text-gray-500 mb-4">{% trans 'No saved documents yet.' %}</p>
+        <a href="{% url 'dashboard:downloads_list' %}" class="px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans 'Browse Documents' %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
