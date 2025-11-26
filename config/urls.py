@@ -45,4 +45,13 @@ if settings.DEBUG:
     # Django's runserver automatically serves from STATICFILES_DIRS
     if settings.STATIC_ROOT and settings.STATIC_ROOT.exists():
         urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    
+    # Django Debug Toolbar URLs (only in development)
+    try:
+        import debug_toolbar
+        urlpatterns = [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ] + urlpatterns
+    except ImportError:
+        pass  # debug_toolbar not installed, skip it
 
