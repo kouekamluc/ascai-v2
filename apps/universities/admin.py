@@ -61,3 +61,8 @@ class SavedUniversityAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'university__name']
     raw_id_fields = ['user', 'university']
 
+
+
+
+
+

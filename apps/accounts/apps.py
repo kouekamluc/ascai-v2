@@ -6,3 +6,8 @@ class AccountsConfig(AppConfig):
     name = 'apps.accounts'
     verbose_name = 'Accounts'
 
+
+
+
+
+

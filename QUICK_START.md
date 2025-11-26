@@ -158,3 +158,8 @@ python manage.py compilemessages
 - Verify CSRF tokens are included in forms
 - Check browser console for errors
 
+
+
+
+
+

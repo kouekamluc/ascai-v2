@@ -76,6 +76,15 @@ run_migrations() {
 # Run migrations with error handling
 run_migrations
 
+# Compile translation files before collecting static files
+echo "Compiling translation files..."
+if python manage.py compilemessages --noinput 2>/dev/null; then
+    echo "✓ Translations compiled using Django compilemessages"
+else
+    echo "Falling back to Python translation compiler..."
+    python compile_translations.py || echo "⚠ Warning: Translation compilation failed, continuing..."
+fi
+
 # Collect static files
 echo "Collecting static files..."
 python manage.py collectstatic --noinput

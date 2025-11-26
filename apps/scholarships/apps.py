@@ -6,3 +6,8 @@ class ScholarshipsConfig(AppConfig):
     name = 'apps.scholarships'
     verbose_name = 'Scholarships'
 
+
+
+
+
+

@@ -9,3 +9,8 @@ class MediaStorage(S3Boto3Storage):
     file_overwrite = False
     default_acl = 'public-read'
 
+
+
+
+
+

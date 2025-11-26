@@ -6,3 +6,8 @@ class DiasporaConfig(AppConfig):
     name = 'apps.diaspora'
     verbose_name = 'Diaspora'
 
+
+
+
+
+

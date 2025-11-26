@@ -12,3 +12,8 @@ urlpatterns = [
     path('<slug:slug>/toggle-save/', toggle_save_university, name='toggle_save'),
 ]
 
+
+
+
+
+

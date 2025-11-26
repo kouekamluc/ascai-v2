@@ -117,6 +117,21 @@ if not CSRF_TRUSTED_ORIGINS:
 if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Email Configuration Validation
+# Warn if SMTP backend is configured but credentials are missing
+if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+    if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+        logger.warning(
+            "SMTP email backend is configured but EMAIL_HOST_USER or "
+            "EMAIL_HOST_PASSWORD is missing. Emails will not be sent. "
+            "Please configure email settings in your environment variables."
+        )
+    else:
+        logger.info(
+            f"Email backend configured: {EMAIL_BACKEND} "
+            f"(Host: {EMAIL_HOST}, Port: {EMAIL_PORT})"
+        )
+
 # Logging - Enhanced for production debugging
 LOGGING = {
     'version': 1,

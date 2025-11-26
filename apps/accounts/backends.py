@@ -30,12 +30,16 @@ class ApprovalRequiredBackend(ModelBackend):
         
         # Check password
         if user.check_password(password):
-            # Check if user is active
+            # Superusers bypass all checks (is_active and is_approved)
+            if user.is_superuser:
+                return user
+            
+            # Check if user is active (non-superusers only)
             if not user.is_active:
                 return None
             
-            # Check if user is approved (superusers bypass this check)
-            if not user.is_approved and not user.is_superuser:
+            # Check if user is approved (non-superusers only)
+            if not user.is_approved:
                 # Don't raise exception here, just return None
                 # The form will handle displaying the error message
                 return None
@@ -43,4 +47,9 @@ class ApprovalRequiredBackend(ModelBackend):
             return user
         
         return None
+
+
+
+
+
 

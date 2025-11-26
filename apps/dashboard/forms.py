@@ -23,13 +23,24 @@ class ProfileUpdateForm(forms.ModelForm):
         ]
         widgets = {
             'full_name': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green'
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
+                'autocomplete': 'name',
+                'autocorrect': 'on',
+                'autocapitalize': 'words'
             }),
             'email': forms.EmailInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green'
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
+                'autocomplete': 'email',
+                'autocorrect': 'off',
+                'autocapitalize': 'none',
+                'spellcheck': 'false'
             }),
             'phone': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green'
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
+                'autocomplete': 'tel',
+                'autocorrect': 'off',
+                'autocapitalize': 'none',
+                'spellcheck': 'false'
             }),
             'city_in_lazio': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green'

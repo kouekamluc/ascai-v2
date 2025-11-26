@@ -18,3 +18,8 @@ urlpatterns = [
     path('<slug:slug>/toggle-save/', toggle_save_scholarship, name='toggle_save'),
 ]
 
+
+
+
+
+

@@ -115,3 +115,8 @@ class PostUpvote(models.Model):
     class Meta:
         unique_together = ['post', 'user']
 
+
+
+
+
+

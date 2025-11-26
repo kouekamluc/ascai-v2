@@ -33,16 +33,20 @@ class CustomLoginForm(LoginForm):
                     # Let parent form handle authentication error
                     return cleaned_data
             
-            # Check if user is approved (superusers bypass this check)
-            if not user.is_approved and not user.is_superuser:
-                raise ValidationError(
-                    _('Your account is pending admin approval. Please wait for approval before logging in.')
-                )
+            # Superusers bypass all checks (is_active and is_approved)
+            if user.is_superuser:
+                return cleaned_data
             
-            # Check if user is active
+            # Check if user is active (non-superusers only)
             if not user.is_active:
                 raise ValidationError(
                     _('Your account is inactive. Please contact an administrator.')
+                )
+            
+            # Check if user is approved (non-superusers only)
+            if not user.is_approved:
+                raise ValidationError(
+                    _('Your account is pending admin approval. Please wait for approval before logging in.')
                 )
         
         return cleaned_data
@@ -145,4 +149,15 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Allow signup by default.
         """
         return True
+    
+    def is_account_active(self, user):
+        """
+        Check if account is active. Superusers bypass this check.
+        This prevents redirect to /accounts/inactive/ for superusers.
+        """
+        # Superusers can always log in, even if is_active is False
+        if user.is_superuser:
+            return True
+        # For regular users, check is_active
+        return user.is_active
 

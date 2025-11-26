@@ -38,3 +38,8 @@ class MentorshipMessageAdmin(admin.ModelAdmin):
     search_fields = ['content', 'sender__username']
     raw_id_fields = ['request', 'sender']
 
+
+
+
+
+

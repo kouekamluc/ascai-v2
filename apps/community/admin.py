@@ -35,3 +35,8 @@ class ForumPostAdmin(admin.ModelAdmin):
 admin.site.register(ThreadUpvote)
 admin.site.register(PostUpvote)
 
+
+
+
+
+

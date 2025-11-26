@@ -34,3 +34,8 @@ class ContactSubmission(models.Model):
     def __str__(self):
         return f"Contact from {self.name} - {self.subject}"
 
+
+
+
+
+

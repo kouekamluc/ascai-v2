@@ -6,3 +6,8 @@ class UniversitiesConfig(AppConfig):
     name = 'apps.universities'
     verbose_name = 'Universities'
 
+
+
+
+
+

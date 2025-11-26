@@ -9,3 +9,8 @@ class DashboardConfig(AppConfig):
     name = 'apps.dashboard'
     verbose_name = 'Dashboard'
 
+
+
+
+
+

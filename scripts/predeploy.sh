@@ -28,11 +28,17 @@ fi
 
 # Compile Django translation files
 echo "Compiling translation files..."
-if python manage.py compilemessages --noinput 2>/dev/null; then
+# Try Django's compilemessages first (requires gettext)
+if command -v msgfmt >/dev/null 2>&1 && python manage.py compilemessages --noinput 2>/dev/null; then
     echo "✓ Translations compiled using Django compilemessages"
 else
     echo "Falling back to Python translation compiler..."
-    python compile_translations.py
+    if python compile_translations.py 2>/dev/null; then
+        echo "✓ Translations compiled using Python script"
+    else
+        echo "⚠ Warning: Translation compilation failed, but continuing..."
+        echo "⚠ Translations may not work correctly until compiled"
+    fi
 fi
 
 # Validate Django settings (optional but helpful)

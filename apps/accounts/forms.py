@@ -16,7 +16,11 @@ class CustomUserCreationForm(UserCreationForm):
         required=True,
         widget=forms.EmailInput(attrs={
             'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all duration-200 bg-white text-gray-900 placeholder-gray-400',
-            'placeholder': _('Email address')
+            'placeholder': _('Email address'),
+            'autocomplete': 'email',
+            'autocorrect': 'off',
+            'autocapitalize': 'none',
+            'spellcheck': 'false'
         })
     )
     
@@ -25,7 +29,11 @@ class CustomUserCreationForm(UserCreationForm):
         max_length=20,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all duration-200 bg-white text-gray-900 placeholder-gray-400',
-            'placeholder': _('Phone number (optional)')
+            'placeholder': _('Phone number (optional)'),
+            'autocomplete': 'tel',
+            'autocorrect': 'off',
+            'autocapitalize': 'none',
+            'spellcheck': 'false'
         })
     )
     
@@ -50,7 +58,11 @@ class CustomUserCreationForm(UserCreationForm):
         widgets = {
             'username': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all duration-200 bg-white text-gray-900 placeholder-gray-400',
-                'placeholder': _('Username')
+                'placeholder': _('Username'),
+                'autocomplete': 'username',
+                'autocorrect': 'off',
+                'autocapitalize': 'none',
+                'spellcheck': 'false'
             }),
         }
     
@@ -60,9 +72,14 @@ class CustomUserCreationForm(UserCreationForm):
             if field_name.startswith('password'):
                 # Remove help_text as we're handling validation messages manually in the template
                 field.help_text = ''
+                autocomplete_value = 'new-password' if field_name == 'password1' else 'new-password'
                 field.widget.attrs.update({
                     'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all duration-200 bg-white text-gray-900 placeholder-gray-400',
-                    'placeholder': field.label
+                    'placeholder': field.label,
+                    'autocomplete': autocomplete_value,
+                    'autocorrect': 'off',
+                    'autocapitalize': 'none',
+                    'spellcheck': 'false'
                 })
     
     def save(self, commit=True):
@@ -82,14 +99,22 @@ class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all duration-200 bg-white text-gray-900 placeholder-gray-400',
-            'placeholder': _('Username')
+            'placeholder': _('Username'),
+            'autocomplete': 'username',
+            'autocorrect': 'off',
+            'autocapitalize': 'none',
+            'spellcheck': 'false'
         })
     )
     
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all duration-200 bg-white text-gray-900 placeholder-gray-400',
-            'placeholder': _('Password')
+            'placeholder': _('Password'),
+            'autocomplete': 'current-password',
+            'autocorrect': 'off',
+            'autocapitalize': 'none',
+            'spellcheck': 'false'
         })
     )
     
@@ -111,16 +136,20 @@ class CustomAuthenticationForm(AuthenticationForm):
                         code='invalid_password',
                     )
                 
-                # Check if user is active
+                # Superusers bypass all checks (is_active and is_approved)
+                if user.is_superuser:
+                    self.user_cache = user
+                    return self.cleaned_data
+                
+                # Check if user is active (non-superusers only)
                 if not user.is_active:
                     raise forms.ValidationError(
                         _('Your account is inactive. Please contact an administrator.'),
                         code='inactive',
                     )
                 
-                # Check if user is approved (custom requirement)
-                # Superusers bypass approval check
-                if not user.is_approved and not user.is_superuser:
+                # Check if user is approved (non-superusers only)
+                if not user.is_approved:
                     raise forms.ValidationError(
                         _('Your account is pending admin approval. Please wait for approval before logging in.'),
                         code='not_approved',
@@ -140,13 +169,18 @@ class CustomAuthenticationForm(AuthenticationForm):
                             code='invalid_login',
                         )
                     
+                    # Superusers bypass all checks (is_active and is_approved)
+                    if user.is_superuser:
+                        self.user_cache = user
+                        return self.cleaned_data
+                    
                     if not user.is_active:
                         raise forms.ValidationError(
                             _('Your account is inactive. Please contact an administrator.'),
                             code='inactive',
                         )
                     
-                    if not user.is_approved and not user.is_superuser:
+                    if not user.is_approved:
                         raise forms.ValidationError(
                             _('Your account is pending admin approval. Please wait for approval before logging in.'),
                             code='not_approved',
