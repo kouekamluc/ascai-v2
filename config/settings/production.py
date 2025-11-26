@@ -38,13 +38,19 @@ ALLOWED_HOSTS = [s.strip() for s in allowed_hosts_str.split(',')] if allowed_hos
 # Django supports leading dot notation for subdomain matching: .railway.app matches *.railway.app
 railway_internal_domains = [
     'healthcheck.railway.app',
-    '.railway.app',  # Matches all Railway subdomains (e.g., *.railway.app)
+    '.railway.app',  # Matches all Railway subdomains (e.g., *.railway.app, *.up.railway.app)
+    '.up.railway.app',  # Explicitly match *.up.railway.app subdomains
 ]
 
 # Add Railway internal domains if not already present
 for domain in railway_internal_domains:
     if domain not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(domain)
+
+# Log ALLOWED_HOSTS for debugging (without exposing sensitive info)
+import logging
+logger = logging.getLogger(__name__)
+logger.info(f"ALLOWED_HOSTS configured: {len(ALLOWED_HOSTS)} host(s)")
 
 if not ALLOWED_HOSTS:
     raise ImproperlyConfigured(
@@ -109,7 +115,7 @@ if not CSRF_TRUSTED_ORIGINS:
 if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Logging
+# Logging - Enhanced for production debugging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -133,6 +139,16 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['console'],
+            'level': 'ERROR',
             'propagate': False,
         },
     },

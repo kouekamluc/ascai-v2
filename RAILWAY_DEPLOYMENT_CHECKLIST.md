@@ -123,7 +123,22 @@ In your Railway service settings:
 
 ---
 
-## Step 5: Deploy and Verify
+## Step 5: Generate Public Domain (REQUIRED)
+
+**⚠️ IMPORTANT: You MUST generate a domain before your app will be accessible!**
+
+- [ ] Go to your Railway service → **Settings** tab
+- [ ] Click on **"Networking"** or **"Domains"** section
+- [ ] Click **"Generate Domain"** button
+- [ ] Railway will create a domain like: `your-app-name.up.railway.app`
+- [ ] **Copy this domain** - you'll need it for `ALLOWED_HOSTS`
+- [ ] Wait a few seconds for the domain to provision
+
+**Note**: Without a generated domain, you'll see "The train has not arrived at the station" error when trying to access your app.
+
+---
+
+## Step 6: Deploy and Verify
 
 - [ ] Click "Deploy" or push to your main branch (auto-deploys)
 - [ ] Wait for build to complete (check Build logs)
@@ -134,7 +149,7 @@ In your Railway service settings:
 
 ---
 
-## Step 6: Post-Deployment Setup
+## Step 7: Post-Deployment Setup
 
 ### Create Superuser
 
@@ -154,7 +169,7 @@ In your Railway service settings:
 
 ---
 
-## Step 7: Custom Domain (Optional)
+## Step 8: Custom Domain (Optional)
 
 If you have a custom domain:
 
@@ -170,7 +185,7 @@ If you have a custom domain:
 
 ---
 
-## Step 8: Monitoring & Maintenance
+## Step 9: Monitoring & Maintenance
 
 - [ ] Set up Railway monitoring/alerts (if available)
 - [ ] Bookmark Railway dashboard for easy access
@@ -182,14 +197,64 @@ If you have a custom domain:
 
 ## Troubleshooting Checklist
 
+### "The train has not arrived at the station" Error
+
+This error means **no domain has been generated** or the domain hasn't finished provisioning:
+
+- [ ] Go to Railway service → **Settings** → **Networking/Domains**
+- [ ] Click **"Generate Domain"** if you haven't already
+- [ ] Wait 1-2 minutes for domain provisioning to complete
+- [ ] Copy the generated domain (e.g., `your-app.up.railway.app`)
+- [ ] Update `ALLOWED_HOSTS` environment variable to include this domain
+- [ ] Update `CSRF_TRUSTED_ORIGINS` to include `https://your-app.up.railway.app`
+- [ ] Redeploy after updating environment variables
+
+### URL Not Working / "Not Found" Error
+
+If your generated URL shows an error page:
+
+1. **Check Railway Logs in Real-Time:**
+   - Go to Railway service → **Deployments** → Latest deployment
+   - Open the **Logs** tab
+   - **Keep the logs open** and try accessing your URL in a browser
+   - Look for error messages that appear when you access the URL
+   - Common errors:
+     - `DisallowedHost` - means `ALLOWED_HOSTS` doesn't match your domain
+     - `404 Not Found` - URL routing issue
+     - `500 Internal Server Error` - application error
+
+2. **Verify ALLOWED_HOSTS:**
+   - Go to Railway service → **Variables** tab
+   - Check `ALLOWED_HOSTS` value
+   - It should include your generated domain (e.g., `your-app.up.railway.app`)
+   - The code automatically adds `.railway.app` and `.up.railway.app`, but you should still set the specific domain
+   - Example: `ALLOWED_HOSTS=your-app.up.railway.app`
+
+3. **Verify CSRF_TRUSTED_ORIGINS:**
+   - Should include: `https://your-app.up.railway.app`
+   - Example: `CSRF_TRUSTED_ORIGINS=https://your-app.up.railway.app`
+
+4. **Test the Healthcheck Endpoint:**
+   - Try: `https://your-app.up.railway.app/health/`
+   - Should return "OK" if the app is working
+   - If this works but root URL doesn't, it's a routing issue
+
+5. **Wait for Domain Provisioning:**
+   - After generating a domain, wait 2-3 minutes
+   - Domain provisioning can take a few minutes
+   - Check Railway dashboard to see if domain status is "Active"
+
+### General Deployment Issues
+
 If deployment fails:
 
 - [ ] Check **Build logs** for errors
 - [ ] Check **Deploy logs** for runtime errors
+- [ ] **Check real-time logs when accessing the URL** (see above)
 - [ ] Verify all required environment variables are set
 - [ ] Verify `SECRET_KEY` is set and not the default value
 - [ ] Verify `DEBUG=False` is set
-- [ ] Verify `ALLOWED_HOSTS` includes your Railway domain
+- [ ] Verify `ALLOWED_HOSTS` includes your Railway domain (the one you generated)
 - [ ] Check database connection (verify `DATABASE_URL` is set)
 - [ ] Verify migrations completed successfully
 - [ ] Check if static files collection succeeded
