@@ -45,16 +45,9 @@ class HealthCheckView(TemplateView):
     Used for deployment healthchecks.
     """
     def get(self, request, *args, **kwargs):
-        # Simple check - just return 200 OK
-        # Optionally check database connectivity
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT 1")
-            return HttpResponse("OK", status=200, content_type="text/plain")
-        except Exception:
-            # Even if DB fails, return OK to allow app to start
-            # The app might be starting up
-            return HttpResponse("OK", status=200, content_type="text/plain")
+        # Ultra-simple check - just return 200 OK immediately
+        # No database queries, no template rendering, just HTTP 200
+        return HttpResponse("OK", status=200, content_type="text/plain")
 
 
 class EventsPartialView(TemplateView):
