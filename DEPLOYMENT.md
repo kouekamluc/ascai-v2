@@ -28,18 +28,18 @@ Set these environment variables in your deployment platform:
 - `EMAIL_HOST_PASSWORD`: Email password
 - `DEFAULT_FROM_EMAIL`: Sender email address
 
-## Railway Deployment
+## Railway Deployment (Docker)
 
-1. Create a new project on Railway
-2. Connect your GitHub repository
-3. Add a PostgreSQL service
-4. Set environment variables:
-   - `DJANGO_ENV=production`
-   - `DATABASE_URL` (auto-set from PostgreSQL service)
-   - `SECRET_KEY` (generate one)
-   - `ALLOWED_HOSTS=your-app-name.railway.app`
+1. Create a new project on Railway and select the Docker builder (Railway detects the `Dockerfile` automatically).
+2. Attach a PostgreSQL service; Railway injects `DATABASE_URL` for you.
+3. Configure environment variables:
+   - `DJANGO_ENV=production` (default in Dockerfile but keep it visible in the dashboard)
+   - `SECRET_KEY=<your-generated-key>`
+   - `ALLOWED_HOSTS=your-app-name.railway.app,your-custom-domain`
    - `DEBUG=False`
-5. Railway will automatically detect `Procfile` and deploy
+   - Optional `USE_S3` + AWS credentials if using S3
+4. Ensure the deploy start command is `./scripts/entrypoint.sh` (pre-configured in `railway.json`).
+5. Trigger a deploy. The entrypoint automatically runs migrations, collects static files, and starts Gunicorn.
 
 ## Render Deployment
 
