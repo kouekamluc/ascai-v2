@@ -193,12 +193,44 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         The parent method automatically uses get_email_confirmation_url() to get the activate_url
         and passes it to the email template context.
         """
-        try:
-            # Log email sending attempt
-            logger.info(
-                f"Sending email confirmation to {emailconfirmation.email_address.email} "
-                f"for user {emailconfirmation.email_address.user.username}"
+        from django.conf import settings
+        from django.core.mail import get_connection
+        
+        # Log email sending attempt with configuration details
+        email = emailconfirmation.email_address.email
+        username = emailconfirmation.email_address.user.username
+        
+        logger.info(
+            f"Sending email confirmation to {email} for user {username}"
+        )
+        logger.info(
+            f"Email backend: {settings.EMAIL_BACKEND}, "
+            f"Host: {getattr(settings, 'EMAIL_HOST', 'N/A')}, "
+            f"Port: {getattr(settings, 'EMAIL_PORT', 'N/A')}, "
+            f"User: {getattr(settings, 'EMAIL_HOST_USER', 'N/A')}"
+        )
+        
+        # Verify email backend is not console in production
+        if settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
+            logger.error(
+                f"ERROR: Console email backend is active! Email to {email} will not be sent. "
+                "Please configure SMTP backend in production."
             )
+        
+        try:
+            # Test connection if using SMTP
+            if settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+                try:
+                    connection = get_connection()
+                    connection.open()
+                    logger.info("SMTP connection test successful")
+                    connection.close()
+                except Exception as conn_error:
+                    logger.error(
+                        f"SMTP connection test failed: {str(conn_error)}. "
+                        "Email may not be sent. Please check your email configuration."
+                    )
+                    # Don't fail here, try to send anyway
             
             # Call parent method to send the email
             # The parent method will automatically call get_email_confirmation_url() 
@@ -206,17 +238,24 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             result = super().send_confirmation_mail(request, emailconfirmation, signup)
             
             logger.info(
-                f"Email confirmation sent successfully to {emailconfirmation.email_address.email}"
+                f"✓ Email confirmation sent successfully to {email}"
             )
             
             return result
         except Exception as e:
-            # Log the error but don't fail silently
+            # Log the error with full details
             logger.error(
-                f"Failed to send email confirmation to {emailconfirmation.email_address.email}: {str(e)}",
+                f"✗ Failed to send email confirmation to {email}: {str(e)}",
                 exc_info=True
             )
-            # Re-raise to ensure the error is visible
+            logger.error(
+                f"Email configuration check: "
+                f"Backend={settings.EMAIL_BACKEND}, "
+                f"Host={getattr(settings, 'EMAIL_HOST', 'Not set')}, "
+                f"User={getattr(settings, 'EMAIL_HOST_USER', 'Not set')}, "
+                f"Password={'Set' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'Not set'}"
+            )
+            # Re-raise to ensure the error is visible and user knows email wasn't sent
             raise
     
     def render_mail(self, template_prefix, email, context, headers=None):

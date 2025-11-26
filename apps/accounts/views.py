@@ -115,7 +115,31 @@ def profile(request):
 class CustomConfirmEmailView(ConfirmEmailView):
     """
     Custom email confirmation view that shows a styled success page.
+    Handles both GET and POST requests to show the confirmation form and success page.
     """
+    def get(self, *args, **kwargs):
+        """Handle GET request - show confirmation form."""
+        # Get the confirmation object
+        self.object = self.get_object()
+        
+        if not self.object:
+            # If no confirmation object, let parent handle it
+            logger.warning("CustomConfirmEmailView: No confirmation object found for GET request")
+            return super().get(*args, **kwargs)
+        
+        # Check if email is already verified
+        email_address = self.object.email_address
+        if email_address.verified:
+            # If already verified, show success page
+            logger.info(f"CustomConfirmEmailView: Email {email_address.email} already verified, showing success page")
+            return render(self.request, 'account/email_confirmed.html', {
+                'email_address': email_address,
+                'user': email_address.user
+            })
+        
+        # Otherwise, show the confirmation form (parent's GET method)
+        return super().get(*args, **kwargs)
+    
     def post(self, *args, **kwargs):
         """Handle email confirmation POST request."""
         # Get the confirmation object before processing
@@ -123,7 +147,7 @@ class CustomConfirmEmailView(ConfirmEmailView):
         
         if not self.object:
             # If no confirmation object, let parent handle it
-            logger.warning("CustomConfirmEmailView: No confirmation object found")
+            logger.warning("CustomConfirmEmailView: No confirmation object found for POST request")
             return super().post(*args, **kwargs)
         
         # Store the email address and its initial verified status
@@ -160,7 +184,15 @@ class CustomConfirmEmailView(ConfirmEmailView):
                 'user': email_address.user
             })
         
-        # Otherwise, return the parent's response (for errors, already verified, etc.)
+        # If already verified, also show success page
+        if email_address.verified:
+            logger.info(f"CustomConfirmEmailView: Email {email_address.email} was already verified, showing success page")
+            return render(self.request, 'account/email_confirmed.html', {
+                'email_address': email_address,
+                'user': email_address.user
+            })
+        
+        # Otherwise, return the parent's response (for errors, etc.)
         logger.debug("CustomConfirmEmailView: Returning parent's response")
         return response
 

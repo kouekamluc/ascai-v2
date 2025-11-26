@@ -117,20 +117,43 @@ if not CSRF_TRUSTED_ORIGINS:
 if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Email Configuration Validation
-# Warn if SMTP backend is configured but credentials are missing
-if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+# Email Configuration Validation and Enforcement
+# Ensure email backend is properly configured for production
+if EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
+    logger.error(
+        "ERROR: Console email backend is configured in production! "
+        "Emails will not be sent. Please set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend "
+        "and configure SMTP settings in your environment variables."
+    )
+elif EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
     if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
-        logger.warning(
-            "SMTP email backend is configured but EMAIL_HOST_USER or "
+        logger.error(
+            "ERROR: SMTP email backend is configured but EMAIL_HOST_USER or "
             "EMAIL_HOST_PASSWORD is missing. Emails will not be sent. "
             "Please configure email settings in your environment variables."
         )
     else:
         logger.info(
-            f"Email backend configured: {EMAIL_BACKEND} "
-            f"(Host: {EMAIL_HOST}, Port: {EMAIL_PORT})"
+            f"✓ Email backend configured: {EMAIL_BACKEND} "
+            f"(Host: {EMAIL_HOST}, Port: {EMAIL_PORT}, User: {EMAIL_HOST_USER})"
         )
+        # Test email connection on startup (non-blocking)
+        try:
+            from django.core.mail import get_connection
+            connection = get_connection()
+            connection.open()
+            connection.close()
+            logger.info("✓ Email SMTP connection test successful")
+        except Exception as e:
+            logger.error(
+                f"ERROR: Failed to connect to SMTP server: {str(e)}. "
+                "Please verify your EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, and EMAIL_HOST_PASSWORD settings."
+            )
+else:
+    logger.warning(
+        f"Email backend is set to {EMAIL_BACKEND}. "
+        "Make sure this is the correct backend for production."
+    )
 
 # Note: Site domain should be updated after deployment using:
 # python manage.py update_site_domain --domain your-app-name.up.railway.app
