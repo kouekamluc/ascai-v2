@@ -56,6 +56,7 @@ Go to your service → **Variables** tab and add the following:
   - *Replace `your-app-name` with your actual Railway app name*
   - *Add your custom domain if you have one (comma-separated)*
   - *Example: `ascai-lazio.up.railway.app,ascailazio.org,www.ascailazio.org`*
+  - *Note: `healthcheck.railway.app` and `.railway.app` are automatically added by the application*
 
 - [ ] **`CSRF_TRUSTED_ORIGINS`** = `https://your-app-name.up.railway.app,https://your-custom-domain.com`
   - *Same domains as ALLOWED_HOSTS but with `https://` prefix*

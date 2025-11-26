@@ -33,6 +33,19 @@ if not allowed_hosts_str:
         allowed_hosts_str = railway_domain
 
 ALLOWED_HOSTS = [s.strip() for s in allowed_hosts_str.split(',')] if allowed_hosts_str else []
+
+# Automatically add Railway's internal domains for healthchecks
+# Django supports leading dot notation for subdomain matching: .railway.app matches *.railway.app
+railway_internal_domains = [
+    'healthcheck.railway.app',
+    '.railway.app',  # Matches all Railway subdomains (e.g., *.railway.app)
+]
+
+# Add Railway internal domains if not already present
+for domain in railway_internal_domains:
+    if domain not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(domain)
+
 if not ALLOWED_HOSTS:
     raise ImproperlyConfigured(
         "ALLOWED_HOSTS must be set in production. Set it as a comma-separated list of domains, "
