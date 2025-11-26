@@ -3,6 +3,7 @@ Production settings for ASCAI Lazio project.
 """
 from .base import *
 from decouple import config
+from django.core.exceptions import ImproperlyConfigured
 
 try:
     import dj_database_url
@@ -11,7 +12,32 @@ except ImportError:
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+# Validate required settings in production
+if DEBUG:
+    raise ImproperlyConfigured(
+        "DEBUG must be False in production. Set DEBUG=False in your environment variables."
+    )
+
+# Validate SECRET_KEY
+if SECRET_KEY == 'django-insecure-change-me-in-production':
+    raise ImproperlyConfigured(
+        "SECRET_KEY must be set in production. Generate one and set it in your environment variables."
+    )
+
+# Get ALLOWED_HOSTS from environment, with fallback to Railway's public domain
+allowed_hosts_str = config('ALLOWED_HOSTS', default='')
+if not allowed_hosts_str:
+    # Try Railway's public domain as fallback
+    railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
+    if railway_domain:
+        allowed_hosts_str = railway_domain
+
+ALLOWED_HOSTS = [s.strip() for s in allowed_hosts_str.split(',')] if allowed_hosts_str else []
+if not ALLOWED_HOSTS:
+    raise ImproperlyConfigured(
+        "ALLOWED_HOSTS must be set in production. Set it as a comma-separated list of domains, "
+        "or ensure RAILWAY_PUBLIC_DOMAIN is available."
+    )
 
 # Database
 DATABASE_URL = config('DATABASE_URL', default=None)
@@ -20,13 +46,25 @@ if DATABASE_URL and dj_database_url:
         'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
+    # Validate individual database settings
+    db_name = config('DB_NAME', default=None)
+    db_user = config('DB_USER', default=None)
+    db_password = config('DB_PASSWORD', default=None)
+    db_host = config('DB_HOST', default=None)
+    
+    if not all([db_name, db_user, db_password, db_host]):
+        raise ImproperlyConfigured(
+            "Database configuration is incomplete. Either set DATABASE_URL or provide "
+            "DB_NAME, DB_USER, DB_PASSWORD, and DB_HOST environment variables."
+        )
+    
     DATABASES = {
         'default': {
             'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USER'),
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config('DB_HOST'),
+            'NAME': db_name,
+            'USER': db_user,
+            'PASSWORD': db_password,
+            'HOST': db_host,
             'PORT': config('DB_PORT', default='5432'),
             'CONN_MAX_AGE': 600,
         }
@@ -45,8 +83,14 @@ X_FRAME_OPTIONS = 'DENY'
 
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    cast=lambda v: [s.strip() for s in v.split(',')]
+    default='',
+    cast=lambda v: [s.strip() for s in v.split(',')] if v else []
 )
+
+# Validate CSRF_TRUSTED_ORIGINS matches ALLOWED_HOSTS
+if not CSRF_TRUSTED_ORIGINS:
+    # Auto-populate from ALLOWED_HOSTS if not set
+    CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS]
 
 # Static files (use S3 or WhiteNoise)
 if not USE_S3:
