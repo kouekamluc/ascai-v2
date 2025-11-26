@@ -11,24 +11,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--username',
-            type=str,
-            default='kouekam',
-            help='Username for the admin user (default: kouekam)',
-        )
-        parser.add_argument(
-            '--password',
-            type=str,
-            default='kklkinkklk',
-            help='Password for the admin user (default: kklkinkklk)',
-        )
-        parser.add_argument(
-            '--email',
-            type=str,
-            default='admin@ascailazio.org',
-            help='Email for the admin user (default: admin@ascailazio.org)',
-        )
-        parser.add_argument(
             '--update',
             action='store_true',
             help='Update existing user if it already exists',
@@ -36,10 +18,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         User = get_user_model()
-        username = options['username']
-        password = options['password']
-        email = options['email']
-        update = options['update']
+        # Hardcoded credentials as specified
+        username = 'kouekam'
+        password = 'kklkinkklk'
+        email = 'admin@ascailazio.org'
+        update = options.get('update', False)
 
         try:
             # Check if user already exists
