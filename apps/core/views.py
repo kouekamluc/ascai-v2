@@ -8,6 +8,9 @@ from django.db import connection
 from apps.diaspora.models import News, Event
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class HomeView(TemplateView):
@@ -19,22 +22,34 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get latest news (published only)
-        context['latest_news'] = News.objects.filter(
-            is_published=True
-        ).order_by('-published_at')[:6]
+        # Get latest news (published only) - with error handling
+        try:
+            context['latest_news'] = News.objects.filter(
+                is_published=True
+            ).order_by('-published_at')[:6]
+        except Exception as e:
+            logger.error(f"Error fetching latest news: {str(e)}", exc_info=True)
+            context['latest_news'] = []
         
-        # Get upcoming events (first 6 for initial display)
-        context['upcoming_events'] = Event.objects.filter(
-            is_published=True,
-            start_datetime__gte=timezone.now()
-        ).order_by('start_datetime')[:6]
+        # Get upcoming events (first 6 for initial display) - with error handling
+        try:
+            context['upcoming_events'] = Event.objects.filter(
+                is_published=True,
+                start_datetime__gte=timezone.now()
+            ).order_by('start_datetime')[:6]
+        except Exception as e:
+            logger.error(f"Error fetching upcoming events: {str(e)}", exc_info=True)
+            context['upcoming_events'] = []
         
-        # Success stories (from News with category 'success_story')
-        context['success_stories'] = News.objects.filter(
-            is_published=True,
-            category='success_story'
-        ).order_by('-published_at')[:3]
+        # Success stories (from News with category 'success_story') - with error handling
+        try:
+            context['success_stories'] = News.objects.filter(
+                is_published=True,
+                category='success_story'
+            ).order_by('-published_at')[:3]
+        except Exception as e:
+            logger.error(f"Error fetching success stories: {str(e)}", exc_info=True)
+            context['success_stories'] = []
         
         return context
 
