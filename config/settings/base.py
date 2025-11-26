@@ -170,7 +170,16 @@ if USE_S3:
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
 
 # Email Configuration
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+# SendGrid API Key (preferred - bypasses SMTP blocking)
+SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='')
+
+# Use SendGrid API backend if API key is set, otherwise use SMTP
+if SENDGRID_API_KEY:
+    EMAIL_BACKEND = 'apps.core.email_backends.SendGridBackend'
+else:
+    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+
+# SMTP Configuration (fallback if SendGrid API not used)
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
