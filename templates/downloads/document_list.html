@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Downloads' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-2">{% trans 'Downloads' %}</h1>
+        <p class="text-gray-600">{% trans 'Access forms, applications, and ASCAI Lazio documents' %}</p>
+    </div>
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form hx-get="{% url 'downloads:index' %}" hx-target="#document-list" hx-trigger="change, keyup delay:500ms">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <select name="category" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                    <option value="">{% trans 'All Categories' %}</option>
+                    <option value="reddito">{% trans 'Reddìto Forms' %}</option>
+                    <option value="enrollment">{% trans 'Enrollment Documents' %}</option>
+                    <option value="visa">{% trans 'Visa-Related Documents' %}</option>
+                    <option value="guidelines">{% trans 'ASCAI Lazio Guidelines' %}</option>
+                </select>
+                <input type="text" name="search" placeholder="{% trans 'Search documents...' %}" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+            </div>
+        </form>
+    </div>
+    
+    <!-- Document List Grouped by Category -->
+    <div id="document-list">
+        {% if grouped_documents %}
+            {% for category_key, category_data in grouped_documents.items %}
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold mb-4 text-cameroon-green">{{ category_data.name }}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for document in category_data.documents %}
+                    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold mb-2 text-gray-900">{{ document.title }}</h3>
+                                    {% if document.description %}
+                                    <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ document.description|truncatewords:15 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-2">
+                                    {% if document.file_type == 'pdf' %}
+                                    <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M4 18h12V6h-4V2H4v16zm-2 1V0h12l4 4v16H2v-1z"/>
+                                    </svg>
+                                    {% else %}
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                                <div id="download-count-{{ document.pk }}" class="text-sm text-gray-500">
+                                    {{ document.download_count }} {% trans 'downloads' %}
+                                </div>
+                                <form hx-post="{% url 'downloads:increment_count' document.pk %}" 
+                                      hx-target="#download-count-{{ document.pk }}"
+                                      hx-swap="outerHTML"
+                                      class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            onclick="window.open('{% url 'downloads:document_download' document.pk %}', '_blank'); return false;"
+                                            class="px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition-colors duration-200 text-sm font-medium">
+                                        {% trans 'Download' %}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                <p class="text-gray-500 text-lg">{% trans 'No documents available.' %}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
