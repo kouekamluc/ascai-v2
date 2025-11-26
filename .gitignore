@@ -32,6 +32,7 @@ db.sqlite3-journal
 
 # Environment
 .env
+.env.example
 .env.local
 .env.*.local
 .venv
@@ -40,9 +41,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
-# Keep .env.example for reference
-!.env.example
 
 # IDE
 .vscode/
