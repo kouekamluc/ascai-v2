@@ -14,6 +14,9 @@ from allauth.account.views import ConfirmEmailView
 from allauth.account.models import EmailConfirmation
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from .models import User
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RegisterView(CreateView):
@@ -118,18 +121,46 @@ class CustomConfirmEmailView(ConfirmEmailView):
         # Get the confirmation object before processing
         self.object = self.get_object()
         
+        if not self.object:
+            # If no confirmation object, let parent handle it
+            logger.warning("CustomConfirmEmailView: No confirmation object found")
+            return super().post(*args, **kwargs)
+        
+        # Store the email address and its initial verified status
+        email_address = self.object.email_address
+        was_verified_before = email_address.verified
+        
+        logger.info(
+            f"CustomConfirmEmailView: Processing email confirmation for {email_address.email} "
+            f"(currently verified: {was_verified_before})"
+        )
+        
         # Call parent method to confirm email
-        response = super().post(*args, **kwargs)
+        try:
+            response = super().post(*args, **kwargs)
+        except Exception as e:
+            logger.error(f"CustomConfirmEmailView: Error during email confirmation: {str(e)}", exc_info=True)
+            # Re-raise to let parent handle error display
+            raise
         
-        # If confirmation was successful, show styled success page
-        # Refresh the object to get updated verification status
-        if self.object:
-            self.object.email_address.refresh_from_db()
-            if self.object.email_address.verified:
-                return render(self.request, 'account/email_confirmed.html', {
-                    'email_address': self.object.email_address,
-                    'user': self.object.email_address.user
-                })
+        # Refresh the email address to get updated verification status
+        email_address.refresh_from_db()
         
+        logger.info(
+            f"CustomConfirmEmailView: Email confirmation processed. "
+            f"Email verified: {email_address.verified} (was: {was_verified_before})"
+        )
+        
+        # If confirmation was successful (email is now verified), show styled success page
+        if email_address.verified and not was_verified_before:
+            logger.info(f"CustomConfirmEmailView: Showing styled success page for {email_address.email}")
+            # Return our styled success page instead of redirect
+            return render(self.request, 'account/email_confirmed.html', {
+                'email_address': email_address,
+                'user': email_address.user
+            })
+        
+        # Otherwise, return the parent's response (for errors, already verified, etc.)
+        logger.debug("CustomConfirmEmailView: Returning parent's response")
         return response
 

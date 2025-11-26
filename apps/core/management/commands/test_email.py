@@ -2,9 +2,12 @@
 Management command to test email configuration by sending a test email.
 """
 from django.core.management.base import BaseCommand
-from django.core.mail import send_mail
+from django.core.mail import send_mail, get_connection
 from django.conf import settings
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -40,6 +43,45 @@ class Command(BaseCommand):
         self.stdout.write(f'  Recipient: {recipient}')
         self.stdout.write('='*60 + '\n')
         
+        # Validate email configuration
+        if settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
+            self.stdout.write(
+                self.style.WARNING(
+                    '⚠ WARNING: Using console email backend. Emails will be printed to console, not actually sent.'
+                )
+            )
+            self.stdout.write('   To send real emails, set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend\n')
+        elif settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+            # Validate SMTP settings
+            email_host = getattr(settings, 'EMAIL_HOST', '')
+            email_user = getattr(settings, 'EMAIL_HOST_USER', '')
+            email_password = getattr(settings, 'EMAIL_HOST_PASSWORD', '')
+            
+            if not email_host:
+                self.stdout.write(
+                    self.style.ERROR('✗ ERROR: EMAIL_HOST is not set!')
+                )
+                sys.exit(1)
+            
+            if not email_user:
+                self.stdout.write(
+                    self.style.ERROR('✗ ERROR: EMAIL_HOST_USER is not set!')
+                )
+                sys.exit(1)
+            
+            if not email_password:
+                self.stdout.write(
+                    self.style.ERROR('✗ ERROR: EMAIL_HOST_PASSWORD is not set!')
+                )
+                sys.exit(1)
+            
+            self.stdout.write(
+                self.style.SUCCESS('✓ Email configuration validated')
+            )
+            self.stdout.write(f'  SMTP Host: {email_host}')
+            self.stdout.write(f'  SMTP User: {email_user}')
+            self.stdout.write(f'  SMTP Password: {"*" * len(email_password)} (hidden)\n')
+        
         # Compose email message
         message = f"""This is a test email from the ASCAI Lazio Django application.
 
@@ -57,13 +99,33 @@ This email was sent to verify that email functionality is properly configured.
         try:
             self.stdout.write(f'Sending test email to {recipient}...')
             
-            send_mail(
+            # Log the attempt
+            logger.info(f"Attempting to send test email to {recipient}")
+            
+            # Test connection first
+            if settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+                try:
+                    connection = get_connection()
+                    connection.open()
+                    self.stdout.write(self.style.SUCCESS('✓ SMTP connection established'))
+                    connection.close()
+                except Exception as conn_error:
+                    self.stdout.write(
+                        self.style.ERROR(f'✗ Failed to establish SMTP connection: {str(conn_error)}')
+                    )
+                    raise
+            
+            # Send the email
+            result = send_mail(
                 subject=subject,
                 message=message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[recipient],
                 fail_silently=False,
             )
+            
+            # Log success
+            logger.info(f"Test email sent successfully to {recipient}")
             
             self.stdout.write('\n' + '='*60)
             self.stdout.write(
@@ -76,6 +138,9 @@ This email was sent to verify that email functionality is properly configured.
             self.stdout.write('If you received the email, your configuration is working correctly!\n')
             
         except Exception as e:
+            # Log the error
+            logger.error(f"Failed to send test email to {recipient}: {str(e)}", exc_info=True)
+            
             self.stdout.write('\n' + '='*60)
             self.stdout.write(
                 self.style.ERROR(f'✗ Failed to send email: {str(e)}')
@@ -85,9 +150,11 @@ This email was sent to verify that email functionality is properly configured.
             self.stdout.write('1. Check that EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are set correctly')
             self.stdout.write('2. Verify your email provider credentials')
             self.stdout.write('3. For Gmail: Make sure you\'re using an App Password, not your regular password')
+            self.stdout.write('   - Remove ALL SPACES from the App Password')
             self.stdout.write('4. For SendGrid: Make sure EMAIL_HOST_USER is set to "apikey"')
             self.stdout.write('5. Check your email provider\'s SMTP settings')
             self.stdout.write('6. Verify firewall/network isn\'t blocking port 587 or 465')
-            self.stdout.write('7. Review the EMAIL_IMPLEMENTATION_GUIDE.md for detailed setup instructions\n')
+            self.stdout.write('7. Check Railway logs for detailed error messages')
+            self.stdout.write('8. Review the EMAIL_IMPLEMENTATION_GUIDE.md for detailed setup instructions\n')
             sys.exit(1)
 
