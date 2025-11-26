@@ -47,7 +47,7 @@ class Command(BaseCommand):
         if settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
             self.stdout.write(
                 self.style.WARNING(
-                    '⚠ WARNING: Using console email backend. Emails will be printed to console, not actually sent.'
+                    'WARNING: Using console email backend. Emails will be printed to console, not actually sent.'
                 )
             )
             self.stdout.write('   To send real emails, set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend\n')
@@ -59,24 +59,24 @@ class Command(BaseCommand):
             
             if not email_host:
                 self.stdout.write(
-                    self.style.ERROR('✗ ERROR: EMAIL_HOST is not set!')
+                    self.style.ERROR('ERROR: EMAIL_HOST is not set!')
                 )
                 sys.exit(1)
             
             if not email_user:
                 self.stdout.write(
-                    self.style.ERROR('✗ ERROR: EMAIL_HOST_USER is not set!')
+                    self.style.ERROR('ERROR: EMAIL_HOST_USER is not set!')
                 )
                 sys.exit(1)
             
             if not email_password:
                 self.stdout.write(
-                    self.style.ERROR('✗ ERROR: EMAIL_HOST_PASSWORD is not set!')
+                    self.style.ERROR('ERROR: EMAIL_HOST_PASSWORD is not set!')
                 )
                 sys.exit(1)
             
             self.stdout.write(
-                self.style.SUCCESS('✓ Email configuration validated')
+                self.style.SUCCESS('Email configuration validated')
             )
             self.stdout.write(f'  SMTP Host: {email_host}')
             self.stdout.write(f'  SMTP User: {email_user}')
@@ -107,11 +107,11 @@ This email was sent to verify that email functionality is properly configured.
                 try:
                     connection = get_connection()
                     connection.open()
-                    self.stdout.write(self.style.SUCCESS('✓ SMTP connection established'))
+                    self.stdout.write(self.style.SUCCESS('SMTP connection established'))
                     connection.close()
                 except Exception as conn_error:
                     self.stdout.write(
-                        self.style.ERROR(f'✗ Failed to establish SMTP connection: {str(conn_error)}')
+                        self.style.ERROR(f'Failed to establish SMTP connection: {str(conn_error)}')
                     )
                     raise
             
@@ -130,7 +130,7 @@ This email was sent to verify that email functionality is properly configured.
             self.stdout.write('\n' + '='*60)
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'✓ Successfully sent test email to {recipient}'
+                    f'Successfully sent test email to {recipient}'
                 )
             )
             self.stdout.write('='*60)
@@ -143,7 +143,7 @@ This email was sent to verify that email functionality is properly configured.
             
             self.stdout.write('\n' + '='*60)
             self.stdout.write(
-                self.style.ERROR(f'✗ Failed to send email: {str(e)}')
+                self.style.ERROR(f'Failed to send email: {str(e)}')
             )
             self.stdout.write('='*60)
             self.stdout.write('\nTroubleshooting Tips:')

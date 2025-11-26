@@ -160,21 +160,12 @@ elif EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
         )
     else:
         logger.info(
-            f"✓ Email backend configured: {EMAIL_BACKEND} "
+            f"Email backend configured: {EMAIL_BACKEND} "
             f"(Host: {EMAIL_HOST}, Port: {EMAIL_PORT}, User: {EMAIL_HOST_USER})"
         )
-        # Test email connection on startup (non-blocking)
-        try:
-            from django.core.mail import get_connection
-            connection = get_connection()
-            connection.open()
-            connection.close()
-            logger.info("✓ Email SMTP connection test successful")
-        except Exception as e:
-            logger.error(
-                f"ERROR: Failed to connect to SMTP server: {str(e)}. "
-                "Please verify your EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, and EMAIL_HOST_PASSWORD settings."
-            )
+        # Note: Email connection test removed from startup to prevent blocking
+        # Email connection will be tested when actually sending emails
+        # If emails fail, check logs for detailed error messages
 else:
     logger.warning(
         f"Email backend is set to {EMAIL_BACKEND}. "
