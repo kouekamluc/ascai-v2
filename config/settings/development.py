@@ -24,6 +24,10 @@ def get_config():
 # Use the config function
 _config = get_config()
 
+# Override SECRET_KEY to use _config (which reads from .env.example as fallback)
+# This ensures SECRET_KEY can be read from .env.example if .env doesn't exist
+SECRET_KEY = _config('SECRET_KEY', default='django-insecure-change-me-in-production')
+
 DEBUG = _config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = _config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
@@ -80,16 +84,60 @@ CSRF_TRUSTED_ORIGINS = _config(
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 
-# Email backend (console for development)
+# Email backend (console for development - emails print to terminal)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Debug toolbar (optional)
+# Override email settings to ensure console backend works
+# These will be used if EMAIL_BACKEND is set to SMTP in .env
+EMAIL_HOST = _config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = _config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = _config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = _config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = _config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = _config('DEFAULT_FROM_EMAIL', default='ASCAI Lazio <noreply@ascailazio.org>')
+CONTACT_EMAIL = _config('CONTACT_EMAIL', default='info@ascailazio.org')
+
+# Debug toolbar (optional - install with: pip install django-debug-toolbar)
 if DEBUG:
     try:
         import debug_toolbar
         INSTALLED_APPS += ['debug_toolbar']
         MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
-        INTERNAL_IPS = ['127.0.0.1']
+        INTERNAL_IPS = ['127.0.0.1', 'localhost']
     except ImportError:
         pass  # debug_toolbar not installed, skip it
+
+# Logging configuration for development
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'WARNING',  # Set to 'DEBUG' to see SQL queries
+            'propagate': False,
+        },
+    },
+}
 

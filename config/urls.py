@@ -37,7 +37,12 @@ urlpatterns += i18n_patterns(
 )
 
 # Serve media files in development
+# Note: Static files are automatically served by Django's runserver when DEBUG=True
+# from STATICFILES_DIRS, so we only need to serve media files manually
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # Only serve static files if STATIC_ROOT exists (for development convenience)
+    # Django's runserver automatically serves from STATICFILES_DIRS
+    if settings.STATIC_ROOT and settings.STATIC_ROOT.exists():
+        urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
