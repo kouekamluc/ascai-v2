@@ -4,6 +4,28 @@ set -euo pipefail
 
 echo "Running predeploy tasks..."
 
+# Check database connectivity
+echo "Checking database connectivity..."
+if python manage.py check --database default 2>/dev/null; then
+    echo "✓ Database connection successful"
+else
+    echo "⚠ Warning: Database connectivity check failed"
+    echo "⚠ Migrations may fail if database is not accessible"
+fi
+
+# Check migration state
+echo "Checking migration state..."
+if python manage.py showmigrations --plan >/dev/null 2>&1; then
+    unapplied_count=$(python manage.py showmigrations --plan 2>/dev/null | grep -c "\[ \]" || echo "0")
+    if [ "$unapplied_count" -gt 0 ]; then
+        echo "⚠ Found $unapplied_count unapplied migration(s)"
+    else
+        echo "✓ All migrations are applied"
+    fi
+else
+    echo "⚠ Could not check migration state"
+fi
+
 # Compile Django translation files
 echo "Compiling translation files..."
 if python manage.py compilemessages --noinput 2>/dev/null; then
