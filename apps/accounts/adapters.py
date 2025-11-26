@@ -131,6 +131,8 @@ class CustomAccountAdapter(DefaultAccountAdapter):
     def save_user(self, request, user, form, commit=True):
         """
         Save the user with custom fields.
+        Note: We keep user active initially so email confirmation can be sent.
+        User will be set to inactive after email confirmation if needed.
         """
         user = super().save_user(request, user, form, commit=False)
         
@@ -142,10 +144,17 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         
         # Set approval status - require admin approval
         user.is_approved = False
-        user.is_active = False  # Inactive until approved
+        # Keep user active initially so email confirmation can be sent
+        # The backend will check is_approved for login, not just is_active
+        # We'll handle inactive status after email confirmation if needed
+        user.is_active = True  # Keep active for email confirmation
         
         if commit:
             user.save()
+            logger.info(
+                f"User {user.username} ({user.email}) created with is_approved=False, is_active=True "
+                f"(will be checked by backend for login)"
+            )
         
         return user
     
@@ -199,63 +208,70 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         # Log email sending attempt with configuration details
         email = emailconfirmation.email_address.email
         username = emailconfirmation.email_address.user.username
+        user = emailconfirmation.email_address.user
         
-        logger.info(
-            f"Sending email confirmation to {email} for user {username}"
-        )
-        logger.info(
-            f"Email backend: {settings.EMAIL_BACKEND}, "
-            f"Host: {getattr(settings, 'EMAIL_HOST', 'N/A')}, "
-            f"Port: {getattr(settings, 'EMAIL_PORT', 'N/A')}, "
-            f"User: {getattr(settings, 'EMAIL_HOST_USER', 'N/A')}"
-        )
+        logger.info("=" * 60)
+        logger.info("EMAIL CONFIRMATION ATTEMPT")
+        logger.info("=" * 60)
+        logger.info(f"User: {username} ({email})")
+        logger.info(f"User is_active: {user.is_active}, is_approved: {user.is_approved}")
+        logger.info(f"Email backend: {settings.EMAIL_BACKEND}")
+        logger.info(f"SMTP Host: {getattr(settings, 'EMAIL_HOST', 'N/A')}")
+        logger.info(f"SMTP Port: {getattr(settings, 'EMAIL_PORT', 'N/A')}")
+        logger.info(f"SMTP User: {getattr(settings, 'EMAIL_HOST_USER', 'N/A')}")
+        logger.info(f"SMTP Password: {'SET' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'NOT SET'}")
         
         # Verify email backend is not console in production
         if settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
-            logger.error(
-                f"ERROR: Console email backend is active! Email to {email} will not be sent. "
-                "Please configure SMTP backend in production."
+            error_msg = (
+                f"CRITICAL ERROR: Console email backend is active! "
+                f"Email to {email} will NOT be sent in production. "
+                f"Set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend in Railway."
             )
+            logger.error("=" * 60)
+            logger.error(error_msg)
+            logger.error("=" * 60)
+            # In production, this is a critical error - raise it
+            if not settings.DEBUG:
+                raise Exception(error_msg)
         
         try:
             # Test connection if using SMTP
             if settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
                 try:
+                    logger.info("Testing SMTP connection...")
                     connection = get_connection()
                     connection.open()
-                    logger.info("SMTP connection test successful")
+                    logger.info("✓ SMTP connection test successful")
                     connection.close()
                 except Exception as conn_error:
-                    logger.error(
-                        f"SMTP connection test failed: {str(conn_error)}. "
-                        "Email may not be sent. Please check your email configuration."
-                    )
-                    # Don't fail here, try to send anyway
+                    logger.error(f"✗ SMTP connection test FAILED: {str(conn_error)}")
+                    logger.error("Email may fail to send. Check Railway email configuration.")
+                    # Don't fail here, try to send anyway - sometimes connection test fails but sending works
             
             # Call parent method to send the email
             # The parent method will automatically call get_email_confirmation_url() 
             # and pass it to the template as 'activate_url'
+            logger.info(f"Attempting to send email confirmation to {email}...")
             result = super().send_confirmation_mail(request, emailconfirmation, signup)
             
-            logger.info(
-                f"✓ Email confirmation sent successfully to {email}"
-            )
+            logger.info("=" * 60)
+            logger.info(f"✅ SUCCESS: Email confirmation sent to {email}")
+            logger.info("=" * 60)
             
             return result
         except Exception as e:
             # Log the error with full details
-            logger.error(
-                f"✗ Failed to send email confirmation to {email}: {str(e)}",
-                exc_info=True
-            )
-            logger.error(
-                f"Email configuration check: "
-                f"Backend={settings.EMAIL_BACKEND}, "
-                f"Host={getattr(settings, 'EMAIL_HOST', 'Not set')}, "
-                f"User={getattr(settings, 'EMAIL_HOST_USER', 'Not set')}, "
-                f"Password={'Set' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'Not set'}"
-            )
-            # Re-raise to ensure the error is visible and user knows email wasn't sent
+            logger.error("=" * 60)
+            logger.error("EMAIL CONFIRMATION FAILED")
+            logger.error("=" * 60)
+            logger.error(f"Failed to send email to {email}: {str(e)}", exc_info=True)
+            logger.error(f"Backend: {settings.EMAIL_BACKEND}")
+            logger.error(f"Host: {getattr(settings, 'EMAIL_HOST', 'Not set')}")
+            logger.error(f"User: {getattr(settings, 'EMAIL_HOST_USER', 'Not set')}")
+            logger.error(f"Password: {'SET' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'NOT SET'}")
+            logger.error("=" * 60)
+            # Re-raise to ensure the error is visible
             raise
     
     def render_mail(self, template_prefix, email, context, headers=None):

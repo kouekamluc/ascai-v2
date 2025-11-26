@@ -84,11 +84,13 @@ CSRF_TRUSTED_ORIGINS = _config(
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 
-# Email backend (console for development - emails print to terminal)
+# Email Configuration
+# Note: Base email settings are inherited from base.py, but we override EMAIL_BACKEND for development
+# In development, we use console backend so emails print to terminal instead of being sent
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Override email settings to ensure console backend works
-# These will be used if EMAIL_BACKEND is set to SMTP in .env
+# Override email settings (inherited from base.py, but redefined here for clarity)
+# These will be used if you override EMAIL_BACKEND to SMTP in .env for testing
 EMAIL_HOST = _config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = _config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = _config('EMAIL_USE_TLS', default=True, cast=bool)

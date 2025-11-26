@@ -117,6 +117,32 @@ if not CSRF_TRUSTED_ORIGINS:
 if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Email Configuration
+# Note: Email settings are inherited from base.py via 'from .base import *'
+# They read from environment variables. We explicitly show them here for clarity.
+# The validation below ensures they are set correctly for production.
+#
+# These settings come from base.py but are shown here for reference:
+# EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+# EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+# EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+# EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ASCAI Lazio <noreply@ascailazio.org>')
+# CONTACT_EMAIL = config('CONTACT_EMAIL', default='info@ascailazio.org')
+#
+# Required environment variables for production:
+# - EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend (MUST be set, not console!)
+# - EMAIL_HOST=smtp.gmail.com (or your SMTP provider)
+# - EMAIL_PORT=587
+# - EMAIL_USE_TLS=True
+# - EMAIL_HOST_USER=your-email@example.com
+# - EMAIL_HOST_PASSWORD=your-password-or-app-password
+# - DEFAULT_FROM_EMAIL=ASCAI Lazio <noreply@ascailazio.org>
+# - CONTACT_EMAIL=info@ascailazio.org
+
 # Email Configuration Validation and Enforcement
 # Ensure email backend is properly configured for production
 if EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
