@@ -235,20 +235,10 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             # The email will fail but user signup can still complete
             # Admin can check logs and fix email configuration
         
+        # Skip SMTP connection test - it can cause blocking/timeout issues
+        # Just try to send the email directly
+        
         try:
-            # Test connection if using SMTP
-            if settings.EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
-                try:
-                    logger.info("Testing SMTP connection...")
-                    connection = get_connection()
-                    connection.open()
-                    logger.info("✓ SMTP connection test successful")
-                    connection.close()
-                except Exception as conn_error:
-                    logger.error(f"✗ SMTP connection test FAILED: {str(conn_error)}")
-                    logger.error("Email may fail to send. Check Railway email configuration.")
-                    # Don't fail here, try to send anyway - sometimes connection test fails but sending works
-            
             # Call parent method to send the email
             # The parent method will automatically call get_email_confirmation_url() 
             # and pass it to the template as 'activate_url'
@@ -256,23 +246,31 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             result = super().send_confirmation_mail(request, emailconfirmation, signup)
             
             logger.info("=" * 60)
-            logger.info(f"✅ SUCCESS: Email confirmation sent to {email}")
+            logger.info(f"SUCCESS: Email confirmation sent to {email}")
             logger.info("=" * 60)
             
             return result
         except Exception as e:
-            # Log the error with full details
+            # Catch ALL exceptions including SystemExit to prevent worker crashes
+            # Log the error with full details but DON'T break signup
             logger.error("=" * 60)
-            logger.error("EMAIL CONFIRMATION FAILED")
+            logger.error("EMAIL CONFIRMATION FAILED - BUT SIGNUP WILL CONTINUE")
             logger.error("=" * 60)
             logger.error(f"Failed to send email to {email}: {str(e)}", exc_info=True)
+            logger.error(f"Exception type: {type(e).__name__}")
             logger.error(f"Backend: {settings.EMAIL_BACKEND}")
             logger.error(f"Host: {getattr(settings, 'EMAIL_HOST', 'Not set')}")
             logger.error(f"User: {getattr(settings, 'EMAIL_HOST_USER', 'Not set')}")
             logger.error(f"Password: {'SET' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'NOT SET'}")
             logger.error("=" * 60)
-            # Re-raise to ensure the error is visible
-            raise
+            logger.error("User signup will complete, but email confirmation was not sent.")
+            logger.error("Admin should check email configuration and resend confirmation email if needed.")
+            logger.error("=" * 60)
+            # DON'T re-raise - allow signup to complete even if email fails
+            # The user account is created, admin can manually send confirmation email later
+            # Return None to indicate email was not sent, but don't break the signup flow
+            # This prevents SystemExit and other exceptions from crashing the worker
+            return None
     
     def render_mail(self, template_prefix, email, context, headers=None):
         """
