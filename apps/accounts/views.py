@@ -118,27 +118,23 @@ class CustomConfirmEmailView(ConfirmEmailView):
     Handles both GET and POST requests to show the confirmation form and success page.
     """
     def get(self, *args, **kwargs):
-        """Handle GET request - show confirmation form."""
+        """Handle GET request - show confirmation form using our styled template."""
         # Get the confirmation object
         self.object = self.get_object()
         
-        if not self.object:
-            # If no confirmation object, let parent handle it
-            logger.warning("CustomConfirmEmailView: No confirmation object found for GET request")
-            return super().get(*args, **kwargs)
-        
         # Check if email is already verified
-        email_address = self.object.email_address
-        if email_address.verified:
+        if self.object and self.object.email_address.verified:
             # If already verified, show success page
-            logger.info(f"CustomConfirmEmailView: Email {email_address.email} already verified, showing success page")
+            logger.info(f"CustomConfirmEmailView: Email {self.object.email_address.email} already verified, showing success page")
             return render(self.request, 'account/email_confirmed.html', {
-                'email_address': email_address,
-                'user': email_address.user
+                'email_address': self.object.email_address,
+                'user': self.object.email_address.user
             })
         
-        # Otherwise, show the confirmation form (parent's GET method)
-        return super().get(*args, **kwargs)
+        # Render our styled template (works for both valid confirmation and invalid/None)
+        return render(self.request, 'account/email_confirm.html', {
+            'confirmation': self.object
+        })
     
     def post(self, *args, **kwargs):
         """Handle email confirmation POST request."""
@@ -146,9 +142,11 @@ class CustomConfirmEmailView(ConfirmEmailView):
         self.object = self.get_object()
         
         if not self.object:
-            # If no confirmation object, let parent handle it
+            # If no confirmation object, show our styled error page
             logger.warning("CustomConfirmEmailView: No confirmation object found for POST request")
-            return super().post(*args, **kwargs)
+            return render(self.request, 'account/email_confirm.html', {
+                'confirmation': None
+            })
         
         # Store the email address and its initial verified status
         email_address = self.object.email_address
@@ -164,8 +162,10 @@ class CustomConfirmEmailView(ConfirmEmailView):
             response = super().post(*args, **kwargs)
         except Exception as e:
             logger.error(f"CustomConfirmEmailView: Error during email confirmation: {str(e)}", exc_info=True)
-            # Re-raise to let parent handle error display
-            raise
+            # Show our styled error page instead of AllAuth's default
+            return render(self.request, 'account/email_confirm.html', {
+                'confirmation': None
+            })
         
         # Refresh the email address to get updated verification status
         email_address.refresh_from_db()
