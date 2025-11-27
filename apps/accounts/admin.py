@@ -4,6 +4,7 @@ Admin configuration for accounts app.
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
+from allauth.account.models import EmailAddress
 from .models import User, UserDocument
 
 
@@ -12,8 +13,8 @@ class UserAdmin(BaseUserAdmin):
     """
     Custom admin interface for User model.
     """
-    list_display = ['username', 'email', 'full_name', 'role', 'is_approved', 'is_active', 'date_joined']
-    list_filter = ['role', 'is_approved', 'is_active', 'is_staff', 'date_joined']
+    list_display = ['username', 'email', 'full_name', 'role', 'is_approved', 'email_verified', 'is_active', 'date_joined']
+    list_filter = ['role', 'is_approved', 'email_verified', 'is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'full_name']
     
     fieldsets = BaseUserAdmin.fieldsets + (
@@ -35,7 +36,7 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     
-    actions = ['approve_users', 'reject_users']
+    actions = ['approve_users', 'reject_users', 'verify_emails', 'mark_emails_unverified']
     
     def save_model(self, request, obj, form, change):
         """Override save to auto-approve superusers and staff."""
@@ -60,6 +61,28 @@ class UserAdmin(BaseUserAdmin):
         updated = queryset.update(is_approved=False)
         self.message_user(request, f'{updated} user(s) rejected.')
     reject_users.short_description = _('Reject selected users')
+
+    def verify_emails(self, request, queryset):
+        """Mark selected users' emails as verified (including allauth records)."""
+        updated = queryset.update(email_verified=True)
+        for user in queryset:
+            if not user.email:
+                continue
+            EmailAddress.objects.filter(user=user).exclude(email=user.email).update(primary=False)
+            EmailAddress.objects.update_or_create(
+                user=user,
+                email=user.email,
+                defaults={'verified': True, 'primary': True}
+            )
+        self.message_user(request, f'{updated} user email(s) marked as verified.')
+    verify_emails.short_description = _('Verify selected user emails')
+
+    def mark_emails_unverified(self, request, queryset):
+        """Mark selected users' emails as unverified."""
+        updated = queryset.update(email_verified=False)
+        EmailAddress.objects.filter(user__in=queryset).update(verified=False)
+        self.message_user(request, f'{updated} user email(s) marked as unverified.')
+    mark_emails_unverified.short_description = _('Unverify selected user emails')
 
 
 @admin.register(UserDocument)

@@ -96,3 +96,7 @@ class Command(BaseCommand):
         
         self.stdout.write(self.style.SUCCESS('\n✓ Migration check completed'))
 
+
+
+
+

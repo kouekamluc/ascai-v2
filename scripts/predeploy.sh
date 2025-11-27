@@ -29,17 +29,46 @@ fi
 # Compile Django translation files
 echo "Compiling translation files..."
 # Try Django's compilemessages first (requires gettext)
-if command -v msgfmt >/dev/null 2>&1 && python manage.py compilemessages --noinput 2>/dev/null; then
-    echo "✓ Translations compiled using Django compilemessages"
+if command -v msgfmt >/dev/null 2>&1; then
+    if python manage.py compilemessages --noinput 2>&1; then
+        echo "✓ Translations compiled using Django compilemessages"
+    else
+        echo "⚠ Django compilemessages failed, trying Python script..."
+        if python compile_translations.py 2>&1; then
+            echo "✓ Translations compiled using Python script"
+        else
+            echo "✗ ERROR: Translation compilation failed!"
+            echo "✗ Translations will not work correctly"
+            exit 1
+        fi
+    fi
 else
-    echo "Falling back to Python translation compiler..."
-    if python compile_translations.py 2>/dev/null; then
+    echo "gettext not available, using Python translation compiler..."
+    if python compile_translations.py 2>&1; then
         echo "✓ Translations compiled using Python script"
     else
-        echo "⚠ Warning: Translation compilation failed, but continuing..."
-        echo "⚠ Translations may not work correctly until compiled"
+        echo "✗ ERROR: Translation compilation failed!"
+        echo "✗ Translations will not work correctly"
+        exit 1
     fi
 fi
+
+# Verify .mo files exist
+echo "Verifying compiled translation files..."
+mo_files_found=0
+for lang_dir in locale/*/LC_MESSAGES/; do
+    if [ -f "${lang_dir}django.mo" ]; then
+        mo_files_found=$((mo_files_found + 1))
+        echo "✓ Found: ${lang_dir}django.mo"
+    fi
+done
+
+if [ $mo_files_found -eq 0 ]; then
+    echo "✗ ERROR: No compiled translation files (.mo) found!"
+    exit 1
+fi
+
+echo "✓ Verified $mo_files_found compiled translation file(s)"
 
 # Validate Django settings (optional but helpful)
 echo "Validating Django configuration..."

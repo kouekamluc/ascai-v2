@@ -81,12 +81,44 @@ echo "Ensuring admin user exists..."
 python manage.py create_admin --update || echo "⚠ Warning: Could not create/update admin user, but continuing..."
 
 # Compile translation files before collecting static files
-echo "Compiling translation files..."
-if python manage.py compilemessages --noinput 2>/dev/null; then
-    echo "✓ Translations compiled using Django compilemessages"
+# (This is a fallback in case they weren't compiled during build)
+echo "Checking translation files..."
+mo_files_exist=true
+for lang_dir in locale/*/LC_MESSAGES/; do
+    if [ ! -f "${lang_dir}django.mo" ]; then
+        mo_files_exist=false
+        break
+    fi
+done
+
+if [ "$mo_files_exist" = false ]; then
+    echo "Compiling translation files (not found from build)..."
+    # Try Django's compilemessages first (requires gettext)
+    if command -v msgfmt >/dev/null 2>&1; then
+        if python manage.py compilemessages --noinput 2>&1; then
+            echo "✓ Translations compiled using Django compilemessages"
+        else
+            echo "Falling back to Python translation compiler..."
+            if python compile_translations.py 2>&1; then
+                echo "✓ Translations compiled using Python script"
+            else
+                echo "✗ ERROR: Translation compilation failed!"
+                echo "✗ Translations will not work correctly"
+                exit 1
+            fi
+        fi
+    else
+        echo "Using Python translation compiler (gettext not available)..."
+        if python compile_translations.py 2>&1; then
+            echo "✓ Translations compiled using Python script"
+        else
+            echo "✗ ERROR: Translation compilation failed!"
+            echo "✗ Translations will not work correctly"
+            exit 1
+        fi
+    fi
 else
-    echo "Falling back to Python translation compiler..."
-    python compile_translations.py || echo "⚠ Warning: Translation compilation failed, continuing..."
+    echo "✓ Translation files already compiled (found from build)"
 fi
 
 # Collect static files

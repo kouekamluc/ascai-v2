@@ -20,6 +20,12 @@ COPY . .
 
 RUN chmod +x scripts/entrypoint.sh scripts/predeploy.sh
 
+# Compile translation files during build
+RUN echo "Compiling translation files during build..." && \
+    (python compile_translations.py || python manage.py compilemessages --noinput) && \
+    echo "Verifying compiled translation files..." && \
+    find locale -name "*.mo" -type f | head -1 || (echo "ERROR: No .mo files found after compilation!" && exit 1)
+
 EXPOSE 8000
 
 CMD ["bash", "-c", "./scripts/entrypoint.sh"]

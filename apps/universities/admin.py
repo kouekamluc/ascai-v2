@@ -66,3 +66,7 @@ class SavedUniversityAdmin(admin.ModelAdmin):
 
 
 
+
+
+
+
