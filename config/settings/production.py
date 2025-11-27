@@ -120,7 +120,10 @@ if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     
     # WhiteNoise configuration
-    WHITENOISE_USE_FINDERS = True  # Allow WhiteNoise to find static files
+    # In production, serve from STATIC_ROOT only (files collected via collectstatic)
+    # This is more efficient and reliable than using finders
+    # WhiteNoise automatically uses STATIC_ROOT, so no need to set WHITENOISE_ROOT
+    WHITENOISE_USE_FINDERS = False  # Serve from STATIC_ROOT only - requires collectstatic
     WHITENOISE_AUTOREFRESH = False  # Disable auto-refresh in production for performance
     
     logger.info("Using WhiteNoise for static file storage (S3 disabled)")

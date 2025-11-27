@@ -75,18 +75,21 @@ if settings.DEBUG or not USE_S3:
 
     # Serve static files
     # In development (DEBUG=True), use Django's static() helper
-    # In production (DEBUG=False), use a view to serve static files
+    # In production (DEBUG=False), WhiteNoise middleware handles static file serving automatically
+    # Only add custom static serving if not using WhiteNoise (i.e., if using S3)
     if settings.DEBUG:
         if settings.STATIC_ROOT and settings.STATIC_ROOT.exists():
             urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    else:
-        # In production, serve static files via view (WhiteNoise middleware should handle it,
-        # but this provides a reliable fallback)
+    elif USE_S3:
+        # Only use custom static file view if S3 is enabled (WhiteNoise won't be used)
+        # In this case, static files should be served from S3, but this provides a fallback
         from apps.core.views import serve_static_file
         static_url_pattern = settings.STATIC_URL.lstrip('/')
         urlpatterns += [
             path(f'{static_url_pattern}<path:path>', serve_static_file, name='serve_static'),
         ]
+    # When USE_S3=False, WhiteNoise middleware handles static files automatically
+    # No URL pattern needed - WhiteNoise intercepts requests before they reach URL routing
     
     # Django Debug Toolbar URLs (only in development)
     try:
