@@ -26,12 +26,14 @@
 
 /* Hero Section Styles */
 .hero-section {
-  background-image: url('https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&q=100');
+  background-image: url('https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&q=100&w=1920');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+  /* Fallback gradient if image fails to load */
+  background-color: #007A5E;
 }
 
 /* Navbar Styles */
