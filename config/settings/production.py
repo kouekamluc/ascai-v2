@@ -120,11 +120,12 @@ if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     
     # WhiteNoise configuration
-    # In production, serve from STATIC_ROOT only (files collected via collectstatic)
-    # This is more efficient and reliable than using finders
-    # WhiteNoise automatically uses STATIC_ROOT, so no need to set WHITENOISE_ROOT
-    WHITENOISE_USE_FINDERS = False  # Serve from STATIC_ROOT only - requires collectstatic
+    # Enable finders as fallback - this allows WhiteNoise to find files from both
+    # STATIC_ROOT (collected files) and static file finders (for any missing files)
+    # This is more reliable and ensures Django admin static files are always found
+    WHITENOISE_USE_FINDERS = True  # Allow WhiteNoise to use finders as fallback
     WHITENOISE_AUTOREFRESH = False  # Disable auto-refresh in production for performance
+    WHITENOISE_ROOT = STATIC_ROOT  # Primary location for static files
     
     logger.info("Using WhiteNoise for static file storage (S3 disabled)")
 else:
