@@ -1,6 +1,7 @@
 """
 URL configuration for ASCAI Lazio project.
 """
+from pathlib import Path
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -43,7 +44,22 @@ urlpatterns += i18n_patterns(
 # Serve media files when running locally (DEBUG=True) or whenever S3 is disabled.
 # This ensures profile avatars & other uploads remain accessible on platforms
 # like Railway where we're relying on the app server to serve media.
-if settings.DEBUG or not getattr(settings, 'USE_S3', False):
+# Note: In production without S3, files stored in MEDIA_ROOT will be lost on container restart.
+# For persistent storage, enable S3 or use a persistent volume.
+USE_S3 = getattr(settings, 'USE_S3', False)
+if settings.DEBUG or not USE_S3:
+    # Ensure MEDIA_ROOT directory exists
+    media_root = settings.MEDIA_ROOT
+    if isinstance(media_root, str):
+        media_root = Path(media_root)
+    elif hasattr(media_root, 'path'):
+        media_root = Path(media_root.path)
+    else:
+        media_root = Path(media_root)
+    
+    # Create media directory if it doesn't exist
+    media_root.mkdir(parents=True, exist_ok=True)
+    
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     # Only serve static files if STATIC_ROOT exists (for development convenience)
