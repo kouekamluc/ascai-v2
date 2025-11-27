@@ -40,14 +40,15 @@ urlpatterns += i18n_patterns(
     prefix_default_language=False,
 )
 
-# Serve media files in development
-# Note: Static files are automatically served by Django's runserver when DEBUG=True
-# from STATICFILES_DIRS, so we only need to serve media files manually
-if settings.DEBUG:
+# Serve media files when running locally (DEBUG=True) or whenever S3 is disabled.
+# This ensures profile avatars & other uploads remain accessible on platforms
+# like Railway where we're relying on the app server to serve media.
+if settings.DEBUG or not getattr(settings, 'USE_S3', False):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
     # Only serve static files if STATIC_ROOT exists (for development convenience)
     # Django's runserver automatically serves from STATICFILES_DIRS
-    if settings.STATIC_ROOT and settings.STATIC_ROOT.exists():
+    if settings.DEBUG and settings.STATIC_ROOT and settings.STATIC_ROOT.exists():
         urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     
     # Django Debug Toolbar URLs (only in development)
