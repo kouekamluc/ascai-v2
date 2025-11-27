@@ -73,10 +73,20 @@ if settings.DEBUG or not USE_S3:
             path(f'{media_url_pattern}<path:path>', serve_media_file, name='serve_media'),
         ]
 
-    # Only serve static files if STATIC_ROOT exists (for development convenience)
-    # Django's runserver automatically serves from STATICFILES_DIRS
-    if settings.DEBUG and settings.STATIC_ROOT and settings.STATIC_ROOT.exists():
-        urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # Serve static files
+    # In development (DEBUG=True), use Django's static() helper
+    # In production (DEBUG=False), use a view to serve static files
+    if settings.DEBUG:
+        if settings.STATIC_ROOT and settings.STATIC_ROOT.exists():
+            urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    else:
+        # In production, serve static files via view (WhiteNoise middleware should handle it,
+        # but this provides a reliable fallback)
+        from apps.core.views import serve_static_file
+        static_url_pattern = settings.STATIC_URL.lstrip('/')
+        urlpatterns += [
+            path(f'{static_url_pattern}<path:path>', serve_static_file, name='serve_static'),
+        ]
     
     # Django Debug Toolbar URLs (only in development)
     try:

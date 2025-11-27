@@ -124,6 +124,65 @@ def serve_media_file(request, path):
         raise Http404("Error reading file")
 
 
+def serve_static_file(request, path):
+    """
+    Serve static files in production when S3 is not enabled.
+    This view handles static file serving when DEBUG=False.
+    WhiteNoise should handle this, but this provides a reliable fallback.
+    """
+    from django.conf import settings
+    from django.http import Http404, FileResponse
+    from pathlib import Path
+    
+    # Only serve static files if S3 is not enabled
+    if getattr(settings, 'USE_S3', False):
+        raise Http404("Static files are served from S3")
+    
+    # Get the full file path
+    static_root = settings.STATIC_ROOT
+    if isinstance(static_root, str):
+        static_root = Path(static_root)
+    elif hasattr(static_root, 'path'):
+        static_root = Path(static_root.path)
+    else:
+        static_root = Path(static_root)
+    
+    file_path = static_root / path
+    
+    # Security: Ensure the file is within STATIC_ROOT
+    try:
+        file_path = file_path.resolve()
+        static_root_resolved = static_root.resolve()
+        if not str(file_path).startswith(str(static_root_resolved)):
+            raise Http404("Invalid file path")
+    except (ValueError, OSError):
+        raise Http404("Invalid file path")
+    
+    # Check if file exists
+    if not file_path.exists() or not file_path.is_file():
+        logger.warning(f"Static file not found: {file_path}")
+        raise Http404("File not found")
+    
+    # Determine content type
+    import mimetypes
+    content_type, _ = mimetypes.guess_type(str(file_path))
+    if content_type is None:
+        content_type = 'application/octet-stream'
+    
+    # Serve the file with cache headers
+    try:
+        response = FileResponse(
+            open(file_path, 'rb'),
+            content_type=content_type
+        )
+        # Set cache headers for static files
+        response['Cache-Control'] = 'public, max-age=31536000'
+        return response
+    except IOError:
+        logger.error(f"Error reading static file: {file_path}")
+        raise Http404("Error reading file")
+
+
 class EventsPartialView(TemplateView):
     """
     HTMX partial view for events container.
