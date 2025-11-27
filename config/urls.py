@@ -60,7 +60,18 @@ if settings.DEBUG or not USE_S3:
     # Create media directory if it doesn't exist
     media_root.mkdir(parents=True, exist_ok=True)
     
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # In production (DEBUG=False), use a view to serve media files
+    # In development (DEBUG=True), use Django's static() helper
+    if settings.DEBUG:
+        urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    else:
+        # Use a view to serve media files in production
+        from apps.core.views import serve_media_file
+        # Remove leading slash from MEDIA_URL for pattern matching
+        media_url_pattern = settings.MEDIA_URL.lstrip('/')
+        urlpatterns += [
+            path(f'{media_url_pattern}<path:path>', serve_media_file, name='serve_media'),
+        ]
 
     # Only serve static files if STATIC_ROOT exists (for development convenience)
     # Django's runserver automatically serves from STATICFILES_DIRS

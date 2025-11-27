@@ -65,6 +65,65 @@ class HealthCheckView(TemplateView):
         return HttpResponse("OK", status=200, content_type="text/plain")
 
 
+def serve_media_file(request, path):
+    """
+    Serve media files in production when S3 is not enabled.
+    This view handles file serving when DEBUG=False.
+    """
+    from django.conf import settings
+    from django.http import Http404, FileResponse
+    import os
+    from pathlib import Path
+    
+    # Only serve media files if S3 is not enabled
+    if getattr(settings, 'USE_S3', False):
+        raise Http404("Media files are served from S3")
+    
+    # Get the full file path
+    media_root = settings.MEDIA_ROOT
+    if isinstance(media_root, str):
+        media_root = Path(media_root)
+    elif hasattr(media_root, 'path'):
+        media_root = Path(media_root.path)
+    else:
+        media_root = Path(media_root)
+    
+    file_path = media_root / path
+    
+    # Security: Ensure the file is within MEDIA_ROOT
+    try:
+        file_path = file_path.resolve()
+        media_root_resolved = media_root.resolve()
+        if not str(file_path).startswith(str(media_root_resolved)):
+            raise Http404("Invalid file path")
+    except (ValueError, OSError):
+        raise Http404("Invalid file path")
+    
+    # Check if file exists
+    if not file_path.exists() or not file_path.is_file():
+        logger.warning(f"Media file not found: {file_path}")
+        raise Http404("File not found")
+    
+    # Determine content type
+    import mimetypes
+    content_type, _ = mimetypes.guess_type(str(file_path))
+    if content_type is None:
+        content_type = 'application/octet-stream'
+    
+    # Serve the file
+    try:
+        response = FileResponse(
+            open(file_path, 'rb'),
+            content_type=content_type
+        )
+        # Set appropriate headers
+        response['Content-Disposition'] = f'inline; filename="{file_path.name}"'
+        return response
+    except IOError:
+        logger.error(f"Error reading media file: {file_path}")
+        raise Http404("Error reading file")
+
+
 class EventsPartialView(TemplateView):
     """
     HTMX partial view for events container.

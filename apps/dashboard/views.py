@@ -111,8 +111,26 @@ class ProfileUpdateView(DashboardRequiredMixin, UpdateView):
         return self.request.user
     
     def form_valid(self, form):
-        messages.success(self.request, _('Profile updated successfully.'))
-        return super().form_valid(form)
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Log file upload if present
+        if 'avatar' in self.request.FILES:
+            uploaded_file = self.request.FILES['avatar']
+            logger.info(f"Avatar upload detected: {uploaded_file.name}, size: {uploaded_file.size} bytes")
+        
+        # Save the form (this will handle the file upload)
+        response = super().form_valid(form)
+        
+        # Log the saved avatar path
+        if self.object.avatar:
+            logger.info(f"Avatar saved to: {self.object.avatar.name}, URL: {self.object.avatar.url}")
+            messages.success(self.request, _('Profile updated successfully.'))
+        else:
+            logger.warning("No avatar file after save")
+            messages.success(self.request, _('Profile updated successfully.'))
+        
+        return response
 
 
 class PasswordChangeView(DashboardRequiredMixin, DjangoPasswordChangeView):
