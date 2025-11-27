@@ -115,7 +115,14 @@ if not CSRF_TRUSTED_ORIGINS:
 
 # Static files (use S3 or WhiteNoise)
 if not USE_S3:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # Use CompressedStaticFilesStorage instead of CompressedManifestStaticFilesStorage
+    # This doesn't require a manifest file and is more reliable
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    
+    # WhiteNoise configuration
+    WHITENOISE_USE_FINDERS = True  # Allow WhiteNoise to find static files
+    WHITENOISE_AUTOREFRESH = False  # Disable auto-refresh in production for performance
+    
     logger.info("Using WhiteNoise for static file storage (S3 disabled)")
 else:
     # Validate AWS S3 configuration in production
