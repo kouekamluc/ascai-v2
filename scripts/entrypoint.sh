@@ -124,6 +124,14 @@ fi
 # Collect static files
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
+echo "Verifying static files were collected..."
+if [ -d "staticfiles/admin" ]; then
+    echo "✓ Admin static files found in staticfiles/admin"
+    ls -la staticfiles/admin/css/ | head -5 || echo "⚠ Could not list admin CSS files"
+else
+    echo "✗ ERROR: staticfiles/admin directory not found!"
+    exit 1
+fi
 
 # Start the application
 echo "Starting application server..."
