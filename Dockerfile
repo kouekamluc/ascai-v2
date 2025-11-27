@@ -29,9 +29,13 @@ RUN echo "Compiling translation files during build..." && \
 # Collect static files during build
 # This ensures all static files (including Django admin) are collected and included in the image
 # Note: collectstatic doesn't require database connection, so it's safe to run during build
-# Set required environment variables for build-time collectstatic (not used for security, just for Django setup)
+# Provide dummy environment variables to satisfy production settings validation
+# (collectstatic doesn't actually use these, they're just needed for Django configuration)
 RUN echo "Collecting static files during build..." && \
-    SECRET_KEY=django-build-time-temp-key-for-collectstatic DEBUG=False ALLOWED_HOSTS=localhost \
+    SECRET_KEY=django-build-time-temp-key-for-collectstatic \
+    DEBUG=False \
+    ALLOWED_HOSTS=localhost \
+    DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy \
     python manage.py collectstatic --noinput --clear && \
     echo "Verifying static files collection..." && \
     test -d staticfiles/admin && echo "✓ Admin static files collected" || (echo "ERROR: Admin static files not found!" && exit 1)
