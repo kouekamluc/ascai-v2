@@ -115,30 +115,30 @@ if not CSRF_TRUSTED_ORIGINS:
 
 # Static files (use S3 or WhiteNoise)
 if not USE_S3:
-    # Use CompressedStaticFilesStorage instead of CompressedManifestStaticFilesStorage
-    # This doesn't require a manifest file and is more reliable
+    # Use CompressedStaticFilesStorage - doesn't require manifest file, more reliable
+    # For better cache busting, you can use CompressedManifestStaticFilesStorage instead
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     
     # WhiteNoise configuration
-    # When using CompressedStaticFilesStorage, WhiteNoise automatically serves from STATIC_ROOT
-    # Enable finders as fallback - this allows WhiteNoise to find files from both
-    # STATIC_ROOT (collected files) and static file finders (for any missing files)
-    # This is more reliable and ensures Django admin static files are always found
+    # Explicitly configure WhiteNoise to serve static files from STATIC_ROOT
+    # This ensures Django admin static files are properly served
     WHITENOISE_USE_FINDERS = True  # Allow WhiteNoise to use finders as fallback
     WHITENOISE_AUTOREFRESH = False  # Disable auto-refresh in production for performance
-    # Note: Don't set WHITENOISE_ROOT when using CompressedStaticFilesStorage
-    # WhiteNoise will automatically use STATIC_ROOT from the storage backend
+    # Explicitly set WHITENOISE_ROOT to STATIC_ROOT to ensure files are found
+    # This is critical for Django admin static files to load correctly
+    WHITENOISE_ROOT = str(STATIC_ROOT)  # Convert Path to string for WhiteNoise
     
     # Ensure STATICFILES_FINDERS includes all default finders
     # This ensures Django admin static files are found during collection
-    # The default finders should already include these, but we set them explicitly for clarity
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
     
     logger.info("Using WhiteNoise for static file storage (S3 disabled)")
-    logger.info(f"Static files will be served from: {STATIC_ROOT}")
+    logger.info(f"STATIC_ROOT: {STATIC_ROOT}")
+    logger.info(f"WHITENOISE_ROOT: {WHITENOISE_ROOT}")
+    logger.info(f"STATIC_URL: {STATIC_URL}")
 else:
     # Validate AWS S3 configuration in production
     # Note: Basic validation already happens in base.py, but we add logging here
