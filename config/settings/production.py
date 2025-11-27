@@ -120,7 +120,7 @@ if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     
     # WhiteNoise configuration
-    # When using CompressedStaticFilesStorage, WhiteNoise automatically handles STATIC_ROOT
+    # When using CompressedStaticFilesStorage, WhiteNoise automatically serves from STATIC_ROOT
     # Enable finders as fallback - this allows WhiteNoise to find files from both
     # STATIC_ROOT (collected files) and static file finders (for any missing files)
     # This is more reliable and ensures Django admin static files are always found
@@ -129,7 +129,16 @@ if not USE_S3:
     # Note: Don't set WHITENOISE_ROOT when using CompressedStaticFilesStorage
     # WhiteNoise will automatically use STATIC_ROOT from the storage backend
     
+    # Ensure STATICFILES_FINDERS includes all default finders
+    # This ensures Django admin static files are found during collection
+    # The default finders should already include these, but we set them explicitly for clarity
+    STATICFILES_FINDERS = [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    ]
+    
     logger.info("Using WhiteNoise for static file storage (S3 disabled)")
+    logger.info(f"Static files will be served from: {STATIC_ROOT}")
 else:
     # Validate AWS S3 configuration in production
     # Note: Basic validation already happens in base.py, but we add logging here
