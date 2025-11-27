@@ -116,6 +116,102 @@ if not CSRF_TRUSTED_ORIGINS:
 # Static files (use S3 or WhiteNoise)
 if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    logger.info("Using WhiteNoise for static file storage (S3 disabled)")
+else:
+    # Validate AWS S3 configuration in production
+    # Note: Basic validation already happens in base.py, but we add logging here
+    try:
+        # Check if AWS variables are defined (they should be if USE_S3 is True)
+        if not all([hasattr(globals(), 'AWS_ACCESS_KEY_ID'), 
+                   hasattr(globals(), 'AWS_SECRET_ACCESS_KEY'),
+                   hasattr(globals(), 'AWS_STORAGE_BUCKET_NAME')]):
+            logger.warning(
+                "AWS S3 is enabled but AWS configuration variables are not properly set. "
+                "This should not happen if base.py validation worked correctly."
+            )
+        else:
+            import boto3
+            from botocore.exceptions import ClientError, NoCredentialsError
+            
+            # Test AWS credentials by attempting to create a client
+            # This will fail gracefully if credentials are invalid
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                region_name=AWS_S3_REGION_NAME
+            )
+            
+            # Try to head the bucket to verify access
+            try:
+                s3_client.head_bucket(Bucket=AWS_STORAGE_BUCKET_NAME)
+                logger.info(
+                    f"AWS S3 configured successfully: bucket '{AWS_STORAGE_BUCKET_NAME}' "
+                    f"in region '{AWS_S3_REGION_NAME}'"
+                )
+            except ClientError as e:
+                error_code = e.response.get('Error', {}).get('Code', 'Unknown')
+                if error_code == '404':
+                    logger.error(
+                        f"AWS S3 bucket '{AWS_STORAGE_BUCKET_NAME}' not found. "
+                        "Please verify the bucket name and region."
+                    )
+                elif error_code == '403':
+                    logger.error(
+                        f"AWS S3 access denied for bucket '{AWS_STORAGE_BUCKET_NAME}'. "
+                        "Please verify IAM permissions."
+                    )
+                else:
+                    logger.warning(
+                        f"AWS S3 bucket verification failed: {error_code}. "
+                        "S3 may still work, but please verify configuration."
+                    )
+            except Exception as e:
+                logger.warning(
+                    f"AWS S3 bucket verification failed: {str(e)}. "
+                    "S3 may still work, but please verify configuration."
+                )
+            
+    except NoCredentialsError:
+        logger.error(
+            "AWS credentials not found. S3 is enabled but credentials are invalid. "
+            "Falling back to local storage."
+        )
+    except ImportError:
+        logger.warning(
+            "boto3 not installed. S3 functionality may not work properly. "
+            "Install with: pip install boto3"
+        )
+    except Exception as e:
+        logger.warning(
+            f"AWS S3 configuration check failed: {str(e)}. "
+            "S3 may still work, but please verify configuration."
+        )
+    logger.info("Using WhiteNoise for static file storage (S3 disabled)")
+else:
+    # Validate AWS S3 configuration in production
+    # Note: Basic validation already happens in base.py, but we add logging here
+    try:
+        # Access AWS settings that were set in base.py
+        aws_access_key = globals().get('AWS_ACCESS_KEY_ID', '')
+        aws_bucket = globals().get('AWS_STORAGE_BUCKET_NAME', '')
+        aws_region = globals().get('AWS_S3_REGION_NAME', '')
+        aws_custom_domain = globals().get('AWS_S3_CUSTOM_DOMAIN', '')
+        
+        if aws_access_key and aws_bucket:
+            # Mask sensitive information in logs (show first 4 and last 4 chars)
+            masked_key = f"{aws_access_key[:4]}...{aws_access_key[-4:]}" if len(aws_access_key) > 8 else "***"
+            logger.info(
+                f"AWS S3 configured: Bucket={aws_bucket}, Region={aws_region}, "
+                f"CustomDomain={aws_custom_domain}, AccessKey={masked_key}"
+            )
+        else:
+            logger.warning(
+                "USE_S3=True but AWS credentials appear incomplete. "
+                "Check AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_STORAGE_BUCKET_NAME."
+            )
+    except Exception as e:
+        logger.error(f"Error validating AWS S3 configuration: {e}")
 
 # Email Configuration
 # Note: Email settings are inherited from base.py via 'from .base import *'

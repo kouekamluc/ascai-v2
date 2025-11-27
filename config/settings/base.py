@@ -137,38 +137,72 @@ STATICFILES_DIRS = [
 USE_S3 = config('USE_S3', default=False, cast=bool)
 
 if USE_S3:
-    AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='')
-    AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='')
-    AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='')
-    AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1')
-    AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default='')
+    # Read AWS configuration from environment variables
+    AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='').strip()
+    AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='').strip()
+    AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='').strip()
+    AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1').strip()
+    AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default='').strip()
     AWS_S3_SIGNATURE_VERSION = config('AWS_S3_SIGNATURE_VERSION', default='s3v4')
     AWS_S3_ADDRESSING_STYLE = config('AWS_S3_ADDRESSING_STYLE', default='virtual')
-    default_domain = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
-    AWS_S3_CUSTOM_DOMAIN = config('AWS_S3_CUSTOM_DOMAIN', default=default_domain).strip() or default_domain
     
-    # Validate S3 settings if USE_S3 is True
+    # Validate S3 settings BEFORE using them to build domain
+    # This prevents errors when building default_domain with empty bucket name
+    # In Railway, gracefully fall back to local storage if credentials are missing
     if not all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
-        from django.core.exceptions import ImproperlyConfigured
-        raise ImproperlyConfigured(
-            "AWS S3 is enabled (USE_S3=True) but AWS credentials are missing. "
-            "Set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_STORAGE_BUCKET_NAME."
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(
+            "AWS S3 is enabled (USE_S3=True) but AWS credentials are missing or incomplete. "
+            "Falling back to local file storage. Files will be lost on container restart. "
+            "To use S3, set the following environment variables in Railway:\n"
+            "  - AWS_ACCESS_KEY_ID\n"
+            "  - AWS_SECRET_ACCESS_KEY\n"
+            "  - AWS_STORAGE_BUCKET_NAME\n"
+            "  - AWS_S3_REGION_NAME (optional, defaults to us-east-1)"
         )
-    AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',
-    }
-    AWS_DEFAULT_ACL = 'public-read'
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_QUERYSTRING_AUTH = False
-    
-    # Static files
-    STATICFILES_STORAGE = 'config.storage_backends.StaticStorage'
-    
-    # Media files
-    DEFAULT_FILE_STORAGE = 'config.storage_backends.MediaStorage'
-    
-    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+        # Disable S3 and fall back to local storage
+        USE_S3 = False
+    else:
+        # Build default domain only after validation
+        # Ensure region name is not empty (fallback to us-east-1 if somehow empty)
+        if not AWS_S3_REGION_NAME:
+            AWS_S3_REGION_NAME = 'us-east-1'
+        
+        default_domain = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+        
+        # Handle custom domain - if provided, use it; otherwise use default
+        custom_domain = config('AWS_S3_CUSTOM_DOMAIN', default='').strip()
+        if custom_domain:
+            AWS_S3_CUSTOM_DOMAIN = custom_domain
+        else:
+            AWS_S3_CUSTOM_DOMAIN = default_domain
+        
+        # AWS S3 configuration
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400',
+        }
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_FILE_OVERWRITE = False
+        AWS_QUERYSTRING_AUTH = False
+        
+        # Only set endpoint URL if explicitly provided (for S3-compatible services)
+        # If empty, django-storages will use default AWS S3 endpoints
+        # Don't set it to None, just leave it as empty string if not provided
+        if not AWS_S3_ENDPOINT_URL:
+            # Use default AWS endpoints - don't set the variable
+            # django-storages will handle this automatically
+            pass
+        
+        # Static files storage
+        STATICFILES_STORAGE = 'config.storage_backends.StaticStorage'
+        
+        # Media files storage
+        DEFAULT_FILE_STORAGE = 'config.storage_backends.MediaStorage'
+        
+        # Build URLs with proper protocol
+        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
 # Email Configuration
 # SendGrid API Key (preferred - bypasses SMTP blocking)
