@@ -187,31 +187,6 @@ else:
             f"AWS S3 configuration check failed: {str(e)}. "
             "S3 may still work, but please verify configuration."
         )
-    logger.info("Using WhiteNoise for static file storage (S3 disabled)")
-else:
-    # Validate AWS S3 configuration in production
-    # Note: Basic validation already happens in base.py, but we add logging here
-    try:
-        # Access AWS settings that were set in base.py
-        aws_access_key = globals().get('AWS_ACCESS_KEY_ID', '')
-        aws_bucket = globals().get('AWS_STORAGE_BUCKET_NAME', '')
-        aws_region = globals().get('AWS_S3_REGION_NAME', '')
-        aws_custom_domain = globals().get('AWS_S3_CUSTOM_DOMAIN', '')
-        
-        if aws_access_key and aws_bucket:
-            # Mask sensitive information in logs (show first 4 and last 4 chars)
-            masked_key = f"{aws_access_key[:4]}...{aws_access_key[-4:]}" if len(aws_access_key) > 8 else "***"
-            logger.info(
-                f"AWS S3 configured: Bucket={aws_bucket}, Region={aws_region}, "
-                f"CustomDomain={aws_custom_domain}, AccessKey={masked_key}"
-            )
-        else:
-            logger.warning(
-                "USE_S3=True but AWS credentials appear incomplete. "
-                "Check AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_STORAGE_BUCKET_NAME."
-            )
-    except Exception as e:
-        logger.error(f"Error validating AWS S3 configuration: {e}")
 
 # Email Configuration
 # Note: Email settings are inherited from base.py via 'from .base import *'
