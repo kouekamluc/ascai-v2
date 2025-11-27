@@ -26,6 +26,14 @@ RUN echo "Compiling translation files during build..." && \
     echo "Verifying compiled translation files..." && \
     find locale -name "*.mo" -type f | head -1 || (echo "ERROR: No .mo files found after compilation!" && exit 1)
 
+# Collect static files during build
+# This ensures all static files (including Django admin) are collected and included in the image
+# Note: collectstatic doesn't require database connection, so it's safe to run during build
+RUN echo "Collecting static files during build..." && \
+    python manage.py collectstatic --noinput --clear && \
+    echo "Verifying static files collection..." && \
+    test -d staticfiles/admin && echo "✓ Admin static files collected" || (echo "ERROR: Admin static files not found!" && exit 1)
+
 EXPOSE 8000
 
 CMD ["bash", "-c", "./scripts/entrypoint.sh"]
