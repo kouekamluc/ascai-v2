@@ -10,7 +10,16 @@ urlpatterns = [
     # Dashboard
     path('', views.GovernanceDashboardView.as_view(), name='dashboard'),
     
-    # Membership
+    # User-facing Member Portal
+    path('my-membership/', views.MemberPortalView.as_view(), name='member_portal'),
+    path('register/', views.MemberSelfRegistrationView.as_view(), name='member_register'),
+    path('my-dues/', views.MyDuesView.as_view(), name='my_dues'),
+    path('my-dues/<int:dues_id>/request-payment/', views.request_dues_payment, name='request_dues_payment'),
+    path('assemblies/<int:pk>/participate/', views.AssemblyParticipationView.as_view(), name='assembly_participate'),
+    path('assemblies/<int:assembly_id>/register-attendance/', views.register_attendance, name='register_attendance'),
+    path('votes/<int:vote_id>/cast/', views.cast_vote, name='cast_vote'),
+    
+    # Admin Membership
     path('members/', views.MemberListView.as_view(), name='member_list'),
     path('members/<int:pk>/', views.MemberDetailView.as_view(), name='member_detail'),
     path('members/create/', views.MemberCreateView.as_view(), name='member_create'),

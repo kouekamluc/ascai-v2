@@ -14,14 +14,36 @@ from .models import (
 
 
 class MemberForm(forms.ModelForm):
-    """Form for member registration/editing."""
+    """Form for member registration/editing (admin)."""
     
     class Meta:
         model = Member
         fields = ['member_type', 'lazio_residence_verified', 'cameroonian_origin_verified', 
                   'membership_start_date', 'membership_end_date', 'notes']
         widgets = {
-            'notes': forms.Textarea(attrs={'rows': 4}),
+            'member_type': forms.Select(attrs={'class': 'form-input'}),
+            'lazio_residence_verified': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'cameroonian_origin_verified': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'membership_start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'membership_end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'notes': forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'}),
+        }
+
+
+class MemberSelfRegistrationForm(forms.ModelForm):
+    """Form for users to register themselves as ASCAI members."""
+    
+    class Meta:
+        model = Member
+        fields = ['member_type']
+        widgets = {
+            'member_type': forms.Select(attrs={'class': 'form-input'}),
+        }
+        labels = {
+            'member_type': _('Member Type'),
+        }
+        help_texts = {
+            'member_type': _('Select your membership type'),
         }
 
 

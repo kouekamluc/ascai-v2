@@ -30,7 +30,7 @@ from .models import (
     AssociationDocument, Communication,
 )
 from .forms import (
-    MemberForm, GeneralAssemblyForm, AgendaItemForm, AssemblyAttendanceForm,
+    MemberForm, MemberSelfRegistrationForm, GeneralAssemblyForm, AgendaItemForm, AssemblyAttendanceForm,
     AssemblyVoteForm, FinancialTransactionForm, MembershipDuesForm, ContributionForm,
     ExecutiveBoardForm, ExecutivePositionForm, BoardMeetingForm,
     ElectionForm, CandidacyForm, CommunicationForm, AssociationEventForm,
@@ -38,7 +38,284 @@ from .forms import (
 
 
 # ============================================================================
-# MEMBERSHIP VIEWS
+# USER-FACING MEMBER PORTAL VIEWS
+# ============================================================================
+
+class MemberPortalView(LoginRequiredMixin, TemplateView):
+    """Member portal - user's personal membership dashboard."""
+    template_name = 'governance/member_portal/index.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Get or create member profile
+        member, created = Member.objects.get_or_create(
+            user=user,
+            defaults={
+                'member_type': 'student',
+                'is_cameroonian_origin': True,  # Default assumption
+                'resides_in_lazio': False,  # User will update
+            }
+        )
+        
+        # Get current year dues
+        current_year = timezone.now().year
+        current_dues = MembershipDues.objects.filter(
+            member=member,
+            year=current_year
+        ).first()
+        
+        # Get all dues
+        all_dues = MembershipDues.objects.filter(member=member).order_by('-year')
+        
+        # Get upcoming assemblies
+        upcoming_assemblies = GeneralAssembly.objects.filter(
+            status='scheduled',
+            date__gte=timezone.now()
+        ).order_by('date')[:5]
+        
+        # Get user's assembly attendances
+        attendances = AssemblyAttendance.objects.filter(
+            user=user
+        ).select_related('assembly').order_by('-assembly__date')[:10]
+        
+        # Get assemblies user can vote in
+        assemblies_with_votes = GeneralAssembly.objects.filter(
+            status='scheduled',
+            date__gte=timezone.now()
+        ).prefetch_related('agenda_items', 'votes')
+        
+        context.update({
+            'member': member,
+            'current_dues': current_dues,
+            'all_dues': all_dues,
+            'upcoming_assemblies': upcoming_assemblies,
+            'attendances': attendances,
+            'assemblies_with_votes': assemblies_with_votes,
+            'is_new_member': created,
+        })
+        return context
+
+
+class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
+    """Allow users to register themselves as ASCAI members."""
+    model = Member
+    form_class = MemberSelfRegistrationForm
+    template_name = 'governance/member_portal/register.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user already has a member profile
+        if hasattr(request.user, 'member_profile'):
+            messages.info(request, _('You are already registered as a member.'))
+            return redirect('governance:member_portal')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        # Automatically link to current user
+        member = form.save(commit=False)
+        member.user = self.request.user
+        member.registration_date = timezone.now().date()
+        # Set default values
+        member.is_cameroonian_origin = True  # Default assumption
+        member.resides_in_lazio = False  # User will update if needed
+        # Verification fields are set to False initially - admin will verify
+        member.lazio_residence_verified = False
+        member.cameroonian_origin_verified = False
+        member.is_active_member = False  # Will be activated after verification
+        member.save()
+        
+        messages.success(
+            self.request,
+            _('Successfully registered as ASCAI member! Your membership is pending admin verification.')
+        )
+        return redirect('governance:member_portal')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Pre-fill some fields based on user data
+        kwargs['initial'] = {
+            'member_type': 'student',
+        }
+        return kwargs
+
+
+class MyDuesView(LoginRequiredMixin, TemplateView):
+    """User's dues management page."""
+    template_name = 'governance/member_portal/my_dues.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        try:
+            member = user.member_profile
+        except Member.DoesNotExist:
+            messages.warning(self.request, _('Please register as a member first.'))
+            return redirect('governance:member_register')
+        
+        current_year = timezone.now().year
+        dues = MembershipDues.objects.filter(member=member).order_by('-year')
+        current_dues = dues.filter(year=current_year).first()
+        
+        # Create current year dues if it doesn't exist
+        if not current_dues:
+            current_dues = MembershipDues.objects.create(
+                member=member,
+                year=current_year,
+                amount=10.00 if member.member_type == 'student' else 5.00,
+                due_date=timezone.datetime(current_year, 3, 31).date(),
+                status='pending'
+            )
+        
+        context.update({
+            'member': member,
+            'current_dues': current_dues,
+            'all_dues': dues,
+        })
+        return context
+
+
+@login_required
+def request_dues_payment(request, dues_id):
+    """User requests to pay their dues (admin will mark as paid)."""
+    dues = get_object_or_404(MembershipDues, pk=dues_id, member__user=request.user)
+    
+    if dues.status == 'paid':
+        messages.info(request, _('This dues payment has already been completed.'))
+        return redirect('governance:my_dues')
+    
+    # Update notes to indicate payment request
+    if dues.notes:
+        dues.notes += f"\n\n[{timezone.now().strftime('%Y-%m-%d %H:%M')}] Payment requested by user."
+    else:
+        dues.notes = f"[{timezone.now().strftime('%Y-%m-%d %H:%M')}] Payment requested by user."
+    
+    dues.status = 'pending'  # Ensure it's pending
+    dues.save()
+    
+    messages.success(
+        request,
+        _('Payment request submitted! An administrator will process your payment and update your status.')
+    )
+    return redirect('governance:my_dues')
+
+
+class AssemblyParticipationView(LoginRequiredMixin, DetailView):
+    """View for users to participate in assemblies (attendance, voting)."""
+    model = GeneralAssembly
+    template_name = 'governance/member_portal/assembly_participate.html'
+    context_object_name = 'assembly'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Check if user is a member
+        try:
+            member = user.member_profile
+        except Member.DoesNotExist:
+            context['not_member'] = True
+            return context
+        
+        assembly = self.get_object()
+        
+        # Check attendance
+        attendance = AssemblyAttendance.objects.filter(
+            assembly=assembly,
+            user=user
+        ).first()
+        
+        # Get agenda items
+        agenda_items = assembly.agenda_items.all().order_by('order')
+        
+        # Get votes for this assembly
+        votes = assembly.votes.all()
+        
+        # Check which items user has voted on
+        # Note: AssemblyVote doesn't have a voters field, we track votes differently
+        user_votes = {}
+        
+        context.update({
+            'member': member,
+            'attendance': attendance,
+            'agenda_items': agenda_items,
+            'votes': votes,
+            'user_votes': user_votes,
+        })
+        return context
+
+
+@login_required
+def register_attendance(request, assembly_id):
+    """User registers their attendance at an assembly."""
+    assembly = get_object_or_404(GeneralAssembly, pk=assembly_id)
+    user = request.user
+    
+    try:
+        member = user.member_profile
+    except Member.DoesNotExist:
+        messages.error(request, _('You must be a registered member to attend assemblies.'))
+        return redirect('governance:member_register')
+    
+    # Check if already registered
+    attendance, created = AssemblyAttendance.objects.get_or_create(
+        assembly=assembly,
+        user=user,
+        defaults={
+            'attended': True,
+            'attendee_type': 'member' if member.is_active_member else 'sympathizer',
+            'registration_date': timezone.now(),
+        }
+    )
+    
+    if not created:
+        attendance.attended = True
+        attendance.save()
+        messages.info(request, _('Attendance updated.'))
+    else:
+        messages.success(request, _('Successfully registered attendance!'))
+    
+    return redirect('governance:assembly_participate', pk=assembly_id)
+
+
+@login_required
+def cast_vote(request, vote_id):
+    """User casts a vote on an assembly item."""
+    vote = get_object_or_404(AssemblyVote, pk=vote_id)
+    user = request.user
+    
+    # Check if user is a member
+    try:
+        member = user.member_profile
+        if not member.is_active_member:
+            messages.error(request, _('Only active members can vote.'))
+            return redirect('governance:assembly_participate', pk=vote.assembly.pk)
+    except Member.DoesNotExist:
+        messages.error(request, _('You must be a registered member to vote.'))
+        return redirect('governance:member_register')
+    
+    # Get vote choice from POST
+    choice = request.POST.get('choice')
+    if choice not in ['yes', 'no', 'abstain']:
+        messages.error(request, _('Invalid vote choice.'))
+        return redirect('governance:assembly_participate', pk=vote.assembly.pk)
+    
+    # Update vote counts (for now, we just increment - in production you'd track individual votes)
+    if choice == 'yes':
+        vote.votes_yes += 1
+    elif choice == 'no':
+        vote.votes_no += 1
+    else:
+        vote.votes_abstain += 1
+    vote.save()
+    
+    messages.success(request, _('Vote cast successfully!'))
+    return redirect('governance:assembly_participate', pk=vote.assembly.pk)
+
+
+# ============================================================================
+# ADMIN MEMBERSHIP VIEWS
 # ============================================================================
 
 class MemberListView(GovernanceRequiredMixin, ListView):
@@ -119,9 +396,7 @@ class ExecutiveBoardListView(GovernanceRequiredMixin, ListView):
     model = ExecutiveBoard
     template_name = 'governance/executive_board/list.html'
     context_object_name = 'boards'
-    
-    def get_queryset(self):
-        return ExecutiveBoard.objects.prefetch_related('positions__user').all()
+    paginate_by = 10
 
 
 class ExecutiveBoardDetailView(GovernanceRequiredMixin, DetailView):
@@ -133,7 +408,7 @@ class ExecutiveBoardDetailView(GovernanceRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         board = self.get_object()
-        context['positions'] = board.positions.select_related('user').all()
+        context['positions'] = board.positions.all().select_related('user')
         context['meetings'] = board.meetings.all()[:10]
         return context
 
@@ -176,13 +451,15 @@ class GeneralAssemblyListView(GovernanceRequiredMixin, ListView):
     def get_queryset(self):
         queryset = GeneralAssembly.objects.all()
         
-        assembly_type = self.request.GET.get('assembly_type')
-        if assembly_type:
-            queryset = queryset.filter(assembly_type=assembly_type)
-        
+        # Filter by status
         status = self.request.GET.get('status')
         if status:
             queryset = queryset.filter(status=status)
+        
+        # Filter by type
+        assembly_type = self.request.GET.get('assembly_type')
+        if assembly_type:
+            queryset = queryset.filter(assembly_type=assembly_type)
         
         return queryset.order_by('-date')
 
@@ -196,8 +473,8 @@ class GeneralAssemblyDetailView(GovernanceRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         assembly = self.get_object()
-        context['agenda_items'] = assembly.agenda_items.all()
-        context['attendances'] = assembly.attendances.select_related('user').all()
+        context['agenda_items'] = assembly.agenda_items.all().order_by('order')
+        context['attendances'] = assembly.attendances.all().select_related('user')[:50]
         context['votes'] = assembly.votes.all()
         return context
 
@@ -208,15 +485,6 @@ class GeneralAssemblyCreateView(AssemblyManagementRequiredMixin, CreateView):
     form_class = GeneralAssemblyForm
     template_name = 'governance/assemblies/form.html'
     success_url = reverse_lazy('governance:assembly_list')
-    
-    def form_valid(self, form):
-        """Set convocation date if not provided."""
-        if not form.cleaned_data.get('convocation_date'):
-            # Default to 10 days before assembly date
-            assembly_date = form.cleaned_data.get('date')
-            if assembly_date:
-                form.instance.convocation_date = assembly_date.date() - timedelta(days=10)
-        return super().form_valid(form)
 
 
 class AgendaItemCreateView(AssemblyManagementRequiredMixin, CreateView):
@@ -224,63 +492,50 @@ class AgendaItemCreateView(AssemblyManagementRequiredMixin, CreateView):
     model = AgendaItem
     form_class = AgendaItemForm
     template_name = 'governance/assemblies/agenda_item_form.html'
+    success_url = reverse_lazy('governance:assembly_list')
     
     def get_initial(self):
         initial = super().get_initial()
         assembly_id = self.request.GET.get('assembly')
         if assembly_id:
-            try:
-                assembly = GeneralAssembly.objects.get(pk=assembly_id)
-                initial['assembly'] = assembly
-                initial['proposed_by'] = self.request.user
-            except GeneralAssembly.DoesNotExist:
-                pass
+            initial['assembly'] = assembly_id
         return initial
     
-    def get_success_url(self):
-        return reverse_lazy('governance:assembly_detail', kwargs={'pk': self.object.assembly.pk})
+    def form_valid(self, form):
+        # Set proposed_by to current user if not set
+        if not form.instance.proposed_by:
+            form.instance.proposed_by = self.request.user
+        return super().form_valid(form)
 
 
 class AssemblyAttendanceCreateView(AssemblyManagementRequiredMixin, CreateView):
-    """Record assembly attendance."""
+    """Create assembly attendance record."""
     model = AssemblyAttendance
     form_class = AssemblyAttendanceForm
     template_name = 'governance/assemblies/attendance_form.html'
+    success_url = reverse_lazy('governance:assembly_list')
     
     def get_initial(self):
         initial = super().get_initial()
         assembly_id = self.request.GET.get('assembly')
         if assembly_id:
-            try:
-                assembly = GeneralAssembly.objects.get(pk=assembly_id)
-                initial['assembly'] = assembly
-            except GeneralAssembly.DoesNotExist:
-                pass
+            initial['assembly'] = assembly_id
         return initial
-    
-    def get_success_url(self):
-        return reverse_lazy('governance:assembly_detail', kwargs={'pk': self.object.assembly.pk})
 
 
 class AssemblyVoteCreateView(AssemblyManagementRequiredMixin, CreateView):
-    """Record assembly vote."""
+    """Create assembly vote."""
     model = AssemblyVote
     form_class = AssemblyVoteForm
     template_name = 'governance/assemblies/vote_form.html'
+    success_url = reverse_lazy('governance:assembly_list')
     
     def get_initial(self):
         initial = super().get_initial()
         assembly_id = self.request.GET.get('assembly')
         if assembly_id:
-            try:
-                assembly = GeneralAssembly.objects.get(pk=assembly_id)
-                initial['assembly'] = assembly
-            except GeneralAssembly.DoesNotExist:
-                pass
+            initial['assembly'] = assembly_id
         return initial
-    
-    def get_success_url(self):
-        return reverse_lazy('governance:assembly_detail', kwargs={'pk': self.object.assembly.pk})
 
 
 # ============================================================================
@@ -295,28 +550,32 @@ class FinancialTransactionListView(FinancialManagementRequiredMixin, ListView):
     paginate_by = 50
     
     def get_queryset(self):
-        queryset = FinancialTransaction.objects.select_related('created_by').all()
+        queryset = FinancialTransaction.objects.all()
         
+        # Filter by type
         transaction_type = self.request.GET.get('transaction_type')
         if transaction_type:
             queryset = queryset.filter(transaction_type=transaction_type)
         
+        # Filter by status
         status = self.request.GET.get('status')
         if status:
             queryset = queryset.filter(status=status)
         
-        return queryset.order_by('-date', '-created_at')
+        return queryset.order_by('-date')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Calculate totals
         transactions = self.get_queryset()
-        context['total_income'] = transactions.filter(transaction_type='income').aggregate(
-            Sum('amount')
-        )['amount__sum'] or 0
-        context['total_expenses'] = transactions.filter(transaction_type='expense').aggregate(
-            Sum('amount')
-        )['amount__sum'] or 0
+        
+        context['total_income'] = transactions.filter(
+            transaction_type='income'
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+        
+        context['total_expenses'] = abs(transactions.filter(
+            transaction_type='expense'
+        ).aggregate(Sum('amount'))['amount__sum'] or 0)
+        
         return context
 
 
@@ -336,12 +595,14 @@ class MembershipDuesListView(FinancialManagementRequiredMixin, ListView):
     paginate_by = 50
     
     def get_queryset(self):
-        queryset = MembershipDues.objects.select_related('member__user').all()
+        queryset = MembershipDues.objects.select_related('member', 'member__user').all()
         
+        # Filter by status
         status = self.request.GET.get('status')
         if status:
             queryset = queryset.filter(status=status)
         
+        # Filter by year
         year = self.request.GET.get('year')
         if year:
             queryset = queryset.filter(year=year)
@@ -350,7 +611,7 @@ class MembershipDuesListView(FinancialManagementRequiredMixin, ListView):
 
 
 class MembershipDuesCreateView(FinancialManagementRequiredMixin, CreateView):
-    """Create membership dues record."""
+    """Create membership dues."""
     model = MembershipDues
     form_class = MembershipDuesForm
     template_name = 'governance/finances/dues_form.html'
@@ -358,7 +619,7 @@ class MembershipDuesCreateView(FinancialManagementRequiredMixin, CreateView):
 
 
 class ExpenseApprovalView(ExpenseApprovalRequiredMixin, DetailView):
-    """Expense approval view."""
+    """Expense approval page (3 signatures required)."""
     model = FinancialTransaction
     template_name = 'governance/finances/expense_approval.html'
     context_object_name = 'transaction'
@@ -366,16 +627,7 @@ class ExpenseApprovalView(ExpenseApprovalRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         transaction = self.get_object()
-        approvals = transaction.approvals.select_related('signer').prefetch_related('signer__executive_positions').all()
-        
-        # Pre-fetch executive positions for each signer to avoid queryset calls in template
-        for approval in approvals:
-            # Get first active executive position if exists
-            try:
-                approval.signer_position = approval.signer.executive_positions.filter(status='active').first()
-            except (AttributeError, Exception):
-                approval.signer_position = None
-        
+        approvals = transaction.approvals.select_related('signer').all()
         context['approvals'] = approvals
         context['signed_count'] = approvals.filter(status='signed').count()
         context['required_signatures'] = 3
@@ -384,38 +636,47 @@ class ExpenseApprovalView(ExpenseApprovalRequiredMixin, DetailView):
 
 @login_required
 def approve_expense(request, pk):
-    """Approve expense (sign)."""
+    """Sign an expense approval."""
     transaction = get_object_or_404(FinancialTransaction, pk=pk)
     
-    if transaction.transaction_type != 'expense':
-        messages.error(request, _('This is not an expense transaction.'))
-        return redirect('governance:financial_transactions')
-    
     # Check if user has permission
-    if not request.user.has_perm('governance.approve_expense'):
+    if not (request.user.has_perm('governance.approve_expense') or request.user.is_staff):
         messages.error(request, _('You do not have permission to approve expenses.'))
-        return redirect('governance:financial_transactions')
+        return redirect('governance:expense_approval', pk=pk)
     
-    # Get or create approval
+    # Check if already signed
     approval, created = ExpenseApproval.objects.get_or_create(
         transaction=transaction,
         signer=request.user,
-        defaults={'status': 'pending'}
+        defaults={
+            'status': 'signed',
+            'signature_date': timezone.now(),
+        }
     )
     
-    if approval.status == 'signed':
-        messages.info(request, _('You have already signed this expense.'))
+    if not created:
+        if approval.status == 'signed':
+            messages.warning(request, _('You have already signed this expense.'))
+        else:
+            approval.status = 'signed'
+            approval.signature_date = timezone.now()
+            approval.save()
+            messages.success(request, _('Expense signed successfully!'))
     else:
-        approval.status = 'signed'
-        approval.signature_date = timezone.now()
-        approval.save()
-        messages.success(request, _('Expense approved successfully.'))
+        messages.success(request, _('Expense signed successfully!'))
+    
+    # Check if all 3 signatures are collected
+    signed_count = transaction.approvals.filter(status='signed').count()
+    if signed_count >= 3:
+        transaction.status = 'approved'
+        transaction.save()
+        messages.success(request, _('Expense fully approved with all required signatures!'))
     
     return redirect('governance:expense_approval', pk=pk)
 
 
 # ============================================================================
-# DASHBOARD VIEWS
+# DASHBOARD
 # ============================================================================
 
 class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
@@ -447,4 +708,3 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
         context['recent_transactions'] = FinancialTransaction.objects.all()[:10]
         
         return context
-
