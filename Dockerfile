@@ -27,18 +27,19 @@ RUN echo "Compiling translation files during build..." && \
     find locale -name "*.mo" -type f | head -1 || (echo "ERROR: No .mo files found after compilation!" && exit 1)
 
 # Collect static files during build
-# This ensures all static files (including Django admin) are collected and included in the image
-# Note: collectstatic doesn't require database connection, so it's safe to run during build
-# Provide dummy environment variables to satisfy production settings validation
-# (collectstatic doesn't actually use these, they're just needed for Django configuration)
-RUN echo "Collecting static files during build..." && \
+# IMPORTANT: This only collects to local staticfiles/ directory for WhiteNoise (when USE_S3=False)
+# If USE_S3=True, collectstatic will be run in entrypoint.sh with real AWS credentials
+# We disable S3 during build by not setting USE_S3, so files are collected locally
+# This ensures WhiteNoise has files to serve, and S3 upload happens at runtime
+RUN echo "Collecting static files during build (local storage for WhiteNoise)..." && \
     SECRET_KEY=django-build-time-temp-key-for-collectstatic \
     DEBUG=False \
     ALLOWED_HOSTS=localhost \
     DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy \
+    USE_S3=False \
     python manage.py collectstatic --noinput --clear && \
     echo "Verifying static files collection..." && \
-    test -d staticfiles/admin && echo "✓ Admin static files collected" || (echo "ERROR: Admin static files not found!" && exit 1)
+    test -d staticfiles/admin && echo "✓ Admin static files collected locally" || (echo "ERROR: Admin static files not found!" && exit 1)
 
 EXPOSE 8000
 

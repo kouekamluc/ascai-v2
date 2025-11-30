@@ -147,14 +147,24 @@ fi
 
 # Collect static files
 echo "Collecting static files..."
-python manage.py collectstatic --noinput
-echo "Verifying static files were collected..."
-if [ -d "staticfiles/admin" ]; then
-    echo "✓ Admin static files found in staticfiles/admin"
-    ls -la staticfiles/admin/css/ | head -5 || echo "⚠ Could not list admin CSS files"
+# Check if S3 is enabled by checking environment variable
+if [ "${USE_S3:-False}" = "True" ]; then
+    echo "S3 is enabled - uploading static files to S3 bucket..."
+    python manage.py collectstatic --noinput
+    echo "✓ Static files uploaded to S3"
+    echo "Note: Verify files are accessible at your S3 bucket's static/ path"
+    echo "Check S3 bucket permissions if admin panel is unstyled (403 Forbidden errors)"
 else
-    echo "✗ ERROR: staticfiles/admin directory not found!"
-    exit 1
+    echo "S3 is disabled - collecting static files locally for WhiteNoise..."
+    python manage.py collectstatic --noinput
+    echo "Verifying static files were collected locally..."
+    if [ -d "staticfiles/admin" ]; then
+        echo "✓ Admin static files found in staticfiles/admin"
+        ls -la staticfiles/admin/css/ | head -5 || echo "⚠ Could not list admin CSS files"
+    else
+        echo "✗ ERROR: staticfiles/admin directory not found!"
+        exit 1
+    fi
 fi
 
 # Start the application
