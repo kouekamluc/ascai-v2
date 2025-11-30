@@ -332,8 +332,9 @@ SOCIALACCOUNT_PROVIDERS = {
         },
         'OAUTH_PKCE_ENABLED': True,
         'APP': {
-            'client_id': config('GOOGLE_OAUTH2_CLIENT_ID', default=''),
-            'secret': config('GOOGLE_OAUTH2_CLIENT_SECRET', default=''),
+            # Support both GOOGLE_CLIENT_ID and GOOGLE_OAUTH2_CLIENT_ID for flexibility
+            'client_id': config('GOOGLE_OAUTH2_CLIENT_ID', default=config('GOOGLE_CLIENT_ID', default='')),
+            'secret': config('GOOGLE_OAUTH2_CLIENT_SECRET', default=config('GOOGLE_CLIENT_SECRET', default='')),
             'key': ''
         }
     }

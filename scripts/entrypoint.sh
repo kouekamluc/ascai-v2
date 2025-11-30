@@ -106,12 +106,15 @@ python manage.py create_admin --update || echo "⚠ Warning: Could not create/up
 
 # Set up Google OAuth SocialApplication if credentials are provided
 echo "Setting up Google OAuth..."
-if [ -n "${GOOGLE_OAUTH2_CLIENT_ID:-}" ] && [ -n "${GOOGLE_OAUTH2_CLIENT_SECRET:-}" ]; then
+# Support both GOOGLE_CLIENT_ID and GOOGLE_OAUTH2_CLIENT_ID for flexibility
+if { [ -n "${GOOGLE_OAUTH2_CLIENT_ID:-}" ] || [ -n "${GOOGLE_CLIENT_ID:-}" ]; } && \
+   { [ -n "${GOOGLE_OAUTH2_CLIENT_SECRET:-}" ] || [ -n "${GOOGLE_CLIENT_SECRET:-}" ]; }; then
     echo "Google OAuth credentials found, setting up SocialApplication..."
     python manage.py setup_google_oauth || echo "⚠ Warning: Could not set up Google OAuth, but continuing..."
 else
-    echo "ℹ Google OAuth credentials not found (GOOGLE_OAUTH2_CLIENT_ID or GOOGLE_OAUTH2_CLIENT_SECRET not set)"
-    echo "ℹ Google login button will not appear until credentials are provided and setup_google_oauth is run"
+    echo "ℹ Google OAuth credentials not found"
+    echo "ℹ Please set either GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET or GOOGLE_OAUTH2_CLIENT_ID/GOOGLE_OAUTH2_CLIENT_SECRET"
+    echo "ℹ Google login button will not appear until credentials are provided"
 fi
 
 # Compile translation files before collecting static files

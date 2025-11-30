@@ -13,14 +13,17 @@ class Command(BaseCommand):
     help = 'Set up Google OAuth SocialApplication from environment variables'
 
     def handle(self, *args, **options):
-        client_id = config('GOOGLE_OAUTH2_CLIENT_ID', default='')
-        client_secret = config('GOOGLE_OAUTH2_CLIENT_SECRET', default='')
+        # Support both GOOGLE_CLIENT_ID and GOOGLE_OAUTH2_CLIENT_ID for flexibility
+        client_id = config('GOOGLE_OAUTH2_CLIENT_ID', default=config('GOOGLE_CLIENT_ID', default=''))
+        client_secret = config('GOOGLE_OAUTH2_CLIENT_SECRET', default=config('GOOGLE_CLIENT_SECRET', default=''))
         
         if not client_id or not client_secret:
             self.stdout.write(
                 self.style.WARNING(
                     'Google OAuth credentials not found in environment variables.\n'
-                    'Please set GOOGLE_OAUTH2_CLIENT_ID and GOOGLE_OAUTH2_CLIENT_SECRET.\n'
+                    'Please set either:\n'
+                    '  - GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET, OR\n'
+                    '  - GOOGLE_OAUTH2_CLIENT_ID and GOOGLE_OAUTH2_CLIENT_SECRET\n'
                     'The Google login button will not appear until credentials are set.'
                 )
             )
