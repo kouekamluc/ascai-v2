@@ -35,11 +35,21 @@
                         <p class="text-sm text-gray-500">{% trans 'You will be redirected to Google to sign in securely' %}</p>
                     </div>
                     
-                    <!-- Auto-redirect notice -->
-                    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p class="text-sm text-blue-800">
-                            {% trans "If you're not redirected automatically, click the button below:" %}
-                        </p>
+                    <!-- Django-allauth form (hidden, auto-submits) -->
+                    {% if form %}
+                    <form method="post" class="hidden">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" id="auto-submit-btn" class="hidden">{% trans 'Continue' %}</button>
+                    </form>
+                    {% endif %}
+                    
+                    <!-- Manual redirect button (fallback) -->
+                    <div class="mt-4">
+                        <button onclick="document.querySelector('form')?.submit()" 
+                                class="w-full bg-cameroon-green text-white py-3 rounded-lg font-semibold hover:bg-cameroon-green/90 transition-colors">
+                            {% trans 'Continue to Google' %}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -49,20 +59,15 @@
 
 <!-- Auto-redirect script -->
 <script>
-    // Auto-redirect after a short delay if JavaScript is enabled
-    setTimeout(function() {
-        // If the form exists, submit it automatically
-        var form = document.querySelector('form');
-        if (form) {
-            form.submit();
-        } else {
-            // If no form, try to find and click the redirect link
-            var redirectLink = document.querySelector('a[href*="google"]');
-            if (redirectLink) {
-                window.location.href = redirectLink.href;
+    // Auto-submit the form after a short delay
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            var form = document.querySelector('form');
+            if (form) {
+                form.submit();
             }
-        }
-    }, 500);
+        }, 500);
+    });
 </script>
 {% endblock %}
 
