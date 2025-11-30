@@ -223,12 +223,23 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Returns the email confirmation URL using absolute URLs for production.
         This ensures email links work correctly in production environments.
         Always uses the Railway domain (ascai.up.railway.app) instead of ascai.org.
+        The URL is generated without language prefix since it's outside i18n_patterns.
         """
+        # Generate the URL path (without language prefix since it's outside i18n_patterns)
         url = reverse("account_confirm_email", args=[emailconfirmation.key])
+        
+        # Log the generated URL path for debugging
+        logger.info(f"Generated email confirmation URL path: {url} for key: {emailconfirmation.key[:10]}...")
         
         # Priority 1: Use request.build_absolute_uri (works when request is available)
         if request:
-            return request.build_absolute_uri(url)
+            absolute_url = request.build_absolute_uri(url)
+            logger.info(f"Built absolute URL from request: {absolute_url}")
+            # Ensure we're using Railway domain, not ascai.org
+            if 'ascai.org' in absolute_url and 'railway.app' not in absolute_url:
+                absolute_url = absolute_url.replace('ascai.org', 'ascai.up.railway.app')
+                logger.info(f"Replaced ascai.org with Railway domain: {absolute_url}")
+            return absolute_url
         
         # Priority 2: Use Railway domain from ALLOWED_HOSTS or environment
         protocol = 'https' if not settings.DEBUG else 'http'
@@ -269,11 +280,14 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             )
         
         # Ensure we always use Railway domain, not ascai.org
-        if railway_domain == 'ascai.org':
+        if railway_domain == 'ascai.org' or railway_domain == 'ascailazio.org':
             railway_domain = 'ascai.up.railway.app'
-            logger.info(f"Replaced ascai.org with Railway domain: {railway_domain}")
+            logger.info(f"Replaced {railway_domain} with Railway domain: ascai.up.railway.app")
         
-        return f"{protocol}://{railway_domain}{url}"
+        absolute_url = f"{protocol}://{railway_domain}{url}"
+        logger.info(f"Final email confirmation URL: {absolute_url}")
+        
+        return absolute_url
     
     def send_confirmation_mail(self, request, emailconfirmation, signup):
         """

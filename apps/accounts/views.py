@@ -119,22 +119,40 @@ class CustomConfirmEmailView(ConfirmEmailView):
     """
     def get(self, *args, **kwargs):
         """Handle GET request - show confirmation form using our styled template."""
-        # Get the confirmation object
-        self.object = self.get_object()
+        # Log the key being used
+        key = kwargs.get('key', 'NO KEY PROVIDED')
+        logger.info(f"CustomConfirmEmailView GET: Received confirmation key: {key[:20]}... (length: {len(key)})")
         
-        # Check if email is already verified
-        if self.object and self.object.email_address.verified:
-            # If already verified, show success page
-            logger.info(f"CustomConfirmEmailView: Email {self.object.email_address.email} already verified, showing success page")
-            return render(self.request, 'account/email_confirmed.html', {
-                'email_address': self.object.email_address,
-                'user': self.object.email_address.user
+        try:
+            # Get the confirmation object
+            self.object = self.get_object()
+            
+            if self.object is None:
+                logger.warning(f"CustomConfirmEmailView: No confirmation object found for key: {key[:20]}...")
+                return render(self.request, 'account/email_confirm.html', {
+                    'confirmation': None
+                })
+            
+            logger.info(f"CustomConfirmEmailView: Found confirmation for email: {self.object.email_address.email}")
+            
+            # Check if email is already verified
+            if self.object.email_address.verified:
+                # If already verified, show success page
+                logger.info(f"CustomConfirmEmailView: Email {self.object.email_address.email} already verified, showing success page")
+                return render(self.request, 'account/email_confirmed.html', {
+                    'email_address': self.object.email_address,
+                    'user': self.object.email_address.user
+                })
+            
+            # Render our styled template (works for both valid confirmation and invalid/None)
+            return render(self.request, 'account/email_confirm.html', {
+                'confirmation': self.object
             })
-        
-        # Render our styled template (works for both valid confirmation and invalid/None)
-        return render(self.request, 'account/email_confirm.html', {
-            'confirmation': self.object
-        })
+        except Exception as e:
+            logger.error(f"CustomConfirmEmailView GET error: {str(e)}", exc_info=True)
+            return render(self.request, 'account/email_confirm.html', {
+                'confirmation': None
+            })
     
     def post(self, *args, **kwargs):
         """Handle email confirmation POST request."""
