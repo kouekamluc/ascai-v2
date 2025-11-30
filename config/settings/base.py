@@ -320,6 +320,9 @@ ACCOUNT_RATE_LIMITS = {
 }
 
 # Social Account Settings (Google OAuth)
+# NOTE: Google OAuth is configured via SocialApp database entries (created by setup_google_oauth command)
+# Do NOT configure 'APP' here to avoid MultipleObjectsReturned errors
+# The setup_google_oauth management command creates the SocialApp entry from environment variables
 SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomSocialAccountAdapter'
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -331,12 +334,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
         },
         'OAUTH_PKCE_ENABLED': True,
-        'APP': {
-            # Support both GOOGLE_CLIENT_ID and GOOGLE_OAUTH2_CLIENT_ID for flexibility
-            'client_id': config('GOOGLE_OAUTH2_CLIENT_ID', default=config('GOOGLE_CLIENT_ID', default='')),
-            'secret': config('GOOGLE_OAUTH2_CLIENT_SECRET', default=config('GOOGLE_CLIENT_SECRET', default='')),
-            'key': ''
-        }
+        # 'APP' configuration removed - using database SocialApp entries instead
+        # This prevents MultipleObjectsReturned errors when both are configured
     }
 }
 # Auto-approve social accounts (users still need admin approval via is_approved field)
