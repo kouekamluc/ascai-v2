@@ -18,9 +18,10 @@ class MemberForm(forms.ModelForm):
     
     class Meta:
         model = Member
-        fields = ['member_type', 'lazio_residence_verified', 'cameroonian_origin_verified', 
+        fields = ['user', 'member_type', 'lazio_residence_verified', 'cameroonian_origin_verified', 
                   'membership_start_date', 'membership_end_date', 'notes']
         widgets = {
+            'user': forms.Select(attrs={'class': 'form-input'}),
             'member_type': forms.Select(attrs={'class': 'form-input'}),
             'lazio_residence_verified': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
             'cameroonian_origin_verified': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
@@ -28,6 +29,24 @@ class MemberForm(forms.ModelForm):
             'membership_end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
             'notes': forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        # Filter users who don't already have a member profile
+        if not self.instance.pk:  # Only for new members
+            existing_member_user_ids = Member.objects.values_list('user_id', flat=True)
+            self.fields['user'].queryset = User.objects.exclude(id__in=existing_member_user_ids).order_by('username')
+            self.fields['user'].required = True
+        else:
+            # For editing, show current user and allow changing
+            if self.instance.user:
+                self.fields['user'].queryset = User.objects.filter(pk=self.instance.user.pk)
+            else:
+                existing_member_user_ids = Member.objects.values_list('user_id', flat=True)
+                self.fields['user'].queryset = User.objects.exclude(id__in=existing_member_user_ids).order_by('username')
 
 
 class MemberSelfRegistrationForm(forms.ModelForm):

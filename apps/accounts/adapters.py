@@ -610,19 +610,10 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 )
             else:
                 logger.warning(f"Google OAuth user {user.username} has no email address!")
-                        defaults={
-                            'verified': True,
-                            'primary': True
-                        }
-                    )
-                logger.info(
-                    f"Existing user linked Google account: {user.username} ({user.email}) - "
-                    f"email marked as verified"
-                )
-            else:
-                logger.info(
-                    f"Existing user linked Google account: {user.username} ({user.email})"
-                )
+            
+            logger.info(
+                f"Existing user linked Google account: {user.username} ({user.email if user.email else 'no email'})"
+            )
         
         user.save()
         
