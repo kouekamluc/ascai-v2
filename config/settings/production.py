@@ -115,17 +115,18 @@ if not CSRF_TRUSTED_ORIGINS:
 
 # Static files (use S3 or WhiteNoise)
 if not USE_S3:
-    # Use CompressedStaticFilesStorage - doesn't require manifest file, more reliable
-    # For better cache busting, you can use CompressedManifestStaticFilesStorage instead
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    # Use CompressedManifestStaticFilesStorage for better cache busting and reliability
+    # This storage backend creates a manifest file that maps original filenames to hashed versions
+    # WhiteNoise will automatically serve these files correctly
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     
     # WhiteNoise configuration
-    # WhiteNoise automatically serves files from STATIC_ROOT, so we don't need to set WHITENOISE_ROOT
+    # WhiteNoise automatically serves files from STATIC_ROOT by default
     # WHITENOISE_ROOT is only for serving files that are NOT in STATIC_ROOT (like files in project root)
-    # Setting WHITENOISE_ROOT to STATIC_ROOT causes conflicts and prevents proper static file serving
+    # Do NOT set WHITENOISE_ROOT to STATIC_ROOT - it causes conflicts
     WHITENOISE_USE_FINDERS = False  # Disable finders in production - files should be collected to STATIC_ROOT
     WHITENOISE_AUTOREFRESH = False  # Disable auto-refresh in production for performance
-    # Do NOT set WHITENOISE_ROOT - WhiteNoise serves from STATIC_ROOT by default
+    # WhiteNoise will automatically serve files from STATIC_ROOT - no additional configuration needed
     
     # Ensure STATICFILES_FINDERS includes all default finders
     # This ensures Django admin static files are found during collectstatic
@@ -137,6 +138,7 @@ if not USE_S3:
     logger.info("Using WhiteNoise for static file storage (S3 disabled)")
     logger.info(f"STATIC_ROOT: {STATIC_ROOT}")
     logger.info(f"STATIC_URL: {STATIC_URL}")
+    logger.info(f"STATICFILES_STORAGE: {STATICFILES_STORAGE}")
     logger.info("WhiteNoise configured to serve from STATIC_ROOT (default behavior)")
 else:
     # Validate AWS S3 configuration in production
