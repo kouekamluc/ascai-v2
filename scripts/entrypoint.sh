@@ -104,6 +104,16 @@ echo "✓ Media directory setup complete"
 echo "Ensuring admin user exists..."
 python manage.py create_admin --update || echo "⚠ Warning: Could not create/update admin user, but continuing..."
 
+# Set up Google OAuth SocialApplication if credentials are provided
+echo "Setting up Google OAuth..."
+if [ -n "${GOOGLE_OAUTH2_CLIENT_ID:-}" ] && [ -n "${GOOGLE_OAUTH2_CLIENT_SECRET:-}" ]; then
+    echo "Google OAuth credentials found, setting up SocialApplication..."
+    python manage.py setup_google_oauth || echo "⚠ Warning: Could not set up Google OAuth, but continuing..."
+else
+    echo "ℹ Google OAuth credentials not found (GOOGLE_OAUTH2_CLIENT_ID or GOOGLE_OAUTH2_CLIENT_SECRET not set)"
+    echo "ℹ Google login button will not appear until credentials are provided and setup_google_oauth is run"
+fi
+
 # Compile translation files before collecting static files
 # (This is a fallback in case they weren't compiled during build)
 echo "Checking translation files..."
