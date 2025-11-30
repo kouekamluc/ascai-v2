@@ -27,16 +27,16 @@ class MemberAdmin(admin.ModelAdmin):
     list_filter = ['member_type', 'is_active_member', 'lazio_residence_verified', 
                    'cameroonian_origin_verified', 'registration_date']
     search_fields = ['user__username', 'user__email', 'user__full_name']
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['registration_date', 'created_at', 'updated_at']
     fieldsets = (
         (_('Member Information'), {
-            'fields': ('user', 'member_type', 'registration_date', 'is_active_member')
+            'fields': ('user', 'member_type', 'is_active_member')
         }),
         (_('Verification'), {
             'fields': ('lazio_residence_verified', 'cameroonian_origin_verified')
         }),
         (_('Dates'), {
-            'fields': ('membership_start_date', 'membership_end_date', 'last_assembly_attendance')
+            'fields': ('registration_date', 'membership_start_date', 'membership_end_date', 'last_assembly_attendance')
         }),
         (_('Notes'), {
             'fields': ('notes',)
