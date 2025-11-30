@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'storages',
     'ckeditor',
     'ckeditor_uploader',
-    'anymail',  # Email service integration (Brevo, SendGrid, etc.)
     
     # Django Allauth
     'django.contrib.sites',
@@ -51,6 +50,13 @@ INSTALLED_APPS = [
     'apps.dashboard',
     'apps.governance',
 ]
+
+# Conditionally add anymail if available (for email service integration)
+try:
+    import anymail
+    INSTALLED_APPS.append('anymail')
+except ImportError:
+    pass  # anymail not installed locally, but will be available in production
 
 MIDDLEWARE = [
     'config.middleware.CustomSecurityMiddleware',  # Custom SecurityMiddleware with healthcheck exemption
