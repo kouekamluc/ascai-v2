@@ -24,7 +24,8 @@ django-filter>=23.5
 django-ckeditor>=6.7.0
 
 # Authentication
-django-allauth>=0.57.0
+django-allauth[socialaccount]>=0.57.0
+requests>=2.31.0
 
 # Internationalization
 babel>=2.17.0
