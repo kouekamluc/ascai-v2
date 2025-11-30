@@ -138,6 +138,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Note: We keep user active initially so email confirmation can be sent.
         User will be set to inactive after email confirmation if needed.
         """
+        is_new_user = not user.pk
         user = super().save_user(request, user, form, commit=False)
         
         # Set custom fields from form
@@ -159,6 +160,44 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 f"User {user.username} ({user.email}) created with is_approved=False, is_active=True "
                 f"(will be checked by backend for login)"
             )
+            
+            # For new users, ensure EmailAddress is properly set up as unverified
+            # This fixes the issue where deleted users' EmailAddress records might
+            # prevent verification emails from being sent
+            if is_new_user and user.email:
+                # Delete any orphaned EmailAddress records that don't belong to any user
+                # or belong to a different user with the same email
+                EmailAddress.objects.filter(email=user.email).exclude(user=user).delete()
+                
+                # Ensure the EmailAddress for this user is marked as unverified
+                # This ensures verification emails are always sent for new signups
+                email_address, created = EmailAddress.objects.get_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={
+                        'verified': False,
+                        'primary': True
+                    }
+                )
+                
+                # If EmailAddress already exists (shouldn't happen for new users, but handle it),
+                # reset it to unverified to ensure verification email is sent
+                if not created and email_address.verified:
+                    logger.warning(
+                        f"EmailAddress for new user {user.username} was already verified. "
+                        f"Resetting to unverified to send verification email."
+                    )
+                    email_address.verified = False
+                    email_address.primary = True
+                    email_address.save()
+                    logger.info(
+                        f"Reset EmailAddress verification status for {user.email} - "
+                        f"verification email will be sent"
+                    )
+                elif created:
+                    logger.info(
+                        f"Created unverified EmailAddress for new user {user.username} ({user.email})"
+                    )
         
         return user
     

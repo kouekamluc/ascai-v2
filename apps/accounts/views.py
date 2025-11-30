@@ -204,3 +204,121 @@ class CustomConfirmEmailView(ConfirmEmailView):
         logger.debug("CustomConfirmEmailView: Returning parent's response")
         return response
 
+
+def resend_verification_email(request):
+    """
+    Allow users to resend verification emails.
+    Can be accessed by authenticated users who haven't verified their email,
+    or by providing an email address (for unauthenticated users who just signed up).
+    Supports unlimited resends - always deletes old confirmations before creating new ones.
+    """
+    from allauth.account.models import EmailAddress, EmailConfirmation
+    from allauth.account.adapter import get_adapter
+    
+    adapter = get_adapter(request)
+    
+    # Handle both GET and POST requests
+    if request.method == 'POST':
+        email = request.POST.get('email')
+    else:
+        email = request.GET.get('email')
+    
+    # If user is authenticated, use their email (unless override provided)
+    if request.user.is_authenticated:
+        user = request.user
+        if not email:
+            email = user.email
+        
+        if not email:
+            messages.error(request, _('You do not have an email address associated with your account.'))
+            return redirect('account_login')
+        
+        # Check if email is already verified
+        try:
+            email_address = EmailAddress.objects.get(user=user, email=email)
+            if email_address.verified:
+                messages.info(request, _('Your email address is already verified.'))
+                return redirect('dashboard:home')
+        except EmailAddress.DoesNotExist:
+            pass
+        
+    else:
+        # For unauthenticated users, email is required
+        if not email:
+            messages.error(request, _('Please provide an email address.'))
+            return redirect('account_email_verification_sent')
+        
+        try:
+            user = User.objects.get(email=email)
+            # Don't allow resending for verified emails
+            try:
+                email_address = EmailAddress.objects.get(user=user, email=email)
+                if email_address.verified:
+                    messages.info(request, _('This email address is already verified. Please log in.'))
+                    return redirect('account_login')
+            except EmailAddress.DoesNotExist:
+                pass
+        except User.DoesNotExist:
+            messages.error(request, _('No account found with this email address.'))
+            return redirect('account_login')
+        except User.MultipleObjectsReturned:
+            # Shouldn't happen with unique emails, but handle it
+            user = User.objects.filter(email=email).first()
+            if not user:
+                messages.error(request, _('No account found with this email address.'))
+                return redirect('account_login')
+    
+    # Get or create EmailAddress
+    email_address, created = EmailAddress.objects.get_or_create(
+        user=user,
+        email=email,
+        defaults={
+            'verified': False,
+            'primary': True
+        }
+    )
+    
+    # Ensure it's marked as unverified (allows resending even if it was verified)
+    if email_address.verified:
+        email_address.verified = False
+        email_address.save()
+        logger.info(f"Reset EmailAddress verification status for {email} to allow resend")
+    
+    try:
+        # IMPORTANT: Delete ALL old email confirmations for this email address FIRST
+        # This ensures we can always create a new one and send it, regardless of how many
+        # times this has been called. No rate limiting - unlimited resends allowed.
+        deleted_count = EmailConfirmation.objects.filter(email_address=email_address).delete()[0]
+        if deleted_count > 0:
+            logger.info(f"Deleted {deleted_count} old email confirmation(s) for {email} before creating new one")
+        
+        # Create new email confirmation (this will always work since we deleted old ones)
+        emailconfirmation = EmailConfirmation.create(email_address)
+        
+        # Send the confirmation email
+        adapter.send_confirmation_mail(request, emailconfirmation, signup=False)
+        
+        messages.success(
+            request,
+            _('Verification email has been sent to {}. Check your inbox and spam folder.').format(email)
+        )
+        logger.info(f"Verification email resent to {email} for user {user.username} (unlimited resends allowed)")
+        
+    except Exception as e:
+        logger.error(f"Failed to resend verification email to {email}: {str(e)}", exc_info=True)
+        messages.error(
+            request,
+            _('Failed to send verification email. Please try again later or contact support.')
+        )
+    
+    # Redirect to email verification sent page
+    redirect_url = 'account_email_verification_sent'
+    if not request.user.is_authenticated and email:
+        # Add email to query string for unauthenticated users
+        from django.http import HttpResponseRedirect
+        from django.urls import reverse
+        url = reverse(redirect_url)
+        return HttpResponseRedirect(f"{url}?email={email}")
+    
+    return redirect(redirect_url)
+

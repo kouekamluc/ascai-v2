@@ -44,7 +44,7 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     
-    actions = ['approve_users', 'reject_users', 'verify_emails', 'mark_emails_unverified']
+    actions = ['approve_users', 'reject_users', 'verify_emails', 'mark_emails_unverified', 'resend_verification_emails']
     
     def save_model(self, request, obj, form, change):
         """Override save to auto-approve superusers and staff."""
@@ -193,6 +193,70 @@ class UserAdmin(BaseUserAdmin):
         EmailAddress.objects.filter(user__in=queryset).update(verified=False)
         self.message_user(request, f'{updated} user email(s) marked as unverified.')
     mark_emails_unverified.short_description = _('Unverify selected user emails')
+    
+    def resend_verification_emails(self, request, queryset):
+        """
+        Resend verification emails to selected users.
+        Supports unlimited resends - always deletes old confirmations before creating new ones.
+        Can be called multiple times without restrictions.
+        """
+        from allauth.account.models import EmailConfirmation
+        from allauth.account.adapter import get_adapter
+        
+        adapter = get_adapter(request)
+        emails_sent = 0
+        errors = []
+        
+        for user in queryset:
+            if not user.email:
+                continue
+            
+            try:
+                # Get or create EmailAddress for the user
+                email_address, created = EmailAddress.objects.get_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={
+                        'verified': False,
+                        'primary': True
+                    }
+                )
+                
+                # Reset to unverified if it was already verified (allows resending)
+                if not created and email_address.verified:
+                    email_address.verified = False
+                    email_address.save()
+                    logger.info(f"Reset EmailAddress verification status for {user.email} to allow resend")
+                
+                # IMPORTANT: Delete ALL old email confirmations FIRST
+                # This ensures unlimited resends - no restrictions on how many times this can be called
+                deleted_count = EmailConfirmation.objects.filter(email_address=email_address).delete()[0]
+                if deleted_count > 0:
+                    logger.info(f"Deleted {deleted_count} old email confirmation(s) for {user.email} before creating new one")
+                
+                # Create new email confirmation (this will always work since we deleted old ones)
+                emailconfirmation = EmailConfirmation.create(email_address)
+                
+                # Send the confirmation email
+                adapter.send_confirmation_mail(request, emailconfirmation, signup=False)
+                
+                emails_sent += 1
+                logger.info(f"Verification email resent to {user.email} for user {user.username} (unlimited resends allowed)")
+                
+            except Exception as e:
+                error_msg = f"Failed to resend verification email to {user.email}: {str(e)}"
+                logger.error(error_msg, exc_info=True)
+                errors.append(user.email)
+        
+        # Build success message
+        message = f'Verification email(s) sent to {emails_sent} user(s).'
+        if errors:
+            message += f' Failed to send to: {", ".join(errors[:5])}'
+            if len(errors) > 5:
+                message += f' (and {len(errors) - 5} more)'
+        
+        self.message_user(request, message)
+    resend_verification_emails.short_description = _('Resend verification emails to selected users (unlimited resends)')
 
 
 @admin.register(UserDocument)
