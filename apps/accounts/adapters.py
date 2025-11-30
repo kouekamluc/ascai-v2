@@ -3,9 +3,12 @@ Django Allauth adapters for custom user signup.
 """
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.forms import SignupForm, LoginForm
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.exceptions import ImmediateHttpResponse
 from django import forms
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .models import User
@@ -286,4 +289,102 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 # but this is a safety check
                 logger.warning(f"activate_url is not absolute: {activate_url}")
         return super().render_mail(template_prefix, email, context, headers)
+
+
+class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
+    """
+    Custom social account adapter to handle Google OAuth signups
+    with custom user model fields and approval workflow.
+    """
+    
+    def pre_social_login(self, request, sociallogin):
+        """
+        Called before a social account is logged in.
+        If a user with this email already exists, connect the accounts.
+        """
+        # If the user is already logged in, connect the social account
+        if request.user.is_authenticated:
+            sociallogin.connect(request, request.user)
+            return
+        
+        # Check if a user with this email already exists
+        email = sociallogin.account.extra_data.get('email')
+        if email:
+            try:
+                user = User.objects.get(email=email)
+                # Connect the social account to existing user
+                sociallogin.connect(request, user)
+            except User.DoesNotExist:
+                # User doesn't exist, will be created in save_user
+                pass
+    
+    def populate_user(self, request, sociallogin, data):
+        """
+        Populate user fields from Google OAuth data.
+        """
+        user = super().populate_user(request, sociallogin, data)
+        
+        # Extract name from Google profile
+        if not user.username:
+            # Use email as username if name not available
+            email = data.get('email', '')
+            user.username = email.split('@')[0] if email else f"user_{sociallogin.account.uid}"
+        
+        # Set full_name from Google profile
+        if not user.full_name:
+            given_name = data.get('given_name', '')
+            family_name = data.get('family_name', '')
+            if given_name or family_name:
+                user.full_name = f"{given_name} {family_name}".strip()
+            elif data.get('name'):
+                user.full_name = data.get('name')
+        
+        # Set default role to student
+        if not user.role:
+            user.role = 'student'
+        
+        # Set default language preference
+        if not user.language_preference:
+            user.language_preference = 'en'
+        
+        # Google emails are already verified
+        user.email_verified = True
+        
+        # Set approval status - require admin approval (same as regular signup)
+        user.is_approved = False
+        user.is_active = True  # Active so email confirmation can be sent if needed
+        
+        return user
+    
+    def save_user(self, request, sociallogin, form=None):
+        """
+        Save the user after social login.
+        """
+        user = super().save_user(request, sociallogin, form)
+        
+        # Ensure custom fields are set
+        if not user.role:
+            user.role = 'student'
+        if not user.language_preference:
+            user.language_preference = 'en'
+        
+        # Set approval status
+        user.is_approved = False
+        user.is_active = True
+        user.email_verified = True  # Google emails are verified
+        
+        user.save()
+        
+        logger.info(
+            f"Social account user {user.username} ({user.email}) created via Google OAuth "
+            f"with is_approved=False, is_active=True"
+        )
+        
+        return user
+    
+    def is_open_for_signup(self, request, sociallogin):
+        """
+        Allow social account signups.
+        """
+        return True
 

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     
     # Local apps
     'apps.accounts',
@@ -317,6 +318,31 @@ ACCOUNT_PASSWORD_MIN_LENGTH = 8
 ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/5m',  # 5 attempts per 5 minutes
 }
+
+# Social Account Settings (Google OAuth)
+SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomSocialAccountAdapter'
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+        'APP': {
+            'client_id': config('GOOGLE_OAUTH2_CLIENT_ID', default=''),
+            'secret': config('GOOGLE_OAUTH2_CLIENT_SECRET', default=''),
+            'key': ''
+        }
+    }
+}
+# Auto-approve social accounts (users still need admin approval via is_approved field)
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Google already verifies emails
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens unless needed
 
 # Session Configuration
 SESSION_COOKIE_AGE = 86400  # 24 hours
