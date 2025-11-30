@@ -222,21 +222,58 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         """
         Returns the email confirmation URL using absolute URLs for production.
         This ensures email links work correctly in production environments.
+        Always uses the Railway domain (ascai.up.railway.app) instead of ascai.org.
         """
         url = reverse("account_confirm_email", args=[emailconfirmation.key])
-        # Use request.build_absolute_uri to get absolute URL
-        # This is critical for production where relative URLs won't work in emails
+        
+        # Priority 1: Use request.build_absolute_uri (works when request is available)
         if request:
             return request.build_absolute_uri(url)
-        # Fallback: construct from settings if request is not available
-        from django.contrib.sites.models import Site
-        try:
-            site = Site.objects.get_current()
-            protocol = 'https' if not settings.DEBUG else 'http'
-            return f"{protocol}://{site.domain}{url}"
-        except Exception:
-            # Last resort fallback
-            return url
+        
+        # Priority 2: Use Railway domain from ALLOWED_HOSTS or environment
+        protocol = 'https' if not settings.DEBUG else 'http'
+        
+        # Check for Railway domain in ALLOWED_HOSTS first
+        railway_domain = None
+        for host in settings.ALLOWED_HOSTS:
+            if 'railway.app' in host and not host.startswith('.'):
+                railway_domain = host
+                break
+        
+        # If not found in ALLOWED_HOSTS, check environment variables
+        if not railway_domain:
+            from decouple import config
+            railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
+            if not railway_domain:
+                # Check ALLOWED_HOSTS again for any non-wildcard domain
+                for host in settings.ALLOWED_HOSTS:
+                    if not host.startswith('.') and host not in ['healthcheck.railway.app', '*']:
+                        railway_domain = host
+                        break
+        
+        # Priority 3: Fallback to Site model
+        if not railway_domain:
+            from django.contrib.sites.models import Site
+            try:
+                site = Site.objects.get_current()
+                railway_domain = site.domain
+            except Exception:
+                pass
+        
+        # Priority 4: Hardcoded fallback to Railway domain
+        if not railway_domain:
+            railway_domain = 'ascai.up.railway.app'
+            logger.warning(
+                f"Could not determine domain from ALLOWED_HOSTS or Site model. "
+                f"Using fallback domain: {railway_domain}"
+            )
+        
+        # Ensure we always use Railway domain, not ascai.org
+        if railway_domain == 'ascai.org':
+            railway_domain = 'ascai.up.railway.app'
+            logger.info(f"Replaced ascai.org with Railway domain: {railway_domain}")
+        
+        return f"{protocol}://{railway_domain}{url}"
     
     def send_confirmation_mail(self, request, emailconfirmation, signup):
         """

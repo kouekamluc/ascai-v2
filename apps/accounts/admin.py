@@ -115,10 +115,14 @@ class UserAdmin(BaseUserAdmin):
             # Get site URL from Django Sites framework
             try:
                 site = Site.objects.get_current()
-                site_url = f"https://{site.domain}" if not site.domain.startswith('http') else site.domain
+                site_domain = site.domain
+                # Ensure we use Railway domain, not ascai.org
+                if site_domain == 'ascai.org' or site_domain == 'ascailazio.org':
+                    site_domain = 'ascai.up.railway.app'
+                site_url = f"https://{site_domain}" if not site_domain.startswith('http') else site_domain
             except Exception:
-                # Fallback if Site framework not configured
-                site_url = getattr(settings, 'SITE_URL', 'https://ascailazio.org')
+                # Fallback to Railway domain
+                site_url = getattr(settings, 'SITE_URL', 'https://ascai.up.railway.app')
             
             login_url = f"{site_url}/accounts/login/"
             context = {

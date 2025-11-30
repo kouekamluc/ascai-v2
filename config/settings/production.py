@@ -331,10 +331,54 @@ else:
         "Make sure this is the correct backend for production."
     )
 
-# Note: Site domain should be updated after deployment using:
-# python manage.py update_site_domain --domain your-app-name.up.railway.app
-# This ensures email confirmation URLs use the correct domain.
-# The adapter will use request.build_absolute_uri() which works with ALLOWED_HOSTS.
+# Auto-update Site domain to match Railway domain for email confirmation URLs
+# This ensures email links use the correct domain (ascai.up.railway.app) instead of ascai.org
+try:
+    from django.contrib.sites.models import Site
+    from django.db import transaction
+    
+    # Get the primary Railway domain from ALLOWED_HOSTS
+    railway_domain = None
+    for host in ALLOWED_HOSTS:
+        if 'railway.app' in host and not host.startswith('.') and host not in ['healthcheck.railway.app']:
+            railway_domain = host
+            break
+    
+    # If not found, try environment variable
+    if not railway_domain:
+        railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
+    
+    # If still not found, use hardcoded Railway domain
+    if not railway_domain:
+        railway_domain = 'ascai.up.railway.app'
+    
+    # Update Site domain if it's different (especially if it's ascai.org)
+    try:
+        with transaction.atomic():
+            site = Site.objects.get(pk=SITE_ID)
+            if site.domain != railway_domain:
+                old_domain = site.domain
+                site.domain = railway_domain
+                site.name = 'ASCAI Lazio'
+                site.save(update_fields=['domain', 'name'])
+                logger.info(
+                    f"✅ Updated Site domain from '{old_domain}' to '{railway_domain}' "
+                    f"for email confirmation URLs"
+                )
+            else:
+                logger.info(f"✅ Site domain is already set to '{railway_domain}'")
+    except Site.DoesNotExist:
+        # Create the site if it doesn't exist
+        Site.objects.create(
+            pk=SITE_ID,
+            domain=railway_domain,
+            name='ASCAI Lazio'
+        )
+        logger.info(f"✅ Created Site with domain '{railway_domain}'")
+    except Exception as e:
+        logger.warning(f"⚠️  Could not auto-update Site domain: {str(e)}. Email links may use wrong domain.")
+except Exception as e:
+    logger.warning(f"⚠️  Site domain auto-update failed: {str(e)}. Run 'python manage.py update_site_domain' manually.")
 
 # Logging - Enhanced for production debugging
 LOGGING = {
