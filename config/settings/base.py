@@ -236,21 +236,21 @@ if USE_S3:
         # This prevents "ValueError: Invalid endpoint:" errors from empty strings
         # Only set AWS_S3_ENDPOINT_URL in environment if using S3-compatible services (DigitalOcean Spaces, MinIO, etc.)
         
-        # Static files storage
+        # Static files storage - set immediately when S3 is enabled
         STATICFILES_STORAGE = 'config.storage_backends.StaticStorage'
         
-        # Media files storage
+        # Media files storage - set immediately when S3 is enabled
         DEFAULT_FILE_STORAGE = 'config.storage_backends.MediaStorage'
         
-        # Also set STORAGES for Django 4.2+ compatibility (if not already set)
-        # This ensures S3 takes precedence over any WhiteNoise settings
-        if 'STORAGES' not in globals() or not isinstance(globals().get('STORAGES'), dict):
-            STORAGES = {}
-        STORAGES["staticfiles"] = {
-            "BACKEND": "config.storage_backends.StaticStorage",
-        }
-        STORAGES["default"] = {
-            "BACKEND": "config.storage_backends.MediaStorage",
+        # Django 4.2+ STORAGES setting - set immediately when S3 is enabled
+        # This ensures S3 is used from the start, no "fix" logic needed
+        STORAGES = {
+            "staticfiles": {
+                "BACKEND": "config.storage_backends.StaticStorage",
+            },
+            "default": {
+                "BACKEND": "config.storage_backends.MediaStorage",
+            },
         }
         
         # Build URLs with proper protocol

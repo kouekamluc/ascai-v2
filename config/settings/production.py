@@ -140,21 +140,20 @@ if not USE_S3:
 # If USE_S3 is still True here, S3 should already be configured in base.py
 logger.info(f"Production settings: USE_S3 = {USE_S3}")
 
-# Use Django 4.2+ STORAGES setting for better control
-# Default to WhiteNoise (will be overridden by S3 if USE_S3=True and credentials are valid)
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
 # Static files (use S3 or WhiteNoise)
+# STORAGES is set in base.py when USE_S3=True and credentials are valid
+# Only set it here when USE_S3=False (WhiteNoise)
 if not USE_S3:
+    # Set STORAGES for WhiteNoise (only when S3 is disabled)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
     # Use WhiteNoise for static files (S3 disabled or credentials missing)
-    # STORAGES is already set to WhiteNoise above, but we also set STATICFILES_STORAGE for compatibility
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     
     # WhiteNoise configuration
@@ -213,23 +212,12 @@ else:
             logger.info(f"STATIC_URL reset to: {STATIC_URL}")
             logger.info(f"STATICFILES_STORAGE set to: {STATICFILES_STORAGE}")
         else:
-            # Credentials are valid - ensure S3 storage is explicitly set
-            # base.py should have already set STATICFILES_STORAGE, but we verify here
-            if not hasattr(globals(), 'STATICFILES_STORAGE') or 's3' not in str(STATICFILES_STORAGE).lower():
-                logger.warning("S3 credentials valid but STATICFILES_STORAGE not set to S3. Setting it now...")
-                STATICFILES_STORAGE = 'config.storage_backends.StaticStorage'
-            
-            # Also set STORAGES for Django 4.2+ compatibility
-            STORAGES["staticfiles"] = {
-                "BACKEND": "config.storage_backends.StaticStorage",
-            }
-            STORAGES["default"] = {
-                "BACKEND": "config.storage_backends.MediaStorage",
-            }
-            
+            # Credentials are valid - S3 should already be configured in base.py
+            # Just verify and log the configuration
             logger.info("✅ S3 storage backends confirmed in production settings")
             logger.info(f"  STATICFILES_STORAGE: {STATICFILES_STORAGE}")
             logger.info(f"  STATIC_URL: {STATIC_URL}")
+            logger.info(f"  MEDIA_URL: {MEDIA_URL}")
             import boto3
             from botocore.exceptions import ClientError, NoCredentialsError
             
