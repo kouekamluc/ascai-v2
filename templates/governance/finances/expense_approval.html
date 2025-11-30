@@ -43,8 +43,8 @@
                 <div>
                     <p class="font-semibold text-gray-900">{{ approval.signer.get_display_name }}</p>
                     <p class="text-sm text-gray-600">
-                        {% if approval.signer.executive_positions.exists %}
-                            {{ approval.signer.executive_positions.first.get_position_display }}
+                        {% if approval.signer_position %}
+                            {{ approval.signer_position.get_position_display }}
                         {% else %}
                             {% trans "Signer" %}
                         {% endif %}

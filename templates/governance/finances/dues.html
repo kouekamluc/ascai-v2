@@ -46,9 +46,13 @@
             {% for due in dues %}
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <a href="{% url 'governance:member_detail' due.member.pk %}" class="text-blue-600 hover:underline">
-                        {{ due.member.user.get_display_name }}
-                    </a>
+                    {% if due.member and due.member.user %}
+                        <a href="{% url 'governance:member_detail' due.member.pk %}" class="text-blue-600 hover:underline">
+                            {{ due.member.user.get_display_name }}
+                        </a>
+                    {% else %}
+                        <span class="text-gray-400">{% trans "N/A" %}</span>
+                    {% endif %}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">{{ due.year }}</td>
                 <td class="px-6 py-4 whitespace-nowrap font-semibold">€{{ due.amount }}</td>

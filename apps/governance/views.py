@@ -366,7 +366,16 @@ class ExpenseApprovalView(ExpenseApprovalRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         transaction = self.get_object()
-        approvals = transaction.approvals.select_related('signer').all()
+        approvals = transaction.approvals.select_related('signer').prefetch_related('signer__executive_positions').all()
+        
+        # Pre-fetch executive positions for each signer to avoid queryset calls in template
+        for approval in approvals:
+            # Get first active executive position if exists
+            try:
+                approval.signer_position = approval.signer.executive_positions.filter(status='active').first()
+            except (AttributeError, Exception):
+                approval.signer_position = None
+        
         context['approvals'] = approvals
         context['signed_count'] = approvals.filter(status='signed').count()
         context['required_signatures'] = 3

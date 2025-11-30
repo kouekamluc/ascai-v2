@@ -74,7 +74,11 @@
             <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
                     <p class="font-medium text-gray-900">
-                        {{ attendance.user.get_display_name|default:attendance.attendee_name }}
+                        {% if attendance.user %}
+                            {{ attendance.user.get_display_name }}
+                        {% else %}
+                            {{ attendance.attendee_name|default:"N/A" }}
+                        {% endif %}
                     </p>
                     <p class="text-xs text-gray-600">{{ attendance.get_attendee_type_display }}</p>
                 </div>

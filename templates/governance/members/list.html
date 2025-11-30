@@ -45,9 +45,13 @@
                 {% for member in members %}
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{% url 'governance:member_detail' member.pk %}" class="text-blue-600 hover:underline">
-                                {{ member.user.get_display_name }}
-                            </a>
+                            {% if member.user %}
+                                <a href="{% url 'governance:member_detail' member.pk %}" class="text-blue-600 hover:underline">
+                                    {{ member.user.get_display_name }}
+                                </a>
+                            {% else %}
+                                <span class="text-gray-400">{% trans "No user" %}</span>
+                            {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ member.get_member_type_display }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">

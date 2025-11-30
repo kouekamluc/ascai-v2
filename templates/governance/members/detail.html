@@ -1,12 +1,12 @@
 {% extends "governance/base.html" %}
 {% load i18n %}
 
-{% block title %}{{ member.user.get_display_name }} - {{ block.super }}{% endblock %}
+{% block title %}{% if member.user %}{{ member.user.get_display_name }}{% else %}{% trans "Member" %}{% endif %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">{{ member.user.get_display_name }}</h1>
+        <h1 class="text-3xl font-bold">{% if member.user %}{{ member.user.get_display_name }}{% else %}{% trans "Member" %}{% endif %}</h1>
         <a href="{% url 'governance:member_edit' member.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             {% trans "Edit" %}
         </a>

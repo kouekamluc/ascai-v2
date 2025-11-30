@@ -92,7 +92,9 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         ).select_related('event').order_by('event__start_datetime')[:5]
         
         # Suggested groups based on user profile
-        suggested_groups = CommunityGroup.objects.filter(is_public=True).exclude(members=user)
+        suggested_groups = CommunityGroup.objects.filter(is_public=True).exclude(members=user).annotate(
+            member_count=Count('members')
+        )
         if user.city_in_lazio:
             suggested_groups = suggested_groups.filter(
                 Q(category__icontains=user.city_in_lazio) | Q(category='students')
@@ -342,6 +344,10 @@ class GroupDetailView(DashboardRequiredMixin, DetailView):
     context_object_name = 'group'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
+    
+    def get_queryset(self):
+        """Annotate member count for performance."""
+        return CommunityGroup.objects.annotate(member_count=Count('members'))
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
