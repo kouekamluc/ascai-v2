@@ -45,19 +45,19 @@ class MemberPortalView(LoginRequiredMixin, TemplateView):
     """Member portal - user's personal membership dashboard."""
     template_name = 'governance/member_portal/index.html'
     
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user has a member profile, if not redirect to registration
+        if not hasattr(request.user, 'member_profile'):
+            messages.info(request, _('Please register as an ASCAI member to access the member portal.'))
+            return redirect('governance:member_register')
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        # Get or create member profile
-        member, created = Member.objects.get_or_create(
-            user=user,
-            defaults={
-                'member_type': 'student',
-                'is_cameroonian_origin': True,  # Default assumption
-                'resides_in_lazio': False,  # User will update
-            }
-        )
+        # Get member profile (guaranteed to exist due to dispatch check)
+        member = user.member_profile
         
         # Get current year dues
         current_year = timezone.now().year
@@ -65,6 +65,18 @@ class MemberPortalView(LoginRequiredMixin, TemplateView):
             member=member,
             year=current_year
         ).first()
+        
+        # Create current year dues if it doesn't exist and member is active
+        if not current_dues and member.is_active_member:
+            # Determine amount based on member type
+            amount = 10.00 if member.member_type == 'student' else 5.00
+            current_dues = MembershipDues.objects.create(
+                member=member,
+                year=current_year,
+                amount=amount,
+                due_date=timezone.datetime(current_year, 3, 31).date(),
+                status='pending'
+            )
         
         # Get all dues
         all_dues = MembershipDues.objects.filter(member=member).order_by('-year')
@@ -93,7 +105,6 @@ class MemberPortalView(LoginRequiredMixin, TemplateView):
             'upcoming_assemblies': upcoming_assemblies,
             'attendances': attendances,
             'assemblies_with_votes': assemblies_with_votes,
-            'is_new_member': created,
         })
         return context
 
@@ -116,18 +127,35 @@ class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
         member = form.save(commit=False)
         member.user = self.request.user
         member.registration_date = timezone.now().date()
-        # Set default values
-        member.is_cameroonian_origin = True  # Default assumption
-        member.resides_in_lazio = False  # User will update if needed
+        member.membership_start_date = timezone.now().date()
+        
+        # Set default values based on member type
+        if member.member_type == 'student':
+            # Students are assumed to be Cameroonian and may be in Lazio
+            member.is_cameroonian_origin = True
+            member.resides_in_lazio = False  # User should verify this
+        elif member.member_type == 'sympathizer':
+            # Sympathizers may not be Cameroonian
+            member.is_cameroonian_origin = False
+            member.resides_in_lazio = False
+        
         # Verification fields are set to False initially - admin will verify
         member.lazio_residence_verified = False
         member.cameroonian_origin_verified = False
-        member.is_active_member = False  # Will be activated after verification
+        member.is_active_member = False  # Will be activated after verification and payment
+        
         member.save()
+        
+        # Create initial membership status record
+        MembershipStatus.objects.create(
+            member=member,
+            status='pending',
+            notes=_('Initial registration - pending admin verification')
+        )
         
         messages.success(
             self.request,
-            _('Successfully registered as ASCAI member! Your membership is pending admin verification.')
+            _('Successfully registered as ASCAI member! Your membership is pending admin verification. Once verified and you pay your dues, you will have full member privileges.')
         )
         return redirect('governance:member_portal')
     
@@ -277,6 +305,41 @@ def register_attendance(request, assembly_id):
         messages.success(request, _('Successfully registered attendance!'))
     
     return redirect('governance:assembly_participate', pk=assembly_id)
+
+
+class MemberDirectoryView(LoginRequiredMixin, ListView):
+    """Public member directory - visible to all logged-in members."""
+    model = Member
+    template_name = 'governance/member_portal/directory.html'
+    context_object_name = 'members'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        # Only show active, verified members to regular users
+        queryset = Member.objects.filter(
+            is_active_member=True,
+            cameroonian_origin_verified=True
+        ).select_related('user')
+        
+        # Filtering
+        member_type = self.request.GET.get('member_type')
+        if member_type:
+            queryset = queryset.filter(member_type=member_type)
+        
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(user__username__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(user__full_name__icontains=search)
+            )
+        
+        return queryset.order_by('-registration_date')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['member_types'] = Member.MEMBER_TYPE_CHOICES
+        return context
 
 
 @login_required

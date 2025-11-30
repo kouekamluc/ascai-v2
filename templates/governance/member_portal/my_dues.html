@@ -4,9 +4,17 @@
 {% block page_heading %}{% trans "My Membership Dues" %}{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold">{% trans "Membership Dues" %}</h1>
-    <p class="text-gray-600 mt-1">{% trans "View and manage your annual membership fees" %}</p>
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold">{% trans "Membership Dues" %}</h1>
+        <p class="text-gray-600 mt-1">{% trans "View and manage your annual membership fees" %}</p>
+    </div>
+    <a href="{% url 'governance:member_portal' %}" class="btn-secondary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        {% trans "Back to Portal" %}
+    </a>
 </div>
 
 {% if current_dues %}

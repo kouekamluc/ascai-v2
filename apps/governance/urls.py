@@ -13,6 +13,7 @@ urlpatterns = [
     # User-facing Member Portal
     path('my-membership/', views.MemberPortalView.as_view(), name='member_portal'),
     path('register/', views.MemberSelfRegistrationView.as_view(), name='member_register'),
+    path('directory/', views.MemberDirectoryView.as_view(), name='member_directory'),
     path('my-dues/', views.MyDuesView.as_view(), name='my_dues'),
     path('my-dues/<int:dues_id>/request-payment/', views.request_dues_payment, name='request_dues_payment'),
     path('assemblies/<int:pk>/participate/', views.AssemblyParticipationView.as_view(), name='assembly_participate'),
