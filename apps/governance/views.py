@@ -130,15 +130,7 @@ class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
         member.registration_date = timezone.now().date()
         member.membership_start_date = timezone.now().date()
         
-        # Set default values based on member type
-        if member.member_type == 'student':
-            # Students are assumed to be Cameroonian and may be in Lazio
-            member.is_cameroonian_origin = True
-            member.resides_in_lazio = False  # User should verify this
-        elif member.member_type == 'sympathizer':
-            # Sympathizers may not be Cameroonian
-            member.is_cameroonian_origin = False
-            member.resides_in_lazio = False
+        # Set default values - verification will be done by admin
         
         # Verification fields are set to False initially - admin will verify
         member.lazio_residence_verified = False
