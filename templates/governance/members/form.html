@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% trans "Edit Member" %}{% else %}{% trans "Add Member" %}{% endif %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">
+        {% if object %}{% trans "Edit Member" %}{% else %}{% trans "Add Member" %}{% endif %}
+    </h1>
+    
+    <div class="bg-white rounded-lg shadow p-6 max-w-2xl">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="mt-6 flex gap-4">
+                <button type="submit" class="bg-cameroon-green text-white px-6 py-2 rounded hover:bg-green-700">
+                    {% trans "Save" %}
+                </button>
+                <a href="{% url 'governance:member_list' %}" class="bg-gray-200 text-gray-800 px-6 py-2 rounded hover:bg-gray-300">
+                    {% trans "Cancel" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

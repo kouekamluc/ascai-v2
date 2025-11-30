@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ member.user.get_display_name }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">{{ member.user.get_display_name }}</h1>
+        <a href="{% url 'governance:member_edit' member.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            {% trans "Edit" %}
+        </a>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">{% trans "Member Information" %}</h2>
+            <dl class="space-y-2">
+                <dt class="font-semibold">{% trans "Type" %}</dt>
+                <dd>{{ member.get_member_type_display }}</dd>
+                
+                <dt class="font-semibold">{% trans "Status" %}</dt>
+                <dd>
+                    {% if member.is_active_member %}
+                        <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">{% trans "Active" %}</span>
+                    {% else %}
+                        <span class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-800">{% trans "Inactive" %}</span>
+                    {% endif %}
+                </dd>
+                
+                <dt class="font-semibold">{% trans "Registration Date" %}</dt>
+                <dd>{{ member.registration_date|date:"d M Y" }}</dd>
+                
+                <dt class="font-semibold">{% trans "Lazio Residence Verified" %}</dt>
+                <dd>{% if member.lazio_residence_verified %}✓{% else %}✗{% endif %}</dd>
+                
+                <dt class="font-semibold">{% trans "Cameroonian Origin Verified" %}</dt>
+                <dd>{% if member.cameroonian_origin_verified %}✓{% else %}✗{% endif %}</dd>
+            </dl>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">{% trans "Recent Dues" %}</h2>
+            {% if dues %}
+                <ul class="space-y-2">
+                    {% for due in dues %}
+                        <li class="border-b pb-2">
+                            <span class="font-semibold">{{ due.year }}</span>
+                            <span class="text-gray-600">€{{ due.amount }}</span>
+                            <span class="px-2 py-1 text-xs rounded {% if due.status == 'paid' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ due.get_status_display }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500">{% trans "No dues records" %}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

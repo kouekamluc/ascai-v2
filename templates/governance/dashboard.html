@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Governance Dashboard" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">{% trans "ASCAI Governance Dashboard" %}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-2">{% trans "Members" %}</h3>
+            <p class="text-3xl font-bold text-cameroon-green">{{ stats.total_members }}</p>
+            <p class="text-sm text-gray-600 mt-2">
+                {% trans "Active:" %} {{ stats.active_members }}
+            </p>
+            <a href="{% url 'governance:member_list' %}" class="text-blue-600 hover:underline mt-4 inline-block">
+                {% trans "View All" %} →
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-2">{% trans "Executive Board" %}</h3>
+            {% if stats.current_board %}
+                <p class="text-lg">{{ stats.current_board }}</p>
+            {% else %}
+                <p class="text-gray-500">{% trans "No active board" %}</p>
+            {% endif %}
+            <a href="{% url 'governance:executive_board_list' %}" class="text-blue-600 hover:underline mt-4 inline-block">
+                {% trans "View Board" %} →
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-2">{% trans "General Assemblies" %}</h3>
+            <p class="text-3xl font-bold text-cameroon-green">{{ stats.upcoming_assemblies }}</p>
+            <p class="text-sm text-gray-600 mt-2">{% trans "Upcoming" %}</p>
+            <a href="{% url 'governance:assembly_list' %}" class="text-blue-600 hover:underline mt-4 inline-block">
+                {% trans "View All" %} →
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-2">{% trans "Membership Dues" %}</h3>
+            <p class="text-3xl font-bold text-red-600">{{ stats.pending_dues }}</p>
+            <p class="text-sm text-gray-600 mt-2">{% trans "Pending" %}</p>
+            <a href="{% url 'governance:membership_dues' %}" class="text-blue-600 hover:underline mt-4 inline-block">
+                {% trans "View All" %} →
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-2">{% trans "Expenses" %}</h3>
+            <p class="text-3xl font-bold text-orange-600">{{ stats.pending_expenses }}</p>
+            <p class="text-sm text-gray-600 mt-2">{% trans "Pending Approval" %}</p>
+            <a href="{% url 'governance:financial_transactions' %}" class="text-blue-600 hover:underline mt-4 inline-block">
+                {% trans "View All" %} →
+            </a>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">{% trans "Recent Assemblies" %}</h2>
+            {% if recent_assemblies %}
+                <ul class="space-y-2">
+                    {% for assembly in recent_assemblies %}
+                        <li class="border-b pb-2">
+                            <a href="{% url 'governance:assembly_detail' assembly.pk %}" class="text-blue-600 hover:underline">
+                                {{ assembly.get_assembly_type_display }} - {{ assembly.date|date:"d M Y" }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500">{% trans "No assemblies yet" %}</p>
+            {% endif %}
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">{% trans "Recent Transactions" %}</h2>
+            {% if recent_transactions %}
+                <ul class="space-y-2">
+                    {% for transaction in recent_transactions %}
+                        <li class="border-b pb-2">
+                            <span class="font-semibold">{{ transaction.get_transaction_type_display }}</span>
+                            <span class="text-gray-600">€{{ transaction.amount }}</span>
+                            <span class="text-sm text-gray-500">{{ transaction.date|date:"d M Y" }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500">{% trans "No transactions yet" %}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

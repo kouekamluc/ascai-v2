@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.downloads',
     'apps.contact',
     'apps.dashboard',
+    'apps.governance',
 ]
 
 MIDDLEWARE = [

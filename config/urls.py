@@ -18,14 +18,14 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     # Healthcheck endpoint (outside i18n_patterns for reliability)
     path('health/', HealthCheckView.as_view(), name='health'),
+    # Email confirmation URL (outside i18n_patterns so it works from email links without language prefix)
+    # This is critical because email links don't have language prefixes
+    path('accounts/confirm-email/<str:key>/', CustomConfirmEmailView.as_view(), name='account_confirm_email'),
 ]
 
 # Language-prefixed URLs
 urlpatterns += i18n_patterns(
     path('', include('apps.core.urls')),
-    # Override allauth's email confirmation view with our styled version
-    # This must come before allauth URLs to take precedence
-    path('accounts/confirm-email/<str:key>/', CustomConfirmEmailView.as_view(), name='account_confirm_email'),
     path('accounts/', include('allauth.urls')),  # Django allauth URLs
     path('accounts/', include('apps.accounts.urls')),  # Custom accounts URLs (profile, etc.)
     path('dashboard/', include('apps.dashboard.urls')),
@@ -38,6 +38,7 @@ urlpatterns += i18n_patterns(
     path('gallery/', include('apps.gallery.urls')),
     path('downloads/', include('apps.downloads.urls')),
     path('contact/', include('apps.contact.urls')),
+    path('governance/', include('apps.governance.urls')),
     prefix_default_language=False,
 )
 
