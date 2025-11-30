@@ -343,6 +343,9 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Google already verifies emails
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens unless needed
+# Auto-connect social accounts to existing users with matching verified email
+# This prevents "account already exists" email errors and improves UX
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
 # Session Configuration
 SESSION_COOKIE_AGE = 86400  # 24 hours

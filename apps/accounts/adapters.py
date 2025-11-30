@@ -275,6 +275,30 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             # This prevents SystemExit and other exceptions from crashing the worker
             return None
     
+    def send_account_already_exists_mail(self, email):
+        """
+        Override to prevent email sending errors from crashing the app.
+        When a user tries to sign in with Google but account already exists,
+        we don't want to crash if email sending fails.
+        """
+        try:
+            logger.info(f"Attempting to send 'account already exists' email to {email}...")
+            result = super().send_account_already_exists_mail(email)
+            logger.info(f"SUCCESS: 'Account already exists' email sent to {email}")
+            return result
+        except Exception as e:
+            # Log the error but don't crash the app
+            logger.error(
+                f"Failed to send 'account already exists' email to {email}: {str(e)}",
+                exc_info=True
+            )
+            logger.warning(
+                "Email sending failed, but login process will continue. "
+                "This is likely due to SMTP blocking on Railway."
+            )
+            # Return None instead of raising - this prevents 500 errors
+            return None
+    
     def render_mail(self, template_prefix, email, context, headers=None):
         """
         Override to ensure activate_url is always an absolute URL in the context.
