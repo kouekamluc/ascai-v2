@@ -35,22 +35,23 @@
                         <p class="text-sm text-gray-500">{% trans 'You will be redirected to Google to sign in securely' %}</p>
                     </div>
                     
-                    <!-- Django-allauth form (hidden, auto-submits) -->
+                    <!-- Django-allauth form (auto-submits immediately) -->
                     {% if form %}
-                    <form method="post" class="hidden">
+                    <form method="post" id="oauth-form">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <button type="submit" id="auto-submit-btn" class="hidden">{% trans 'Continue' %}</button>
+                        <noscript>
+                            <button type="submit" class="w-full bg-cameroon-green text-white py-3 rounded-lg font-semibold hover:bg-cameroon-green/90 transition-colors">
+                                {% trans 'Continue to Google' %}
+                            </button>
+                        </noscript>
                     </form>
-                    {% endif %}
-                    
-                    <!-- Manual redirect button (fallback) -->
+                    {% else %}
+                    <!-- Fallback if no form (shouldn't happen, but just in case) -->
                     <div class="mt-4">
-                        <button onclick="document.querySelector('form')?.submit()" 
-                                class="w-full bg-cameroon-green text-white py-3 rounded-lg font-semibold hover:bg-cameroon-green/90 transition-colors">
-                            {% trans 'Continue to Google' %}
-                        </button>
+                        <p class="text-sm text-red-600">{% trans 'Redirect form not available. Please try again.' %}</p>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -59,15 +60,15 @@
 
 <!-- Auto-redirect script -->
 <script>
-    // Auto-submit the form after a short delay
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-            var form = document.querySelector('form');
-            if (form) {
-                form.submit();
-            }
-        }, 500);
-    });
+    // Auto-submit the form immediately when page loads
+    // This prevents the loop by submitting before any other scripts run
+    (function() {
+        var form = document.getElementById('oauth-form');
+        if (form) {
+            // Submit immediately - don't wait
+            form.submit();
+        }
+    })();
 </script>
 {% endblock %}
 
