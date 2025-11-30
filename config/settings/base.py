@@ -218,7 +218,9 @@ if USE_S3:
         AWS_S3_OBJECT_PARAMETERS = {
             'CacheControl': 'max-age=86400',
         }
-        AWS_DEFAULT_ACL = 'public-read'
+        # Set ACL to None - let bucket policy handle public access
+        # Setting to 'public-read' causes "Access Denied" when bucket blocks public access
+        AWS_DEFAULT_ACL = None
         AWS_S3_FILE_OVERWRITE = False
         AWS_QUERYSTRING_AUTH = False
         

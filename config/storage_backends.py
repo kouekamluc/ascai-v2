@@ -13,7 +13,9 @@ class StaticStorage(S3Boto3Storage):
     Store collected static files under the `static/` prefix.
     """
     location = 'static'
-    default_acl = 'public-read'
+    # Set ACL to None - let bucket policy handle public access
+    # Setting to 'public-read' causes "Access Denied" when bucket blocks public access
+    default_acl = None
     file_overwrite = True
 
 
@@ -23,4 +25,6 @@ class MediaStorage(S3Boto3Storage):
     """
     location = 'media'
     file_overwrite = False
-    default_acl = 'public-read'
+    # Set ACL to None - let bucket policy handle public access
+    # Setting to 'public-read' causes "Access Denied" when bucket blocks public access
+    default_acl = None
