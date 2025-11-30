@@ -147,8 +147,12 @@ fi
 
 # Collect static files
 echo "Collecting static files..."
-# Check if S3 is enabled by checking environment variable
-if [ "${USE_S3:-False}" = "True" ]; then
+# Check if S3 is enabled by checking environment variable (case-insensitive)
+USE_S3_VALUE="${USE_S3:-False}"
+USE_S3_NORMALIZED=$(echo "$USE_S3_VALUE" | tr '[:upper:]' '[:lower:]')
+echo "USE_S3 environment variable: '${USE_S3_VALUE}' (normalized: ${USE_S3_NORMALIZED})"
+
+if [ "$USE_S3_NORMALIZED" = "true" ] || [ "$USE_S3_NORMALIZED" = "1" ] || [ "$USE_S3_NORMALIZED" = "yes" ] || [ "$USE_S3_NORMALIZED" = "on" ]; then
     echo "S3 is enabled - uploading static files to S3 bucket..."
     python manage.py collectstatic --noinput
     echo "✓ Static files uploaded to S3"

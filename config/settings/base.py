@@ -134,7 +134,15 @@ STATICFILES_DIRS = [
 ]
 
 # AWS S3 Configuration
-USE_S3 = config('USE_S3', default=False, cast=bool)
+# Handle USE_S3 with robust boolean conversion
+# Railway environment variables are strings, so we need to handle "True", "true", "1", etc.
+use_s3_raw = config('USE_S3', default='False').strip().lower()
+USE_S3 = use_s3_raw in ('true', '1', 'yes', 'on')
+
+# Log the S3 configuration status for debugging
+import logging
+logger = logging.getLogger(__name__)
+logger.info(f"USE_S3 environment variable: '{config('USE_S3', default='False')}' → parsed as: {USE_S3}")
 
 if USE_S3:
     # Read AWS configuration from environment variables
@@ -149,21 +157,30 @@ if USE_S3:
     # Validate S3 settings BEFORE using them to build domain
     # This prevents errors when building default_domain with empty bucket name
     # In Railway, gracefully fall back to local storage if credentials are missing
+    logger.info(f"AWS S3 configuration check:")
+    logger.info(f"  AWS_ACCESS_KEY_ID: {'SET' if AWS_ACCESS_KEY_ID else 'MISSING'}")
+    logger.info(f"  AWS_SECRET_ACCESS_KEY: {'SET' if AWS_SECRET_ACCESS_KEY else 'MISSING'}")
+    logger.info(f"  AWS_STORAGE_BUCKET_NAME: {'SET (' + AWS_STORAGE_BUCKET_NAME + ')' if AWS_STORAGE_BUCKET_NAME else 'MISSING'}")
+    logger.info(f"  AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}")
+    
     if not all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.warning(
-            "AWS S3 is enabled (USE_S3=True) but AWS credentials are missing or incomplete. "
-            "Falling back to local file storage. Files will be lost on container restart. "
+        logger.error(
+            "❌ AWS S3 is enabled (USE_S3=True) but AWS credentials are missing or incomplete. "
+            "Falling back to local file storage. Files will be lost on container restart."
+        )
+        logger.error(
             "To use S3, set the following environment variables in Railway:\n"
-            "  - AWS_ACCESS_KEY_ID\n"
-            "  - AWS_SECRET_ACCESS_KEY\n"
-            "  - AWS_STORAGE_BUCKET_NAME\n"
-            "  - AWS_S3_REGION_NAME (optional, defaults to us-east-1)"
+            "  - AWS_ACCESS_KEY_ID (currently: " + ('SET' if AWS_ACCESS_KEY_ID else 'MISSING') + ")\n"
+            "  - AWS_SECRET_ACCESS_KEY (currently: " + ('SET' if AWS_SECRET_ACCESS_KEY else 'MISSING') + ")\n"
+            "  - AWS_STORAGE_BUCKET_NAME (currently: " + ('SET (' + AWS_STORAGE_BUCKET_NAME + ')' if AWS_STORAGE_BUCKET_NAME else 'MISSING') + ")\n"
+            "  - AWS_S3_REGION_NAME (optional, defaults to us-east-1, currently: " + AWS_S3_REGION_NAME + ")"
         )
         # Disable S3 and fall back to local storage
         USE_S3 = False
     else:
+        logger.info("✅ AWS S3 credentials validated successfully")
+        
+        # Build default domain only after validation
         # Build default domain only after validation
         # Ensure region name is not empty (fallback to us-east-1 if somehow empty)
         if not AWS_S3_REGION_NAME:
@@ -203,6 +220,11 @@ if USE_S3:
         # Build URLs with proper protocol
         STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+        
+        logger.info(f"✅ S3 configured: Static files → {STATIC_URL}")
+        logger.info(f"✅ S3 configured: Media files → {MEDIA_URL}")
+else:
+    logger.info("ℹ️  S3 is disabled (USE_S3=False or not set). Using local file storage.")
 
 # Email Configuration
 # SendGrid API Key (preferred - bypasses SMTP blocking)
