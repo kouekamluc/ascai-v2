@@ -150,7 +150,14 @@ if USE_S3:
     AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='').strip()
     AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='').strip()
     AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1').strip()
-    AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default='').strip()
+    # Only set AWS_S3_ENDPOINT_URL if explicitly provided (for S3-compatible services like DigitalOcean Spaces)
+    # If empty, don't set it at all - django-storages will use default AWS S3 endpoints
+    # Setting to empty string causes "ValueError: Invalid endpoint:" error
+    # Setting to None might also cause issues, so we only set it if a value is provided
+    aws_endpoint_raw = config('AWS_S3_ENDPOINT_URL', default='').strip()
+    if aws_endpoint_raw:
+        AWS_S3_ENDPOINT_URL = aws_endpoint_raw
+    # If empty, AWS_S3_ENDPOINT_URL is not set - django-storages will use defaults automatically
     AWS_S3_SIGNATURE_VERSION = config('AWS_S3_SIGNATURE_VERSION', default='s3v4')
     AWS_S3_ADDRESSING_STYLE = config('AWS_S3_ADDRESSING_STYLE', default='virtual')
     
@@ -224,13 +231,10 @@ if USE_S3:
         AWS_S3_FILE_OVERWRITE = False
         AWS_QUERYSTRING_AUTH = False
         
-        # Only set endpoint URL if explicitly provided (for S3-compatible services)
-        # If empty, django-storages will use default AWS S3 endpoints
-        # Don't set it to None, just leave it as empty string if not provided
-        if not AWS_S3_ENDPOINT_URL:
-            # Use default AWS endpoints - don't set the variable
-            # django-storages will handle this automatically
-            pass
+        # AWS_S3_ENDPOINT_URL is only set above if explicitly provided
+        # If not set, django-storages will use default AWS S3 endpoints automatically
+        # This prevents "ValueError: Invalid endpoint:" errors from empty strings
+        # Only set AWS_S3_ENDPOINT_URL in environment if using S3-compatible services (DigitalOcean Spaces, MinIO, etc.)
         
         # Static files storage
         STATICFILES_STORAGE = 'config.storage_backends.StaticStorage'
