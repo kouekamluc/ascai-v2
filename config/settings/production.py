@@ -120,16 +120,15 @@ if not USE_S3:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     
     # WhiteNoise configuration
-    # Explicitly configure WhiteNoise to serve static files from STATIC_ROOT
-    # This ensures Django admin static files are properly served
-    WHITENOISE_USE_FINDERS = True  # Allow WhiteNoise to use finders as fallback
+    # WhiteNoise automatically serves files from STATIC_ROOT, so we don't need to set WHITENOISE_ROOT
+    # WHITENOISE_ROOT is only for serving files that are NOT in STATIC_ROOT (like files in project root)
+    # Setting WHITENOISE_ROOT to STATIC_ROOT causes conflicts and prevents proper static file serving
+    WHITENOISE_USE_FINDERS = False  # Disable finders in production - files should be collected to STATIC_ROOT
     WHITENOISE_AUTOREFRESH = False  # Disable auto-refresh in production for performance
-    # Explicitly set WHITENOISE_ROOT to STATIC_ROOT to ensure files are found
-    # This is critical for Django admin static files to load correctly
-    WHITENOISE_ROOT = str(STATIC_ROOT)  # Convert Path to string for WhiteNoise
+    # Do NOT set WHITENOISE_ROOT - WhiteNoise serves from STATIC_ROOT by default
     
     # Ensure STATICFILES_FINDERS includes all default finders
-    # This ensures Django admin static files are found during collection
+    # This ensures Django admin static files are found during collectstatic
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -137,8 +136,8 @@ if not USE_S3:
     
     logger.info("Using WhiteNoise for static file storage (S3 disabled)")
     logger.info(f"STATIC_ROOT: {STATIC_ROOT}")
-    logger.info(f"WHITENOISE_ROOT: {WHITENOISE_ROOT}")
     logger.info(f"STATIC_URL: {STATIC_URL}")
+    logger.info("WhiteNoise configured to serve from STATIC_ROOT (default behavior)")
 else:
     # Validate AWS S3 configuration in production
     # Note: Basic validation already happens in base.py, but we add logging here
