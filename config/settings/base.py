@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'storages',
     'ckeditor',
     'ckeditor_uploader',
+    'anymail',  # Email service integration (Brevo, SendGrid, etc.)
     
     # Django Allauth
     'django.contrib.sites',
@@ -253,16 +254,37 @@ else:
     logger.info("ℹ️  S3 is disabled (USE_S3=False or not set). Using local file storage.")
 
 # Email Configuration
-# SendGrid API Key (preferred - bypasses SMTP blocking)
+# Priority: Brevo > SendGrid > SMTP > Console
+
+# Brevo (formerly Sendinblue) Configuration (RECOMMENDED)
+# Brevo API is reliable and bypasses Railway SMTP blocking
+BREVO_API_KEY = config('BREVO_API_KEY', default='')
+
+# SendGrid API Key (fallback option)
 SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='')
 
-# Use SendGrid API backend if API key is set, otherwise use SMTP
-if SENDGRID_API_KEY:
+# Determine which email backend to use
+if BREVO_API_KEY:
+    # Use Brevo via django-anymail
+    EMAIL_BACKEND = 'anymail.backends.brevo.EmailBackend'
+    ANYMAIL = {
+        "BREVO_API_KEY": BREVO_API_KEY,
+        "BREVO_SEND_DEFAULTS": {
+            # Optional: set default tags, metadata, etc.
+        },
+        "BREVO_API_URL": "https://api.brevo.com/v3",
+    }
+    logger.info("✅ Email backend: Brevo (via django-anymail)")
+elif SENDGRID_API_KEY:
+    # Fallback to SendGrid if Brevo not configured
     EMAIL_BACKEND = 'apps.core.email_backends.SendGridBackend'
+    logger.info("✅ Email backend: SendGrid API")
 else:
+    # Fallback to SMTP or console
     EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+    logger.info(f"⚠️  Email backend: {EMAIL_BACKEND} (Brevo/SendGrid not configured)")
 
-# SMTP Configuration (fallback if SendGrid API not used)
+# SMTP Configuration (fallback if API backends not used)
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
@@ -270,6 +292,8 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)  # 10 second timeout to prevent blocking
+
+# Email addresses
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ASCAI Lazio <noreply@ascailazio.org>')
 CONTACT_EMAIL = config('CONTACT_EMAIL', default='info@ascailazio.org')
 
