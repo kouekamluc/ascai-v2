@@ -35,19 +35,19 @@
                         <p class="text-sm text-gray-500">{% trans 'You will be redirected to Google to sign in securely' %}</p>
                     </div>
                     
-                    <!-- Django-allauth form (auto-submits immediately) -->
+                    <!-- Django-allauth form - submit only once -->
                     {% if form %}
-                    <form method="post" id="oauth-form">
+                    <form method="post" id="oauth-form" style="display: none;">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <noscript>
-                            <button type="submit" class="w-full bg-cameroon-green text-white py-3 rounded-lg font-semibold hover:bg-cameroon-green/90 transition-colors">
-                                {% trans 'Continue to Google' %}
-                            </button>
-                        </noscript>
                     </form>
+                    <noscript>
+                        <button type="submit" form="oauth-form" class="w-full bg-cameroon-green text-white py-3 rounded-lg font-semibold hover:bg-cameroon-green/90 transition-colors">
+                            {% trans 'Continue to Google' %}
+                        </button>
+                    </noscript>
                     {% else %}
-                    <!-- Fallback if no form (shouldn't happen, but just in case) -->
+                    <!-- Fallback if no form -->
                     <div class="mt-4">
                         <p class="text-sm text-red-600">{% trans 'Redirect form not available. Please try again.' %}</p>
                     </div>
@@ -58,15 +58,26 @@
     </div>
 </div>
 
-<!-- Auto-redirect script -->
+<!-- Submit form once - prevent loops -->
 <script>
-    // Auto-submit the form immediately when page loads
-    // This prevents the loop by submitting before any other scripts run
     (function() {
-        var form = document.getElementById('oauth-form');
-        if (form) {
-            // Submit immediately - don't wait
-            form.submit();
+        // Check if we've already tried to submit (prevent loops)
+        var submitKey = 'oauth_submit_' + window.location.pathname;
+        var alreadySubmitted = sessionStorage.getItem(submitKey);
+        
+        if (!alreadySubmitted) {
+            var form = document.getElementById('oauth-form');
+            if (form) {
+                // Mark as submitted immediately
+                sessionStorage.setItem(submitKey, 'true');
+                // Submit the form
+                form.submit();
+            }
+        } else {
+            // If already submitted, clear after 10 seconds to allow retry
+            setTimeout(function() {
+                sessionStorage.removeItem(submitKey);
+            }, 10000);
         }
     })();
 </script>
