@@ -17,3 +17,6 @@ class ScholarshipsConfig(AppConfig):
 
 
 
+
+
+

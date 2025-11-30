@@ -71,6 +71,12 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 # Media files (using local storage in development)
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+# Disable WhiteNoise middleware in development
+# Django's staticfiles app handles static file serving automatically in DEBUG mode
+# WhiteNoise should only be used in production
+if 'whitenoise.middleware.WhiteNoiseMiddleware' in MIDDLEWARE:
+    MIDDLEWARE = [m for m in MIDDLEWARE if m != 'whitenoise.middleware.WhiteNoiseMiddleware']
+
 # Security settings (relaxed for development)
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False

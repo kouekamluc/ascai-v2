@@ -74,11 +74,13 @@ if settings.DEBUG or not USE_S3:
         ]
 
     # Serve static files
-    # In development (DEBUG=True), use Django's static() helper
+    # In development (DEBUG=True), Django's staticfiles app automatically serves static files
+    # We also add explicit static() helper to ensure collected static files are served
     # In production (DEBUG=False), use WhiteNoise middleware with fallback URL pattern
     if settings.DEBUG:
-        if settings.STATIC_ROOT and settings.STATIC_ROOT.exists():
-            urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+        # In DEBUG mode, serve static files from STATIC_ROOT (collected files)
+        # Django's staticfiles app will also serve from STATICFILES_DIRS automatically
+        urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     else:
         # In production, add fallback static file serving view
         # WhiteNoise middleware should handle most requests, but this provides a reliable fallback
