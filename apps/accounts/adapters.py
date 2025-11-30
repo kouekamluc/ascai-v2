@@ -3,6 +3,7 @@ Django Allauth adapters for custom user signup.
 """
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.forms import SignupForm, LoginForm
+from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.exceptions import ImmediateHttpResponse
 from django import forms
@@ -416,15 +417,40 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             user.is_active = True
             user.email_verified = True  # Google emails are verified
             
+            # Mark email as verified in allauth's EmailAddress model
+            # This prevents the "verify your email" redirect page
+            if user.email:
+                EmailAddress.objects.update_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={
+                        'verified': True,
+                        'primary': True
+                    }
+                )
+                logger.info(
+                    f"Marked email {user.email} as verified in EmailAddress for Google OAuth user"
+                )
+            
             logger.info(
                 f"New user created via Google OAuth: {user.username} ({user.email}) "
-                f"with is_approved=False, is_active=True"
+                f"with is_approved=False, is_active=True, email_verified=True"
             )
         else:
             # Existing user linking Google account - preserve existing data
             # Only update email_verified if not already verified
             if not user.email_verified:
                 user.email_verified = True
+                # Also mark as verified in EmailAddress
+                if user.email:
+                    EmailAddress.objects.update_or_create(
+                        user=user,
+                        email=user.email,
+                        defaults={
+                            'verified': True,
+                            'primary': True
+                        }
+                    )
                 logger.info(
                     f"Existing user linked Google account: {user.username} ({user.email}) - "
                     f"email marked as verified"
