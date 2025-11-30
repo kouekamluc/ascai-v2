@@ -311,24 +311,35 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         logger.info(f"User is_active: {user.is_active}, is_approved: {user.is_approved}")
         logger.info(f"Email backend: {settings.EMAIL_BACKEND}")
         
-        # CRITICAL FIX: Ensure EmailConfirmation is saved to database before sending
-        # Allauth sometimes creates confirmations on-the-fly that aren't persisted
-        if not emailconfirmation.pk:
-            logger.warning(f"EmailConfirmation for {email} has no primary key! Saving it now...")
-            emailconfirmation.save()
-            logger.info(f"✓ Saved EmailConfirmation with key: {emailconfirmation.key[:20]}... (ID: {emailconfirmation.pk})")
-        else:
-            logger.info(f"EmailConfirmation already exists with key: {emailconfirmation.key[:20]}... (ID: {emailconfirmation.pk})")
+        # Check if this is a database-backed EmailConfirmation or HMAC-based
+        # HMAC-based confirmations don't have a 'pk' attribute
+        has_pk = hasattr(emailconfirmation, 'pk')
+        is_db_confirmation = has_pk
         
-        # Verify the confirmation exists in the database
-        from allauth.account.models import EmailConfirmation
-        db_confirmation = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).first()
-        if db_confirmation:
-            logger.info(f"✓ EmailConfirmation verified in database")
+        if not is_db_confirmation:
+            # HMAC-based confirmation (no database storage)
+            logger.info(f"Using HMAC-based EmailConfirmation (no database storage needed)")
+            logger.info(f"Confirmation key: {emailconfirmation.key[:20]}...")
         else:
-            logger.error(f"✗ EmailConfirmation NOT found in database! Saving again...")
-            emailconfirmation.save()
-            logger.info(f"✓ Re-saved EmailConfirmation (ID: {emailconfirmation.pk})")
+            # Database-backed EmailConfirmation
+            # CRITICAL FIX: Ensure EmailConfirmation is saved to database before sending
+            # Allauth sometimes creates confirmations on-the-fly that aren't persisted
+            if not emailconfirmation.pk:
+                logger.warning(f"EmailConfirmation for {email} has no primary key! Saving it now...")
+                emailconfirmation.save()
+                logger.info(f"✓ Saved EmailConfirmation with key: {emailconfirmation.key[:20]}... (ID: {emailconfirmation.pk})")
+            else:
+                logger.info(f"EmailConfirmation already exists with key: {emailconfirmation.key[:20]}... (ID: {emailconfirmation.pk})")
+            
+            # Verify the confirmation exists in the database
+            from allauth.account.models import EmailConfirmation
+            db_confirmation = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).first()
+            if db_confirmation:
+                logger.info(f"✓ EmailConfirmation verified in database")
+            else:
+                logger.error(f"✗ EmailConfirmation NOT found in database! Saving again...")
+                emailconfirmation.save()
+                logger.info(f"✓ Re-saved EmailConfirmation (ID: {emailconfirmation.pk})")
         
         logger.info(f"SMTP Host: {getattr(settings, 'EMAIL_HOST', 'N/A')}")
         logger.info(f"SMTP Port: {getattr(settings, 'EMAIL_PORT', 'N/A')}")
@@ -357,8 +368,13 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             result = super().send_confirmation_mail(request, emailconfirmation, signup)
             
             # Verify confirmation still exists after sending (it should!)
-            final_check = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).exists()
-            logger.info(f"EmailConfirmation still in database after sending: {final_check}")
+            # Only check database if it's a database-backed confirmation
+            if hasattr(emailconfirmation, 'pk') and emailconfirmation.pk:
+                from allauth.account.models import EmailConfirmation
+                final_check = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).exists()
+                logger.info(f"EmailConfirmation still in database after sending: {final_check}")
+            else:
+                logger.info(f"HMAC-based confirmation (no database check needed)")
             
             logger.info("=" * 60)
             logger.info(f"SUCCESS: Email confirmation sent to {email}")
