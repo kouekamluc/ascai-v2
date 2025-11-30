@@ -38,40 +38,39 @@ class Command(BaseCommand):
             )
             return
         
-        # Create or update the Google SocialApplication
-        social_app, created = SocialApp.objects.update_or_create(
+        # Delete all existing Google SocialApplications to prevent MultipleObjectsReturned errors
+        existing_count = SocialApp.objects.filter(provider='google').count()
+        if existing_count > 0:
+            self.stdout.write(
+                self.style.WARNING(
+                    f'Found {existing_count} existing Google SocialApplication(s). Deleting to prevent conflicts...'
+                )
+            )
+            SocialApp.objects.filter(provider='google').delete()
+            self.stdout.write(
+                self.style.SUCCESS(f'✓ Deleted {existing_count} existing Google SocialApplication(s)')
+            )
+        
+        # Create a new Google SocialApplication
+        social_app = SocialApp.objects.create(
             provider='google',
-            defaults={
-                'name': 'Google',
-                'client_id': client_id,
-                'secret': client_secret,
-                'key': '',
-            }
+            name='Google',
+            client_id=client_id,
+            secret=client_secret,
+            key='',
         )
         
-        # Add the site to the social app if not already added
-        if site not in social_app.sites.all():
-            social_app.sites.add(site)
-            self.stdout.write(
-                self.style.SUCCESS(f'Added site "{site.domain}" to Google SocialApplication')
-            )
+        # Add the site to the social app
+        social_app.sites.add(site)
         
-        if created:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f'✅ Google OAuth SocialApplication created successfully!\n'
-                    f'   Client ID: {client_id[:20]}...\n'
-                    f'   Site: {site.domain}'
-                )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'✅ Google OAuth SocialApplication created successfully!\n'
+                f'   Client ID: {client_id[:20]}...\n'
+                f'   Site: {site.domain}\n'
+                f'   Total Google apps after cleanup: 1'
             )
-        else:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f'✅ Google OAuth SocialApplication updated successfully!\n'
-                    f'   Client ID: {client_id[:20]}...\n'
-                    f'   Site: {site.domain}'
-                )
-            )
+        )
         
         self.stdout.write(
             self.style.SUCCESS(
