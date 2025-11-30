@@ -1,0 +1,158 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block page_heading %}{{ assembly.get_assembly_type_display }} - {{ assembly.date|date:"d M Y" }}{% endblock %}
+
+{% block content %}
+<div class="governance-card mb-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">{{ assembly.get_assembly_type_display }}</h2>
+            <p class="text-gray-600 mt-1">
+                {{ assembly.date|date:"d M Y H:i" }} - {{ assembly.location }}
+            </p>
+        </div>
+        <span class="stat-badge {% if assembly.status == 'completed' %}stat-badge-success{% elif assembly.status == 'scheduled' %}stat-badge-info{% else %}stat-badge-gray{% endif %}">
+            {{ assembly.get_status_display }}
+        </span>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600">{% trans "Convocation Date" %}</p>
+            <p class="font-semibold text-gray-900">{{ assembly.convocation_date|date:"d M Y" }}</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600">{% trans "Notice Period" %}</p>
+            <p class="font-semibold text-gray-900">{{ assembly.notice_period_days }} {% trans "days" %}</p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="governance-card">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">{% trans "Agenda Items" %}</h3>
+            <a href="{% url 'governance:agenda_item_create' %}?assembly={{ assembly.pk }}" class="text-sm text-blue-600 hover:underline">
+                {% trans "Add Item" %}
+            </a>
+        </div>
+        {% if agenda_items %}
+        <div class="space-y-3">
+            {% for item in agenda_items %}
+            <div class="p-4 border border-gray-200 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-semibold text-gray-900">{{ item.title }}</h4>
+                    <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">
+                        {{ item.get_item_type_display }}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-600 mb-2">{{ item.description|truncatewords:20 }}</p>
+                <div class="flex items-center text-xs text-gray-500">
+                    <span>{% trans "Proposed by" %}: {{ item.proposed_by.get_display_name|default:"N/A" }}</span>
+                    <span class="mx-2">•</span>
+                    <span>{{ item.proposal_date|date:"d M Y" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center py-8">{% trans "No agenda items" %}</p>
+        {% endif %}
+    </div>
+    
+    <div class="governance-card">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">{% trans "Attendance" %}</h3>
+            <a href="{% url 'governance:assembly_attendance_create' %}?assembly={{ assembly.pk }}" class="text-sm text-blue-600 hover:underline">
+                {% trans "Record Attendance" %}
+            </a>
+        </div>
+        {% if attendances %}
+        <div class="space-y-2">
+            {% for attendance in attendances %}
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                    <p class="font-medium text-gray-900">
+                        {{ attendance.user.get_display_name|default:attendance.attendee_name }}
+                    </p>
+                    <p class="text-xs text-gray-600">{{ attendance.get_attendee_type_display }}</p>
+                </div>
+                {% if attendance.attended %}
+                    <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">{% trans "Attended" %}</span>
+                {% else %}
+                    <span class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-800">{% trans "Absent" %}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center py-8">{% trans "No attendance records" %}</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if assembly.minutes_en or assembly.minutes_fr or assembly.minutes_it %}
+<div class="governance-card mt-6">
+    <h3 class="text-lg font-semibold mb-4">{% trans "Minutes" %}</h3>
+    <div class="space-y-4">
+        {% if assembly.minutes_en %}
+        <div>
+            <h4 class="font-semibold mb-2">{% trans "English" %}</h4>
+            <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-700 whitespace-pre-wrap">{{ assembly.minutes_en }}</div>
+        </div>
+        {% endif %}
+        {% if assembly.minutes_fr %}
+        <div>
+            <h4 class="font-semibold mb-2">{% trans "Français" %}</h4>
+            <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-700 whitespace-pre-wrap">{{ assembly.minutes_fr }}</div>
+        </div>
+        {% endif %}
+        {% if assembly.minutes_it %}
+        <div>
+            <h4 class="font-semibold mb-2">{% trans "Italiano" %}</h4>
+            <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-700 whitespace-pre-wrap">{{ assembly.minutes_it }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="governance-card mt-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold">{% trans "Votes" %}</h3>
+        <a href="{% url 'governance:assembly_vote_create' %}?assembly={{ assembly.pk }}" class="text-sm text-blue-600 hover:underline">
+            {% trans "Record Vote" %}
+        </a>
+    </div>
+{% if votes %}
+    <div class="space-y-4">
+        {% for vote in votes %}
+        <div class="p-4 border border-gray-200 rounded-lg">
+            <h4 class="font-semibold mb-2">{{ vote.question }}</h4>
+            <div class="grid grid-cols-3 gap-4 mt-3">
+                <div class="text-center p-3 bg-green-50 rounded-lg">
+                    <p class="text-2xl font-bold text-green-600">{{ vote.votes_yes }}</p>
+                    <p class="text-xs text-gray-600">{% trans "Yes" %}</p>
+                </div>
+                <div class="text-center p-3 bg-red-50 rounded-lg">
+                    <p class="text-2xl font-bold text-red-600">{{ vote.votes_no }}</p>
+                    <p class="text-xs text-gray-600">{% trans "No" %}</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <p class="text-2xl font-bold text-gray-600">{{ vote.votes_abstain }}</p>
+                    <p class="text-xs text-gray-600">{% trans "Abstain" %}</p>
+                </div>
+            </div>
+            {% if vote.result %}
+            <p class="mt-3 font-semibold text-gray-900">{% trans "Result" %}: {{ vote.result }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-gray-500 text-center py-8">{% trans "No votes recorded" %}</p>
+{% endif %}
+</div>
+{% endblock %}
+

@@ -50,6 +50,12 @@
                     {% trans 'Contact' %}
                 </a>
                 
+                {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'governance:dashboard' %}" class="nav-link relative px-4 py-2 text-sm font-medium text-gray-700 hover:text-cameroon-green transition-all duration-200 rounded-lg hover:bg-cameroon-green/5">
+                    {% trans 'Governance' %}
+                </a>
+                {% endif %}
+                
                 <!-- Divider -->
                 <div class="h-6 w-px bg-gray-300 mx-2"></div>
                 
@@ -88,6 +94,14 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                                 </svg>
                                 {% trans 'Dashboard' %}
+                            </a>
+                            {% endif %}
+                            {% if user.is_staff or user.has_perm('governance.view_member') %}
+                            <a href="{% url 'governance:dashboard' %}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-cameroon-green/5 hover:text-cameroon-green transition-colors duration-150">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                                {% trans 'Governance' %}
                             </a>
                             {% endif %}
                             <a href="{% url 'accounts:profile' %}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-cameroon-green/5 hover:text-cameroon-green transition-colors duration-150">

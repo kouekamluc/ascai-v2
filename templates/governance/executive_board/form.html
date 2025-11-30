@@ -1,0 +1,20 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block page_heading %}{% if object %}{% trans "Edit Executive Board" %}{% else %}{% trans "Create Executive Board" %}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="governance-card max-w-2xl">
+    <form method="post">
+        {% csrf_token %}
+        <div class="space-y-4">
+            {{ form.as_p }}
+        </div>
+        <div class="mt-6 flex gap-4">
+            <button type="submit" class="btn-primary">{% trans "Save" %}</button>
+            <a href="{% url 'governance:executive_board_list' %}" class="btn-secondary">{% trans "Cancel" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,71 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block page_heading %}{{ board }}{% endblock %}
+
+{% block content %}
+<div class="governance-card mb-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">{{ board }}</h2>
+            <p class="text-gray-600 mt-1">
+                {{ board.term_start_date|date:"d M Y" }} - {{ board.term_end_date|date:"d M Y" }}
+            </p>
+        </div>
+        <span class="stat-badge {% if board.status == 'active' %}stat-badge-success{% else %}stat-badge-gray{% endif %}">
+            {{ board.get_status_display }}
+        </span>
+    </div>
+    
+    <h3 class="text-lg font-semibold mb-4">{% trans "Board Positions" %}</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {% for position in positions %}
+        <div class="p-4 border border-gray-200 rounded-lg">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="font-semibold text-gray-900">{{ position.get_position_display }}</h4>
+                <span class="px-2 py-1 text-xs rounded {% if position.status == 'active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {{ position.get_status_display }}
+                </span>
+            </div>
+            {% if position.user %}
+                <p class="text-gray-700">{{ position.user.get_display_name }}</p>
+                <p class="text-sm text-gray-500 mt-1">
+                    {% trans "Since" %} {{ position.start_date|date:"d M Y" }}
+                </p>
+            {% else %}
+                <p class="text-gray-400 italic">{% trans "Vacant" %}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if board.notes %}
+    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h4 class="font-semibold mb-2">{% trans "Notes" %}</h4>
+        <p class="text-gray-700">{{ board.notes }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="governance-card">
+    <h3 class="text-lg font-semibold mb-4">{% trans "Recent Board Meetings" %}</h3>
+    {% if meetings %}
+    <div class="space-y-3">
+        {% for meeting in meetings %}
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div>
+                <p class="font-semibold text-gray-900">{{ meeting.meeting_date|date:"d M Y H:i" }}</p>
+                {% if meeting.location %}
+                    <p class="text-sm text-gray-600">{{ meeting.location }}</p>
+                {% endif %}
+            </div>
+            <a href="#" class="text-blue-600 hover:underline text-sm">{% trans "View" %}</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-center py-8">{% trans "No meetings recorded" %}</p>
+    {% endif %}
+</div>
+{% endblock %}
+

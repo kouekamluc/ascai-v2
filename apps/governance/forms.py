@@ -61,12 +61,17 @@ class AgendaItemForm(forms.ModelForm):
     
     class Meta:
         model = AgendaItem
-        fields = ['title', 'description', 'item_type', 'proposed_by', 'proposal_date', 
+        fields = ['assembly', 'title', 'description', 'item_type', 'proposed_by', 'proposal_date', 
                   'status', 'order']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'proposal_date': forms.DateInput(attrs={'type': 'date'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make assembly field required
+        self.fields['assembly'].required = True
     
     def clean(self):
         cleaned_data = super().clean()
@@ -89,7 +94,17 @@ class AssemblyAttendanceForm(forms.ModelForm):
     
     class Meta:
         model = AssemblyAttendance
-        fields = ['user', 'attendee_name', 'attendee_type', 'attended']
+        fields = ['assembly', 'user', 'attendee_name', 'attendee_type', 'attended']
+        widgets = {
+            'assembly': forms.HiddenInput(),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make assembly field required
+        self.fields['assembly'].required = True
+        # Make user field optional if attendee_name is provided
+        self.fields['user'].required = False
     
     def clean(self):
         cleaned_data = super().clean()
@@ -109,11 +124,18 @@ class AssemblyVoteForm(forms.ModelForm):
     
     class Meta:
         model = AssemblyVote
-        fields = ['agenda_item', 'vote_type', 'voting_method', 'question',
+        fields = ['assembly', 'agenda_item', 'vote_type', 'voting_method', 'question',
                   'votes_yes', 'votes_no', 'votes_abstain', 'result', 'is_published']
         widgets = {
             'question': forms.Textarea(attrs={'rows': 3}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make assembly field required
+        self.fields['assembly'].required = True
+        # Make agenda_item optional
+        self.fields['agenda_item'].required = False
 
 
 class FinancialTransactionForm(forms.ModelForm):

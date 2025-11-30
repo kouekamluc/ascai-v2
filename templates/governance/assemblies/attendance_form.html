@@ -1,0 +1,24 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block page_heading %}{% trans "Record Assembly Attendance" %}{% endblock %}
+
+{% block content %}
+<div class="governance-card max-w-2xl">
+    <form method="post">
+        {% csrf_token %}
+        <div class="space-y-4">
+            {{ form.as_p }}
+        </div>
+        <div class="mt-6 flex gap-4">
+            <button type="submit" class="btn-primary">{% trans "Save" %}</button>
+            {% if form.assembly.value %}
+            <a href="{% url 'governance:assembly_detail' form.assembly.value %}" class="btn-secondary">{% trans "Cancel" %}</a>
+            {% else %}
+            <a href="{% url 'governance:assembly_list' %}" class="btn-secondary">{% trans "Cancel" %}</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,89 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block page_heading %}{% trans "Expense Approval" %}{% endblock %}
+
+{% block content %}
+<div class="governance-card mb-6">
+    <h2 class="text-xl font-bold mb-4">{% trans "Expense Details" %}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <p class="text-sm text-gray-600">{% trans "Description" %}</p>
+            <p class="font-semibold text-gray-900">{{ transaction.description }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">{% trans "Amount" %}</p>
+            <p class="text-2xl font-bold text-red-600">€{{ transaction.amount }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">{% trans "Date" %}</p>
+            <p class="font-semibold text-gray-900">{{ transaction.date|date:"d M Y" }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">{% trans "Status" %}</p>
+            <span class="px-3 py-1 rounded text-sm font-semibold
+                {% if transaction.status == 'approved' %}bg-green-100 text-green-800
+                {% elif transaction.status == 'completed' %}bg-blue-100 text-blue-800
+                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                {{ transaction.get_status_display }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="governance-card">
+    <h2 class="text-xl font-bold mb-4">{% trans "Required Approvals" %} (3 {% trans "signatures" %})</h2>
+    <div class="space-y-4">
+        {% for approval in approvals %}
+        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-cameroon-green/20 to-cameroon-green/10 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-cameroon-green font-bold">{{ approval.signer.username|first|upper }}</span>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-900">{{ approval.signer.get_display_name }}</p>
+                    <p class="text-sm text-gray-600">
+                        {% if approval.signer.executive_positions.exists %}
+                            {{ approval.signer.executive_positions.first.get_position_display }}
+                        {% else %}
+                            {% trans "Signer" %}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center">
+                {% if approval.status == 'signed' %}
+                    <span class="px-3 py-1 rounded bg-green-100 text-green-800 text-sm font-semibold mr-3">
+                        ✓ {% trans "Signed" %}
+                    </span>
+                    <span class="text-xs text-gray-500">
+                        {{ approval.signature_date|date:"d M Y H:i" }}
+                    </span>
+                {% elif approval.signer == user %}
+                    <a href="{% url 'governance:approve_expense' transaction.pk %}" class="btn-primary">
+                        {% trans "Sign" %}
+                    </a>
+                {% else %}
+                    <span class="px-3 py-1 rounded bg-yellow-100 text-yellow-800 text-sm font-semibold">
+                        {% trans "Pending" %}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if signed_count >= required_signatures %}
+    <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <p class="text-green-800 font-semibold">✓ {% trans "All required approvals received. Expense is approved." %}</p>
+    </div>
+    {% else %}
+    <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <p class="text-yellow-800 font-semibold">
+            {% trans "Approvals" %}: {{ signed_count }}/{{ required_signatures }} {% trans "signed" %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

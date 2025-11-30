@@ -293,8 +293,8 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         """
         Send email confirmation with proper error handling and logging.
         This ensures emails are actually sent and logs any failures.
-        The parent method automatically uses get_email_confirmation_url() to get the activate_url
-        and passes it to the email template context.
+        CRITICAL: Ensure the EmailConfirmation object is saved to the database
+        before sending, as allauth sometimes creates it on-the-fly without saving.
         """
         from django.conf import settings
         from django.core.mail import get_connection
@@ -310,6 +310,26 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         logger.info(f"User: {username} ({email})")
         logger.info(f"User is_active: {user.is_active}, is_approved: {user.is_approved}")
         logger.info(f"Email backend: {settings.EMAIL_BACKEND}")
+        
+        # CRITICAL FIX: Ensure EmailConfirmation is saved to database before sending
+        # Allauth sometimes creates confirmations on-the-fly that aren't persisted
+        if not emailconfirmation.pk:
+            logger.warning(f"EmailConfirmation for {email} has no primary key! Saving it now...")
+            emailconfirmation.save()
+            logger.info(f"✓ Saved EmailConfirmation with key: {emailconfirmation.key[:20]}... (ID: {emailconfirmation.pk})")
+        else:
+            logger.info(f"EmailConfirmation already exists with key: {emailconfirmation.key[:20]}... (ID: {emailconfirmation.pk})")
+        
+        # Verify the confirmation exists in the database
+        from allauth.account.models import EmailConfirmation
+        db_confirmation = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).first()
+        if db_confirmation:
+            logger.info(f"✓ EmailConfirmation verified in database")
+        else:
+            logger.error(f"✗ EmailConfirmation NOT found in database! Saving again...")
+            emailconfirmation.save()
+            logger.info(f"✓ Re-saved EmailConfirmation (ID: {emailconfirmation.pk})")
+        
         logger.info(f"SMTP Host: {getattr(settings, 'EMAIL_HOST', 'N/A')}")
         logger.info(f"SMTP Port: {getattr(settings, 'EMAIL_PORT', 'N/A')}")
         logger.info(f"SMTP User: {getattr(settings, 'EMAIL_HOST_USER', 'N/A')}")
@@ -325,9 +345,6 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             logger.error("=" * 60)
             logger.error(error_msg)
             logger.error("=" * 60)
-            # Log the error but don't break signup - let the parent method handle it
-            # The email will fail but user signup can still complete
-            # Admin can check logs and fix email configuration
         
         # Skip SMTP connection test - it can cause blocking/timeout issues
         # Just try to send the email directly
@@ -338,6 +355,10 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             # and pass it to the template as 'activate_url'
             logger.info(f"Attempting to send email confirmation to {email}...")
             result = super().send_confirmation_mail(request, emailconfirmation, signup)
+            
+            # Verify confirmation still exists after sending (it should!)
+            final_check = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).exists()
+            logger.info(f"EmailConfirmation still in database after sending: {final_check}")
             
             logger.info("=" * 60)
             logger.info(f"SUCCESS: Email confirmation sent to {email}")

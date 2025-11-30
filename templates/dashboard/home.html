@@ -193,5 +193,40 @@
         {% endif %}
     </div>
 </div>
+
+{% if governance_stats %}
+<!-- Governance Section (for staff/executive board) -->
+<div class="mt-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">{% trans 'Governance' %}</h2>
+        <a href="{% url 'governance:dashboard' %}" class="text-sm font-medium text-cameroon-green hover:text-cameroon-green/80 hover:underline">
+            {% trans 'View Full Dashboard' %} →
+        </a>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="stat-card border-l-4 border-cameroon-green">
+            <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans 'Total Members' %}</p>
+            <p class="text-3xl font-bold text-gray-900 mt-2 mb-1">{{ governance_stats.total_members }}</p>
+        </div>
+        <div class="stat-card border-l-4 border-green-500">
+            <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans 'Active Members' %}</p>
+            <p class="text-3xl font-bold text-gray-900 mt-2 mb-1">{{ governance_stats.active_members }}</p>
+        </div>
+        <div class="stat-card border-l-4 border-blue-500">
+            <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans 'Upcoming Assemblies' %}</p>
+            <p class="text-3xl font-bold text-gray-900 mt-2 mb-1">{{ governance_stats.upcoming_assemblies }}</p>
+        </div>
+        <div class="stat-card border-l-4 border-yellow-500">
+            <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans 'Pending Dues' %}</p>
+            <p class="text-3xl font-bold text-gray-900 mt-2 mb-1">{{ governance_stats.pending_dues }}</p>
+        </div>
+        <div class="stat-card border-l-4 border-red-500">
+            <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans 'Pending Expenses' %}</p>
+            <p class="text-3xl font-bold text-gray-900 mt-2 mb-1">{{ governance_stats.pending_expenses }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 

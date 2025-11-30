@@ -54,6 +54,27 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             'group_memberships': CommunityGroup.objects.filter(members=user).count(),
         }
         
+        # Governance stats (if user has permissions)
+        try:
+            if user.has_perm('governance.view_member') or user.is_staff:
+                from apps.governance.models import Member, GeneralAssembly, MembershipDues, FinancialTransaction
+                context['governance_stats'] = {
+                    'total_members': Member.objects.count(),
+                    'active_members': Member.objects.filter(is_active_member=True).count(),
+                    'upcoming_assemblies': GeneralAssembly.objects.filter(
+                        status='scheduled',
+                        date__gte=timezone.now()
+                    ).count(),
+                    'pending_dues': MembershipDues.objects.filter(status='pending').count(),
+                    'pending_expenses': FinancialTransaction.objects.filter(
+                        transaction_type='expense',
+                        status='pending'
+                    ).count(),
+                }
+        except Exception:
+            # Governance app might not be migrated yet
+            pass
+        
         # Recent activity
         context['recent_tickets'] = SupportTicket.objects.filter(user=user).order_by('-created_at')[:5]
         context['recent_stories'] = UserStorySubmission.objects.filter(user=user).order_by('-submitted_at')[:3]
@@ -85,6 +106,16 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             {'title': _('Create Ticket'), 'url': reverse_lazy('dashboard:tickets_create'), 'icon': 'support'},
             {'title': _('Browse Groups'), 'url': reverse_lazy('dashboard:groups_list'), 'icon': 'users'},
         ]
+        
+        # Add governance quick actions if user has permissions
+        if user.has_perm('governance.view_member') or user.is_staff:
+            context['quick_actions'].append(
+                {'title': _('Governance Dashboard'), 'url': reverse_lazy('governance:dashboard'), 'icon': 'governance'}
+            )
+        if user.has_perm('governance.manage_finances') or user.is_staff:
+            context['quick_actions'].append(
+                {'title': _('Financial Transactions'), 'url': reverse_lazy('governance:financial_transactions'), 'icon': 'finance'}
+            )
         
         return context
 

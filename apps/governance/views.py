@@ -208,6 +208,15 @@ class GeneralAssemblyCreateView(AssemblyManagementRequiredMixin, CreateView):
     form_class = GeneralAssemblyForm
     template_name = 'governance/assemblies/form.html'
     success_url = reverse_lazy('governance:assembly_list')
+    
+    def form_valid(self, form):
+        """Set convocation date if not provided."""
+        if not form.cleaned_data.get('convocation_date'):
+            # Default to 10 days before assembly date
+            assembly_date = form.cleaned_data.get('date')
+            if assembly_date:
+                form.instance.convocation_date = assembly_date.date() - timedelta(days=10)
+        return super().form_valid(form)
 
 
 class AgendaItemCreateView(AssemblyManagementRequiredMixin, CreateView):
@@ -215,6 +224,18 @@ class AgendaItemCreateView(AssemblyManagementRequiredMixin, CreateView):
     model = AgendaItem
     form_class = AgendaItemForm
     template_name = 'governance/assemblies/agenda_item_form.html'
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        assembly_id = self.request.GET.get('assembly')
+        if assembly_id:
+            try:
+                assembly = GeneralAssembly.objects.get(pk=assembly_id)
+                initial['assembly'] = assembly
+                initial['proposed_by'] = self.request.user
+            except GeneralAssembly.DoesNotExist:
+                pass
+        return initial
     
     def get_success_url(self):
         return reverse_lazy('governance:assembly_detail', kwargs={'pk': self.object.assembly.pk})
@@ -226,6 +247,17 @@ class AssemblyAttendanceCreateView(AssemblyManagementRequiredMixin, CreateView):
     form_class = AssemblyAttendanceForm
     template_name = 'governance/assemblies/attendance_form.html'
     
+    def get_initial(self):
+        initial = super().get_initial()
+        assembly_id = self.request.GET.get('assembly')
+        if assembly_id:
+            try:
+                assembly = GeneralAssembly.objects.get(pk=assembly_id)
+                initial['assembly'] = assembly
+            except GeneralAssembly.DoesNotExist:
+                pass
+        return initial
+    
     def get_success_url(self):
         return reverse_lazy('governance:assembly_detail', kwargs={'pk': self.object.assembly.pk})
 
@@ -235,6 +267,17 @@ class AssemblyVoteCreateView(AssemblyManagementRequiredMixin, CreateView):
     model = AssemblyVote
     form_class = AssemblyVoteForm
     template_name = 'governance/assemblies/vote_form.html'
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        assembly_id = self.request.GET.get('assembly')
+        if assembly_id:
+            try:
+                assembly = GeneralAssembly.objects.get(pk=assembly_id)
+                initial['assembly'] = assembly
+            except GeneralAssembly.DoesNotExist:
+                pass
+        return initial
     
     def get_success_url(self):
         return reverse_lazy('governance:assembly_detail', kwargs={'pk': self.object.assembly.pk})
@@ -323,7 +366,10 @@ class ExpenseApprovalView(ExpenseApprovalRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         transaction = self.get_object()
-        context['approvals'] = transaction.approvals.select_related('signer').all()
+        approvals = transaction.approvals.select_related('signer').all()
+        context['approvals'] = approvals
+        context['signed_count'] = approvals.filter(status='signed').count()
+        context['required_signatures'] = 3
         return context
 
 

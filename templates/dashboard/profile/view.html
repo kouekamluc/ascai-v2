@@ -125,6 +125,50 @@
         </div>
         {% endif %}
         
+        <!-- Governance Information -->
+        {% if profile_user.member_profile %}
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{% trans 'ASCAI Membership' %}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 bg-gradient-to-br from-cameroon-green/5 to-cameroon-green/10 rounded-lg border border-cameroon-green/20">
+                    <p class="text-sm font-medium text-gray-600 mb-1">{% trans 'Member Type' %}</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ profile_user.member_profile.get_member_type_display }}</p>
+                </div>
+                <div class="p-4 bg-gradient-to-br from-cameroon-green/5 to-cameroon-green/10 rounded-lg border border-cameroon-green/20">
+                    <p class="text-sm font-medium text-gray-600 mb-1">{% trans 'Status' %}</p>
+                    <p class="text-lg font-semibold text-gray-900">
+                        {% if profile_user.member_profile.is_active_member %}
+                            <span class="text-green-600">{% trans 'Active Member' %}</span>
+                        {% else %}
+                            <span class="text-gray-600">{% trans 'Inactive' %}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% if profile_user.member_profile.registration_date %}
+            <p class="text-sm text-gray-600 mt-3">
+                {% trans 'Member since' %} {{ profile_user.member_profile.registration_date|date:"F Y" }}
+            </p>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if profile_user.executive_positions.exists %}
+        <div class="mt-6 pt-6 border-t border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{% trans 'Executive Positions' %}</h3>
+            <div class="space-y-3">
+                {% for position in profile_user.executive_positions.filter.status='active' %}
+                <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="font-semibold text-gray-900">{{ position.get_position_display }}</p>
+                    <p class="text-sm text-gray-600 mt-1">
+                        {{ position.board }} - {% trans "Since" %} {{ position.start_date|date:"M Y" }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
         <!-- Action Buttons -->
         <div class="mt-8 pt-6 border-t border-gray-200">
             <div class="flex flex-wrap gap-3">
