@@ -210,10 +210,12 @@ def resend_verification_email(request):
     Allow users to resend verification emails.
     Can be accessed by authenticated users who haven't verified their email,
     or by providing an email address (for unauthenticated users who just signed up).
-    Supports unlimited resends - uses allauth's send_email_confirmation utility.
+    Supports unlimited resends - always deletes old confirmations before creating new ones.
     """
     from allauth.account.models import EmailAddress, EmailConfirmation
-    from allauth.account.utils import send_email_confirmation
+    from allauth.account.adapter import get_adapter
+    
+    adapter = get_adapter(request)
     
     # Handle both GET and POST requests
     if request.method == 'POST':
@@ -290,16 +292,12 @@ def resend_verification_email(request):
         if deleted_count > 0:
             logger.info(f"Deleted {deleted_count} old email confirmation(s) for {email} before creating new one")
         
-        # Use allauth's utility function to send email confirmation
-        # This is the recommended way and handles all the internal logic properly
-        # It automatically creates EmailConfirmation and sends the email
-        result = send_email_confirmation(request, user, email=email)
+        # Create new email confirmation
+        emailconfirmation = EmailConfirmation.create(email_address)
+        logger.info(f"Created new EmailConfirmation for {email}")
         
-        # Check if email was actually sent
-        if result is None or result == 0:
-            logger.warning(f"send_email_confirmation returned {result} for {email} - email may not have been sent")
-        else:
-            logger.info(f"send_email_confirmation returned {result} confirmations for {email}")
+        # Send the confirmation email using the adapter
+        adapter.send_confirmation_mail(request, emailconfirmation, signup=False)
         
         messages.success(
             request,

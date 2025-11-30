@@ -197,12 +197,13 @@ class UserAdmin(BaseUserAdmin):
     def resend_verification_emails(self, request, queryset):
         """
         Resend verification emails to selected users.
-        Supports unlimited resends - uses allauth's send_email_confirmation utility.
+        Supports unlimited resends - always deletes old confirmations before creating new ones.
         Can be called multiple times without restrictions.
         """
         from allauth.account.models import EmailConfirmation
-        from allauth.account.utils import send_email_confirmation
+        from allauth.account.adapter import get_adapter
         
+        adapter = get_adapter(request)
         emails_sent = 0
         errors = []
         
@@ -233,17 +234,12 @@ class UserAdmin(BaseUserAdmin):
                 if deleted_count > 0:
                     logger.info(f"Deleted {deleted_count} old email confirmation(s) for {user.email} before creating new one")
                 
-                # Use allauth's utility function to send email confirmation
-                # This is the recommended way and handles all the internal logic properly
-                # It automatically creates EmailConfirmation and sends the email
-                result = send_email_confirmation(request, user, email=user.email)
+                # Create new email confirmation
+                emailconfirmation = EmailConfirmation.create(email_address)
+                logger.info(f"Created new EmailConfirmation for {user.email}")
                 
-                # Check if email was actually sent
-                if result is None or result == 0:
-                    logger.warning(f"send_email_confirmation returned {result} for {user.email} - email may not have been sent")
-                    raise Exception(f"Email confirmation not sent (result: {result})")
-                else:
-                    logger.info(f"send_email_confirmation returned {result} confirmations for {user.email}")
+                # Send the confirmation email using the adapter
+                adapter.send_confirmation_mail(request, emailconfirmation, signup=False)
                 
                 emails_sent += 1
                 logger.info(f"Verification email resent to {user.email} for user {user.username} (unlimited resends allowed)")
