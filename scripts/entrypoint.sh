@@ -145,43 +145,40 @@ else
     echo "✓ Translation files already compiled (found from build)"
 fi
 
-# Collect static files
+# Collect static files (run in background to not block app startup)
 echo "Collecting static files..."
 echo "USE_S3 environment variable: '${USE_S3:-False}'"
-echo "Running collectstatic - Django will use the configured storage backend automatically..."
 
-# Always run collectstatic - Django will use the correct storage backend based on settings
+# Run collectstatic in background with timeout to prevent blocking app startup
+# This ensures the healthcheck passes even if collectstatic is slow
 # If STATICFILES_STORAGE is set to S3 backend, files will be uploaded to S3
 # If it's set to WhiteNoise, files will be collected to STATIC_ROOT
-# Add timeout to prevent hanging (5 minutes should be enough for most cases)
-# Use --verbosity 1 to show progress without too much output
-# Continue even if it fails so the app can start (static files can be uploaded later)
-if timeout 300 python manage.py collectstatic --noinput --verbosity 1; then
-    echo "✓ collectstatic completed successfully"
-else
-    exit_code=$?
-    if [ $exit_code -eq 124 ]; then
-        echo "⚠ WARNING: collectstatic timed out after 5 minutes"
-        echo "⚠ This usually means S3 upload is very slow or hanging"
-        echo "⚠ Continuing with deployment - static files may not be fully uploaded"
-        echo "⚠ You can run collectstatic manually later or check S3 bucket permissions"
+(
+    echo "Running collectstatic in background..."
+    if command -v timeout >/dev/null 2>&1; then
+        timeout 300 python manage.py collectstatic --noinput --verbosity 1 && \
+        echo "✓ collectstatic completed successfully" || \
+        echo "⚠ WARNING: collectstatic failed or timed out - static files may not be fully uploaded"
     else
-        echo "⚠ WARNING: collectstatic failed with exit code $exit_code"
-        echo "⚠ Continuing with deployment - check error messages above"
-        echo "⚠ Static files may not be fully uploaded to S3"
+        # Fallback if timeout command is not available
+        python manage.py collectstatic --noinput --verbosity 1 && \
+        echo "✓ collectstatic completed successfully" || \
+        echo "⚠ WARNING: collectstatic failed - static files may not be fully uploaded"
     fi
-fi
+) &
 
-# Verify collection based on whether files exist locally (WhiteNoise) or not (S3)
+# Store the background process PID
+COLLECTSTATIC_PID=$!
+
+# Give collectstatic a moment to start, then continue with app startup
+sleep 2
+
+# Verify if files were collected locally (for WhiteNoise)
 if [ -d "staticfiles/admin" ] && [ -n "$(ls -A staticfiles/admin 2>/dev/null)" ]; then
-    echo "✓ Static files collected locally (using WhiteNoise)"
-    echo "✓ Admin static files found in staticfiles/admin"
-    ls -la staticfiles/admin/css/ | head -5 || echo "⚠ Could not list admin CSS files"
+    echo "✓ Static files found locally (using WhiteNoise)"
 else
-    echo "✓ Static files should be uploaded to S3 (check Django logs for confirmation)"
-    echo "Note: If using S3, verify files are accessible at your S3 bucket's static/ path"
-    echo "Check S3 bucket permissions if admin panel is unstyled (403 Forbidden errors)"
-    echo "Check Railway logs above for S3 configuration status"
+    echo "ℹ Static files will be uploaded to S3 (running in background)"
+    echo "ℹ App will start immediately - collectstatic continues in background"
 fi
 
 # Start the application
