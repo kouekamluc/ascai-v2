@@ -1,6 +1,7 @@
 """
 Production settings for ASCAI Lazio project.
 """
+import os
 from .base import *
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
@@ -112,6 +113,26 @@ CSRF_TRUSTED_ORIGINS = config(
 if not CSRF_TRUSTED_ORIGINS:
     # Auto-populate from ALLOWED_HOSTS if not set
     CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS]
+
+# Media files configuration for Railway
+# Railway persistent volumes can be mounted at /data or a custom path
+# Allow override via RAILWAY_VOLUME_MOUNT_PATH environment variable
+if not USE_S3:
+    RAILWAY_VOLUME_MOUNT_PATH = config('RAILWAY_VOLUME_MOUNT_PATH', default='/data')
+    # Use Railway volume for media files if volume is mounted, otherwise use default MEDIA_ROOT
+    # Check if volume path exists (Railway mounts volumes at specified paths)
+    volume_media_path = os.path.join(RAILWAY_VOLUME_MOUNT_PATH, 'media')
+    if os.path.exists(RAILWAY_VOLUME_MOUNT_PATH) and os.path.isdir(RAILWAY_VOLUME_MOUNT_PATH):
+        # Railway volume is mounted, use it for media files
+        MEDIA_ROOT = volume_media_path
+        logger.info(f"Using Railway volume for media files: {MEDIA_ROOT}")
+    else:
+        # No volume mounted, use default path (files will be lost on restart)
+        logger.warning(
+            f"Railway volume not found at {RAILWAY_VOLUME_MOUNT_PATH}. "
+            f"Media files will be stored at {MEDIA_ROOT} and will be lost on container restart. "
+            "To persist media files, mount a Railway volume and set RAILWAY_VOLUME_MOUNT_PATH."
+        )
 
 # Static files (use S3 or WhiteNoise)
 if not USE_S3:

@@ -76,6 +76,30 @@ run_migrations() {
 # Run migrations with error handling
 run_migrations
 
+# Ensure media directory exists (for Railway volume or local storage)
+echo "Setting up media directory..."
+# Check if Railway volume is mounted (default path is /data)
+RAILWAY_VOLUME_MOUNT_PATH="${RAILWAY_VOLUME_MOUNT_PATH:-/data}"
+if [ -d "$RAILWAY_VOLUME_MOUNT_PATH" ]; then
+    # Railway volume is mounted, use it for media files
+    MEDIA_DIR="$RAILWAY_VOLUME_MOUNT_PATH/media"
+    echo "Railway volume detected at $RAILWAY_VOLUME_MOUNT_PATH"
+    echo "Using volume for media files: $MEDIA_DIR"
+else
+    # No volume mounted, use default media directory
+    MEDIA_DIR="media"
+    echo "No Railway volume detected, using default media directory: $MEDIA_DIR"
+    echo "⚠ Warning: Media files will be lost on container restart without a Railway volume"
+fi
+
+# Create media directory and subdirectories if they don't exist
+mkdir -p "$MEDIA_DIR" || echo "⚠ Warning: Could not create media directory, but continuing..."
+# Create common subdirectories that might be needed
+mkdir -p "$MEDIA_DIR/profiles" || true
+mkdir -p "$MEDIA_DIR/uploads" || true
+mkdir -p "$MEDIA_DIR/events" || true
+echo "✓ Media directory setup complete"
+
 # Ensure admin user exists and has correct permissions
 echo "Ensuring admin user exists..."
 python manage.py create_admin --update || echo "⚠ Warning: Could not create/update admin user, but continuing..."
