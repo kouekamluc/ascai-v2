@@ -153,7 +153,24 @@ echo "Running collectstatic - Django will use the configured storage backend aut
 # Always run collectstatic - Django will use the correct storage backend based on settings
 # If STATICFILES_STORAGE is set to S3 backend, files will be uploaded to S3
 # If it's set to WhiteNoise, files will be collected to STATIC_ROOT
-python manage.py collectstatic --noinput
+# Add timeout to prevent hanging (5 minutes should be enough for most cases)
+# Use --verbosity 1 to show progress without too much output
+# Continue even if it fails so the app can start (static files can be uploaded later)
+if timeout 300 python manage.py collectstatic --noinput --verbosity 1; then
+    echo "✓ collectstatic completed successfully"
+else
+    exit_code=$?
+    if [ $exit_code -eq 124 ]; then
+        echo "⚠ WARNING: collectstatic timed out after 5 minutes"
+        echo "⚠ This usually means S3 upload is very slow or hanging"
+        echo "⚠ Continuing with deployment - static files may not be fully uploaded"
+        echo "⚠ You can run collectstatic manually later or check S3 bucket permissions"
+    else
+        echo "⚠ WARNING: collectstatic failed with exit code $exit_code"
+        echo "⚠ Continuing with deployment - check error messages above"
+        echo "⚠ Static files may not be fully uploaded to S3"
+    fi
+fi
 
 # Verify collection based on whether files exist locally (WhiteNoise) or not (S3)
 if [ -d "staticfiles/admin" ] && [ -n "$(ls -A staticfiles/admin 2>/dev/null)" ]; then

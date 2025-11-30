@@ -164,18 +164,9 @@ if USE_S3:
     # Validate S3 settings BEFORE using them to build domain
     # This prevents errors when building default_domain with empty bucket name
     # In Railway, gracefully fall back to local storage if credentials are missing
-    # Use both logger and print to ensure messages appear (logging may not be configured yet)
     aws_key_status = 'SET' if AWS_ACCESS_KEY_ID else 'MISSING'
     aws_secret_status = 'SET' if AWS_SECRET_ACCESS_KEY else 'MISSING'
     aws_bucket_status = f'SET ({AWS_STORAGE_BUCKET_NAME})' if AWS_STORAGE_BUCKET_NAME else 'MISSING'
-    
-    print("=" * 60)
-    print("AWS S3 CONFIGURATION CHECK (base.py)")
-    print(f"  AWS_ACCESS_KEY_ID: {aws_key_status}")
-    print(f"  AWS_SECRET_ACCESS_KEY: {aws_secret_status}")
-    print(f"  AWS_STORAGE_BUCKET_NAME: {aws_bucket_status}")
-    print(f"  AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}")
-    print("=" * 60)
     
     logger.info(f"AWS S3 configuration check:")
     logger.info(f"  AWS_ACCESS_KEY_ID: {aws_key_status}")
@@ -193,7 +184,6 @@ if USE_S3:
             f"  - AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}\n"
             "Please set these environment variables in Railway Variables."
         )
-        print(error_msg)
         logger.error(error_msg)
         # Disable S3 and fall back to local storage
         USE_S3 = False
@@ -201,10 +191,8 @@ if USE_S3:
         AWS_ACCESS_KEY_ID = None
         AWS_SECRET_ACCESS_KEY = None
         AWS_STORAGE_BUCKET_NAME = None
-        print("⚠️  USE_S3 set to False due to missing credentials. Using local storage.")
         logger.warning("USE_S3 set to False due to missing credentials. Using local storage.")
     else:
-        print("✅ AWS S3 credentials validated successfully - S3 will be used for static/media files")
         logger.info("✅ AWS S3 credentials validated successfully")
         
         # Build default domain only after validation
