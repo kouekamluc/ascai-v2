@@ -301,10 +301,12 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         Called before a social account is logged in.
         If a user with this email already exists, connect the accounts.
+        This allows existing users to login with Google OAuth.
         """
         # If the user is already logged in, connect the social account
         if request.user.is_authenticated:
             sociallogin.connect(request, request.user)
+            logger.info(f"Connecting Google account to already logged-in user: {request.user.email}")
             return
         
         # Check if a user with this email already exists
@@ -313,10 +315,21 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             try:
                 user = User.objects.get(email=email)
                 # Connect the social account to existing user
+                # This allows existing users to login with Google
                 sociallogin.connect(request, user)
+                logger.info(
+                    f"Linked Google account to existing user: {user.email} (username: {user.username})"
+                )
             except User.DoesNotExist:
                 # User doesn't exist, will be created in save_user
+                logger.info(f"New user signup via Google OAuth: {email}")
                 pass
+            except User.MultipleObjectsReturned:
+                # Multiple users with same email (shouldn't happen, but handle it)
+                logger.warning(f"Multiple users found with email {email}, using first one")
+                user = User.objects.filter(email=email).first()
+                if user:
+                    sociallogin.connect(request, user)
     
     def populate_user(self, request, sociallogin, data):
         """
@@ -359,26 +372,45 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def save_user(self, request, sociallogin, form=None):
         """
         Save the user after social login.
+        For new users: sets default values and requires approval.
+        For existing users (linked accounts): preserves existing data.
         """
         user = super().save_user(request, sociallogin, form)
         
-        # Ensure custom fields are set
-        if not user.role:
-            user.role = 'student'
-        if not user.language_preference:
-            user.language_preference = 'en'
+        # Check if this is a new user or an existing user being linked
+        is_new_user = not user.pk or user.date_joined == user.updated_at
         
-        # Set approval status
-        user.is_approved = False
-        user.is_active = True
-        user.email_verified = True  # Google emails are verified
+        if is_new_user:
+            # New user signup - set defaults and require approval
+            if not user.role:
+                user.role = 'student'
+            if not user.language_preference:
+                user.language_preference = 'en'
+            
+            # Set approval status for new users
+            user.is_approved = False
+            user.is_active = True
+            user.email_verified = True  # Google emails are verified
+            
+            logger.info(
+                f"New user created via Google OAuth: {user.username} ({user.email}) "
+                f"with is_approved=False, is_active=True"
+            )
+        else:
+            # Existing user linking Google account - preserve existing data
+            # Only update email_verified if not already verified
+            if not user.email_verified:
+                user.email_verified = True
+                logger.info(
+                    f"Existing user linked Google account: {user.username} ({user.email}) - "
+                    f"email marked as verified"
+                )
+            else:
+                logger.info(
+                    f"Existing user linked Google account: {user.username} ({user.email})"
+                )
         
         user.save()
-        
-        logger.info(
-            f"Social account user {user.username} ({user.email}) created via Google OAuth "
-            f"with is_approved=False, is_active=True"
-        )
         
         return user
     
