@@ -325,3 +325,42 @@ SESSION_SAVE_EVERY_REQUEST = True
 # HTMX Configuration
 HTMX_ENABLED = True
 
+# File Upload Configuration
+# Set reasonable limits for file uploads to prevent abuse
+# These limits apply to all file uploads (images, documents, etc.)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB - files larger than this will be written to disk
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB - form data size limit
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000  # Maximum number of form fields
+
+# Maximum file size for uploads (50 MB)
+# This is enforced at the application level, not Django level
+# Individual apps can set stricter limits if needed
+MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
+
+# Allowed file extensions for uploads (security measure)
+# This is a general list - individual apps may have more specific requirements
+ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+ALLOWED_DOCUMENT_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.rtf', '.odt']
+ALLOWED_VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg', '.mov']
+ALLOWED_FILE_EXTENSIONS = ALLOWED_IMAGE_EXTENSIONS + ALLOWED_DOCUMENT_EXTENSIONS + ALLOWED_VIDEO_EXTENSIONS
+
+# CKEditor Upload Settings
+# CKEditor uploads will use the same S3 storage as other media files
+# The upload path 'uploads/' will be under 'media/uploads/' in S3
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+CKEDITOR_ALLOW_NONIMAGE_FILES = True  # Allow non-image files in CKEditor
+
+# CKEditor Configuration with upload support
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+        # Upload settings - CKEditor will use the configured storage backend (S3)
+        'filebrowserUploadUrl': '/ckeditor/upload/',
+        'filebrowserBrowseUrl': '/ckeditor/browse/',
+        # Allow all file types in uploads
+        'allowedContent': True,
+    },
+}
+
