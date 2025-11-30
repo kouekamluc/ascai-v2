@@ -223,24 +223,11 @@ def resend_verification_email(request):
     else:
         email = request.GET.get('email')
     
-    # If user is authenticated, use their email (unless override provided)
+    # If user is authenticated, redirect them to allauth's email management page
+    # This is the recommended way as it uses allauth's built-in functionality
     if request.user.is_authenticated:
-        user = request.user
-        if not email:
-            email = user.email
-        
-        if not email:
-            messages.error(request, _('You do not have an email address associated with your account.'))
-            return redirect('account_login')
-        
-        # Check if email is already verified
-        try:
-            email_address = EmailAddress.objects.get(user=user, email=email)
-            if email_address.verified:
-                messages.info(request, _('Your email address is already verified.'))
-                return redirect('dashboard:home')
-        except EmailAddress.DoesNotExist:
-            pass
+        messages.info(request, _('Please use the email management page to resend verification emails.'))
+        return redirect('account_email')
         
     else:
         # For unauthenticated users, email is required

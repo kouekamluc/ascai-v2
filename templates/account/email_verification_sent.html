@@ -19,25 +19,31 @@
     </p>
 
     <div class="space-y-3">
-      <form method="post" action="{% url 'accounts:resend_verification_email' %}" class="inline">
-        {% csrf_token %}
-        {% if user.is_authenticated %}
-          <input type="hidden" name="email" value="{{ user.email }}">
-        {% elif request.GET.email %}
-          <input type="hidden" name="email" value="{{ request.GET.email }}">
-        {% elif request.user.is_authenticated %}
-          <input type="hidden" name="email" value="{{ request.user.email }}">
-        {% endif %}
-        <button 
-          type="submit"
-          class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-          {% trans 'Resend Verification Email' %}
-        </button>
-      </form>
-      
-      <p class="text-xs text-gray-400 mt-4">
-        {% trans 'You can request a new verification email as many times as needed.' %}
-      </p>
+      {% if user.is_authenticated %}
+        <a href="{% url 'account_email' %}" 
+           class="block w-full py-2 px-4 bg-cameroon-green text-white font-semibold rounded-lg hover:bg-cameroon-green/90 transition text-center">
+          {% trans 'Manage Email & Resend Verification' %}
+        </a>
+        <p class="text-xs text-gray-400 mt-2 text-center">
+          {% trans 'Visit the email management page to resend verification emails' %}
+        </p>
+      {% else %}
+        <form method="post" action="{% url 'accounts:resend_verification_email' %}" class="inline">
+          {% csrf_token %}
+          {% if request.GET.email %}
+            <input type="hidden" name="email" value="{{ request.GET.email }}">
+          {% endif %}
+          <button 
+            type="submit"
+            class="w-full py-2 px-4 bg-cameroon-green text-white font-semibold rounded-lg hover:bg-cameroon-green/90 transition">
+            {% trans 'Resend Verification Email' %}
+          </button>
+        </form>
+        
+        <p class="text-xs text-gray-400 mt-4">
+          {% trans 'You can request a new verification email as many times as needed.' %}
+        </p>
+      {% endif %}
     </div>
 
   </div>
