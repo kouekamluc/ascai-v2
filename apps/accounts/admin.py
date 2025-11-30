@@ -240,7 +240,22 @@ class UserAdmin(BaseUserAdmin):
                 
                 # Create new email confirmation
                 emailconfirmation = EmailConfirmation.create(email_address)
-                logger.info(f"Created new EmailConfirmation for {user.email}")
+                # EmailConfirmation.create() saves automatically, but let's verify
+                if not emailconfirmation.pk:
+                    emailconfirmation.save()
+                logger.info(
+                    f"Created EmailConfirmation for {user.email} - "
+                    f"Key: {emailconfirmation.key[:20]}..., "
+                    f"ID: {emailconfirmation.pk}, "
+                    f"Created: {emailconfirmation.created}"
+                )
+                
+                # Verify it exists in the database
+                db_confirmation = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).first()
+                if db_confirmation:
+                    logger.info(f"✓ EmailConfirmation verified in database with key: {db_confirmation.key[:20]}...")
+                else:
+                    logger.error(f"✗ EmailConfirmation NOT found in database after creation!")
                 
                 # Send the confirmation email using the adapter
                 adapter.send_confirmation_mail(request, emailconfirmation, signup=False)

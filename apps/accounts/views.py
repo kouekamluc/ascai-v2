@@ -124,11 +124,30 @@ class CustomConfirmEmailView(ConfirmEmailView):
         logger.info(f"CustomConfirmEmailView GET: Received confirmation key: {key[:20]}... (length: {len(key)})")
         
         try:
-            # Get the confirmation object
+            # Try to find the confirmation directly to debug
+            from allauth.account.models import EmailConfirmation
+            try:
+                confirmation_query = EmailConfirmation.objects.filter(key=key)
+                logger.info(f"CustomConfirmEmailView: Found {confirmation_query.count()} confirmation(s) with key {key[:20]}...")
+                
+                if confirmation_query.exists():
+                    confirmation_obj = confirmation_query.first()
+                    logger.info(f"CustomConfirmEmailView: Confirmation details - Email: {confirmation_obj.email_address.email}, "
+                              f"Created: {confirmation_obj.created}, Verified: {confirmation_obj.email_address.verified}")
+                else:
+                    logger.warning(f"CustomConfirmEmailView: No EmailConfirmation found in database for key: {key[:20]}...")
+                    # Check if there are any confirmations at all
+                    all_confirmations = EmailConfirmation.objects.all()[:5]
+                    logger.info(f"CustomConfirmEmailView: Sample of existing confirmation keys: "
+                              f"{[c.key[:20] + '...' for c in all_confirmations]}")
+            except Exception as e:
+                logger.error(f"CustomConfirmEmailView: Error querying EmailConfirmation: {str(e)}", exc_info=True)
+            
+            # Get the confirmation object using parent's method
             self.object = self.get_object()
             
             if self.object is None:
-                logger.warning(f"CustomConfirmEmailView: No confirmation object found for key: {key[:20]}...")
+                logger.warning(f"CustomConfirmEmailView: get_object() returned None for key: {key[:20]}...")
                 return render(self.request, 'account/email_confirm.html', {
                     'confirmation': None
                 })
@@ -299,7 +318,22 @@ def resend_verification_email(request):
         
         # Create new email confirmation
         emailconfirmation = EmailConfirmation.create(email_address)
-        logger.info(f"Created new EmailConfirmation for {email}")
+        # EmailConfirmation.create() saves automatically, but let's verify
+        if not emailconfirmation.pk:
+            emailconfirmation.save()
+        logger.info(
+            f"Created EmailConfirmation for {email} - "
+            f"Key: {emailconfirmation.key[:20]}..., "
+            f"ID: {emailconfirmation.pk}, "
+            f"Created: {emailconfirmation.created}"
+        )
+        
+        # Verify it exists in the database
+        db_confirmation = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).first()
+        if db_confirmation:
+            logger.info(f"✓ EmailConfirmation verified in database with key: {db_confirmation.key[:20]}...")
+        else:
+            logger.error(f"✗ EmailConfirmation NOT found in database after creation!")
         
         # Send the confirmation email using the adapter
         adapter.send_confirmation_mail(request, emailconfirmation, signup=False)
