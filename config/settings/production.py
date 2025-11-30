@@ -135,32 +135,42 @@ if not USE_S3:
         )
 
 # Static files (use S3 or WhiteNoise)
+# IMPORTANT: Check USE_S3 value that was set in base.py
+# If base.py set USE_S3=False due to missing credentials, we use WhiteNoise
+# If USE_S3 is still True here, S3 should already be configured in base.py
+logger.info(f"Production settings: USE_S3 = {USE_S3}")
+
+# Use Django 4.2+ STORAGES setting for better control
+# Default to WhiteNoise (will be overridden by S3 if USE_S3=True and credentials are valid)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# Static files (use S3 or WhiteNoise)
 if not USE_S3:
-    # Use CompressedManifestStaticFilesStorage for better cache busting and reliability
-    # This storage backend creates a manifest file that maps original filenames to hashed versions
-    # WhiteNoise will automatically serve these files correctly
+    # Use WhiteNoise for static files (S3 disabled or credentials missing)
+    # STORAGES is already set to WhiteNoise above, but we also set STATICFILES_STORAGE for compatibility
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     
     # WhiteNoise configuration
-    # WhiteNoise automatically serves files from STATIC_ROOT by default
-    # WHITENOISE_ROOT is only for serving files that are NOT in STATIC_ROOT (like files in project root)
-    # Do NOT set WHITENOISE_ROOT to STATIC_ROOT - it causes conflicts
-    WHITENOISE_USE_FINDERS = False  # Disable finders in production - files should be collected to STATIC_ROOT
-    WHITENOISE_AUTOREFRESH = False  # Disable auto-refresh in production for performance
-    # WhiteNoise will automatically serve files from STATIC_ROOT - no additional configuration needed
+    WHITENOISE_USE_FINDERS = False
+    WHITENOISE_AUTOREFRESH = False
     
     # Ensure STATICFILES_FINDERS includes all default finders
-    # This ensures Django admin static files are found during collectstatic
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
     
-    logger.info("Using WhiteNoise for static file storage (S3 disabled)")
-    logger.info(f"STATIC_ROOT: {STATIC_ROOT}")
-    logger.info(f"STATIC_URL: {STATIC_URL}")
-    logger.info(f"STATICFILES_STORAGE: {STATICFILES_STORAGE}")
-    logger.info("WhiteNoise configured to serve from STATIC_ROOT (default behavior)")
+    logger.info("✅ Using WhiteNoise for static file storage (S3 disabled or credentials missing)")
+    logger.info(f"  STATIC_ROOT: {STATIC_ROOT}")
+    logger.info(f"  STATIC_URL: {STATIC_URL}")
+    logger.info(f"  STATICFILES_STORAGE: {STATICFILES_STORAGE}")
 else:
     # Validate AWS S3 configuration in production
     # Note: Basic validation already happens in base.py, but we add logging here
@@ -195,10 +205,31 @@ else:
             # Reset STATIC_URL to local if it was set to S3
             if STATIC_URL.startswith('https://'):
                 STATIC_URL = '/static/'
+            # Update STORAGES to use WhiteNoise
+            STORAGES["staticfiles"] = {
+                "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            }
             logger.warning("Forcing fallback to WhiteNoise due to missing S3 credentials")
             logger.info(f"STATIC_URL reset to: {STATIC_URL}")
             logger.info(f"STATICFILES_STORAGE set to: {STATICFILES_STORAGE}")
         else:
+            # Credentials are valid - ensure S3 storage is explicitly set
+            # base.py should have already set STATICFILES_STORAGE, but we verify here
+            if not hasattr(globals(), 'STATICFILES_STORAGE') or 's3' not in str(STATICFILES_STORAGE).lower():
+                logger.warning("S3 credentials valid but STATICFILES_STORAGE not set to S3. Setting it now...")
+                STATICFILES_STORAGE = 'config.storage_backends.StaticStorage'
+            
+            # Also set STORAGES for Django 4.2+ compatibility
+            STORAGES["staticfiles"] = {
+                "BACKEND": "config.storage_backends.StaticStorage",
+            }
+            STORAGES["default"] = {
+                "BACKEND": "config.storage_backends.MediaStorage",
+            }
+            
+            logger.info("✅ S3 storage backends confirmed in production settings")
+            logger.info(f"  STATICFILES_STORAGE: {STATICFILES_STORAGE}")
+            logger.info(f"  STATIC_URL: {STATIC_URL}")
             import boto3
             from botocore.exceptions import ClientError, NoCredentialsError
             

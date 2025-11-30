@@ -157,31 +157,47 @@ if USE_S3:
     # Validate S3 settings BEFORE using them to build domain
     # This prevents errors when building default_domain with empty bucket name
     # In Railway, gracefully fall back to local storage if credentials are missing
+    # Use both logger and print to ensure messages appear (logging may not be configured yet)
+    aws_key_status = 'SET' if AWS_ACCESS_KEY_ID else 'MISSING'
+    aws_secret_status = 'SET' if AWS_SECRET_ACCESS_KEY else 'MISSING'
+    aws_bucket_status = f'SET ({AWS_STORAGE_BUCKET_NAME})' if AWS_STORAGE_BUCKET_NAME else 'MISSING'
+    
+    print("=" * 60)
+    print("AWS S3 CONFIGURATION CHECK (base.py)")
+    print(f"  AWS_ACCESS_KEY_ID: {aws_key_status}")
+    print(f"  AWS_SECRET_ACCESS_KEY: {aws_secret_status}")
+    print(f"  AWS_STORAGE_BUCKET_NAME: {aws_bucket_status}")
+    print(f"  AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}")
+    print("=" * 60)
+    
     logger.info(f"AWS S3 configuration check:")
-    logger.info(f"  AWS_ACCESS_KEY_ID: {'SET' if AWS_ACCESS_KEY_ID else 'MISSING'}")
-    logger.info(f"  AWS_SECRET_ACCESS_KEY: {'SET' if AWS_SECRET_ACCESS_KEY else 'MISSING'}")
-    logger.info(f"  AWS_STORAGE_BUCKET_NAME: {'SET (' + AWS_STORAGE_BUCKET_NAME + ')' if AWS_STORAGE_BUCKET_NAME else 'MISSING'}")
+    logger.info(f"  AWS_ACCESS_KEY_ID: {aws_key_status}")
+    logger.info(f"  AWS_SECRET_ACCESS_KEY: {aws_secret_status}")
+    logger.info(f"  AWS_STORAGE_BUCKET_NAME: {aws_bucket_status}")
     logger.info(f"  AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}")
     
     if not all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
-        logger.error(
-            "❌ AWS S3 is enabled (USE_S3=True) but AWS credentials are missing or incomplete. "
-            "Falling back to local file storage. Files will be lost on container restart."
+        error_msg = (
+            "❌ AWS S3 is enabled (USE_S3=True) but AWS credentials are missing or incomplete.\n"
+            "Falling back to local file storage. Files will be lost on container restart.\n"
+            f"  - AWS_ACCESS_KEY_ID: {aws_key_status}\n"
+            f"  - AWS_SECRET_ACCESS_KEY: {aws_secret_status}\n"
+            f"  - AWS_STORAGE_BUCKET_NAME: {aws_bucket_status}\n"
+            f"  - AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}\n"
+            "Please set these environment variables in Railway Variables."
         )
-        logger.error(
-            "To use S3, set the following environment variables in Railway:\n"
-            "  - AWS_ACCESS_KEY_ID (currently: " + ('SET' if AWS_ACCESS_KEY_ID else 'MISSING') + ")\n"
-            "  - AWS_SECRET_ACCESS_KEY (currently: " + ('SET' if AWS_SECRET_ACCESS_KEY else 'MISSING') + ")\n"
-            "  - AWS_STORAGE_BUCKET_NAME (currently: " + ('SET (' + AWS_STORAGE_BUCKET_NAME + ')' if AWS_STORAGE_BUCKET_NAME else 'MISSING') + ")\n"
-            "  - AWS_S3_REGION_NAME (optional, defaults to us-east-1, currently: " + AWS_S3_REGION_NAME + ")"
-        )
+        print(error_msg)
+        logger.error(error_msg)
         # Disable S3 and fall back to local storage
         USE_S3 = False
         # Clear AWS variables to prevent confusion
         AWS_ACCESS_KEY_ID = None
         AWS_SECRET_ACCESS_KEY = None
         AWS_STORAGE_BUCKET_NAME = None
+        print("⚠️  USE_S3 set to False due to missing credentials. Using local storage.")
+        logger.warning("USE_S3 set to False due to missing credentials. Using local storage.")
     else:
+        print("✅ AWS S3 credentials validated successfully - S3 will be used for static/media files")
         logger.info("✅ AWS S3 credentials validated successfully")
         
         # Build default domain only after validation
@@ -220,12 +236,24 @@ if USE_S3:
         # Media files storage
         DEFAULT_FILE_STORAGE = 'config.storage_backends.MediaStorage'
         
+        # Also set STORAGES for Django 4.2+ compatibility (if not already set)
+        # This ensures S3 takes precedence over any WhiteNoise settings
+        if 'STORAGES' not in globals() or not isinstance(globals().get('STORAGES'), dict):
+            STORAGES = {}
+        STORAGES["staticfiles"] = {
+            "BACKEND": "config.storage_backends.StaticStorage",
+        }
+        STORAGES["default"] = {
+            "BACKEND": "config.storage_backends.MediaStorage",
+        }
+        
         # Build URLs with proper protocol
         STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
         
         logger.info(f"✅ S3 configured: Static files → {STATIC_URL}")
         logger.info(f"✅ S3 configured: Media files → {MEDIA_URL}")
+        logger.info(f"✅ S3 storage backends set: STATICFILES_STORAGE = {STATICFILES_STORAGE}")
 else:
     logger.info("ℹ️  S3 is disabled (USE_S3=False or not set). Using local file storage.")
 
