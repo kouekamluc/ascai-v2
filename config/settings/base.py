@@ -346,6 +346,9 @@ SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens unless needed
 # Auto-connect social accounts to existing users with matching verified email
 # This prevents "account already exists" email errors and improves UX
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+# Allow social login via GET request (prevents redirect loops)
+# This is safe because the actual OAuth flow still requires user consent
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # Session Configuration
 SESSION_COOKIE_AGE = 86400  # 24 hours
