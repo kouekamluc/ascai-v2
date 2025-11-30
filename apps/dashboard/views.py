@@ -129,6 +129,23 @@ class ProfileView(DashboardRequiredMixin, DetailView):
     
     def get_object(self):
         return self.request.user
+    
+    def get_context_data(self, **kwargs):
+        """Add governance-related context."""
+        context = super().get_context_data(**kwargs)
+        profile_user = self.get_object()
+        
+        # Get active executive positions (filter in Python, not template)
+        try:
+            if hasattr(profile_user, 'executive_positions'):
+                context['active_positions'] = profile_user.executive_positions.filter(status='active')
+            else:
+                context['active_positions'] = []
+        except Exception:
+            # Governance app might not be migrated yet
+            context['active_positions'] = []
+        
+        return context
 
 
 class ProfileUpdateView(DashboardRequiredMixin, UpdateView):

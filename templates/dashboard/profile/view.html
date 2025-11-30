@@ -153,11 +153,11 @@
         </div>
         {% endif %}
         
-        {% if profile_user.executive_positions.exists %}
+        {% if active_positions %}
         <div class="mt-6 pt-6 border-t border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">{% trans 'Executive Positions' %}</h3>
             <div class="space-y-3">
-                {% for position in profile_user.executive_positions.filter.status='active' %}
+                {% for position in active_positions %}
                 <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <p class="font-semibold text-gray-900">{{ position.get_position_display }}</p>
                     <p class="text-sm text-gray-600 mt-1">
