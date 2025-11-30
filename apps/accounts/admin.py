@@ -3,9 +3,17 @@ Admin configuration for accounts app.
 """
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
 from allauth.account.models import EmailAddress
+import logging
+
 from .models import User, UserDocument
+
+logger = logging.getLogger(__name__)
 
 
 @admin.register(User)
@@ -40,6 +48,15 @@ class UserAdmin(BaseUserAdmin):
     
     def save_model(self, request, obj, form, change):
         """Override save to auto-approve superusers and staff."""
+        # Store previous approval status to detect changes
+        was_approved = False
+        if change and obj.pk:
+            try:
+                old_obj = User.objects.get(pk=obj.pk)
+                was_approved = old_obj.is_approved
+            except User.DoesNotExist:
+                pass
+        
         # Superusers must always be staff and active
         if obj.is_superuser:
             obj.is_staff = True
@@ -48,13 +65,100 @@ class UserAdmin(BaseUserAdmin):
         elif obj.is_staff:
             obj.is_active = True
             obj.is_approved = True
+        
         super().save_model(request, obj, form, change)
+        
+        # Send approval email if status changed from False to True
+        # (The signal will handle this, but we ensure it works here too)
+        if change and not was_approved and obj.is_approved and obj.email:
+            try:
+                self._send_approval_email(obj)
+            except Exception as e:
+                logger.error(f"Failed to send approval email in admin save: {str(e)}", exc_info=True)
     
     def approve_users(self, request, queryset):
         """Approve selected users and activate them."""
+        # Get users who were not approved before (to send emails only to newly approved)
+        users_to_approve = queryset.filter(is_approved=False)
+        
+        # Update all selected users
         updated = queryset.update(is_approved=True, is_active=True)
-        self.message_user(request, f'{updated} user(s) approved and activated successfully.')
+        
+        # Send approval emails to users who were just approved
+        emails_sent = 0
+        for user in users_to_approve:
+            if user.email:
+                try:
+                    self._send_approval_email(user)
+                    emails_sent += 1
+                except Exception as e:
+                    logger.error(f"Failed to send approval email to {user.email}: {str(e)}", exc_info=True)
+        
+        message = f'{updated} user(s) approved and activated successfully.'
+        if emails_sent > 0:
+            message += f' {emails_sent} approval email(s) sent.'
+        self.message_user(request, message)
     approve_users.short_description = _('Approve selected users')
+    
+    def _send_approval_email(self, user):
+        """Helper method to send approval email to a user."""
+        if not user.email:
+            return
+        
+        try:
+            # Get site URL from Django Sites framework
+            try:
+                site = Site.objects.get_current()
+                site_url = f"https://{site.domain}" if not site.domain.startswith('http') else site.domain
+            except Exception:
+                # Fallback if Site framework not configured
+                site_url = getattr(settings, 'SITE_URL', 'https://ascailazio.org')
+            
+            login_url = f"{site_url}/accounts/login/"
+            context = {
+                'user': user,
+                'username': user.get_display_name(),
+                'login_url': login_url,
+            }
+            
+            # Render email template
+            email_html = render_to_string(
+                'accounts/email/account_approved.html',
+                context,
+                using='django'
+            )
+            
+            # Prepare plain text version
+            email_text = f"""
+{_('Hello')} {user.get_display_name()},
+
+{_('Great news! Your account has been approved by an administrator.')}
+
+{_('You can now log in to your account and access all features of the ASCAI Lazio platform.')}
+
+{_('Login URL')}: {login_url}
+
+{_('Thank you for your patience.')}
+
+---
+{_('ASCAI Lazio - Association of Cameroonian Students and Academics in Lazio')}
+"""
+            
+            # Send email
+            send_mail(
+                subject=_('Your ASCAI Lazio Account Has Been Approved'),
+                message=email_text.strip(),
+                html_message=email_html,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            
+            logger.info(f"Approval email sent successfully to {user.email} for user {user.username}")
+            
+        except Exception as e:
+            logger.error(f"Failed to send approval email to {user.email}: {str(e)}", exc_info=True)
+            raise
     
     def reject_users(self, request, queryset):
         """Reject selected users."""
