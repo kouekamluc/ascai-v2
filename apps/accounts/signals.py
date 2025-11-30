@@ -14,6 +14,14 @@ from .models import User
 
 logger = logging.getLogger(__name__)
 
+# Import allauth signals if available
+try:
+    from allauth.account.signals import email_confirmed, email_address_verified
+    ALLAUTH_AVAILABLE = True
+except ImportError:
+    ALLAUTH_AVAILABLE = False
+    logger.warning("django-allauth signals not available")
+
 
 @receiver(pre_save, sender=User)
 def store_previous_approval_status(sender, instance, **kwargs):
@@ -123,4 +131,37 @@ def send_approval_email(sender, instance, created, **kwargs):
         except Exception as e:
             # Log error but don't fail the save operation
             logger.error(f"Failed to send approval email to {instance.email}: {str(e)}", exc_info=True)
+
+
+# Signal to sync User.email_verified when EmailAddress is verified
+if ALLAUTH_AVAILABLE:
+    @receiver(email_confirmed)
+    def update_user_email_verified(sender, request, email_address, **kwargs):
+        """
+        Update User.email_verified when email is confirmed via allauth.
+        This ensures the User model stays in sync with EmailAddress.verified.
+        """
+        try:
+            user = email_address.user
+            if not user.email_verified:
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.info(f"Updated email_verified=True for user {user.username} after email confirmation")
+        except Exception as e:
+            logger.error(f"Failed to update email_verified for user {email_address.user.username}: {str(e)}", exc_info=True)
+    
+    @receiver(email_address_verified)
+    def sync_email_verified_on_verification(sender, request, email_address, **kwargs):
+        """
+        Alternative signal handler for email verification.
+        This is called when an email address is verified.
+        """
+        try:
+            user = email_address.user
+            if not user.email_verified:
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.info(f"Updated email_verified=True for user {user.username} via email_address_verified signal")
+        except Exception as e:
+            logger.error(f"Failed to update email_verified via email_address_verified signal: {str(e)}", exc_info=True)
 

@@ -79,20 +79,26 @@ class UserAdmin(BaseUserAdmin):
     def approve_users(self, request, queryset):
         """Approve selected users and activate them."""
         # Get users who were not approved before (to send emails only to newly approved)
-        users_to_approve = queryset.filter(is_approved=False)
+        # Store their IDs and emails before update
+        users_to_approve = list(queryset.filter(is_approved=False).values_list('id', 'email'))
         
         # Update all selected users
         updated = queryset.update(is_approved=True, is_active=True)
         
         # Send approval emails to users who were just approved
+        # We need to refetch users after update since queryset.update() doesn't refresh objects
         emails_sent = 0
-        for user in users_to_approve:
-            if user.email:
+        for user_id, user_email in users_to_approve:
+            if user_email:
                 try:
+                    # Refetch the user to get updated data
+                    user = User.objects.get(pk=user_id)
                     self._send_approval_email(user)
                     emails_sent += 1
+                except User.DoesNotExist:
+                    logger.warning(f"User with id {user_id} not found after approval update")
                 except Exception as e:
-                    logger.error(f"Failed to send approval email to {user.email}: {str(e)}", exc_info=True)
+                    logger.error(f"Failed to send approval email to {user_email}: {str(e)}", exc_info=True)
         
         message = f'{updated} user(s) approved and activated successfully.'
         if emails_sent > 0:

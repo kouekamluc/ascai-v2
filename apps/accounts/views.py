@@ -175,6 +175,14 @@ class CustomConfirmEmailView(ConfirmEmailView):
             f"Email verified: {email_address.verified} (was: {was_verified_before})"
         )
         
+        # Update User.email_verified field if email was just verified
+        if email_address.verified and not was_verified_before:
+            user = email_address.user
+            if not user.email_verified:
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.info(f"Updated email_verified=True for user {user.username} after email confirmation")
+        
         # If confirmation was successful (email is now verified), show styled success page
         if email_address.verified and not was_verified_before:
             logger.info(f"CustomConfirmEmailView: Showing styled success page for {email_address.email}")
