@@ -177,10 +177,13 @@ if USE_S3:
         )
         # Disable S3 and fall back to local storage
         USE_S3 = False
+        # Clear AWS variables to prevent confusion
+        AWS_ACCESS_KEY_ID = None
+        AWS_SECRET_ACCESS_KEY = None
+        AWS_STORAGE_BUCKET_NAME = None
     else:
         logger.info("✅ AWS S3 credentials validated successfully")
         
-        # Build default domain only after validation
         # Build default domain only after validation
         # Ensure region name is not empty (fallback to us-east-1 if somehow empty)
         if not AWS_S3_REGION_NAME:

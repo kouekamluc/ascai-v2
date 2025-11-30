@@ -165,14 +165,39 @@ else:
     # Validate AWS S3 configuration in production
     # Note: Basic validation already happens in base.py, but we add logging here
     try:
-        # Check if AWS variables are defined (they should be if USE_S3 is True)
-        if not all([hasattr(globals(), 'AWS_ACCESS_KEY_ID'), 
-                   hasattr(globals(), 'AWS_SECRET_ACCESS_KEY'),
-                   hasattr(globals(), 'AWS_STORAGE_BUCKET_NAME')]):
-            logger.warning(
-                "AWS S3 is enabled but AWS configuration variables are not properly set. "
-                "This should not happen if base.py validation worked correctly."
+        # Check if AWS variables exist AND have non-empty values
+        # hasattr only checks existence, not if values are empty strings
+        aws_key_id = globals().get('AWS_ACCESS_KEY_ID', '')
+        aws_secret = globals().get('AWS_SECRET_ACCESS_KEY', '')
+        aws_bucket = globals().get('AWS_STORAGE_BUCKET_NAME', '')
+        
+        logger.info(f"Production S3 validation check:")
+        logger.info(f"  AWS_ACCESS_KEY_ID exists: {hasattr(globals(), 'AWS_ACCESS_KEY_ID')}, value: {'SET (length: ' + str(len(aws_key_id)) + ')' if aws_key_id else 'EMPTY'}")
+        logger.info(f"  AWS_SECRET_ACCESS_KEY exists: {hasattr(globals(), 'AWS_SECRET_ACCESS_KEY')}, value: {'SET (length: ' + str(len(aws_secret)) + ')' if aws_secret else 'EMPTY'}")
+        logger.info(f"  AWS_STORAGE_BUCKET_NAME exists: {hasattr(globals(), 'AWS_STORAGE_BUCKET_NAME')}, value: {'SET (' + aws_bucket + ')' if aws_bucket else 'EMPTY'}")
+        
+        if not all([aws_key_id, aws_secret, aws_bucket]):
+            logger.error(
+                "❌ AWS S3 is enabled (USE_S3=True) but AWS configuration variables are missing or empty. "
+                "This means base.py validation should have set USE_S3=False, but it didn't. "
+                "Check base.py validation logic."
             )
+            logger.error(
+                f"Missing variables:\n"
+                f"  - AWS_ACCESS_KEY_ID: {'MISSING' if not aws_key_id else 'SET'}\n"
+                f"  - AWS_SECRET_ACCESS_KEY: {'MISSING' if not aws_secret else 'SET'}\n"
+                f"  - AWS_STORAGE_BUCKET_NAME: {'MISSING' if not aws_bucket else 'SET'}\n"
+                f"Please set these in Railway Variables."
+            )
+            # Force fallback to local storage
+            USE_S3 = False
+            STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+            # Reset STATIC_URL to local if it was set to S3
+            if STATIC_URL.startswith('https://'):
+                STATIC_URL = '/static/'
+            logger.warning("Forcing fallback to WhiteNoise due to missing S3 credentials")
+            logger.info(f"STATIC_URL reset to: {STATIC_URL}")
+            logger.info(f"STATICFILES_STORAGE set to: {STATICFILES_STORAGE}")
         else:
             import boto3
             from botocore.exceptions import ClientError, NoCredentialsError

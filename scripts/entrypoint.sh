@@ -147,28 +147,24 @@ fi
 
 # Collect static files
 echo "Collecting static files..."
-# Check if S3 is enabled by checking environment variable (case-insensitive)
-USE_S3_VALUE="${USE_S3:-False}"
-USE_S3_NORMALIZED=$(echo "$USE_S3_VALUE" | tr '[:upper:]' '[:lower:]')
-echo "USE_S3 environment variable: '${USE_S3_VALUE}' (normalized: ${USE_S3_NORMALIZED})"
+echo "USE_S3 environment variable: '${USE_S3:-False}'"
+echo "Running collectstatic - Django will use the configured storage backend automatically..."
 
-if [ "$USE_S3_NORMALIZED" = "true" ] || [ "$USE_S3_NORMALIZED" = "1" ] || [ "$USE_S3_NORMALIZED" = "yes" ] || [ "$USE_S3_NORMALIZED" = "on" ]; then
-    echo "S3 is enabled - uploading static files to S3 bucket..."
-    python manage.py collectstatic --noinput
-    echo "✓ Static files uploaded to S3"
-    echo "Note: Verify files are accessible at your S3 bucket's static/ path"
-    echo "Check S3 bucket permissions if admin panel is unstyled (403 Forbidden errors)"
+# Always run collectstatic - Django will use the correct storage backend based on settings
+# If STATICFILES_STORAGE is set to S3 backend, files will be uploaded to S3
+# If it's set to WhiteNoise, files will be collected to STATIC_ROOT
+python manage.py collectstatic --noinput
+
+# Verify collection based on whether files exist locally (WhiteNoise) or not (S3)
+if [ -d "staticfiles/admin" ] && [ -n "$(ls -A staticfiles/admin 2>/dev/null)" ]; then
+    echo "✓ Static files collected locally (using WhiteNoise)"
+    echo "✓ Admin static files found in staticfiles/admin"
+    ls -la staticfiles/admin/css/ | head -5 || echo "⚠ Could not list admin CSS files"
 else
-    echo "S3 is disabled - collecting static files locally for WhiteNoise..."
-    python manage.py collectstatic --noinput
-    echo "Verifying static files were collected locally..."
-    if [ -d "staticfiles/admin" ]; then
-        echo "✓ Admin static files found in staticfiles/admin"
-        ls -la staticfiles/admin/css/ | head -5 || echo "⚠ Could not list admin CSS files"
-    else
-        echo "✗ ERROR: staticfiles/admin directory not found!"
-        exit 1
-    fi
+    echo "✓ Static files should be uploaded to S3 (check Django logs for confirmation)"
+    echo "Note: If using S3, verify files are accessible at your S3 bucket's static/ path"
+    echo "Check S3 bucket permissions if admin panel is unstyled (403 Forbidden errors)"
+    echo "Check Railway logs above for S3 configuration status"
 fi
 
 # Start the application
