@@ -1,28 +1,57 @@
 {% extends "governance/base.html" %}
 {% load i18n %}
 
-{% block title %}{% if object %}{% trans "Edit Member" %}{% else %}{% trans "Add Member" %}{% endif %} - {{ block.super }}{% endblock %}
+{% block page_heading %}{% if object %}{% trans "Edit Member" %}{% else %}{% trans "Add Member" %}{% endif %}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">
-        {% if object %}{% trans "Edit Member" %}{% else %}{% trans "Add Member" %}{% endif %}
-    </h1>
-    
-    <div class="bg-white rounded-lg shadow p-6 max-w-2xl">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <div class="mt-6 flex gap-4">
-                <button type="submit" class="bg-cameroon-green text-white px-6 py-2 rounded hover:bg-green-700">
-                    {% trans "Save" %}
-                </button>
-                <a href="{% url 'governance:member_list' %}" class="bg-gray-200 text-gray-800 px-6 py-2 rounded hover:bg-gray-300">
-                    {% trans "Cancel" %}
-                </a>
+<div class="governance-card max-w-3xl">
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <ul class="text-sm text-red-800">
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+            <div class="{% if field.field.required %}required{% endif %}">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
             </div>
-        </form>
-    </div>
+            {% endfor %}
+        </div>
+        
+        <div class="flex gap-4 pt-4 border-t border-gray-200">
+            <button type="submit" class="btn-primary">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                {% trans "Save Member" %}
+            </button>
+            <a href="{% if object %}{% url 'governance:member_detail' object.pk %}{% else %}{% url 'governance:member_list' %}{% endif %}" class="btn-secondary">
+                {% trans "Cancel" %}
+            </a>
+        </div>
+    </form>
 </div>
 {% endblock %}
 

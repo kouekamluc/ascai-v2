@@ -33,11 +33,14 @@ class GeneralAssemblyForm(forms.ModelForm):
         fields = ['assembly_type', 'date', 'location', 'convocation_date', 'status',
                   'minutes_en', 'minutes_fr', 'minutes_it']
         widgets = {
-            'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'convocation_date': forms.DateInput(attrs={'type': 'date'}),
-            'minutes_en': forms.Textarea(attrs={'rows': 10}),
-            'minutes_fr': forms.Textarea(attrs={'rows': 10}),
-            'minutes_it': forms.Textarea(attrs={'rows': 10}),
+            'assembly_type': forms.Select(attrs={'class': 'form-input'}),
+            'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-input'}),
+            'location': forms.TextInput(attrs={'class': 'form-input'}),
+            'convocation_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'status': forms.Select(attrs={'class': 'form-input'}),
+            'minutes_en': forms.Textarea(attrs={'rows': 10, 'class': 'form-textarea'}),
+            'minutes_fr': forms.Textarea(attrs={'rows': 10, 'class': 'form-textarea'}),
+            'minutes_it': forms.Textarea(attrs={'rows': 10, 'class': 'form-textarea'}),
         }
     
     def clean(self):
@@ -145,8 +148,12 @@ class FinancialTransactionForm(forms.ModelForm):
         model = FinancialTransaction
         fields = ['transaction_type', 'category', 'amount', 'date', 'description', 'status']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'description': forms.Textarea(attrs={'rows': 3}),
+            'transaction_type': forms.Select(attrs={'class': 'form-input'}),
+            'category': forms.Select(attrs={'class': 'form-input'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'}),
+            'status': forms.Select(attrs={'class': 'form-input'}),
         }
 
 
@@ -158,9 +165,14 @@ class MembershipDuesForm(forms.ModelForm):
         fields = ['member', 'year', 'amount', 'due_date', 'payment_date', 
                   'payment_method', 'status', 'notes']
         widgets = {
-            'due_date': forms.DateInput(attrs={'type': 'date'}),
-            'payment_date': forms.DateInput(attrs={'type': 'date'}),
-            'notes': forms.Textarea(attrs={'rows': 3}),
+            'member': forms.Select(attrs={'class': 'form-input'}),
+            'year': forms.NumberInput(attrs={'class': 'form-input'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
+            'due_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'payment_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'payment_method': forms.Select(attrs={'class': 'form-input'}),
+            'status': forms.Select(attrs={'class': 'form-input'}),
+            'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-textarea'}),
         }
 
 

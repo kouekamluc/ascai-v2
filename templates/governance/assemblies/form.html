@@ -5,14 +5,138 @@
 
 {% block content %}
 <div class="governance-card max-w-3xl">
-    <form method="post">
+    <form method="post" class="space-y-6">
         {% csrf_token %}
-        <div class="space-y-4">
-            {{ form.as_p }}
+        
+        {% if form.non_field_errors %}
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <ul class="text-sm text-red-800">
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
         </div>
-        <div class="mt-6 flex gap-4">
-            <button type="submit" class="btn-primary">{% trans "Save" %}</button>
-            <a href="{% url 'governance:assembly_list' %}" class="btn-secondary">{% trans "Cancel" %}</a>
+        {% endif %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+                <label for="{{ form.assembly_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.assembly_type.label }}
+                    {% if form.assembly_type.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ form.assembly_type }}
+                {% if form.assembly_type.help_text %}
+                <p class="mt-1 text-xs text-gray-500">{{ form.assembly_type.help_text }}</p>
+                {% endif %}
+                {% if form.assembly_type.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in form.assembly_type.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.date.label }}
+                    {% if form.date.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ form.date }}
+                {% if form.date.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in form.date.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.location.label }}
+                    {% if form.location.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ form.location }}
+                {% if form.location.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in form.location.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.convocation_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.convocation_date.label }}
+                    {% if form.convocation_date.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ form.convocation_date }}
+                {% if form.convocation_date.help_text %}
+                <p class="mt-1 text-xs text-gray-500">{{ form.convocation_date.help_text }}</p>
+                {% endif %}
+                {% if form.convocation_date.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in form.convocation_date.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.status.label }}
+                    {% if form.status.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in form.status.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <div class="md:col-span-2">
+                <label for="{{ form.minutes_en.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.minutes_en.label }}
+                </label>
+                {{ form.minutes_en }}
+                {% if form.minutes_en.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in form.minutes_en.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <div class="md:col-span-2">
+                <label for="{{ form.minutes_fr.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.minutes_fr.label }}
+                </label>
+                {{ form.minutes_fr }}
+                {% if form.minutes_fr.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in form.minutes_fr.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <div class="md:col-span-2">
+                <label for="{{ form.minutes_it.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.minutes_it.label }}
+                </label>
+                {{ form.minutes_it }}
+                {% if form.minutes_it.errors %}
+                <ul class="mt-1 text-sm text-red-600">
+                    {% for error in form.minutes_it.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="flex gap-4 pt-4 border-t border-gray-200">
+            <button type="submit" class="btn-primary">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                {% trans "Save Assembly" %}
+            </button>
+            <a href="{% if object %}{% url 'governance:assembly_detail' object.pk %}{% else %}{% url 'governance:assembly_list' %}{% endif %}" class="btn-secondary">
+                {% trans "Cancel" %}
+            </a>
         </div>
     </form>
 </div>
