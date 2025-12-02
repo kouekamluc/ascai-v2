@@ -743,6 +743,16 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
+        # Financial summary calculations
+        all_transactions = FinancialTransaction.objects.all()
+        total_income = all_transactions.filter(transaction_type='income').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+        total_expenses = all_transactions.filter(transaction_type='expense').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+        net_balance = total_income - total_expenses
+        
         # Statistics
         context['stats'] = {
             'total_members': Member.objects.count(),
@@ -757,10 +767,13 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
                 transaction_type='expense',
                 status='pending'
             ).count(),
+            'total_income': total_income,
+            'total_expenses': total_expenses,
+            'net_balance': net_balance,
         }
         
         # Recent activity
-        context['recent_assemblies'] = GeneralAssembly.objects.all()[:5]
-        context['recent_transactions'] = FinancialTransaction.objects.all()[:10]
+        context['recent_assemblies'] = GeneralAssembly.objects.all().order_by('-date')[:5]
+        context['recent_transactions'] = FinancialTransaction.objects.all().order_by('-date')
         
         return context
