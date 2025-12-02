@@ -50,14 +50,21 @@
             <p class="text-gray-700">{{ mentor.bio|linebreaks }}</p>
         </div>
         
-        {% if user.is_authenticated and user.role == 'student' and mentor.availability_status == 'available' %}
-            {% if not has_request %}
+        {% if user.is_authenticated and user.role == 'student' %}
+            {% if not has_request and mentor.availability_status == 'available' %}
         <a href="{% url 'mentorship:request_create' mentor.pk %}" class="inline-block px-8 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 font-semibold">
             {% trans 'Request Mentorship' %}
         </a>
-            {% else %}
+            {% elif existing_request %}
             <div class="p-4 bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg">
-                <p class="text-cameroon-green">{% trans 'You have already sent a mentorship request to this mentor.' %}</p>
+                <p class="text-cameroon-green mb-2">{% trans 'You have an active request with this mentor.' %}</p>
+                <a href="{% url 'mentorship:request_detail' existing_request.pk %}" class="text-cameroon-green underline">
+                    {% trans 'View Request' %}
+                </a>
+            </div>
+            {% elif mentor.availability_status != 'available' %}
+            <div class="p-4 bg-gray-100 border border-gray-200 rounded-lg">
+                <p class="text-gray-700">{% trans 'This mentor is currently not available.' %}</p>
             </div>
             {% endif %}
         {% endif %}

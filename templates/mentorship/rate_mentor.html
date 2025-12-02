@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Rate Mentor' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <h1 class="text-3xl font-bold mb-6">{% trans 'Rate Your Mentor' %}</h1>
+        
+        {% if already_rated %}
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+            <p class="text-yellow-800">{% trans 'You have already rated this mentor.' %}</p>
+            <div class="mt-4">
+                <p class="text-sm text-gray-600">{% trans 'Your Rating' %}: <span class="font-bold">{{ existing_rating.rating }}/5</span></p>
+                {% if existing_rating.comment %}
+                <p class="text-sm text-gray-600 mt-2">{{ existing_rating.comment }}</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'mentorship:request_detail' request.pk %}" class="inline-block mt-4 px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                {% trans 'Back to Request' %}
+            </a>
+        </div>
+        {% else %}
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">{% trans 'Mentor' %}: {{ mentor.user.get_full_name|default:mentor.user.username }}</h2>
+            <p class="text-gray-600">{% trans 'Request' %}: {{ request.subject }}</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-6">
+                <label for="{{ form.rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {% trans 'Rating' %} <span class="text-red-500">*</span>
+                </label>
+                {{ form.rating }}
+                {% if form.rating.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.rating.errors }}</p>
+                {% endif %}
+                <p class="text-sm text-gray-500 mt-1">{% trans 'Please rate your mentor from 1 to 5 stars.' %}</p>
+            </div>
+            
+            <div class="mb-6">
+                <label for="{{ form.comment.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {% trans 'Comment' %} ({% trans 'Optional' %})
+                </label>
+                {{ form.comment }}
+                {% if form.comment.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.comment.errors }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="flex gap-4">
+                <button type="submit" class="px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                    {% trans 'Submit Rating' %}
+                </button>
+                <a href="{% url 'mentorship:request_detail' request.pk %}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                    {% trans 'Cancel' %}
+                </a>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

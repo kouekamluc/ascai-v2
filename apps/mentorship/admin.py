@@ -3,7 +3,7 @@ Admin configuration for mentorship app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import MentorProfile, MentorshipRequest, MentorshipMessage
+from .models import MentorProfile, MentorshipRequest, MentorshipMessage, MentorRating
 
 
 @admin.register(MentorProfile)
@@ -37,6 +37,15 @@ class MentorshipMessageAdmin(admin.ModelAdmin):
     list_filter = ['is_read', 'created_at']
     search_fields = ['content', 'sender__username']
     raw_id_fields = ['request', 'sender']
+
+
+@admin.register(MentorRating)
+class MentorRatingAdmin(admin.ModelAdmin):
+    """Admin interface for MentorRating."""
+    list_display = ['mentor', 'student', 'rating', 'created_at']
+    list_filter = ['rating', 'created_at']
+    search_fields = ['mentor__user__username', 'student__username', 'comment']
+    raw_id_fields = ['request', 'student', 'mentor']
 
 
 

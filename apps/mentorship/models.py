@@ -53,6 +53,21 @@ class MentorProfile(models.Model):
     
     def __str__(self):
         return f"Mentor: {self.user.username}"
+    
+    def update_rating(self):
+        """Update average rating from all ratings."""
+        from django.db.models import Avg
+        avg_rating = self.ratings.aggregate(Avg('rating'))['rating__avg']
+        if avg_rating:
+            self.rating = round(avg_rating, 2)
+        else:
+            self.rating = 0.00
+        self.save(update_fields=['rating'])
+    
+    def increment_students_helped(self):
+        """Increment students helped count."""
+        self.students_helped += 1
+        self.save(update_fields=['students_helped'])
 
 
 class MentorshipRequest(models.Model):
@@ -94,6 +109,14 @@ class MentorshipRequest(models.Model):
     
     def __str__(self):
         return f"Request from {self.student.username} to {self.mentor.user.username}"
+    
+    def can_be_completed(self):
+        """Check if request can be marked as completed."""
+        return self.status == 'accepted'
+    
+    def has_rating(self):
+        """Check if this request has been rated."""
+        return hasattr(self, 'rating')
 
 
 class MentorshipMessage(models.Model):
@@ -121,6 +144,43 @@ class MentorshipMessage(models.Model):
     
     def __str__(self):
         return f"Message from {self.sender.username}"
+
+
+class MentorRating(models.Model):
+    """Rating given by student to mentor after mentorship completion."""
+    request = models.OneToOneField(
+        MentorshipRequest,
+        on_delete=models.CASCADE,
+        related_name='rating',
+        verbose_name=_('Request')
+    )
+    student = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='mentor_ratings_given',
+        verbose_name=_('Student')
+    )
+    mentor = models.ForeignKey(
+        MentorProfile,
+        on_delete=models.CASCADE,
+        related_name='ratings',
+        verbose_name=_('Mentor')
+    )
+    rating = models.PositiveIntegerField(
+        choices=[(i, i) for i in range(1, 6)],
+        verbose_name=_('Rating')
+    )
+    comment = models.TextField(blank=True, verbose_name=_('Comment'))
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = _('Mentor Rating')
+        verbose_name_plural = _('Mentor Ratings')
+        ordering = ['-created_at']
+        unique_together = ['request', 'student']
+    
+    def __str__(self):
+        return f"Rating {self.rating}/5 for {self.mentor.user.username} by {self.student.username}"
 
 
 
