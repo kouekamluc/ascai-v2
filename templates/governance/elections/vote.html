@@ -9,19 +9,33 @@
 <div class="max-w-4xl">
     <div class="governance-card mb-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ election.get_election_type_display }}</h2>
-        <p class="text-gray-600">{% trans "Cast your secret ballot vote. Your choices are confidential." %}</p>
+        <p class="text-gray-600 mb-2">{% trans "Cast your secret ballot vote. Your choices are confidential." %}</p>
+        <p class="text-sm text-gray-500">{% trans "You can vote for one or more positions. You may skip positions if you don't want to vote for them." %}</p>
     </div>
 
-    <form method="post" action="{% url 'governance:cast_election_vote' election.pk %}" class="space-y-6">
+    {% if voting_eligibility and not voting_eligibility.eligible %}
+    <div class="governance-card mb-6 bg-red-50 border border-red-200">
+        <p class="text-red-800 font-semibold">{% trans "Voting Eligibility Issue" %}</p>
+        <p class="text-red-700 mt-2">{{ voting_eligibility.reason }}</p>
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'governance:cast_election_vote' election_id=election.pk %}" class="space-y-6" id="election-vote-form">
         {% csrf_token %}
         
+        {% if candidacies_by_position %}
         {% for position_code, position_data in candidacies_by_position.items %}
         <div class="governance-card">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ position_data.name }}</h3>
             
             {% if position_data.has_voted %}
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <p class="text-blue-800">{% trans "You have already voted for this position." %}</p>
+                <p class="text-blue-800">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {% trans "You have already voted for this position. You can change your vote by selecting a different candidate." %}
+                </p>
             </div>
             {% endif %}
             
@@ -33,8 +47,7 @@
                            name="position_{{ position_code }}" 
                            value="{{ candidacy.pk }}" 
                            class="mt-1 mr-4 w-5 h-5 text-cameroon-green focus:ring-cameroon-green"
-                           {% if position_data.has_voted %}disabled{% endif %}
-                           required>
+                           id="position_{{ position_code }}_{{ candidacy.pk }}">
                     <div class="flex-1">
                         <p class="font-semibold text-gray-900">{{ candidacy.candidate.get_display_name }}</p>
                         {% if candidacy.eligibility_notes %}
@@ -43,12 +56,38 @@
                     </div>
                 </label>
                 {% endfor %}
+                
+                <label class="flex items-start p-4 border-2 border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 cursor-pointer transition-all">
+                    <input type="radio" 
+                           name="position_{{ position_code }}" 
+                           value="" 
+                           class="mt-1 mr-4 w-5 h-5 text-gray-400 focus:ring-gray-400"
+                           id="position_{{ position_code }}_none"
+                           checked>
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-600">{% trans "Skip this position (Abstain)" %}</p>
+                    </div>
+                </label>
             </div>
             {% else %}
-            <p class="text-gray-500 text-center py-8">{% trans "No candidates for this position" %}</p>
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p class="text-yellow-800 text-center">{% trans "No approved candidates for this position" %}</p>
+            </div>
             {% endif %}
         </div>
         {% endfor %}
+        {% else %}
+        <div class="governance-card">
+            <p class="text-gray-500 text-center py-8">{% trans "No positions available for voting in this election." %}</p>
+        </div>
+        {% endif %}
+
+        {% if candidacies_by_position %}
+        <div class="governance-card bg-blue-50 border border-blue-200">
+            <p class="text-blue-800 text-sm mb-2">
+                <strong>{% trans "Note:" %}</strong> {% trans "You can vote for one or more positions. Positions you skip will not be counted." %}
+            </p>
+        </div>
 
         <div class="flex items-center justify-end space-x-4">
             <a href="{% url 'governance:election_detail' election.pk %}" class="btn-secondary">
@@ -61,7 +100,19 @@
                 {% trans "Submit Vote" %}
             </button>
         </div>
+        {% endif %}
     </form>
 </div>
+
+<script>
+// Allow form submission even if no votes are selected (user can skip all positions)
+document.getElementById('election-vote-form').addEventListener('submit', function(e) {
+    // Remove validation - allow empty submission
+    const radios = this.querySelectorAll('input[type="radio"]');
+    radios.forEach(radio => {
+        radio.removeAttribute('required');
+    });
+});
+</script>
 {% endblock %}
 

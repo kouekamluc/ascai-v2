@@ -1284,6 +1284,9 @@ class ElectionDetailView(GovernanceRequiredMixin, DetailView):
         # Check if user can vote
         if self.request.user.is_authenticated:
             context['voting_eligibility'] = check_voting_eligibility(self.request.user, election=election)
+        else:
+            # Default eligibility for non-authenticated users
+            context['voting_eligibility'] = {'eligible': False, 'reason': _('You must be logged in to vote.')}
         return context
 
 
@@ -1436,23 +1439,24 @@ class ElectionVoteView(LoginRequiredMixin, DetailView):
         election = self.get_object()
         user = self.request.user
         
-        # Get candidacies by position
+        # Get candidacies by position - show all positions even if no candidates
         candidacies_by_position = {}
         for position_code, position_name in EXECUTIVE_POSITION_CHOICES:
             candidacies = election.candidacies.filter(
                 position=position_code,
                 status='approved'
             ).select_related('candidate')
-            if candidacies.exists():
-                candidacies_by_position[position_code] = {
-                    'name': position_name,
-                    'candidacies': candidacies,
-                    'has_voted': ElectionVote.objects.filter(
-                        election=election,
-                        voter=user,
-                        position=position_code
-                    ).exists()
-                }
+            
+            # Show position even if no candidates (user can see it's empty)
+            candidacies_by_position[position_code] = {
+                'name': position_name,
+                'candidacies': candidacies,
+                'has_voted': ElectionVote.objects.filter(
+                    election=election,
+                    voter=user,
+                    position=position_code
+                ).exists()
+            }
         context['candidacies_by_position'] = candidacies_by_position
         
         # Check voting eligibility
@@ -1482,11 +1486,16 @@ def cast_election_vote(request, election_id):
     votes = {}
     for position_code, position_name in EXECUTIVE_POSITION_CHOICES:
         candidate_id = request.POST.get(f'position_{position_code}')
-        if candidate_id:
-            votes[position_code] = int(candidate_id)
+        if candidate_id and candidate_id.strip():  # Only add if not empty
+            try:
+                votes[position_code] = int(candidate_id)
+            except (ValueError, TypeError):
+                # Skip invalid candidate IDs
+                continue
     
+    # Allow submission even if no votes (user can skip all positions)
     if not votes:
-        messages.error(request, _('No votes submitted.'))
+        messages.info(request, _('No votes were submitted. You can vote later or skip positions you don\'t want to vote for.'))
         return redirect('governance:election_vote', election_id=election_id)
     
     # Record votes
