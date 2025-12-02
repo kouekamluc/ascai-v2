@@ -417,10 +417,29 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         """
         Override to skip email verification for social account users.
         Google OAuth users have pre-verified emails, so we can skip verification.
+        
+        Note: email_address can be either an EmailAddress object or a string (email).
         """
+        from allauth.account.models import EmailAddress
+        
+        # Handle both EmailAddress object and string (email)
+        if isinstance(email_address, str):
+            # If it's a string, try to find the EmailAddress object
+            try:
+                email_address_obj = EmailAddress.objects.get(email=email_address)
+                user = email_address_obj.user
+            except EmailAddress.DoesNotExist:
+                # If EmailAddress doesn't exist, try to find user by email
+                try:
+                    user = User.objects.get(email=email_address)
+                except User.DoesNotExist:
+                    # Can't determine if verified, use default behavior
+                    return super().is_email_verified(request, email_address)
+        else:
+            # It's an EmailAddress object
+            user = email_address.user if hasattr(email_address, 'user') else None
+        
         # Check if user has a social account (Google OAuth)
-        # This works even if user is not authenticated yet
-        user = email_address.user
         if user:
             from allauth.socialaccount.models import SocialAccount
             has_social_account = SocialAccount.objects.filter(user=user, provider='google').exists()
@@ -428,7 +447,14 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             if has_social_account:
                 # For Google OAuth users, emails are pre-verified
                 # Mark as verified if not already
-                if not email_address.verified:
+                if isinstance(email_address, str):
+                    # If we got a string, update/create EmailAddress
+                    EmailAddress.objects.update_or_create(
+                        user=user,
+                        email=email_address,
+                        defaults={'verified': True, 'primary': True}
+                    )
+                elif hasattr(email_address, 'verified') and not email_address.verified:
                     email_address.verified = True
                     email_address.save()
                     logger.info(f"Marked email as verified for Google OAuth user: {user.email}")
