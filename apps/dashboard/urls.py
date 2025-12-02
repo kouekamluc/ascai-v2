@@ -57,6 +57,11 @@ urlpatterns = [
     
     # Mentorship
     path('mentorship/', views.MentorshipDashboardView.as_view(), name='mentorship_dashboard'),
+    path('mentorship/profile/create/', views.DashboardMentorProfileCreateView.as_view(), name='mentorship_profile_create'),
+    path('mentorship/profile/update/', views.DashboardMentorProfileUpdateView.as_view(), name='mentorship_profile_update'),
+    path('mentorship/mentor/', views.DashboardMentorManagementView.as_view(), name='mentorship_mentor_management'),
+    path('mentorship/student/', views.DashboardStudentRequestsView.as_view(), name='mentorship_student_requests'),
+    path('mentorship/requests/<int:pk>/', views.DashboardRequestDetailView.as_view(), name='mentorship_request_detail'),
     
     # Personalization
     path('saved-items/', views.SavedItemsView.as_view(), name='saved_items'),

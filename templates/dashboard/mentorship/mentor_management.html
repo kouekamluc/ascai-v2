@@ -1,0 +1,67 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'Mentor Management' %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {% if not mentor_profile %}
+    <div class="bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg p-6 mb-6">
+        <p class="text-cameroon-green mb-4">{% trans 'You need to create a mentor profile first.' %}</p>
+        <a href="{% url 'dashboard:mentorship_profile_create' %}" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans 'Create Mentor Profile' %}
+        </a>
+    </div>
+    {% else %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="dashboard-card">
+            <h3 class="text-xl font-semibold mb-2">{% trans 'Total Requests' %}</h3>
+            <p class="text-3xl font-bold text-cameroon-green">{{ requests.count }}</p>
+        </div>
+        <div class="dashboard-card">
+            <h3 class="text-xl font-semibold mb-2">{% trans 'Pending Requests' %}</h3>
+            <p class="text-3xl font-bold text-yellow-600">{{ pending_count|default:0 }}</p>
+        </div>
+        <div class="dashboard-card">
+            <h3 class="text-xl font-semibold mb-2">{% trans 'Students Helped' %}</h3>
+            <p class="text-3xl font-bold text-green-600">{{ mentor_profile.students_helped }}</p>
+        </div>
+    </div>
+    
+    <!-- Profile Actions -->
+    <div class="mb-6 flex gap-4">
+        <a href="{% url 'dashboard:mentorship_profile_update' %}" class="px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+            {% trans 'Edit Profile' %}
+        </a>
+        <div class="flex items-center gap-2">
+            <label for="availability-status" class="text-gray-700">{% trans 'Availability' %}:</label>
+            <form method="post" action="{% url 'mentorship:update_availability' %}" 
+                  hx-post="{% url 'mentorship:update_availability' %}" 
+                  hx-trigger="change from:#availability-status"
+                  class="inline">
+                {% csrf_token %}
+                <select name="availability_status" id="availability-status" 
+                        class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
+                    <option value="available" {% if mentor_profile.availability_status == 'available' %}selected{% endif %}>{% trans 'Available' %}</option>
+                    <option value="busy" {% if mentor_profile.availability_status == 'busy' %}selected{% endif %}>{% trans 'Busy' %}</option>
+                    <option value="unavailable" {% if mentor_profile.availability_status == 'unavailable' %}selected{% endif %}>{% trans 'Unavailable' %}</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    
+    <div class="dashboard-card">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Mentorship Requests' %}</h2>
+        
+        <div class="space-y-4" id="requests-list">
+            {% for request in requests %}
+            {% include 'mentorship/partials/request_item.html' %}
+            {% empty %}
+            <p class="text-gray-500">{% trans 'No mentorship requests yet.' %}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

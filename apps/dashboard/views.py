@@ -909,7 +909,10 @@ class MentorshipDashboardView(DashboardRequiredMixin, TemplateView):
             try:
                 mentor_profile = user.mentor_profile
                 context['mentor_profile'] = mentor_profile
-                context['requests'] = MentorshipRequest.objects.filter(mentor=mentor_profile).order_by('-created_at')[:10]
+                all_requests = mentor_profile.requests.all().order_by('-created_at')
+                context['requests'] = all_requests[:10]
+                context['pending_count'] = all_requests.filter(status='pending').count()
+                context['accepted_count'] = all_requests.filter(status='accepted').count()
             except MentorProfile.DoesNotExist:
                 context['needs_profile'] = True
         
@@ -917,6 +920,131 @@ class MentorshipDashboardView(DashboardRequiredMixin, TemplateView):
             context['my_requests'] = MentorshipRequest.objects.filter(student=user).order_by('-created_at')[:10]
         
         return context
+
+
+class DashboardMentorProfileCreateView(DashboardRequiredMixin, CreateView):
+    """Create mentor profile within dashboard."""
+    from apps.mentorship.models import MentorProfile
+    from apps.mentorship.forms import MentorProfileForm
+    model = MentorProfile
+    form_class = MentorProfileForm
+    template_name = 'dashboard/mentorship/profile_create.html'
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:mentorship_dashboard')
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        messages.success(self.request, _('Mentor profile created! It will be reviewed by an admin before being published.'))
+        return super().form_valid(form)
+
+
+class DashboardMentorProfileUpdateView(DashboardRequiredMixin, UpdateView):
+    """Update mentor profile within dashboard."""
+    from apps.mentorship.models import MentorProfile
+    from apps.mentorship.forms import MentorProfileUpdateForm
+    model = MentorProfile
+    form_class = MentorProfileUpdateForm
+    template_name = 'dashboard/mentorship/profile_update.html'
+    
+    def get_queryset(self):
+        from apps.mentorship.models import MentorProfile
+        return MentorProfile.objects.filter(user=self.request.user)
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:mentorship_dashboard')
+    
+    def form_valid(self, form):
+        messages.success(self.request, _('Mentor profile updated successfully!'))
+        return super().form_valid(form)
+
+
+class DashboardMentorManagementView(DashboardRequiredMixin, TemplateView):
+    """Full mentor management dashboard within dashboard."""
+    template_name = 'dashboard/mentorship/mentor_management.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from apps.mentorship.models import MentorProfile
+        mentor_profile = getattr(self.request.user, 'mentor_profile', None)
+        context['in_dashboard'] = True  # Flag for templates
+        if mentor_profile:
+            all_requests = mentor_profile.requests.all().order_by('-created_at')
+            context['requests'] = all_requests
+            context['mentor_profile'] = mentor_profile
+            context['pending_count'] = all_requests.filter(status='pending').count()
+            context['accepted_count'] = all_requests.filter(status='accepted').count()
+        return context
+
+
+class DashboardStudentRequestsView(DashboardRequiredMixin, TemplateView):
+    """Student mentorship requests within dashboard."""
+    template_name = 'dashboard/mentorship/student_requests.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['requests'] = MentorshipRequest.objects.filter(
+            student=self.request.user
+        ).order_by('-created_at')
+        return context
+
+
+class DashboardRequestDetailView(DashboardRequiredMixin, DetailView):
+    """Mentorship request detail within dashboard."""
+    from apps.mentorship.models import MentorshipRequest
+    model = MentorshipRequest
+    template_name = 'dashboard/mentorship/request_detail.html'
+    context_object_name = 'request'
+    
+    def get_queryset(self):
+        from apps.mentorship.models import MentorshipRequest
+        user = self.request.user
+        return MentorshipRequest.objects.filter(
+            Q(student=user) | Q(mentor__user=user)
+        )
+    
+    def get_context_data(self, **kwargs):
+        from apps.mentorship.forms import MentorshipMessageForm, MentorRatingForm
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Mark messages as read when viewing
+        unread_messages = self.object.messages.exclude(sender=user).filter(is_read=False)
+        unread_messages.update(is_read=True)
+        
+        context['messages'] = self.object.messages.all().order_by('created_at')
+        context['form'] = MentorshipMessageForm()
+        context['rating_form'] = MentorRatingForm() if self.object.status == 'accepted' and not self.object.has_rating() and self.object.student == user else None
+        context['can_complete'] = self.object.can_be_completed()
+        context['is_student'] = self.object.student == user
+        context['is_mentor'] = self.object.mentor.user == user
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        """Handle message creation via HTMX."""
+        from apps.mentorship.forms import MentorshipMessageForm
+        self.object = self.get_object()
+        
+        # Only allow messages if request is accepted
+        if self.object.status != 'accepted':
+            return JsonResponse({'error': _('Request must be accepted to send messages.')}, status=400)
+        
+        form = MentorshipMessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.request = self.object
+            message.sender = request.user
+            message.save()
+            
+            # Return message item for HTMX
+            if request.headers.get('HX-Request'):
+                return render(request, 'mentorship/partials/message_item.html', {
+                    'message': message,
+                    'user': request.user
+                })
+            return redirect('dashboard:mentorship_request_detail', pk=self.object.pk)
+        
+        return JsonResponse({'error': _('Invalid form data.')}, status=400)
 
 
 # Personalization
