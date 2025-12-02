@@ -1501,7 +1501,7 @@ class ElectionVoteView(LoginRequiredMixin, DetailView):
         election = self.get_object()
         user = self.request.user
         
-        # Get candidacies by position - show all positions even if no candidates
+        # Get candidacies by position - only show positions with approved candidates
         candidacies_by_position = {}
         for position_code, position_name in EXECUTIVE_POSITION_CHOICES:
             candidacies = election.candidacies.filter(
@@ -1509,16 +1509,22 @@ class ElectionVoteView(LoginRequiredMixin, DetailView):
                 status='approved'
             ).select_related('candidate')
             
-            # Show position even if no candidates (user can see it's empty)
-            candidacies_by_position[position_code] = {
-                'name': position_name,
-                'candidacies': candidacies,
-                'has_voted': ElectionVote.objects.filter(
-                    election=election,
-                    voter=user,
-                    position=position_code
-                ).exists()
-            }
+            # Only show positions that have approved candidates
+            if candidacies.exists():
+                candidacies_by_position[position_code] = {
+                    'name': position_name,
+                    'candidacies': candidacies,
+                    'has_voted': ElectionVote.objects.filter(
+                        election=election,
+                        voter=user,
+                        position=position_code
+                    ).exists(),
+                    'current_vote': ElectionVote.objects.filter(
+                        election=election,
+                        voter=user,
+                        position=position_code
+                    ).select_related('candidate').first()
+                }
         context['candidacies_by_position'] = candidacies_by_position
         
         # Check voting eligibility
@@ -1547,10 +1553,11 @@ def cast_election_vote(request, election_id):
     # Get vote data from POST
     votes = {}
     for position_code, position_name in EXECUTIVE_POSITION_CHOICES:
-        candidate_id = request.POST.get(f'position_{position_code}')
-        if candidate_id and candidate_id.strip():  # Only add if not empty
+        candidate_id = request.POST.get(f'position_{position_code}', '').strip()
+        if candidate_id:  # Only add if not empty
             try:
-                votes[position_code] = int(candidate_id)
+                candidate_pk = int(candidate_id)
+                votes[position_code] = candidate_pk
             except (ValueError, TypeError):
                 # Skip invalid candidate IDs
                 continue

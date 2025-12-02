@@ -1,118 +1,234 @@
-{% extends "governance/base.html" %}
+{% extends "dashboard/base_dashboard.html" %}
 {% load i18n %}
-
-{% block title %}{% trans "Vote in Election" %} - {{ block.super }}{% endblock %}
 
 {% block page_heading %}{% trans "Vote in Election" %}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl">
+<div class="max-w-4xl mx-auto">
     <div class="governance-card mb-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ election.get_election_type_display }}</h2>
         <p class="text-gray-600 mb-2">{% trans "Cast your secret ballot vote. Your choices are confidential." %}</p>
-        <p class="text-sm text-gray-500">{% trans "You can vote for one or more positions. You may skip positions if you don't want to vote for them." %}</p>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
+            <p class="text-blue-800 text-sm">
+                <strong>{% trans "Instructions:" %}</strong> 
+                {% trans "Select ONE candidate for each position you want to vote for. You can skip positions by leaving them unselected or choosing 'Abstain'." %}
+            </p>
+        </div>
     </div>
 
     {% if voting_eligibility and not voting_eligibility.eligible %}
     <div class="governance-card mb-6 bg-red-50 border border-red-200">
-        <p class="text-red-800 font-semibold">{% trans "Voting Eligibility Issue" %}</p>
-        <p class="text-red-700 mt-2">{{ voting_eligibility.reason }}</p>
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <p class="text-red-800 font-semibold">{% trans "Voting Eligibility Issue" %}</p>
+                <p class="text-red-700 mt-1 text-sm">{{ voting_eligibility.reason }}</p>
+            </div>
+        </div>
     </div>
     {% endif %}
 
+    {% if not candidacies_by_position %}
+    <div class="governance-card">
+        <p class="text-gray-500 text-center py-12">
+            <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {% trans "No positions available for voting in this election." %}
+        </p>
+    </div>
+    {% else %}
     <form method="post" action="{% url 'governance:cast_election_vote' election_id=election.pk %}" class="space-y-6" id="election-vote-form">
         {% csrf_token %}
         
-        {% if candidacies_by_position %}
         {% for position_code, position_data in candidacies_by_position.items %}
         <div class="governance-card">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ position_data.name }}</h3>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-900">{{ position_data.name }}</h3>
+                {% if position_data.has_voted %}
+                <span class="px-3 py-1 text-xs rounded bg-blue-100 text-blue-800 font-semibold">
+                    ✓ {% trans "Voted" %}
+                </span>
+                {% endif %}
+            </div>
             
             {% if position_data.has_voted %}
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <p class="text-blue-800">
+                <p class="text-blue-800 text-sm">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    {% trans "You have already voted for this position. You can change your vote by selecting a different candidate." %}
+                    {% trans "You have already voted for this position. Select a different candidate to change your vote." %}
                 </p>
             </div>
             {% endif %}
             
             {% if position_data.candidacies %}
-            <div class="space-y-3">
+            <p class="text-sm text-gray-600 mb-4">{% trans "Select ONE candidate for this position:" %}</p>
+            <div class="space-y-3 mb-4">
                 {% for candidacy in position_data.candidacies %}
-                <label class="flex items-start p-4 border-2 border-gray-200 rounded-lg hover:border-cameroon-green hover:bg-cameroon-green/5 cursor-pointer transition-all">
+                <label class="flex items-start p-5 border-2 {% if position_data.current_vote and position_data.current_vote.candidate_id == candidacy.pk %}border-cameroon-green bg-cameroon-green/10{% else %}border-gray-300{% endif %} rounded-lg hover:border-cameroon-green hover:bg-cameroon-green/5 cursor-pointer transition-all group">
                     <input type="radio" 
                            name="position_{{ position_code }}" 
                            value="{{ candidacy.pk }}" 
-                           class="mt-1 mr-4 w-5 h-5 text-cameroon-green focus:ring-cameroon-green"
-                           id="position_{{ position_code }}_{{ candidacy.pk }}">
+                           class="mt-1 mr-4 w-6 h-6 text-cameroon-green focus:ring-cameroon-green cursor-pointer"
+                           id="position_{{ position_code }}_{{ candidacy.pk }}"
+                           {% if position_data.current_vote and position_data.current_vote.candidate_id == candidacy.pk %}checked{% endif %}
+                           onchange="updateSelection('{{ position_code }}', '{{ candidacy.pk }}')">
                     <div class="flex-1">
-                        <p class="font-semibold text-gray-900">{{ candidacy.candidate.get_display_name }}</p>
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="font-bold text-lg text-gray-900 group-hover:text-cameroon-green transition-colors">
+                                {{ candidacy.candidate.get_display_name }}
+                            </p>
+                            {% if position_data.current_vote and position_data.current_vote.candidate_id == candidacy.pk %}
+                            <span class="px-3 py-1 text-xs rounded bg-green-100 text-green-800 font-semibold">
+                                ✓ {% trans "Your Current Vote" %}
+                            </span>
+                            {% else %}
+                            <span class="px-3 py-1 text-xs rounded bg-blue-100 text-blue-700 font-medium">
+                                {% trans "Click to Vote" %}
+                            </span>
+                            {% endif %}
+                        </div>
                         {% if candidacy.eligibility_notes %}
-                        <p class="text-sm text-gray-600 mt-1">{{ candidacy.eligibility_notes }}</p>
+                        <p class="text-sm text-gray-600 mt-2">{{ candidacy.eligibility_notes }}</p>
                         {% endif %}
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            {{ candidacy.candidate.email }}
+                        </div>
                     </div>
                 </label>
                 {% endfor %}
-                
-                <label class="flex items-start p-4 border-2 border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 cursor-pointer transition-all">
+            </div>
+            
+            <div class="border-t border-gray-200 pt-4 mt-4">
+                <label class="flex items-center p-4 border-2 border-dashed {% if not position_data.current_vote %}border-gray-400 bg-gray-50{% else %}border-gray-300{% endif %} rounded-lg hover:border-gray-400 hover:bg-gray-50 cursor-pointer transition-all">
                     <input type="radio" 
                            name="position_{{ position_code }}" 
                            value="" 
-                           class="mt-1 mr-4 w-5 h-5 text-gray-400 focus:ring-gray-400"
+                           class="mr-4 w-6 h-6 text-gray-400 focus:ring-gray-400 cursor-pointer"
                            id="position_{{ position_code }}_none"
-                           checked>
+                           {% if not position_data.current_vote %}checked{% endif %}
+                           onchange="updateSelection('{{ position_code }}', 'none')">
                     <div class="flex-1">
                         <p class="font-medium text-gray-600">{% trans "Skip this position (Abstain)" %}</p>
+                        <p class="text-xs text-gray-500 mt-1">{% trans "You can skip voting for this position" %}</p>
                     </div>
                 </label>
             </div>
             {% else %}
             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p class="text-yellow-800 text-center">{% trans "No approved candidates for this position" %}</p>
+                <p class="text-yellow-800 text-center">
+                    <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    {% trans "No approved candidates for this position" %}
+                </p>
             </div>
             {% endif %}
         </div>
         {% endfor %}
-        {% else %}
-        <div class="governance-card">
-            <p class="text-gray-500 text-center py-8">{% trans "No positions available for voting in this election." %}</p>
-        </div>
-        {% endif %}
 
-        {% if candidacies_by_position %}
-        <div class="governance-card bg-blue-50 border border-blue-200">
-            <p class="text-blue-800 text-sm mb-2">
-                <strong>{% trans "Note:" %}</strong> {% trans "You can vote for one or more positions. Positions you skip will not be counted." %}
-            </p>
+        <div class="governance-card bg-gradient-to-r from-blue-50 to-green-50 border-2 border-blue-200">
+            <div class="flex items-start">
+                <svg class="w-6 h-6 text-blue-600 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div class="flex-1">
+                    <p class="font-semibold text-gray-900 mb-2">{% trans "Voting Instructions" %}</p>
+                    <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                        <li>{% trans "Select ONE candidate per position you want to vote for" %}</li>
+                        <li>{% trans "You can vote for all positions, some positions, or skip all positions" %}</li>
+                        <li>{% trans "Your vote is secret and confidential" %}</li>
+                        <li>{% trans "You can change your vote by selecting a different candidate" %}</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
-        <div class="flex items-center justify-end space-x-4">
+        <div class="flex items-center justify-between bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <a href="{% url 'governance:election_detail' election.pk %}" class="btn-secondary">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
                 {% trans "Cancel" %}
             </a>
-            <button type="submit" class="btn-primary">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button type="submit" class="btn-primary text-lg px-8 py-3">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                {% trans "Submit Vote" %}
+                {% trans "Submit My Vote" %}
             </button>
         </div>
-        {% endif %}
     </form>
+    {% endif %}
 </div>
 
 <script>
-// Allow form submission even if no votes are selected (user can skip all positions)
-document.getElementById('election-vote-form').addEventListener('submit', function(e) {
-    // Remove validation - allow empty submission
-    const radios = this.querySelectorAll('input[type="radio"]');
-    radios.forEach(radio => {
-        radio.removeAttribute('required');
+// Visual feedback when selecting a candidate
+function updateSelection(positionCode, candidateId) {
+    // Remove highlight from all options in this position
+    const positionGroup = document.querySelectorAll(`input[name="position_${positionCode}"]`);
+    positionGroup.forEach(radio => {
+        const label = radio.closest('label');
+        if (label) {
+            label.classList.remove('border-cameroon-green', 'bg-cameroon-green/10');
+            label.classList.add('border-gray-300');
+        }
     });
+    
+    // Highlight selected option
+    const selected = document.getElementById(`position_${positionCode}_${candidateId}`);
+    if (selected) {
+        const label = selected.closest('label');
+        if (label) {
+            label.classList.add('border-cameroon-green', 'bg-cameroon-green/10');
+            label.classList.remove('border-gray-300');
+        }
+    }
+}
+
+// Show selected state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const allRadios = document.querySelectorAll('input[type="radio"]');
+    allRadios.forEach(radio => {
+        if (radio.checked) {
+            updateSelection(radio.name.replace('position_', ''), radio.value || 'none');
+        }
+    });
+});
+
+// Form validation - at least show confirmation
+document.getElementById('election-vote-form').addEventListener('submit', function(e) {
+    const form = this;
+    const selectedVotes = [];
+    
+    // Count selected votes
+    const allRadios = form.querySelectorAll('input[type="radio"]:checked');
+    allRadios.forEach(radio => {
+        if (radio.value && radio.value !== '') {
+            selectedVotes.push(radio.value);
+        }
+    });
+    
+    if (selectedVotes.length === 0) {
+        if (!confirm('{% trans "You have not selected any candidates. Are you sure you want to submit without voting?" %}')) {
+            e.preventDefault();
+            return false;
+        }
+    } else {
+        if (!confirm(`{% trans "You are about to submit votes for" %} ${selectedVotes.length} {% trans "position(s). Continue?" %}`)) {
+            e.preventDefault();
+            return false;
+        }
+    }
 });
 </script>
 {% endblock %}
+
 
