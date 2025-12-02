@@ -365,6 +365,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
         },
         'OAUTH_PKCE_ENABLED': True,
+        'VERIFIED_EMAIL': True,  # CRITICAL: Tell allauth that Google emails are already verified
         # 'APP' configuration removed - using database SocialApp entries instead
         # This prevents MultipleObjectsReturned errors when both are configured
     }
