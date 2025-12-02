@@ -154,7 +154,7 @@ class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
         MembershipStatus.objects.create(
             member=member,
             status='pending',
-            notes=_('Initial registration - pending admin verification')
+            reason=_('Initial registration - pending admin verification')
         )
         
         messages.success(
@@ -497,7 +497,7 @@ def verify_member(request, member_id):
                 member=member,
                 status='active',
                 effective_date=timezone.now().date(),
-                notes=_('Member activated by {user}').format(user=request.user.get_full_name() or request.user.username)
+                reason=_('Member activated by {user}').format(user=request.user.get_full_name() or request.user.username)
             )
             messages.success(request, _('Member activated successfully.'))
         else:
@@ -509,7 +509,7 @@ def verify_member(request, member_id):
             member=member,
             status='inactive',
             effective_date=timezone.now().date(),
-            notes=_('Member deactivated by {user}').format(user=request.user.get_full_name() or request.user.username)
+            reason=_('Member deactivated by {user}').format(user=request.user.get_full_name() or request.user.username)
         )
         messages.success(request, _('Member deactivated.'))
     else:
