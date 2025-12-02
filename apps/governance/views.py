@@ -1480,14 +1480,14 @@ def cast_election_vote(request, election_id):
     
     # Get vote data from POST
     votes = {}
-    for position_code, _ in EXECUTIVE_POSITION_CHOICES:
+    for position_code, position_name in EXECUTIVE_POSITION_CHOICES:
         candidate_id = request.POST.get(f'position_{position_code}')
         if candidate_id:
             votes[position_code] = int(candidate_id)
     
     if not votes:
         messages.error(request, _('No votes submitted.'))
-        return redirect('governance:election_vote', pk=election_id)
+        return redirect('governance:election_vote', election_id=election_id)
     
     # Record votes
     for position_code, candidate_id in votes.items():
@@ -1517,7 +1517,7 @@ def cast_election_vote(request, election_id):
                 )
         except Candidacy.DoesNotExist:
             messages.error(request, _('Invalid candidate selected.'))
-            return redirect('governance:election_vote', pk=election_id)
+            return redirect('governance:election_vote', election_id=election_id)
     
     messages.success(request, _('Vote cast successfully!'))
     return redirect('governance:election_detail', pk=election_id)
