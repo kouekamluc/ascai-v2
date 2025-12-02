@@ -1,0 +1,54 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Disciplinary Cases" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Disciplinary Cases" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{% trans "Disciplinary Cases" %}</h2>
+        <p class="text-sm text-gray-600 mt-1">{% trans "Member discipline and sanctions management" %}</p>
+    </div>
+    <a href="{% url 'governance:disciplinary_case_create' %}" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {% trans "Report Case" %}
+    </a>
+</div>
+
+{% if cases %}
+<div class="space-y-4">
+    {% for case in cases %}
+    <div class="governance-card hover:shadow-lg transition-shadow">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex items-center space-x-3 mb-2">
+                    <h3 class="text-lg font-bold text-gray-900">{{ case.member.user.get_display_name }}</h3>
+                    <span class="px-3 py-1 rounded text-xs font-semibold
+                        {% if case.status == 'resolved' %}bg-green-100 text-green-800
+                        {% elif case.status == 'under_review' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ case.get_status_display }}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-600 mb-2"><strong>{% trans "Violation" %}:</strong> {{ case.get_violation_type_display }}</p>
+                <p class="text-sm text-gray-600">{{ case.description|truncatewords:30 }}</p>
+                <p class="text-xs text-gray-500 mt-2">{% trans "Reported" %}: {{ case.reported_date|date:"d M Y" }}</p>
+            </div>
+            <a href="{% url 'governance:disciplinary_case_detail' case.pk %}" class="btn-secondary ml-4">
+                {% trans "View" %}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p class="text-gray-500">{% trans "No disciplinary cases found" %}</p>
+</div>
+{% endif %}
+{% endblock %}
+

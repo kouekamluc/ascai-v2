@@ -1,0 +1,51 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Association Events" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Association Events" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{% trans "Association Events" %}</h2>
+        <p class="text-sm text-gray-600 mt-1">{% trans "Events and activities organized by ASCAI" %}</p>
+    </div>
+    {% if perms.governance.manage_executive_board %}
+    <a href="{% url 'governance:association_event_create' %}" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {% trans "Create Event" %}
+    </a>
+    {% endif %}
+</div>
+
+{% if events %}
+<div class="space-y-4">
+    {% for event in events %}
+    <div class="governance-card hover:shadow-lg transition-shadow">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ event.title }}</h3>
+                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                    <span>{{ event.get_event_type_display }}</span>
+                    <span>{{ event.start_date|date:"d M Y" }}</span>
+                    <span>{{ event.location }}</span>
+                </div>
+                <p class="text-sm text-gray-700">{{ event.description|truncatewords:30 }}</p>
+            </div>
+            <a href="{% url 'governance:association_event_detail' event.pk %}" class="btn-secondary ml-4">
+                {% trans "View" %}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p class="text-gray-500">{% trans "No events found" %}</p>
+</div>
+{% endif %}
+{% endblock %}
+

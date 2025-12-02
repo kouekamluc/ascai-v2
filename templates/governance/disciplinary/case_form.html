@@ -1,0 +1,50 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Report Disciplinary Case" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Report Disciplinary Case" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <form method="post" class="governance-card">
+        {% csrf_token %}
+        <div class="space-y-6">
+            <div>
+                <label for="{{ form.member.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.member.label }} *
+                </label>
+                {{ form.member }}
+                {% if form.member.errors %}<p class="mt-1 text-sm text-red-600">{{ form.member.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.violation_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.violation_type.label }} *
+                </label>
+                {{ form.violation_type }}
+                {% if form.violation_type.errors %}<p class="mt-1 text-sm text-red-600">{{ form.violation_type.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.description.label }} *
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}<p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.evidence.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.evidence.label }}
+                </label>
+                {{ form.evidence }}
+                <p class="mt-1 text-xs text-gray-500">{% trans "Links, screenshots, or other evidence" %}</p>
+                {% if form.evidence.errors %}<p class="mt-1 text-sm text-red-600">{{ form.evidence.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="mt-6 flex items-center justify-end space-x-4">
+            <a href="{% url 'governance:disciplinary_case_list' %}" class="btn-secondary">{% trans "Cancel" %}</a>
+            <button type="submit" class="btn-primary">{% trans "Submit Report" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

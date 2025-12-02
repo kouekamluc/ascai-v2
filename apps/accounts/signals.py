@@ -176,12 +176,13 @@ if ALLAUTH_AVAILABLE:
         """
         Mark email as verified when a social account (Google OAuth) is added.
         This ensures Google OAuth users don't need to verify their email.
+        CRITICAL: This signal fires when social account is connected, ensuring email is verified immediately.
         """
         try:
             if sociallogin.account.provider == 'google':
                 user = sociallogin.user
                 if user and user.email:
-                    # Mark email as verified in EmailAddress
+                    # Force mark email as verified in EmailAddress
                     email_address, created = EmailAddress.objects.update_or_create(
                         user=user,
                         email=user.email,
@@ -190,14 +191,58 @@ if ALLAUTH_AVAILABLE:
                             'primary': True
                         }
                     )
+                    # Force verification to True (in case defaults didn't work)
+                    email_address.verified = True
+                    email_address.save()
+                    
                     # Mark in User model
-                    if not user.email_verified:
-                        user.email_verified = True
-                        user.save(update_fields=['email_verified'])
+                    user.email_verified = True
+                    user.save(update_fields=['email_verified'])
+                    
                     logger.info(
-                        f"SIGNAL: Marked email as verified for Google OAuth user: {user.email} "
-                        f"(email_address created={created}, verified={email_address.verified})"
+                        f"SIGNAL (social_account_added): FORCED email verification for Google OAuth user: {user.email} "
+                        f"(email_address created={created}, verified={email_address.verified}, user.email_verified={user.email_verified})"
                     )
         except Exception as e:
             logger.error(f"Failed to mark email as verified for social account: {str(e)}", exc_info=True)
+    
+    # Also handle pre_social_login signal to mark email verified even earlier
+    try:
+        from allauth.socialaccount.signals import pre_social_login
+        @receiver(pre_social_login)
+        def mark_email_verified_before_social_login(sender, request, sociallogin, **kwargs):
+            """
+            Mark email as verified BEFORE social login completes.
+            This ensures email is verified before allauth checks for verification.
+            """
+            try:
+                if sociallogin.account.provider == 'google':
+                    email = sociallogin.account.extra_data.get('email')
+                    if email:
+                        # Check if user exists
+                        try:
+                            user = User.objects.get(email=email)
+                            # Mark email as verified IMMEDIATELY
+                            email_address, created = EmailAddress.objects.update_or_create(
+                                user=user,
+                                email=email,
+                                defaults={
+                                    'verified': True,
+                                    'primary': True
+                                }
+                            )
+                            email_address.verified = True
+                            email_address.save()
+                            user.email_verified = True
+                            user.save(update_fields=['email_verified'])
+                            logger.info(
+                                f"SIGNAL (pre_social_login): Marked email as verified BEFORE login: {email}"
+                            )
+                        except User.DoesNotExist:
+                            # User doesn't exist yet, will be handled in save_user
+                            pass
+            except Exception as e:
+                logger.error(f"Failed to mark email as verified in pre_social_login: {str(e)}", exc_info=True)
+    except ImportError:
+        pass
 

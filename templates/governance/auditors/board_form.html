@@ -1,0 +1,58 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Create Board of Auditors" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Create Board of Auditors" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <form method="post" class="governance-card">
+        {% csrf_token %}
+        <div class="space-y-6">
+            <div>
+                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.name.label }} *
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}<p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="{{ form.term_start.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.term_start.label }} *
+                    </label>
+                    {{ form.term_start }}
+                    {% if form.term_start.errors %}<p class="mt-1 text-sm text-red-600">{{ form.term_start.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.term_end.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.term_end.label }} *
+                    </label>
+                    {{ form.term_end }}
+                    {% if form.term_end.errors %}<p class="mt-1 text-sm text-red-600">{{ form.term_end.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+            <div>
+                <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.status.label }}
+                </label>
+                {{ form.status }}
+                {% if form.status.errors %}<p class="mt-1 text-sm text-red-600">{{ form.status.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.notes.label }}
+                </label>
+                {{ form.notes }}
+                {% if form.notes.errors %}<p class="mt-1 text-sm text-red-600">{{ form.notes.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="mt-6 flex items-center justify-end space-x-4">
+            <a href="{% url 'governance:board_of_auditors_list' %}" class="btn-secondary">{% trans "Cancel" %}</a>
+            <button type="submit" class="btn-primary">{% trans "Create Board" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,52 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Board of Auditors" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Board of Auditors" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{% trans "Board of Auditors" %}</h2>
+        <p class="text-sm text-gray-600 mt-1">{% trans "Financial oversight and audit management" %}</p>
+    </div>
+    {% if perms.governance.manage_assembly %}
+    <a href="{% url 'governance:board_of_auditors_create' %}" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {% trans "Create Board" %}
+    </a>
+    {% endif %}
+</div>
+
+{% if boards %}
+<div class="space-y-4">
+    {% for board in boards %}
+    <div class="governance-card hover:shadow-lg transition-shadow">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ board.name }}</h3>
+                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                    <span>{% trans "Term" %}: {{ board.term_start|date:"d M Y" }} - {{ board.term_end|date:"d M Y" }}</span>
+                    <span class="px-3 py-1 rounded text-xs font-semibold {% if board.status == 'active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ board.get_status_display }}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-600">{{ board.members.count }} {% trans "members" %}</p>
+            </div>
+            <a href="{% url 'governance:board_of_auditors_detail' board.pk %}" class="btn-secondary ml-4">
+                {% trans "View" %}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p class="text-gray-500">{% trans "No boards of auditors found" %}</p>
+</div>
+{% endif %}
+{% endblock %}
+

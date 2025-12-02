@@ -1,0 +1,68 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Apply Disciplinary Sanction" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Apply Disciplinary Sanction" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <div class="governance-card mb-6">
+        <h3 class="text-lg font-semibold mb-2">{% trans "Sanction Scale" %}</h3>
+        <ul class="list-disc list-inside space-y-1 text-sm text-gray-700">
+            <li>{% trans "Request for Explanation" %} - {% trans "Forum confusion" %}</li>
+            <li>{% trans "Warning" %} - {% trans "Public insult, Non-compliance" %}</li>
+            <li>{% trans "Blame" %} - {% trans "Assault and battery" %}</li>
+            <li>{% trans "Exclusion" %} - {% trans "Repeated violations" %}</li>
+        </ul>
+    </div>
+
+    <form method="post" class="governance-card">
+        {% csrf_token %}
+        <div class="space-y-6">
+            <div>
+                <label for="{{ form.case.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.case.label }} *
+                </label>
+                {{ form.case }}
+                {% if form.case.errors %}<p class="mt-1 text-sm text-red-600">{{ form.case.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.sanction_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.sanction_type.label }} *
+                </label>
+                {{ form.sanction_type }}
+                {% if form.sanction_type.errors %}<p class="mt-1 text-sm text-red-600">{{ form.sanction_type.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="{{ form.applied_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.applied_date.label }} *
+                    </label>
+                    {{ form.applied_date }}
+                    {% if form.applied_date.errors %}<p class="mt-1 text-sm text-red-600">{{ form.applied_date.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.expiration_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.expiration_date.label }}
+                    </label>
+                    {{ form.expiration_date }}
+                    {% if form.expiration_date.errors %}<p class="mt-1 text-sm text-red-600">{{ form.expiration_date.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+            <div>
+                <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.notes.label }}
+                </label>
+                {{ form.notes }}
+                {% if form.notes.errors %}<p class="mt-1 text-sm text-red-600">{{ form.notes.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="mt-6 flex items-center justify-end space-x-4">
+            <a href="{% url 'governance:disciplinary_case_list' %}" class="btn-secondary">{% trans "Cancel" %}</a>
+            <button type="submit" class="btn-primary">{% trans "Apply Sanction" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

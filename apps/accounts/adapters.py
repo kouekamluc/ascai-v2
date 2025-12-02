@@ -444,6 +444,53 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         # For regular users, use default behavior
         return super().is_email_verified(request, email_address)
     
+    def is_open_for_signup(self, request):
+        """
+        Allow signup by default.
+        """
+        return True
+    
+    def respond_email_verification_sent(self, request, user):
+        """
+        Override to prevent email verification redirect for Google OAuth users.
+        This is called by allauth when it wants to redirect to email verification.
+        For Google OAuth users, we skip this and redirect to dashboard instead.
+        """
+        # Check if user has a Google social account
+        from allauth.socialaccount.models import SocialAccount
+        has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+        
+        if has_google_account:
+            # For Google OAuth users, mark email as verified and redirect to dashboard
+            if user.email:
+                EmailAddress.objects.update_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={
+                        'verified': True,
+                        'primary': True
+                    }
+                )
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.info(f"BYPASSED email verification for Google OAuth user: {user.email}")
+            
+            # Redirect to dashboard instead of email verification page
+            from django.shortcuts import redirect
+            from django.conf import settings
+            from django.utils.translation import get_language
+            
+            if user.is_approved or user.is_superuser:
+                current_language = get_language()
+                if current_language != settings.LANGUAGE_CODE:
+                    return redirect(f'/{current_language}/dashboard/')
+                return redirect('/dashboard/')
+            else:
+                return redirect('/')
+        
+        # For regular users, use default behavior (show email verification page)
+        return super().respond_email_verification_sent(request, user)
+    
     
     def get_login_redirect_url(self, request):
         """
@@ -667,15 +714,16 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             except User.DoesNotExist:
                 pass
         
+        # Call super to create/link the user
         user = super().save_user(request, sociallogin, form)
         
         # Check if this is a new user or an existing user being linked
         is_new_user = existing_user is None
         
         # CRITICAL: Mark email as verified IMMEDIATELY for ALL Google OAuth users
-        # This must happen BEFORE allauth checks for email verification
+        # This must happen IMMEDIATELY after user is created, before allauth checks
         if user.email:
-            # Mark as verified in EmailAddress FIRST - this is what allauth checks
+            # Force mark as verified in EmailAddress - this is what allauth checks
             email_address, created = EmailAddress.objects.update_or_create(
                 user=user,
                 email=user.email,
@@ -684,15 +732,17 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                     'primary': True
                 }
             )
+            # Force save to ensure it's persisted
+            email_address.verified = True
+            email_address.save()
+            
             logger.info(
                 f"CRITICAL: Marked EmailAddress as verified for Google OAuth user: {user.email} "
                 f"(created={created}, verified={email_address.verified})"
             )
             
             # Also mark in User model
-            if not user.email_verified:
-                user.email_verified = True
-                logger.info(f"Marked user.email_verified=True for Google OAuth user: {user.email}")
+            user.email_verified = True
         
         if is_new_user:
             # New user signup - set defaults and require approval
@@ -704,29 +754,44 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             # Set approval status for new users
             user.is_approved = False
             user.is_active = True
-            
-            logger.info(
-                f"New user created via Google OAuth: {user.username} ({user.email}) "
-                f"with is_approved=False, is_active=True, email_verified=True"
-            )
-        else:
-            # Existing user linking/signing in with Google account
-            logger.info(
-                f"Existing user linked Google account: {user.username} ({user.email if user.email else 'no email'})"
-            )
         
-        # Save user with all updates
+        # Save user with all updates (including email_verified=True)
         user.save()
         
-        # Double-check email is verified after save
+        # CRITICAL: Double-check and force email verification after save
+        # This ensures it's verified even if something reset it
         if user.email:
             email_address = EmailAddress.objects.filter(user=user, email=user.email).first()
-            if email_address and not email_address.verified:
-                email_address.verified = True
-                email_address.save()
-                logger.warning(
-                    f"EmailAddress was not verified after save_user, fixed it: {user.email}"
+            if email_address:
+                if not email_address.verified:
+                    email_address.verified = True
+                    email_address.save()
+                    logger.warning(
+                        f"EmailAddress was not verified after save_user, FORCED verification: {user.email}"
+                    )
+            else:
+                # EmailAddress doesn't exist, create it as verified
+                EmailAddress.objects.create(
+                    user=user,
+                    email=user.email,
+                    verified=True,
+                    primary=True
                 )
+                logger.warning(
+                    f"EmailAddress didn't exist after save_user, CREATED as verified: {user.email}"
+                )
+            
+            # Ensure user.email_verified is also True
+            if not user.email_verified:
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.warning(f"user.email_verified was False, FORCED to True: {user.email}")
+        
+        logger.info(
+            f"Google OAuth user saved: {user.username} ({user.email}) - "
+            f"email_verified={user.email_verified}, "
+            f"EmailAddress.verified={EmailAddress.objects.filter(user=user, email=user.email).first().verified if user.email else 'N/A'}"
+        )
         
         return user
     
