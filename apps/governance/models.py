@@ -1259,6 +1259,10 @@ class Election(models.Model):
         ('cancelled', _('Cancelled')),
     ]
     
+    ELECTION_TYPE_CHOICES = [
+        ('executive_board', _('Executive Board')),
+    ]
+    
     commission = models.ForeignKey(
         ElectoralCommission,
         on_delete=models.SET_NULL,
@@ -1269,6 +1273,7 @@ class Election(models.Model):
     
     election_type = models.CharField(
         max_length=50,
+        choices=ELECTION_TYPE_CHOICES,
         default='executive_board',
         verbose_name=_('Election Type'),
         help_text=_('Currently only Executive Board elections')
