@@ -16,6 +16,23 @@ class TicketReplyInline(admin.TabularInline):
     extra = 0
     readonly_fields = ['author', 'created_at']
     fields = ['author', 'message', 'is_admin_reply', 'created_at']
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        """Override formset to handle author field for new instances."""
+        formset = super().get_formset(request, obj, **kwargs)
+        user = request.user
+        
+        class TicketReplyFormset(formset):
+            def save_new(self, form, commit=True):
+                """Set author and is_admin_reply for new replies."""
+                instance = super().save_new(form, commit=False)
+                instance.author = user
+                instance.is_admin_reply = True
+                if commit:
+                    instance.save()
+                return instance
+        
+        return TicketReplyFormset
 
 
 @admin.register(SupportTicket)
@@ -45,14 +62,11 @@ class SupportTicketAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
     
     def save_formset(self, request, form, formset, change):
-        """Set is_admin_reply to True for admin replies created via inline."""
-        instances = formset.save(commit=False)
-        for instance in instances:
-            if not instance.pk:  # New reply
-                instance.author = request.user
-                instance.is_admin_reply = True
-            instance.save()
-        formset.save_m2m()
+        """Handle formset saving - author is set in formset's save_new method."""
+        formset.save()
+        # Delete removed instances
+        for obj in formset.deleted_objects:
+            obj.delete()
 
 
 @admin.register(TicketReply)
