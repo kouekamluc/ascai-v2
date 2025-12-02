@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 # Import allauth signals if available
 try:
     from allauth.account.signals import email_confirmed, email_address_verified
+    from allauth.socialaccount.signals import social_account_added, pre_social_login
+    from allauth.account.models import EmailAddress
     ALLAUTH_AVAILABLE = True
 except ImportError:
     ALLAUTH_AVAILABLE = False
@@ -168,4 +170,34 @@ if ALLAUTH_AVAILABLE:
                 logger.info(f"Updated email_verified=True for user {user.username} via email_address_verified signal")
         except Exception as e:
             logger.error(f"Failed to update email_verified via email_address_verified signal: {str(e)}", exc_info=True)
+    
+    @receiver(social_account_added)
+    def mark_email_verified_for_social_account(sender, request, sociallogin, **kwargs):
+        """
+        Mark email as verified when a social account (Google OAuth) is added.
+        This ensures Google OAuth users don't need to verify their email.
+        """
+        try:
+            if sociallogin.account.provider == 'google':
+                user = sociallogin.user
+                if user and user.email:
+                    # Mark email as verified in EmailAddress
+                    email_address, created = EmailAddress.objects.update_or_create(
+                        user=user,
+                        email=user.email,
+                        defaults={
+                            'verified': True,
+                            'primary': True
+                        }
+                    )
+                    # Mark in User model
+                    if not user.email_verified:
+                        user.email_verified = True
+                        user.save(update_fields=['email_verified'])
+                    logger.info(
+                        f"SIGNAL: Marked email as verified for Google OAuth user: {user.email} "
+                        f"(email_address created={created}, verified={email_address.verified})"
+                    )
+        except Exception as e:
+            logger.error(f"Failed to mark email as verified for social account: {str(e)}", exc_info=True)
 

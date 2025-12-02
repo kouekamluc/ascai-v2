@@ -1529,15 +1529,11 @@ def propose_agenda_item(request):
             assembly = form.cleaned_data['assembly']
             proposal_date = form.cleaned_data['proposal_date']
             
-            # Check 14-day requirement
-            if assembly.date:
-                notice_days = (assembly.date.date() - proposal_date).days
-                if notice_days < 14:
-                    messages.error(
-                        request,
-                        _('Agenda items must be proposed at least 14 days before the assembly (Article 22).')
-                    )
-                    return redirect('governance:assembly_list')
+            # Check 14-day requirement using utility
+            deadline_check = check_agenda_item_proposal_deadline(assembly, proposal_date)
+            if not deadline_check['compliant']:
+                messages.error(request, deadline_check['message'])
+                return redirect('governance:assembly_list')
             
             form.instance.proposed_by = request.user
             form.instance.status = 'proposed'
@@ -1552,6 +1548,9 @@ def propose_agenda_item(request):
         assembly_id = request.GET.get('assembly')
         if assembly_id:
             form.fields['assembly'].initial = assembly_id
+            # Pre-fill proposal date as today
+            from datetime import date
+            form.fields['proposal_date'].initial = date.today()
     
     return render(request, 'governance/assemblies/propose_agenda_item.html', {'form': form})
 

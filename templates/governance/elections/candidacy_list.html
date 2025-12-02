@@ -1,0 +1,118 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Candidacies" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Candidacies" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{% trans "Candidacies" %}</h2>
+        <p class="text-sm text-gray-600 mt-1">{% trans "Candidate applications for elections" %}</p>
+    </div>
+    <a href="{% url 'governance:candidacy_apply' %}" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {% trans "Apply for Candidacy" %}
+    </a>
+</div>
+
+{% if candidacies %}
+<div class="space-y-4">
+    {% for candidacy in candidacies %}
+    <div class="governance-card hover:shadow-lg transition-shadow">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex items-center space-x-3 mb-2">
+                    <h3 class="text-lg font-bold text-gray-900">{{ candidacy.candidate.get_display_name }}</h3>
+                    <span class="px-3 py-1 rounded text-xs font-semibold
+                        {% if candidacy.status == 'approved' %}bg-green-100 text-green-800
+                        {% elif candidacy.status == 'rejected' %}bg-red-100 text-red-800
+                        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {{ candidacy.get_status_display }}
+                    </span>
+                </div>
+                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                    <span><strong>{% trans "Position" %}:</strong> {{ candidacy.get_position_display }}</span>
+                    <span><strong>{% trans "Election" %}:</strong> {{ candidacy.election.get_election_type_display }}</span>
+                    <span><strong>{% trans "Applied" %}:</strong> {{ candidacy.application_date|date:"d M Y" }}</span>
+                </div>
+                <div class="flex items-center space-x-4 text-xs text-gray-500">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1 {% if candidacy.seniority_verified %}text-green-600{% else %}text-red-600{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {% trans "Seniority" %}
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1 {% if candidacy.lazio_residence_verified %}text-green-600{% else %}text-red-600{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {% trans "Lazio Residence" %}
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1 {% if candidacy.cameroonian_origin_verified %}text-green-600{% else %}text-red-600{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {% trans "Cameroonian Origin" %}
+                    </span>
+                </div>
+            </div>
+            {% if perms.governance.manage_elections and candidacy.status == 'pending' %}
+            <div class="ml-4 flex space-x-2">
+                <form method="post" action="{% url 'governance:approve_candidacy' candidacy.pk %}" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="approve">
+                    <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                        {% trans "Approve" %}
+                    </button>
+                </form>
+                <form method="post" action="{% url 'governance:approve_candidacy' candidacy.pk %}" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="reject">
+                    <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                        {% trans "Reject" %}
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="mt-6 flex items-center justify-center">
+    <nav class="flex space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+            {% trans "Previous" %}
+        </a>
+        {% endif %}
+        <span class="px-4 py-2 bg-cameroon-green text-white rounded-lg">
+            {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+            {% trans "Next" %}
+        </a>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+    </svg>
+    <p class="text-gray-500">{% trans "No candidacies found" %}</p>
+    <a href="{% url 'governance:candidacy_apply' %}" class="mt-4 btn-primary">
+        {% trans "Apply for Candidacy" %}
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+

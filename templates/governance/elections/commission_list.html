@@ -1,0 +1,105 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Electoral Commissions" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Electoral Commissions" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{% trans "Electoral Commissions" %}</h2>
+        <p class="text-sm text-gray-600 mt-1">{% trans "Manage electoral commissions for elections" %}</p>
+    </div>
+    {% if perms.governance.manage_assembly %}
+    <a href="{% url 'governance:electoral_commission_create' %}" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {% trans "Create Commission" %}
+    </a>
+    {% endif %}
+</div>
+
+{% if commissions %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for commission in commissions %}
+    <div class="governance-card hover:shadow-lg transition-shadow">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 mb-1">{{ commission.name }}</h3>
+                <p class="text-sm text-gray-600">
+                    <span class="px-2 py-1 rounded text-xs font-semibold {% if commission.status == 'active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ commission.get_status_display }}
+                    </span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="space-y-2 mb-4">
+            <div class="flex items-center text-sm text-gray-600">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>{% trans "Start" %}: {{ commission.start_date|date:"d M Y" }}</span>
+            </div>
+            {% if commission.end_date %}
+            <div class="flex items-center text-sm text-gray-600">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>{% trans "End" %}: {{ commission.end_date|date:"d M Y" }}</span>
+            </div>
+            {% endif %}
+            <div class="flex items-center text-sm text-gray-600">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span>{{ commission.members.count }} {% trans "members" %}</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+            <a href="{% url 'governance:electoral_commission_detail' commission.pk %}" class="text-sm font-medium text-cameroon-green hover:text-cameroon-green/80 hover:underline">
+                {% trans "View Details" %} →
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="mt-6 flex items-center justify-center">
+    <nav class="flex space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+            {% trans "Previous" %}
+        </a>
+        {% endif %}
+        <span class="px-4 py-2 bg-cameroon-green text-white rounded-lg">
+            {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+            {% trans "Next" %}
+        </a>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+    </svg>
+    <p class="text-gray-500">{% trans "No electoral commissions found" %}</p>
+    {% if perms.governance.manage_assembly %}
+    <a href="{% url 'governance:electoral_commission_create' %}" class="mt-4 btn-primary">
+        {% trans "Create First Commission" %}
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+

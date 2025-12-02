@@ -1,0 +1,84 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ commission.name }} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{{ commission.name }}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+        <div class="governance-card mb-6">
+            <h3 class="text-lg font-semibold mb-4">{% trans "Commission Information" %}</h3>
+            <dl class="grid grid-cols-2 gap-4">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Status" %}</dt>
+                    <dd class="mt-1">
+                        <span class="px-3 py-1 rounded text-sm font-semibold {% if commission.status == 'active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ commission.get_status_display }}
+                        </span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Start Date" %}</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ commission.start_date|date:"d M Y" }}</dd>
+                </div>
+                {% if commission.end_date %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "End Date" %}</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ commission.end_date|date:"d M Y" }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+            {% if commission.notes %}
+            <div class="mt-4">
+                <dt class="text-sm font-medium text-gray-500 mb-2">{% trans "Notes" %}</dt>
+                <dd class="text-sm text-gray-700">{{ commission.notes|linebreaks }}</dd>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="governance-card">
+            <h3 class="text-lg font-semibold mb-4">{% trans "Commission Members" %}</h3>
+            {% if members %}
+            <div class="space-y-3">
+                {% for member in members %}
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-cameroon-green/20 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-cameroon-green font-semibold">{{ member.user.username|first|upper }}</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ member.user.get_display_name }}</p>
+                            <p class="text-sm text-gray-600">{{ member.get_role_display }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-gray-500 text-center py-8">{% trans "No members assigned" %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="governance-card mb-6">
+            <h3 class="text-lg font-semibold mb-4">{% trans "Related Elections" %}</h3>
+            {% if elections %}
+            <div class="space-y-3">
+                {% for election in elections %}
+                <a href="{% url 'governance:election_detail' election.pk %}" class="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <p class="font-semibold text-gray-900 text-sm">{{ election.get_election_type_display }}</p>
+                    <p class="text-xs text-gray-600 mt-1">{{ election.start_date|date:"d M Y" }}</p>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-gray-500 text-center py-8 text-sm">{% trans "No elections yet" %}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

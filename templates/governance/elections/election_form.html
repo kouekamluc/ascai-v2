@@ -1,0 +1,89 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Create Election" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Create Election" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <form method="post" class="governance-card">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            <div>
+                <label for="{{ form.commission.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.commission.label }}
+                </label>
+                {{ form.commission }}
+                {% if form.commission.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.commission.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.election_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.election_type.label }}
+                </label>
+                {{ form.election_type }}
+                {% if form.election_type.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.election_type.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="{{ form.start_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.start_date.label }}
+                    </label>
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.start_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.end_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.end_date.label }}
+                    </label>
+                    {{ form.end_date }}
+                    {% if form.end_date.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.end_date.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500">{% trans "Must be within 90 days of start date" %}</p>
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.status.label }}
+                </label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.status.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.notes.label }}
+                </label>
+                {{ form.notes }}
+                {% if form.notes.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.notes.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-end space-x-4">
+            <a href="{% url 'governance:election_list' %}" class="btn-secondary">
+                {% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn-primary">
+                {% trans "Create Election" %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
