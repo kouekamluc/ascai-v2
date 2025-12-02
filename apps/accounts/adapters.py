@@ -669,8 +669,16 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def populate_user(self, request, sociallogin, data):
         """
         Populate user fields from Google OAuth data.
+        CRITICAL: Mark email addresses in sociallogin as verified BEFORE allauth processes them.
         """
         user = super().populate_user(request, sociallogin, data)
+        
+        # CRITICAL: Mark all email addresses in sociallogin as verified BEFORE allauth checks
+        # This ensures allauth knows the email is already verified and won't require verification
+        if sociallogin.account.provider == 'google':
+            for email_address in sociallogin.email_addresses:
+                email_address.verified = True
+                logger.info(f"POPULATE_USER: Marked email in sociallogin as verified: {email_address.email}")
         
         # Extract name from Google profile
         if not user.username:
@@ -844,6 +852,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         
         return True
     
+    
     def get_login_redirect_url(self, request):
         """
         Redirect Google OAuth users directly to dashboard after login.
@@ -853,14 +862,26 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         if request.user.is_authenticated:
             user = request.user
             
-            # For Google OAuth users, ensure email is verified and redirect to dashboard
-            # Google emails are pre-verified, so we can skip email confirmation
-            if user.email_verified or EmailAddress.objects.filter(
-                user=user, 
-                email=user.email, 
-                verified=True
-            ).exists():
-                # Redirect to dashboard if user is approved, otherwise home
+            # Check if user has a Google social account
+            from allauth.socialaccount.models import SocialAccount
+            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+            
+            if has_google_account:
+                # For Google OAuth users, ensure email is verified and redirect to dashboard
+                if user.email:
+                    EmailAddress.objects.update_or_create(
+                        user=user,
+                        email=user.email,
+                        defaults={
+                            'verified': True,
+                            'primary': True
+                        }
+                    )
+                    if not user.email_verified:
+                        user.email_verified = True
+                        user.save(update_fields=['email_verified'])
+                
+                # Redirect to dashboard if approved, otherwise home
                 if user.is_approved or user.is_superuser:
                     from django.conf import settings
                     from django.utils.translation import get_language
@@ -873,6 +894,22 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 else:
                     # User not approved yet, redirect to home
                     return '/'
+            
+            # For regular users, check email verification
+            # If email is verified, redirect to dashboard
+            if user.email_verified or EmailAddress.objects.filter(
+                user=user,
+                email=user.email,
+                verified=True
+            ).exists():
+                if user.is_approved or user.is_superuser:
+                    from django.conf import settings
+                    from django.utils.translation import get_language
+                    
+                    current_language = get_language()
+                    if current_language != settings.LANGUAGE_CODE:
+                        return f'/{current_language}/dashboard/'
+                    return '/dashboard/'
         
         # Fallback to default behavior - check if method exists in parent
         try:
