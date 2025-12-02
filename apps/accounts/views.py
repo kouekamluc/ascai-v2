@@ -12,9 +12,15 @@ from django.conf import settings
 from django.http import JsonResponse
 from allauth.account.views import ConfirmEmailView, EmailVerificationSentView
 from allauth.account.models import EmailConfirmation, EmailAddress
-from allauth.socialaccount.views import SignupView as SocialSignupView, OAuthCallbackView
+from allauth.socialaccount.views import SignupView as SocialSignupView
 from allauth.socialaccount.views import ConnectionsView
 from allauth.socialaccount.models import SocialAccount
+
+# Try to import OAuthCallbackView if available (may not exist in all allauth versions)
+try:
+    from allauth.socialaccount.views import OAuthCallbackView
+except ImportError:
+    OAuthCallbackView = None
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from .models import User
 import logging
@@ -453,56 +459,60 @@ class CustomConnectionsView(ConnectionsView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class CustomOAuthCallbackView(OAuthCallbackView):
-    """
-    Custom OAuth callback view that bypasses email verification for Google OAuth users.
-    This intercepts the OAuth callback and ensures email verification is skipped.
-    """
-    def dispatch(self, request, *args, **kwargs):
+# CustomOAuthCallbackView is only defined if OAuthCallbackView is available
+# This class is currently not used in URLs, but kept for potential future use
+if OAuthCallbackView:
+    class CustomOAuthCallbackView(OAuthCallbackView):
         """
-        Override dispatch to handle Google OAuth callbacks and bypass email verification.
+        Custom OAuth callback view that bypasses email verification for Google OAuth users.
+        This intercepts the OAuth callback and ensures email verification is skipped.
+        Note: This class is not currently used in URLs.
         """
-        # Get the provider from the request
-        provider = kwargs.get('provider', '')
-        
-        # For Google OAuth, mark email as verified before processing
-        if provider == 'google':
-            logger.info(f"CUSTOM OAUTH CALLBACK: Intercepting Google OAuth callback")
-        
-        # Call parent dispatch to process the callback
-        response = super().dispatch(request, *args, **kwargs)
-        
-        # After callback processing, if user is authenticated and has Google account,
-        # ensure email is verified and redirect appropriately
-        if request.user.is_authenticated and provider == 'google':
-            user = request.user
-            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+        def dispatch(self, request, *args, **kwargs):
+            """
+            Override dispatch to handle Google OAuth callbacks and bypass email verification.
+            """
+            # Get the provider from the request
+            provider = kwargs.get('provider', '')
             
-            if has_google_account and user.email:
-                # Force mark email as verified
-                EmailAddress.objects.update_or_create(
-                    user=user,
-                    email=user.email,
-                    defaults={
-                        'verified': True,
-                        'primary': True
-                    }
-                )
-                user.email_verified = True
-                user.save(update_fields=['email_verified'])
-                logger.info(f"CUSTOM OAUTH CALLBACK: Marked email as verified for Google OAuth user: {user.email}")
+            # For Google OAuth, mark email as verified before processing
+            if provider == 'google':
+                logger.info(f"CUSTOM OAUTH CALLBACK: Intercepting Google OAuth callback")
+            
+            # Call parent dispatch to process the callback
+            response = super().dispatch(request, *args, **kwargs)
+            
+            # After callback processing, if user is authenticated and has Google account,
+            # ensure email is verified and redirect appropriately
+            if request.user.is_authenticated and provider == 'google':
+                user = request.user
+                has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
                 
-                # If response is a redirect to email verification, redirect to dashboard instead
-                if hasattr(response, 'url') and 'confirm-email' in response.url:
-                    if user.is_approved or user.is_superuser:
-                        current_language = get_language()
-                        if current_language != settings.LANGUAGE_CODE:
-                            return redirect(f'/{current_language}/dashboard/')
-                        return redirect('/dashboard/')
-                    else:
-                        return redirect('/')
-        
-        return response
+                if has_google_account and user.email:
+                    # Force mark email as verified
+                    EmailAddress.objects.update_or_create(
+                        user=user,
+                        email=user.email,
+                        defaults={
+                            'verified': True,
+                            'primary': True
+                        }
+                    )
+                    user.email_verified = True
+                    user.save(update_fields=['email_verified'])
+                    logger.info(f"CUSTOM OAUTH CALLBACK: Marked email as verified for Google OAuth user: {user.email}")
+                    
+                    # If response is a redirect to email verification, redirect to dashboard instead
+                    if hasattr(response, 'url') and 'confirm-email' in response.url:
+                        if user.is_approved or user.is_superuser:
+                            current_language = get_language()
+                            if current_language != settings.LANGUAGE_CODE:
+                                return redirect(f'/{current_language}/dashboard/')
+                            return redirect('/dashboard/')
+                        else:
+                            return redirect('/')
+            
+            return response
 
 
 def email_verification_required_view(request):
