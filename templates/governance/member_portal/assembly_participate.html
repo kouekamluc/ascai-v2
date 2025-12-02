@@ -123,11 +123,20 @@
         <div class="p-4 border border-gray-200 rounded-lg">
             <div class="flex items-center justify-between mb-3">
                 <h4 class="font-semibold text-gray-900">{{ vote.question }}</h4>
-                {% if vote.is_published %}
-                <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-                    {% trans "Published" %}
-                </span>
-                {% endif %}
+                <div class="flex items-center space-x-2">
+                    <span class="px-3 py-1 text-xs rounded font-medium {% if vote.voting_method == 'secret_ballot' %}bg-purple-100 text-purple-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                        {% if vote.voting_method == 'secret_ballot' %}
+                            🔒 {% trans "Secret Ballot" %}
+                        {% else %}
+                            ✋ {% trans "Show of Hands" %}
+                        {% endif %}
+                    </span>
+                    {% if vote.is_published %}
+                    <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                        {% trans "Published" %}
+                    </span>
+                    {% endif %}
+                </div>
             </div>
             
             {% if vote.agenda_item %}
@@ -154,6 +163,11 @@
                 {% elif can_vote and member and member.is_active_member %}
                 <form method="post" action="{% url 'governance:cast_vote' vote.pk %}" class="mb-4">
                     {% csrf_token %}
+                    {% if vote.voting_method == 'secret_ballot' %}
+                    <p class="text-sm text-gray-600 mb-3">{% trans "This is a secret ballot vote. Your choice will be kept confidential." %}</p>
+                    {% else %}
+                    <p class="text-sm text-gray-600 mb-3">{% trans "This is a show of hands vote. Your choice will be visible to all members." %}</p>
+                    {% endif %}
                     <p class="text-sm text-gray-600 mb-3">{% trans "Cast your vote:" %}</p>
                     <div class="grid grid-cols-3 gap-3">
                         <button type="submit" name="choice" value="yes" class="p-3 bg-green-50 border-2 border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-colors">

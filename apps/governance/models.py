@@ -757,7 +757,8 @@ class AssemblyVote(models.Model):
         max_length=20,
         choices=VOTING_METHOD_CHOICES,
         default='show_of_hands',
-        verbose_name=_('Voting Method')
+        verbose_name=_('Voting Method'),
+        help_text=_('Article 36: Show of hands for resolutions, secret ballot for elections')
     )
     
     question = models.TextField(

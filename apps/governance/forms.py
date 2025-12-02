@@ -165,7 +165,7 @@ class AssemblyAttendanceForm(forms.ModelForm):
 
 
 class AssemblyVoteForm(forms.ModelForm):
-    """Form for recording assembly votes."""
+    """Form for recording assembly votes (Article 36 - show of hands for resolutions, secret ballot for elections)."""
     
     class Meta:
         model = AssemblyVote
@@ -181,6 +181,23 @@ class AssemblyVoteForm(forms.ModelForm):
         self.fields['assembly'].required = True
         # Make agenda_item optional
         self.fields['agenda_item'].required = False
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        vote_type = cleaned_data.get('vote_type')
+        voting_method = cleaned_data.get('voting_method')
+        
+        # Article 36: Elections must use secret ballot
+        if vote_type == 'election' and voting_method != 'secret_ballot':
+            raise forms.ValidationError(
+                _('Elections must use secret ballot voting method (Article 36).')
+            )
+        
+        # Article 36: Resolutions default to show of hands
+        if vote_type == 'resolution' and not voting_method:
+            cleaned_data['voting_method'] = 'show_of_hands'
+        
+        return cleaned_data
 
 
 class FinancialTransactionForm(forms.ModelForm):
