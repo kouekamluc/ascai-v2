@@ -206,23 +206,70 @@ if ALLAUTH_AVAILABLE:
         except Exception as e:
             logger.error(f"Failed to mark email as verified for social account: {str(e)}", exc_info=True)
     
+    # Also handle the pre_social_login signal more aggressively
+    try:
+        from allauth.socialaccount.signals import pre_social_login
+        @receiver(pre_social_login)
+        def force_email_verified_before_social_login(sender, request, sociallogin, **kwargs):
+            """
+            CRITICAL: Force email to be verified BEFORE allauth processes the social login.
+            This ensures allauth sees the email as verified and doesn't redirect to verification page.
+            """
+            try:
+                if sociallogin.account.provider == 'google':
+                    email = sociallogin.account.extra_data.get('email')
+                    if email:
+                        # Mark all email addresses in sociallogin as verified
+                        for email_address in sociallogin.email_addresses:
+                            email_address.verified = True
+                            logger.info(f"SIGNAL (pre_social_login): FORCED email verified in sociallogin: {email_address.email}")
+                        
+                        # If user exists, mark email as verified in database immediately
+                        try:
+                            user = User.objects.get(email=email)
+                            EmailAddress.objects.update_or_create(
+                                user=user,
+                                email=email,
+                                defaults={
+                                    'verified': True,
+                                    'primary': True
+                                }
+                            )
+                            user.email_verified = True
+                            user.save(update_fields=['email_verified'])
+                            logger.info(f"SIGNAL (pre_social_login): Marked email as verified for existing user: {email}")
+                        except User.DoesNotExist:
+                            # User will be created, email will be marked verified in save_user
+                            logger.info(f"SIGNAL (pre_social_login): User doesn't exist yet, will be created and verified")
+            except Exception as e:
+                logger.error(f"Failed to force email verification in pre_social_login: {str(e)}", exc_info=True)
+    except ImportError:
+        pass
+    
     # Also handle pre_social_login signal to mark email verified even earlier
     try:
         from allauth.socialaccount.signals import pre_social_login
         @receiver(pre_social_login)
         def mark_email_verified_before_social_login(sender, request, sociallogin, **kwargs):
             """
-            Mark email as verified BEFORE social login completes.
+            CRITICAL: Mark email as verified BEFORE social login completes.
             This ensures email is verified before allauth checks for verification.
+            This is the EARLIEST point we can intercept, before allauth processes the callback.
             """
             try:
                 if sociallogin.account.provider == 'google':
                     email = sociallogin.account.extra_data.get('email')
                     if email:
-                        # Check if user exists
+                        # CRITICAL: Mark all email addresses in sociallogin object as verified
+                        # This is what allauth checks during the callback
+                        for email_address in sociallogin.email_addresses:
+                            email_address.verified = True
+                            logger.info(f"SIGNAL (pre_social_login): FORCED email verified in sociallogin object: {email_address.email}")
+                        
+                        # Also check if user exists and mark in database
                         try:
                             user = User.objects.get(email=email)
-                            # Mark email as verified IMMEDIATELY
+                            # Mark email as verified IMMEDIATELY in database
                             email_address, created = EmailAddress.objects.update_or_create(
                                 user=user,
                                 email=email,
@@ -236,11 +283,12 @@ if ALLAUTH_AVAILABLE:
                             user.email_verified = True
                             user.save(update_fields=['email_verified'])
                             logger.info(
-                                f"SIGNAL (pre_social_login): Marked email as verified BEFORE login: {email}"
+                                f"SIGNAL (pre_social_login): Marked email as verified in database BEFORE login: {email}"
                             )
                         except User.DoesNotExist:
                             # User doesn't exist yet, will be handled in save_user
-                            pass
+                            # But we've already marked it as verified in sociallogin object
+                            logger.info(f"SIGNAL (pre_social_login): User doesn't exist yet, email marked as verified in sociallogin object")
             except Exception as e:
                 logger.error(f"Failed to mark email as verified in pre_social_login: {str(e)}", exc_info=True)
     except ImportError:
