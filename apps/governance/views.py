@@ -113,6 +113,17 @@ class MemberPortalView(LoginRequiredMixin, TemplateView):
             date__gte=timezone.now()
         ).prefetch_related('agenda_items', 'votes')
         
+        # Get active elections (for voting)
+        active_elections = Election.objects.filter(
+            status='in_progress'
+        ).order_by('-start_date')[:5]
+        
+        # Get upcoming elections
+        upcoming_elections = Election.objects.filter(
+            status='scheduled',
+            start_date__gte=timezone.now().date()
+        ).order_by('start_date')[:5]
+        
         context.update({
             'member': member,
             'current_dues': current_dues,
@@ -120,6 +131,8 @@ class MemberPortalView(LoginRequiredMixin, TemplateView):
             'upcoming_assemblies': upcoming_assemblies,
             'attendances': attendances,
             'assemblies_with_votes': assemblies_with_votes,
+            'active_elections': active_elections,
+            'upcoming_elections': upcoming_elections,
         })
         return context
 
@@ -1252,7 +1265,7 @@ class ElectoralCommissionDeleteView(AssemblyManagementRequiredMixin, DeleteView)
 
 
 class ElectionListView(GovernanceRequiredMixin, ListView):
-    """List elections."""
+    """List elections (admin view)."""
     model = Election
     template_name = 'governance/elections/election_list.html'
     context_object_name = 'elections'
@@ -1266,8 +1279,52 @@ class ElectionListView(GovernanceRequiredMixin, ListView):
         return queryset.order_by('-start_date')
 
 
-class ElectionDetailView(GovernanceRequiredMixin, DetailView):
-    """Election detail."""
+class MemberElectionListView(LoginRequiredMixin, ListView):
+    """List elections for members (public view)."""
+    model = Election
+    template_name = 'governance/member_portal/elections.html'
+    context_object_name = 'elections'
+    paginate_by = 20
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user is a member
+        if not hasattr(request.user, 'member_profile'):
+            messages.info(request, _('Please register as an ASCAI member to view elections.'))
+            return redirect('governance:member_register')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        queryset = Election.objects.select_related('commission').all()
+        status = self.request.GET.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset.order_by('-start_date')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Check voting eligibility for each election
+        election_eligibility = {}
+        for election in context['elections']:
+            if user.is_authenticated:
+                election_eligibility[election.id] = check_voting_eligibility(user, election=election)
+            else:
+                election_eligibility[election.id] = {'eligible': False, 'reason': _('You must be logged in to vote.')}
+        
+        context['election_eligibility'] = election_eligibility
+        
+        # Get member profile
+        try:
+            context['member'] = user.member_profile
+        except Member.DoesNotExist:
+            context['member'] = None
+        
+        return context
+
+
+class ElectionDetailView(LoginRequiredMixin, DetailView):
+    """Election detail - accessible to all logged-in users."""
     model = Election
     template_name = 'governance/elections/election_detail.html'
     context_object_name = 'election'
@@ -1276,7 +1333,12 @@ class ElectionDetailView(GovernanceRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         election = self.get_object()
         context['candidacies'] = election.candidacies.all().select_related('candidate').order_by('position')
-        context['votes'] = election.votes.all().select_related('voter', 'candidate')
+        
+        # Only show votes to admins or if election is completed
+        if self.request.user.is_staff or self.request.user.has_perm('governance.manage_elections') or election.status == 'completed':
+            context['votes'] = election.votes.all().select_related('voter', 'candidate')
+        else:
+            context['votes'] = ElectionVote.objects.none()  # Empty queryset for regular members
         
         # Calculate results using utility function
         context['results'] = calculate_election_results(election)

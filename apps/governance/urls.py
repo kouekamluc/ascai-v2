@@ -16,6 +16,7 @@ urlpatterns = [
     path('directory/', views.MemberDirectoryView.as_view(), name='member_directory'),
     path('my-dues/', views.MyDuesView.as_view(), name='my_dues'),
     path('my-dues/<int:dues_id>/request-payment/', views.request_dues_payment, name='request_dues_payment'),
+    path('elections/', views.MemberElectionListView.as_view(), name='member_elections'),
     path('assemblies/<int:pk>/participate/', views.AssemblyParticipationView.as_view(), name='assembly_participate'),
     path('assemblies/<int:assembly_id>/register-attendance/', views.register_attendance, name='register_attendance'),
     path('votes/<int:vote_id>/cast/', views.cast_vote, name='cast_vote'),
