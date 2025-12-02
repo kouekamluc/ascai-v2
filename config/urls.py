@@ -10,7 +10,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import set_language
 from config import admin as custom_admin
 from apps.core.views import HealthCheckView
-from apps.accounts.views import CustomConfirmEmailView, CustomEmailVerificationSentView
+from apps.accounts.views import CustomConfirmEmailView, CustomEmailVerificationSentView, email_verification_required_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -21,6 +21,8 @@ urlpatterns = [
     # Email confirmation URL (outside i18n_patterns so it works from email links without language prefix)
     # This is critical because email links don't have language prefixes
     path('accounts/confirm-email/<str:key>/', CustomConfirmEmailView.as_view(), name='account_confirm_email'),
+    # Intercept /accounts/confirm-email/ (without key) to bypass for Google OAuth users
+    path('accounts/confirm-email/', email_verification_required_view, name='account_email_verification_required'),
     # Override email verification sent view to bypass for Google OAuth users
     path('accounts/email-verification-sent/', CustomEmailVerificationSentView.as_view(), name='account_email_verification_sent'),
 ]

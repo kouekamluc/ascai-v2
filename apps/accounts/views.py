@@ -453,6 +453,48 @@ class CustomConnectionsView(ConnectionsView):
         return super().dispatch(request, *args, **kwargs)
 
 
+@login_required
+def email_verification_required_view(request):
+    """
+    View to handle /accounts/confirm-email/ route (without key).
+    This is called by allauth when email verification is required.
+    For Google OAuth users, we bypass email verification and redirect to dashboard.
+    """
+    user = request.user
+    # Check if user has a Google social account
+    has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+    
+    if has_google_account:
+        # For Google OAuth users, mark email as verified and redirect to dashboard
+        if user.email:
+            # Force mark email as verified
+            EmailAddress.objects.update_or_create(
+                user=user,
+                email=user.email,
+                defaults={
+                    'verified': True,
+                    'primary': True
+                }
+            )
+            user.email_verified = True
+            user.save(update_fields=['email_verified'])
+            logger.info(
+                f"EMAIL_VERIFICATION_REQUIRED_VIEW: Bypassed email verification for Google OAuth user: {user.email}"
+            )
+        
+        # Redirect to dashboard instead of showing email verification page
+        if user.is_approved or user.is_superuser:
+            current_language = get_language()
+            if current_language != settings.LANGUAGE_CODE:
+                return redirect(f'/{current_language}/dashboard/')
+            return redirect('/dashboard/')
+        else:
+            return redirect('/')
+    
+    # For regular users, redirect to email verification sent page
+    return redirect('account_email_verification_sent')
+
+
 class CustomEmailVerificationSentView(EmailVerificationSentView):
     """
     Custom email verification sent view that redirects Google OAuth users directly to dashboard.
