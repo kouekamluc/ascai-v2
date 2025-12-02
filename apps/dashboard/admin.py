@@ -43,6 +43,16 @@ class SupportTicketAdmin(admin.ModelAdmin):
             from django.utils import timezone
             obj.resolved_at = timezone.now()
         super().save_model(request, obj, form, change)
+    
+    def save_formset(self, request, form, formset, change):
+        """Set is_admin_reply to True for admin replies created via inline."""
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if not instance.pk:  # New reply
+                instance.author = request.user
+                instance.is_admin_reply = True
+            instance.save()
+        formset.save_m2m()
 
 
 @admin.register(TicketReply)
@@ -51,6 +61,13 @@ class TicketReplyAdmin(admin.ModelAdmin):
     list_filter = ['is_admin_reply', 'created_at']
     search_fields = ['message', 'ticket__subject', 'author__username']
     readonly_fields = ['ticket', 'author', 'created_at']
+    
+    def save_model(self, request, obj, form, change):
+        """Set is_admin_reply to True and author to current user for admin replies."""
+        if not change:  # New reply
+            obj.author = request.user
+            obj.is_admin_reply = True
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(CommunityGroup)

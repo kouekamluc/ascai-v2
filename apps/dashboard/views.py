@@ -378,6 +378,18 @@ class TicketReplyView(DashboardRequiredMixin, CreateView):
         self.ticket = get_object_or_404(SupportTicket, pk=kwargs['pk'], user=request.user)
         return super().dispatch(request, *args, **kwargs)
     
+    def get_context_data(self, **kwargs):
+        """Add ticket context for form error display."""
+        context = super().get_context_data(**kwargs)
+        context['ticket'] = self.ticket
+        context['replies'] = TicketReply.objects.filter(ticket=self.ticket).order_by('created_at')
+        # Use the form from context if available, otherwise create a new one
+        if 'form' not in context:
+            context['reply_form'] = self.get_form()
+        else:
+            context['reply_form'] = context['form']
+        return context
+    
     def form_valid(self, form):
         form.instance.ticket = self.ticket
         form.instance.author = self.request.user
@@ -388,6 +400,11 @@ class TicketReplyView(DashboardRequiredMixin, CreateView):
             self.ticket.save()
         messages.success(self.request, _('Your reply has been sent.'))
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        """Handle form validation errors by showing them in the ticket detail view."""
+        messages.error(self.request, _('Please correct the errors below.'))
+        return self.render_to_response(self.get_context_data(form=form))
     
     def get_success_url(self):
         return reverse_lazy('dashboard:ticket_detail', kwargs={'pk': self.ticket.pk})
