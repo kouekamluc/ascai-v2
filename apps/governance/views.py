@@ -1408,6 +1408,11 @@ class ElectionVoteView(LoginRequiredMixin, DetailView):
     template_name = 'governance/elections/vote.html'
     context_object_name = 'election'
     
+    def get_object(self, queryset=None):
+        """Override to handle election_id from URL instead of pk."""
+        election_id = self.kwargs.get('election_id') or self.kwargs.get('pk')
+        return get_object_or_404(Election, pk=election_id)
+    
     def dispatch(self, request, *args, **kwargs):
         election = self.get_object()
         if election.status != 'in_progress':
