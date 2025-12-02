@@ -809,26 +809,40 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         # Call super to create/link the user
         # This will call sociallogin.save() which creates EmailAddress via setup_user_email()
         # We need to catch any IntegrityError and handle it gracefully
+        from django.db import IntegrityError
         try:
             user = super().save_user(request, sociallogin, form)
-        except Exception as e:
+        except (IntegrityError, Exception) as e:
             # If there's an IntegrityError, it might be because EmailAddress already exists
-            # Try to get the user and continue
-            if 'duplicate key' in str(e).lower() or 'unique constraint' in str(e).lower():
-                logger.warning(f"IntegrityError during save_user, trying to recover: {e}")
+            # This can happen if a previous attempt partially succeeded
+            is_integrity_error = (
+                isinstance(e, IntegrityError) or
+                'duplicate key' in str(e).lower() or
+                'unique constraint' in str(e).lower() or
+                'IntegrityError' in str(type(e).__name__)
+            )
+            
+            if is_integrity_error:
+                logger.warning(f"IntegrityError during save_user (likely duplicate EmailAddress), recovering: {e}")
                 if email:
                     try:
+                        # Get the user that was created (or already exists)
                         user = User.objects.get(email=email)
-                        # Now update the EmailAddress
-                        email_address, _ = EmailAddress.objects.get_or_create(
+                        # Delete any existing EmailAddress to avoid duplicates
+                        EmailAddress.objects.filter(user=user, email=email).delete()
+                        # Create a fresh EmailAddress
+                        email_address = EmailAddress.objects.create(
                             user=user,
                             email=email,
-                            defaults={'verified': True, 'primary': True}
+                            verified=True,
+                            primary=True
                         )
-                        email_address.verified = True
-                        email_address.save()
-                        logger.info(f"Recovered from IntegrityError, updated EmailAddress for: {email}")
+                        logger.info(f"Recovered from IntegrityError, created fresh EmailAddress for: {email}")
                     except User.DoesNotExist:
+                        logger.error(f"User not found after IntegrityError for email: {email}")
+                        raise
+                    except Exception as recovery_error:
+                        logger.error(f"Error during recovery from IntegrityError: {recovery_error}")
                         raise
                 else:
                     raise
