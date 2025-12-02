@@ -107,10 +107,16 @@
             </p>
         </div>
         {% elif election.status == 'completed' %}
-        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-            <p class="text-gray-800">
-                <strong>{% trans "Election Completed" %}</strong> - {% trans "Results are available" %}
-            </p>
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="font-semibold text-green-900">{% trans "Election Completed" %}</p>
+                    <p class="text-sm text-green-700 mt-1">{% trans "Final results are now available" %}</p>
+                </div>
+                <a href="{% url 'governance:election_detail' election.pk %}" class="btn-primary text-sm">
+                    {% trans "View Results" %}
+                </a>
+            </div>
         </div>
         {% endif %}
         
@@ -120,7 +126,11 @@
             </a>
             {% if election.status == 'in_progress' and member and member.is_active_member %}
             <a href="{% url 'governance:election_vote' election_id=election.pk %}" class="btn-primary text-sm">
-                {% trans "Vote" %}
+                {% trans "Vote Now" %}
+            </a>
+            {% elif election.status == 'completed' %}
+            <a href="{% url 'governance:election_detail' election.pk %}" class="btn-primary text-sm">
+                {% trans "View Results" %}
             </a>
             {% endif %}
         </div>

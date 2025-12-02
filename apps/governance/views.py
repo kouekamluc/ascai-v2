@@ -1340,8 +1340,15 @@ class ElectionDetailView(LoginRequiredMixin, DetailView):
         else:
             context['votes'] = ElectionVote.objects.none()  # Empty queryset for regular members
         
-        # Calculate results using utility function
-        context['results'] = calculate_election_results(election)
+        # Calculate results - only show if election is completed or user is admin
+        # For regular members, only show results after election completion
+        if election.status == 'completed' or self.request.user.is_staff or self.request.user.has_perm('governance.manage_elections'):
+            context['results'] = calculate_election_results(election)
+            context['show_results'] = True
+        else:
+            # Don't show results during voting to maintain secrecy
+            context['results'] = {}
+            context['show_results'] = False
         
         # Check if user can vote
         if self.request.user.is_authenticated:

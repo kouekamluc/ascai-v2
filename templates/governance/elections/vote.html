@@ -7,8 +7,18 @@
 <div class="max-w-4xl mx-auto">
     <div class="governance-card mb-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ election.get_election_type_display }}</h2>
-        <p class="text-gray-600 mb-2">{% trans "Cast your secret ballot vote. Your choices are confidential." %}</p>
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
+        <div class="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-3">
+            <div class="flex items-start">
+                <svg class="w-6 h-6 text-green-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+                <div>
+                    <p class="font-bold text-green-900 mb-1">{% trans "Secret Ballot - Your Vote is Anonymous" %}</p>
+                    <p class="text-green-800 text-sm">{% trans "Your vote is completely confidential. No one can see who you voted for. Only the vote counts will be published after the election ends." %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p class="text-blue-800 text-sm">
                 <strong>{% trans "Instructions:" %}</strong> 
                 {% trans "Select ONE candidate for each position you want to vote for. You can skip positions by leaving them unselected or choosing 'Abstain'." %}
