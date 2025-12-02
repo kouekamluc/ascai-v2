@@ -793,47 +793,73 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             except User.DoesNotExist:
                 pass
         
-        # CRITICAL: Mark email as verified in sociallogin BEFORE calling super
-        # This ensures allauth sees it as verified during the callback
+        # CRITICAL: For Google OAuth, ensure EmailAddress objects in sociallogin are properly configured
+        # but don't have user set yet (for new users) to avoid duplicate creation
         if sociallogin.account.provider == 'google' and email:
+            # Mark all email addresses as verified in sociallogin object
+            # This tells allauth the email is verified, but don't set user yet for new users
             for email_addr in sociallogin.email_addresses:
                 email_addr.verified = True
+                # For new users, don't set user yet - let allauth create the user first
+                if existing_user is None and hasattr(email_addr, 'user') and email_addr.user is None:
+                    # Don't set user - let allauth handle it
+                    pass
                 logger.info(f"SAVE_USER: Marked email in sociallogin as verified BEFORE super: {email_addr.email}")
         
         # Call super to create/link the user
         # This will call sociallogin.save() which creates EmailAddress via setup_user_email()
-        user = super().save_user(request, sociallogin, form)
+        # We need to catch any IntegrityError and handle it gracefully
+        try:
+            user = super().save_user(request, sociallogin, form)
+        except Exception as e:
+            # If there's an IntegrityError, it might be because EmailAddress already exists
+            # Try to get the user and continue
+            if 'duplicate key' in str(e).lower() or 'unique constraint' in str(e).lower():
+                logger.warning(f"IntegrityError during save_user, trying to recover: {e}")
+                if email:
+                    try:
+                        user = User.objects.get(email=email)
+                        # Now update the EmailAddress
+                        email_address, _ = EmailAddress.objects.get_or_create(
+                            user=user,
+                            email=email,
+                            defaults={'verified': True, 'primary': True}
+                        )
+                        email_address.verified = True
+                        email_address.save()
+                        logger.info(f"Recovered from IntegrityError, updated EmailAddress for: {email}")
+                    except User.DoesNotExist:
+                        raise
+                else:
+                    raise
+            else:
+                raise
         
         # Check if this is a new user or an existing user being linked
         is_new_user = existing_user is None
         
         # CRITICAL: Mark email as verified IMMEDIATELY for ALL Google OAuth users
         # Note: super().save_user() already creates EmailAddress via sociallogin.save()
-        # We need to update it after it's created, but handle the case where it might already exist
+        # Use get_or_create to safely handle the case where it might already exist
         if user.email and sociallogin.account.provider == 'google':
             # Use get_or_create to safely get the EmailAddress that allauth just created
-            # If it already exists (from pre_social_login), get it; otherwise create it
-            email_address, created = EmailAddress.objects.get_or_create(
-                user=user,
-                email=user.email,
-                defaults={
-                    'verified': True,
-                    'primary': True
-                }
-            )
-            # Always update to ensure it's verified (in case it was created by allauth without verified=True)
-            if not email_address.verified:
+            # If it already exists (from a previous attempt or pre_social_login), get it
+            try:
+                email_address = EmailAddress.objects.get(user=user, email=user.email)
+                # Update existing EmailAddress
                 email_address.verified = True
                 email_address.primary = True
                 email_address.save()
-                logger.info(
-                    f"CRITICAL: Updated EmailAddress as verified for Google OAuth user: {user.email} "
-                    f"(was created by allauth without verified=True)"
+                logger.info(f"CRITICAL: Updated existing EmailAddress as verified for Google OAuth user: {user.email}")
+            except EmailAddress.DoesNotExist:
+                # If it doesn't exist (shouldn't happen, but handle it), create it
+                email_address = EmailAddress.objects.create(
+                    user=user,
+                    email=user.email,
+                    verified=True,
+                    primary=True
                 )
-            else:
-                logger.info(
-                    f"CRITICAL: EmailAddress already verified for Google OAuth user: {user.email}"
-                )
+                logger.info(f"CRITICAL: Created EmailAddress as verified for Google OAuth user: {user.email}")
             
             # Also mark in User model
             user.email_verified = True
