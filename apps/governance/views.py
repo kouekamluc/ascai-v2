@@ -470,6 +470,78 @@ class MemberUpdateView(GovernanceRequiredMixin, UpdateView):
     success_url = reverse_lazy('governance:member_list')
 
 
+@login_required
+def verify_member(request, member_id):
+    """Verify member (lazio residence, cameroonian origin, activate)."""
+    member = get_object_or_404(Member, pk=member_id)
+    
+    if not request.user.has_perm('governance.manage_member'):
+        messages.error(request, _('You do not have permission to verify members.'))
+        return redirect('governance:member_detail', pk=member_id)
+    
+    action = request.POST.get('action')
+    
+    if action == 'verify_lazio':
+        member.lazio_residence_verified = True
+        member.save(update_fields=['lazio_residence_verified'])
+        messages.success(request, _('Lazio residence verified.'))
+    elif action == 'verify_cameroonian':
+        member.cameroonian_origin_verified = True
+        member.save(update_fields=['cameroonian_origin_verified'])
+        messages.success(request, _('Cameroonian origin verified.'))
+    elif action == 'activate':
+        if member.lazio_residence_verified and member.cameroonian_origin_verified:
+            member.is_active_member = True
+            member.save(update_fields=['is_active_member'])
+            MembershipStatus.objects.create(
+                member=member,
+                status='active',
+                effective_date=timezone.now().date(),
+                notes=_('Member activated by {user}').format(user=request.user.get_full_name() or request.user.username)
+            )
+            messages.success(request, _('Member activated successfully.'))
+        else:
+            messages.error(request, _('Cannot activate member. Please verify residence and origin first.'))
+    elif action == 'deactivate':
+        member.is_active_member = False
+        member.save(update_fields=['is_active_member'])
+        MembershipStatus.objects.create(
+            member=member,
+            status='inactive',
+            effective_date=timezone.now().date(),
+            notes=_('Member deactivated by {user}').format(user=request.user.get_full_name() or request.user.username)
+        )
+        messages.success(request, _('Member deactivated.'))
+    else:
+        messages.error(request, _('Invalid action.'))
+    
+    return redirect('governance:member_detail', pk=member_id)
+
+
+@login_required
+def mark_dues_paid(request, dues_id):
+    """Mark membership dues as paid."""
+    dues = get_object_or_404(MembershipDues, pk=dues_id)
+    
+    if not request.user.has_perm('governance.manage_finances'):
+        messages.error(request, _('You do not have permission to mark dues as paid.'))
+        return redirect('governance:membership_dues')
+    
+    if request.method == 'POST':
+        payment_date = request.POST.get('payment_date')
+        payment_method = request.POST.get('payment_method', 'cash')
+        
+        dues.status = 'paid'
+        dues.payment_date = payment_date or timezone.now().date()
+        dues.payment_method = payment_method
+        dues.save()
+        
+        messages.success(request, _('Dues marked as paid successfully.'))
+        return redirect('governance:membership_dues')
+    
+    return render(request, 'governance/finances/mark_dues_paid.html', {'dues': dues})
+
+
 # ============================================================================
 # EXECUTIVE BOARD VIEWS
 # ============================================================================
@@ -508,6 +580,21 @@ class ExecutiveBoardCreateView(ExecutiveBoardRequiredMixin, CreateView):
     success_url = reverse_lazy('governance:executive_board_list')
 
 
+class ExecutiveBoardUpdateView(ExecutiveBoardRequiredMixin, UpdateView):
+    """Update executive board."""
+    model = ExecutiveBoard
+    form_class = ExecutiveBoardForm
+    template_name = 'governance/executive_board/form.html'
+    success_url = reverse_lazy('governance:executive_board_list')
+
+
+class ExecutiveBoardDeleteView(ExecutiveBoardRequiredMixin, DeleteView):
+    """Delete executive board."""
+    model = ExecutiveBoard
+    template_name = 'governance/executive_board/confirm_delete.html'
+    success_url = reverse_lazy('governance:executive_board_list')
+
+
 class ExecutivePositionCreateView(ExecutiveBoardRequiredMixin, CreateView):
     """Create executive position."""
     model = ExecutivePosition
@@ -516,11 +603,41 @@ class ExecutivePositionCreateView(ExecutiveBoardRequiredMixin, CreateView):
     success_url = reverse_lazy('governance:executive_board_list')
 
 
+class ExecutivePositionUpdateView(ExecutiveBoardRequiredMixin, UpdateView):
+    """Update executive position."""
+    model = ExecutivePosition
+    form_class = ExecutivePositionForm
+    template_name = 'governance/executive_board/position_form.html'
+    success_url = reverse_lazy('governance:executive_board_list')
+
+
+class ExecutivePositionDeleteView(ExecutiveBoardRequiredMixin, DeleteView):
+    """Delete executive position."""
+    model = ExecutivePosition
+    template_name = 'governance/executive_board/position_confirm_delete.html'
+    success_url = reverse_lazy('governance:executive_board_list')
+
+
 class BoardMeetingCreateView(ExecutiveBoardRequiredMixin, CreateView):
     """Create board meeting."""
     model = BoardMeeting
     form_class = BoardMeetingForm
     template_name = 'governance/executive_board/meeting_form.html'
+    success_url = reverse_lazy('governance:executive_board_list')
+
+
+class BoardMeetingUpdateView(ExecutiveBoardRequiredMixin, UpdateView):
+    """Update board meeting."""
+    model = BoardMeeting
+    form_class = BoardMeetingForm
+    template_name = 'governance/executive_board/meeting_form.html'
+    success_url = reverse_lazy('governance:executive_board_list')
+
+
+class BoardMeetingDeleteView(ExecutiveBoardRequiredMixin, DeleteView):
+    """Delete board meeting."""
+    model = BoardMeeting
+    template_name = 'governance/executive_board/meeting_confirm_delete.html'
     success_url = reverse_lazy('governance:executive_board_list')
 
 
@@ -584,6 +701,21 @@ class GeneralAssemblyCreateView(AssemblyManagementRequiredMixin, CreateView):
     success_url = reverse_lazy('governance:assembly_list')
 
 
+class GeneralAssemblyUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update general assembly."""
+    model = GeneralAssembly
+    form_class = GeneralAssemblyForm
+    template_name = 'governance/assemblies/form.html'
+    success_url = reverse_lazy('governance:assembly_list')
+
+
+class GeneralAssemblyDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete general assembly."""
+    model = GeneralAssembly
+    template_name = 'governance/assemblies/confirm_delete.html'
+    success_url = reverse_lazy('governance:assembly_list')
+
+
 class AgendaItemCreateView(AssemblyManagementRequiredMixin, CreateView):
     """Create agenda item."""
     model = AgendaItem
@@ -605,6 +737,21 @@ class AgendaItemCreateView(AssemblyManagementRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+class AgendaItemUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update agenda item."""
+    model = AgendaItem
+    form_class = AgendaItemForm
+    template_name = 'governance/assemblies/agenda_item_form.html'
+    success_url = reverse_lazy('governance:assembly_list')
+
+
+class AgendaItemDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete agenda item."""
+    model = AgendaItem
+    template_name = 'governance/assemblies/agenda_item_confirm_delete.html'
+    success_url = reverse_lazy('governance:assembly_list')
+
+
 class AssemblyAttendanceCreateView(AssemblyManagementRequiredMixin, CreateView):
     """Create assembly attendance record."""
     model = AssemblyAttendance
@@ -620,6 +767,21 @@ class AssemblyAttendanceCreateView(AssemblyManagementRequiredMixin, CreateView):
         return initial
 
 
+class AssemblyAttendanceUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update assembly attendance record."""
+    model = AssemblyAttendance
+    form_class = AssemblyAttendanceForm
+    template_name = 'governance/assemblies/attendance_form.html'
+    success_url = reverse_lazy('governance:assembly_list')
+
+
+class AssemblyAttendanceDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete assembly attendance record."""
+    model = AssemblyAttendance
+    template_name = 'governance/assemblies/attendance_confirm_delete.html'
+    success_url = reverse_lazy('governance:assembly_list')
+
+
 class AssemblyVoteCreateView(AssemblyManagementRequiredMixin, CreateView):
     """Create assembly vote."""
     model = AssemblyVote
@@ -633,6 +795,21 @@ class AssemblyVoteCreateView(AssemblyManagementRequiredMixin, CreateView):
         if assembly_id:
             initial['assembly'] = assembly_id
         return initial
+
+
+class AssemblyVoteUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update assembly vote."""
+    model = AssemblyVote
+    form_class = AssemblyVoteForm
+    template_name = 'governance/assemblies/vote_form.html'
+    success_url = reverse_lazy('governance:assembly_list')
+
+
+class AssemblyVoteDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete assembly vote."""
+    model = AssemblyVote
+    template_name = 'governance/assemblies/vote_confirm_delete.html'
+    success_url = reverse_lazy('governance:assembly_list')
 
 
 # ============================================================================
@@ -684,6 +861,21 @@ class FinancialTransactionCreateView(FinancialManagementRequiredMixin, CreateVie
     success_url = reverse_lazy('governance:financial_transactions')
 
 
+class FinancialTransactionUpdateView(FinancialManagementRequiredMixin, UpdateView):
+    """Update financial transaction."""
+    model = FinancialTransaction
+    form_class = FinancialTransactionForm
+    template_name = 'governance/finances/transaction_form.html'
+    success_url = reverse_lazy('governance:financial_transactions')
+
+
+class FinancialTransactionDeleteView(FinancialManagementRequiredMixin, DeleteView):
+    """Delete financial transaction."""
+    model = FinancialTransaction
+    template_name = 'governance/finances/transaction_confirm_delete.html'
+    success_url = reverse_lazy('governance:financial_transactions')
+
+
 class MembershipDuesListView(FinancialManagementRequiredMixin, ListView):
     """List membership dues."""
     model = MembershipDues
@@ -712,6 +904,21 @@ class MembershipDuesCreateView(FinancialManagementRequiredMixin, CreateView):
     model = MembershipDues
     form_class = MembershipDuesForm
     template_name = 'governance/finances/dues_form.html'
+    success_url = reverse_lazy('governance:membership_dues')
+
+
+class MembershipDuesUpdateView(FinancialManagementRequiredMixin, UpdateView):
+    """Update membership dues."""
+    model = MembershipDues
+    form_class = MembershipDuesForm
+    template_name = 'governance/finances/dues_form.html'
+    success_url = reverse_lazy('governance:membership_dues')
+
+
+class MembershipDuesDeleteView(FinancialManagementRequiredMixin, DeleteView):
+    """Delete membership dues."""
+    model = MembershipDues
+    template_name = 'governance/finances/dues_confirm_delete.html'
     success_url = reverse_lazy('governance:membership_dues')
 
 
@@ -885,6 +1092,28 @@ class ElectoralCommissionCreateView(AssemblyManagementRequiredMixin, CreateView)
         return form
 
 
+class ElectoralCommissionUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update electoral commission."""
+    model = ElectoralCommission
+    fields = ['name', 'start_date', 'end_date', 'status', 'notes']
+    template_name = 'governance/elections/commission_form.html'
+    success_url = reverse_lazy('governance:electoral_commission_list')
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['start_date'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['end_date'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['notes'].widget = forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'})
+        return form
+
+
+class ElectoralCommissionDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete electoral commission."""
+    model = ElectoralCommission
+    template_name = 'governance/elections/commission_confirm_delete.html'
+    success_url = reverse_lazy('governance:electoral_commission_list')
+
+
 class ElectionListView(GovernanceRequiredMixin, ListView):
     """List elections."""
     model = Election
@@ -926,6 +1155,21 @@ class ElectionCreateView(AssemblyManagementRequiredMixin, CreateView):
     model = Election
     form_class = ElectionForm
     template_name = 'governance/elections/election_form.html'
+    success_url = reverse_lazy('governance:election_list')
+
+
+class ElectionUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update election."""
+    model = Election
+    form_class = ElectionForm
+    template_name = 'governance/elections/election_form.html'
+    success_url = reverse_lazy('governance:election_list')
+
+
+class ElectionDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete election."""
+    model = Election
+    template_name = 'governance/elections/election_confirm_delete.html'
     success_url = reverse_lazy('governance:election_list')
 
 
@@ -1181,6 +1425,28 @@ class BoardOfAuditorsCreateView(AssemblyManagementRequiredMixin, CreateView):
         return form
 
 
+class BoardOfAuditorsUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update board of auditors."""
+    model = BoardOfAuditors
+    fields = ['name', 'term_start', 'term_end', 'is_renewed', 'status', 'notes']
+    template_name = 'governance/auditors/board_form.html'
+    success_url = reverse_lazy('governance:board_of_auditors_list')
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['term_start'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['term_end'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['notes'].widget = forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'})
+        return form
+
+
+class BoardOfAuditorsDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete board of auditors."""
+    model = BoardOfAuditors
+    template_name = 'governance/auditors/board_confirm_delete.html'
+    success_url = reverse_lazy('governance:board_of_auditors_list')
+
+
 class AuditReportListView(GovernanceRequiredMixin, ListView):
     """List audit reports."""
     model = AuditReport
@@ -1212,6 +1478,31 @@ class AuditReportCreateView(FinancialManagementRequiredMixin, CreateView):
         form.fields['findings'].widget = forms.Textarea(attrs={'rows': 10, 'class': 'form-textarea'})
         form.fields['recommendations'].widget = forms.Textarea(attrs={'rows': 5, 'class': 'form-textarea'})
         return form
+
+
+class AuditReportUpdateView(FinancialManagementRequiredMixin, UpdateView):
+    """Update audit report."""
+    model = AuditReport
+    fields = ['board', 'period_start', 'period_end', 'report_date', 'findings',
+              'recommendations', 'financial_verification_status']
+    template_name = 'governance/auditors/audit_report_form.html'
+    success_url = reverse_lazy('governance:audit_report_list')
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['period_start'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['period_end'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['report_date'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['findings'].widget = forms.Textarea(attrs={'rows': 10, 'class': 'form-textarea'})
+        form.fields['recommendations'].widget = forms.Textarea(attrs={'rows': 5, 'class': 'form-textarea'})
+        return form
+
+
+class AuditReportDeleteView(FinancialManagementRequiredMixin, DeleteView):
+    """Delete audit report."""
+    model = AuditReport
+    template_name = 'governance/auditors/audit_report_confirm_delete.html'
+    success_url = reverse_lazy('governance:audit_report_list')
 
 
 # ============================================================================
@@ -1270,6 +1561,27 @@ class DisciplinaryCaseCreateView(GovernanceRequiredMixin, CreateView):
         form.fields['description'].widget = forms.Textarea(attrs={'rows': 6, 'class': 'form-textarea'})
         form.fields['evidence'].widget = forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'})
         return form
+
+
+class DisciplinaryCaseUpdateView(GovernanceRequiredMixin, UpdateView):
+    """Update disciplinary case."""
+    model = DisciplinaryCase
+    fields = ['member', 'violation_type', 'description', 'evidence', 'status']
+    template_name = 'governance/disciplinary/case_form.html'
+    success_url = reverse_lazy('governance:disciplinary_case_list')
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['description'].widget = forms.Textarea(attrs={'rows': 6, 'class': 'form-textarea'})
+        form.fields['evidence'].widget = forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'})
+        return form
+
+
+class DisciplinaryCaseDeleteView(GovernanceRequiredMixin, DeleteView):
+    """Delete disciplinary case."""
+    model = DisciplinaryCase
+    template_name = 'governance/disciplinary/case_confirm_delete.html'
+    success_url = reverse_lazy('governance:disciplinary_case_list')
 
 
 class DisciplinarySanctionCreateView(ExecutiveBoardRequiredMixin, CreateView):
@@ -1360,6 +1672,21 @@ class AssociationEventCreateView(ExecutiveBoardRequiredMixin, CreateView):
     success_url = reverse_lazy('governance:association_event_list')
 
 
+class AssociationEventUpdateView(ExecutiveBoardRequiredMixin, UpdateView):
+    """Update association event."""
+    model = AssociationEvent
+    form_class = AssociationEventForm
+    template_name = 'governance/events/event_form.html'
+    success_url = reverse_lazy('governance:association_event_list')
+
+
+class AssociationEventDeleteView(ExecutiveBoardRequiredMixin, DeleteView):
+    """Delete association event."""
+    model = AssociationEvent
+    template_name = 'governance/events/event_confirm_delete.html'
+    success_url = reverse_lazy('governance:association_event_list')
+
+
 # ============================================================================
 # COMMUNICATION VIEWS
 # ============================================================================
@@ -1406,6 +1733,21 @@ class CommunicationCreateView(GovernanceRequiredMixin, CreateView):
             _('Communication created. It requires President approval before publication (Article 19).')
         )
         return super().form_valid(form)
+
+
+class CommunicationUpdateView(GovernanceRequiredMixin, UpdateView):
+    """Update communication."""
+    model = Communication
+    form_class = CommunicationForm
+    template_name = 'governance/communications/form.html'
+    success_url = reverse_lazy('governance:communication_list')
+
+
+class CommunicationDeleteView(GovernanceRequiredMixin, DeleteView):
+    """Delete communication."""
+    model = Communication
+    template_name = 'governance/communications/confirm_delete.html'
+    success_url = reverse_lazy('governance:communication_list')
 
 
 @login_required
@@ -1492,6 +1834,28 @@ class AssociationDocumentCreateView(AssemblyManagementRequiredMixin, CreateView)
         return form
 
 
+class AssociationDocumentUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update association document."""
+    model = AssociationDocument
+    fields = ['document_type', 'title', 'version', 'language', 'file', 'description', 
+              'publication_date', 'is_active']
+    template_name = 'governance/documents/form.html'
+    success_url = reverse_lazy('governance:association_document_list')
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['publication_date'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['description'].widget = forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'})
+        return form
+
+
+class AssociationDocumentDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete association document."""
+    model = AssociationDocument
+    template_name = 'governance/documents/confirm_delete.html'
+    success_url = reverse_lazy('governance:association_document_list')
+
+
 # ============================================================================
 # FINANCIAL REPORTS VIEWS
 # ============================================================================
@@ -1530,6 +1894,157 @@ class FinancialReportCreateView(FinancialManagementRequiredMixin, CreateView):
         form.fields['period_end'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
         form.fields['report_content'].widget = forms.Textarea(attrs={'rows': 15, 'class': 'form-textarea'})
         return form
+
+
+class FinancialReportUpdateView(FinancialManagementRequiredMixin, UpdateView):
+    """Update financial report."""
+    model = FinancialReport
+    fields = ['report_type', 'period_start', 'period_end', 'report_content', 
+              'total_income', 'total_expenses', 'balance']
+    template_name = 'governance/finances/report_form.html'
+    success_url = reverse_lazy('governance:financial_report_list')
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['period_start'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['period_end'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-input'})
+        form.fields['report_content'].widget = forms.Textarea(attrs={'rows': 15, 'class': 'form-textarea'})
+        return form
+
+
+class FinancialReportDeleteView(FinancialManagementRequiredMixin, DeleteView):
+    """Delete financial report."""
+    model = FinancialReport
+    template_name = 'governance/finances/report_confirm_delete.html'
+    success_url = reverse_lazy('governance:financial_report_list')
+
+
+# ============================================================================
+# COMMISSION MEMBER & AUDITOR MEMBER MANAGEMENT
+# ============================================================================
+
+class CommissionMemberCreateView(AssemblyManagementRequiredMixin, CreateView):
+    """Add member to electoral commission."""
+    model = CommissionMember
+    fields = ['commission', 'user', 'role']
+    template_name = 'governance/elections/commission_member_form.html'
+    success_url = reverse_lazy('governance:electoral_commission_list')
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        commission_id = self.request.GET.get('commission')
+        if commission_id:
+            initial['commission'] = commission_id
+        return initial
+
+
+class CommissionMemberUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update commission member."""
+    model = CommissionMember
+    fields = ['commission', 'user', 'role']
+    template_name = 'governance/elections/commission_member_form.html'
+    success_url = reverse_lazy('governance:electoral_commission_list')
+
+
+class CommissionMemberDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Remove member from electoral commission."""
+    model = CommissionMember
+    template_name = 'governance/elections/commission_member_confirm_delete.html'
+    success_url = reverse_lazy('governance:electoral_commission_list')
+
+
+class AuditorMemberCreateView(AssemblyManagementRequiredMixin, CreateView):
+    """Add member to board of auditors."""
+    model = AuditorMember
+    fields = ['board', 'user', 'is_president', 'is_founding_member', 'is_former_president']
+    template_name = 'governance/auditors/auditor_member_form.html'
+    success_url = reverse_lazy('governance:board_of_auditors_list')
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        board_id = self.request.GET.get('board')
+        if board_id:
+            initial['board'] = board_id
+        return initial
+
+
+class AuditorMemberUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update auditor member."""
+    model = AuditorMember
+    fields = ['board', 'user', 'is_president', 'is_founding_member', 'is_former_president']
+    template_name = 'governance/auditors/auditor_member_form.html'
+    success_url = reverse_lazy('governance:board_of_auditors_list')
+
+
+class AuditorMemberDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Remove member from board of auditors."""
+    model = AuditorMember
+    template_name = 'governance/auditors/auditor_member_confirm_delete.html'
+    success_url = reverse_lazy('governance:board_of_auditors_list')
+
+
+# ============================================================================
+# STATUS UPDATE ACTIONS
+# ============================================================================
+
+@login_required
+def update_assembly_status(request, assembly_id):
+    """Update assembly status."""
+    assembly = get_object_or_404(GeneralAssembly, pk=assembly_id)
+    
+    if not request.user.has_perm('governance.manage_assembly'):
+        messages.error(request, _('You do not have permission to update assembly status.'))
+        return redirect('governance:assembly_detail', pk=assembly_id)
+    
+    new_status = request.POST.get('status')
+    if new_status in dict(GeneralAssembly.STATUS_CHOICES):
+        assembly.status = new_status
+        assembly.save(update_fields=['status'])
+        messages.success(request, _('Assembly status updated.'))
+    else:
+        messages.error(request, _('Invalid status.'))
+    
+    return redirect('governance:assembly_detail', pk=assembly_id)
+
+
+@login_required
+def update_election_status(request, election_id):
+    """Update election status."""
+    election = get_object_or_404(Election, pk=election_id)
+    
+    if not request.user.has_perm('governance.manage_elections'):
+        messages.error(request, _('You do not have permission to update election status.'))
+        return redirect('governance:election_detail', pk=election_id)
+    
+    new_status = request.POST.get('status')
+    if new_status in dict(Election.STATUS_CHOICES):
+        election.status = new_status
+        election.save(update_fields=['status'])
+        messages.success(request, _('Election status updated.'))
+    else:
+        messages.error(request, _('Invalid status.'))
+    
+    return redirect('governance:election_detail', pk=election_id)
+
+
+@login_required
+def update_case_status(request, case_id):
+    """Update disciplinary case status."""
+    case = get_object_or_404(DisciplinaryCase, pk=case_id)
+    
+    if not request.user.has_perm('governance.apply_sanctions'):
+        messages.error(request, _('You do not have permission to update case status.'))
+        return redirect('governance:disciplinary_case_detail', pk=case_id)
+    
+    new_status = request.POST.get('status')
+    if new_status in dict(DisciplinaryCase.STATUS_CHOICES):
+        case.status = new_status
+        case.save(update_fields=['status'])
+        messages.success(request, _('Case status updated.'))
+    else:
+        messages.error(request, _('Invalid status.'))
+    
+    return redirect('governance:disciplinary_case_detail', pk=case_id)
 
 
 # ============================================================================
