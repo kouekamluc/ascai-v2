@@ -194,6 +194,129 @@
     </div>
 </div>
 
+{% if is_member %}
+<!-- Governance Participation Section (for all members) -->
+<div class="mt-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">{% trans 'Governance Participation' %}</h2>
+        <a href="{% url 'governance:member_portal' %}" class="text-sm font-medium text-cameroon-green hover:text-cameroon-green/80 hover:underline">
+            {% trans 'View Member Portal' %} →
+        </a>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Upcoming Assemblies -->
+        {% if upcoming_assemblies %}
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">{% trans 'Upcoming Assemblies' %}</h3>
+                        <p class="text-sm text-gray-600 mt-1">{% trans 'Participate and vote' %}</p>
+                    </div>
+                    <a href="{% url 'governance:assembly_list' %}" class="text-sm font-medium text-cameroon-green hover:text-cameroon-green/80 hover:underline">
+                        {% trans 'View All' %} →
+                    </a>
+                </div>
+            </div>
+            <div class="space-y-3">
+                {% for assembly_data in upcoming_assemblies %}
+                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:border-cameroon-green/30 hover:shadow-sm transition-all duration-200">
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900 mb-1">{{ assembly_data.assembly.get_assembly_type_display }}</p>
+                        <div class="flex items-center text-sm text-gray-600 space-x-3">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                {{ assembly_data.assembly.date|date:"M d, Y" }}
+                            </span>
+                            {% if assembly_data.has_votes %}
+                            <span class="flex items-center text-blue-600">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                {{ assembly_data.vote_count }} {% trans 'vote' %}{{ assembly_data.vote_count|pluralize }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{% url 'governance:assembly_participate' assembly_data.assembly.pk %}" class="ml-4 px-4 py-2 bg-cameroon-green/10 text-cameroon-green rounded-lg hover:bg-cameroon-green hover:text-white transition-all duration-200 text-sm font-medium">
+                        {% if assembly_data.has_votes and not assembly_data.user_has_voted_all %}
+                            {% trans 'Vote' %}
+                        {% else %}
+                            {% trans 'Participate' %}
+                        {% endif %}
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Active Elections -->
+        {% if active_elections %}
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">{% trans 'Active Elections' %}</h3>
+                        <p class="text-sm text-gray-600 mt-1">{% trans 'Cast your vote' %}</p>
+                    </div>
+                    <a href="{% url 'governance:election_list' %}" class="text-sm font-medium text-cameroon-green hover:text-cameroon-green/80 hover:underline">
+                        {% trans 'View All' %} →
+                    </a>
+                </div>
+            </div>
+            <div class="space-y-3">
+                {% for election_data in active_elections %}
+                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:border-cameroon-green/30 hover:shadow-sm transition-all duration-200">
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900 mb-1">{{ election_data.election.get_election_type_display }}</p>
+                        <div class="flex items-center text-sm text-gray-600 space-x-3">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                {% trans 'Ends' %}: {{ election_data.election.end_date|date:"M d, Y" }}
+                            </span>
+                        </div>
+                        {% if not election_data.eligible %}
+                        <p class="text-xs text-yellow-600 mt-1">{{ election_data.reason }}</p>
+                        {% endif %}
+                    </div>
+                    {% if election_data.eligible %}
+                    <a href="{% url 'governance:election_vote' election_data.election.pk %}" class="ml-4 px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition-all duration-200 text-sm font-medium">
+                        {% trans 'Vote Now' %}
+                    </a>
+                    {% else %}
+                    <a href="{% url 'governance:election_detail' election_data.election.pk %}" class="ml-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 text-sm font-medium">
+                        {% trans 'View' %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if not upcoming_assemblies and not active_elections %}
+    <div class="dashboard-card">
+        <div class="empty-state">
+            <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+            <p class="text-gray-500 text-sm">{% trans 'No upcoming assemblies or elections at this time' %}</p>
+            <a href="{% url 'governance:member_portal' %}" class="mt-4 btn-primary">
+                {% trans 'View Member Portal' %}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
 {% if governance_stats %}
 <!-- Governance Section (for staff/executive board) -->
 <div class="mt-8">

@@ -56,8 +56,73 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         
         # Governance stats (if user has permissions)
         try:
+            from apps.governance.models import (
+                Member, GeneralAssembly, MembershipDues, FinancialTransaction,
+                Election, AssemblyVote, AssemblyVoteRecord
+            )
+            
+            # Check if user is a member
+            is_member = hasattr(user, 'member_profile')
+            context['is_member'] = is_member
+            
+            if is_member:
+                member = user.member_profile
+                context['member'] = member
+                
+                # Get upcoming assemblies for participation
+                upcoming_assemblies = GeneralAssembly.objects.filter(
+                    status='scheduled',
+                    date__gte=timezone.now()
+                ).prefetch_related('votes', 'agenda_items').order_by('date')[:5]
+                
+                # Check which assemblies have votes user can participate in
+                assemblies_with_voting = []
+                for assembly in upcoming_assemblies:
+                    votes = assembly.votes.all()
+                    if votes.exists():
+                        # Check if user has voted on all votes
+                        user_has_voted_all = all(
+                            AssemblyVoteRecord.objects.filter(
+                                vote=vote, voter=user
+                            ).exists() for vote in votes
+                        )
+                        assemblies_with_voting.append({
+                            'assembly': assembly,
+                            'has_votes': True,
+                            'user_has_voted_all': user_has_voted_all,
+                            'vote_count': votes.count()
+                        })
+                    else:
+                        assemblies_with_voting.append({
+                            'assembly': assembly,
+                            'has_votes': False,
+                            'user_has_voted_all': False,
+                            'vote_count': 0
+                        })
+                
+                context['upcoming_assemblies'] = assemblies_with_voting
+                
+                # Get active elections user can vote in
+                active_elections = Election.objects.filter(
+                    status='in_progress',
+                    end_date__gte=timezone.now().date()
+                ).select_related('commission').prefetch_related('candidacies')[:5]
+                
+                # Check voting eligibility for each election
+                elections_with_eligibility = []
+                for election in active_elections:
+                    from apps.governance.utils import check_voting_eligibility
+                    eligibility = check_voting_eligibility(user, election=election)
+                    elections_with_eligibility.append({
+                        'election': election,
+                        'eligible': eligibility.get('eligible', False),
+                        'reason': eligibility.get('reason', '')
+                    })
+                
+                context['active_elections'] = elections_with_eligibility
+            
+            # Admin/staff governance stats
             if user.has_perm('governance.view_member') or user.is_staff:
-                from apps.governance.models import Member, GeneralAssembly, MembershipDues, FinancialTransaction
                 context['governance_stats'] = {
                     'total_members': Member.objects.count(),
                     'active_members': Member.objects.filter(is_active_member=True).count(),
@@ -71,9 +136,12 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                         status='pending'
                     ).count(),
                 }
-        except Exception:
+        except Exception as e:
             # Governance app might not be migrated yet
-            pass
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Governance integration error: {e}")
+            context['is_member'] = False
         
         # Recent activity
         context['recent_tickets'] = SupportTicket.objects.filter(user=user).order_by('-created_at')[:5]
@@ -108,6 +176,17 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             {'title': _('Create Ticket'), 'url': reverse_lazy('dashboard:tickets_create'), 'icon': 'support'},
             {'title': _('Browse Groups'), 'url': reverse_lazy('dashboard:groups_list'), 'icon': 'users'},
         ]
+        
+        # Add member portal link if user is a member
+        try:
+            if hasattr(user, 'member_profile'):
+                context['quick_actions'].insert(0, {
+                    'title': _('My Membership'), 
+                    'url': reverse_lazy('governance:member_portal'), 
+                    'icon': 'membership'
+                })
+        except Exception:
+            pass
         
         # Add governance quick actions if user has permissions
         if user.has_perm('governance.view_member') or user.is_staff:
