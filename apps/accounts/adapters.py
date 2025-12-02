@@ -605,9 +605,18 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             if email:
                 # CRITICAL: Mark email addresses in sociallogin as verified BEFORE allauth processes
                 # This tells allauth that the email is already verified and no verification is needed
+                # This MUST happen before allauth checks email verification
                 for email_address in sociallogin.email_addresses:
                     email_address.verified = True
-                    logger.info(f"PRE-SOCIAL-LOGIN: Marked email in sociallogin as verified: {email}")
+                    logger.info(f"PRE-SOCIAL-LOGIN: Marked email in sociallogin as verified: {email_address.email}")
+                
+                # Also ensure the email_address objects are properly set up
+                # This is critical - allauth checks these objects during the callback
+                if not sociallogin.email_addresses:
+                    # Create email address object if it doesn't exist
+                    from allauth.account.models import EmailAddress
+                    # We'll create it later, but mark it as verified in the sociallogin state
+                    logger.info(f"PRE-SOCIAL-LOGIN: No email_addresses in sociallogin, will be created in populate_user")
                 
                 # Check if user already exists
                 try:
@@ -758,6 +767,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             except User.DoesNotExist:
                 pass
         
+        # CRITICAL: Mark email as verified in sociallogin BEFORE calling super
+        # This ensures allauth sees it as verified during the callback
+        if sociallogin.account.provider == 'google' and email:
+            for email_addr in sociallogin.email_addresses:
+                email_addr.verified = True
+                logger.info(f"SAVE_USER: Marked email in sociallogin as verified BEFORE super: {email_addr.email}")
+        
         # Call super to create/link the user
         user = super().save_user(request, sociallogin, form)
         
@@ -766,7 +782,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         
         # CRITICAL: Mark email as verified IMMEDIATELY for ALL Google OAuth users
         # This must happen IMMEDIATELY after user is created, before allauth checks
-        if user.email:
+        if user.email and sociallogin.account.provider == 'google':
             # Force mark as verified in EmailAddress - this is what allauth checks
             email_address, created = EmailAddress.objects.update_or_create(
                 user=user,
