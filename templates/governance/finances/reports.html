@@ -1,0 +1,59 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Financial Reports" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Financial Reports" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{% trans "Financial Reports" %}</h2>
+        <p class="text-sm text-gray-600 mt-1">{% trans "Quarterly, annual, and event-based reports" %}</p>
+    </div>
+    {% if perms.governance.manage_finances %}
+    <a href="{% url 'governance:financial_report_create' %}" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {% trans "Create Report" %}
+    </a>
+    {% endif %}
+</div>
+
+{% if reports %}
+<div class="space-y-4">
+    {% for report in reports %}
+    <div class="governance-card hover:shadow-lg transition-shadow">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                    {{ report.get_report_type_display }} - {{ report.period_start|date:"d M Y" }} to {{ report.period_end|date:"d M Y" }}
+                </h3>
+                <div class="grid grid-cols-3 gap-4 text-sm mb-2">
+                    <div>
+                        <span class="text-gray-600">{% trans "Income" %}:</span>
+                        <span class="font-semibold text-green-600">€{{ report.total_income }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">{% trans "Expenses" %}:</span>
+                        <span class="font-semibold text-red-600">€{{ report.total_expenses }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">{% trans "Balance" %}:</span>
+                        <span class="font-semibold {% if report.balance >= 0 %}text-blue-600{% else %}text-red-600{% endif %}">€{{ report.balance }}</span>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500">{% trans "Generated" %}: {{ report.created_at|date:"d M Y" }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p class="text-gray-500">{% trans "No financial reports found" %}</p>
+</div>
+{% endif %}
+{% endblock %}
+

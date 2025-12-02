@@ -1,0 +1,55 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Association Documents" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Association Documents" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{% trans "Association Documents" %}</h2>
+        <p class="text-sm text-gray-600 mt-1">{% trans "Official documents and reports" %}</p>
+    </div>
+    {% if perms.governance.manage_assembly %}
+    <a href="{% url 'governance:association_document_create' %}" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {% trans "Upload Document" %}
+    </a>
+    {% endif %}
+</div>
+
+{% if documents %}
+<div class="space-y-4">
+    {% for document in documents %}
+    <div class="governance-card hover:shadow-lg transition-shadow">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ document.title }}</h3>
+                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                    <span>{{ document.get_document_type_display }}</span>
+                    <span>{{ document.get_language_display }}</span>
+                    {% if document.version %}<span>v{{ document.version }}</span>{% endif %}
+                    {% if document.is_active %}<span class="px-2 py-1 rounded bg-green-100 text-green-800 text-xs">{% trans "Active" %}</span>{% endif %}
+                </div>
+                {% if document.description %}
+                <p class="text-sm text-gray-700">{{ document.description|truncatewords:20 }}</p>
+                {% endif %}
+                <p class="text-xs text-gray-500 mt-2">{{ document.publication_date|date:"d M Y" }}</p>
+            </div>
+            <a href="{{ document.file.url }}" target="_blank" class="btn-secondary ml-4">
+                {% trans "Download" %}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p class="text-gray-500">{% trans "No documents found" %}</p>
+</div>
+{% endif %}
+{% endblock %}
+

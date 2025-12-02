@@ -725,7 +725,19 @@ class ExpenseApprovalView(ExpenseApprovalRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         transaction = self.get_object()
         approvals = transaction.approvals.select_related('signer').all()
+        
+        # Get signer positions for display - attach to approval objects
+        current_board = ExecutiveBoard.objects.filter(status='active').first()
+        if current_board:
+            for approval in approvals:
+                position = current_board.positions.filter(
+                    user=approval.signer,
+                    status='active'
+                ).first()
+                approval.signer_position = position  # Attach to approval object
+        
         context['approvals'] = approvals
+        context['signer_positions'] = signer_positions
         approval_status = check_expense_approval_status(transaction)
         context['approval_status'] = approval_status
         context['signed_count'] = approval_status['signed_count']
@@ -1053,6 +1065,11 @@ class ElectionVoteView(LoginRequiredMixin, DetailView):
                     ).exists()
                 }
         context['candidacies_by_position'] = candidacies_by_position
+        
+        # Check voting eligibility
+        if user.is_authenticated:
+            context['voting_eligibility'] = check_voting_eligibility(user, election=election)
+        
         return context
 
 

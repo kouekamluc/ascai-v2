@@ -1,0 +1,92 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ event.title }} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+        <div class="governance-card mb-6">
+            <h3 class="text-lg font-semibold mb-4">{% trans "Event Information" %}</h3>
+            <dl class="space-y-4">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Event Type" %}</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ event.get_event_type_display }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Start Date" %}</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ event.start_date|date:"d M Y, H:i" }}</dd>
+                </div>
+                {% if event.end_date %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "End Date" %}</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ event.end_date|date:"d M Y, H:i" }}</dd>
+                </div>
+                {% endif %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Location" %}</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ event.location }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Description" %}</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ event.description|linebreaks }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        {% if event.report %}
+        <div class="governance-card">
+            <h3 class="text-lg font-semibold mb-4">{% trans "Post-Event Report" %}</h3>
+            <div class="text-sm text-gray-900">{{ event.report|linebreaks }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <div class="governance-card mb-6">
+            <h3 class="text-lg font-semibold mb-4">{% trans "Financial Summary" %}</h3>
+            <dl class="space-y-3">
+                {% if event.budget %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Budget" %}</dt>
+                    <dd class="mt-1 text-lg font-bold text-gray-900">€{{ event.budget }}</dd>
+                </div>
+                {% endif %}
+                {% if event.revenue %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Revenue" %}</dt>
+                    <dd class="mt-1 text-lg font-bold text-green-600">€{{ event.revenue }}</dd>
+                </div>
+                {% endif %}
+                {% if event.expenses %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Expenses" %}</dt>
+                    <dd class="mt-1 text-lg font-bold text-red-600">€{{ event.expenses }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+        </div>
+
+        {% if organizing_committees %}
+        <div class="governance-card">
+            <h3 class="text-lg font-semibold mb-4">{% trans "Organizing Committee" %}</h3>
+            <div class="space-y-2">
+                {% for committee in organizing_committees %}
+                <div class="p-3 bg-gray-50 rounded-lg">
+                    <p class="text-sm font-semibold text-gray-900">{{ committee.role|default:"Member" }}</p>
+                    <div class="mt-2 space-y-1">
+                        {% for member in committee.members.all %}
+                        <p class="text-xs text-gray-600">{{ member.get_display_name }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

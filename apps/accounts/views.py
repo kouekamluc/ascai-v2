@@ -10,8 +10,11 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _, get_language
 from django.conf import settings
 from django.http import JsonResponse
-from allauth.account.views import ConfirmEmailView
-from allauth.account.models import EmailConfirmation
+from allauth.account.views import ConfirmEmailView, EmailVerificationSentView
+from allauth.account.models import EmailConfirmation, EmailAddress
+from allauth.socialaccount.views import SignupView as SocialSignupView
+from allauth.socialaccount.views import ConnectionsView
+from allauth.socialaccount.models import SocialAccount
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from .models import User
 import logging
@@ -361,4 +364,137 @@ def resend_verification_email(request):
         return HttpResponseRedirect(f"{url}?email={email}")
     
     return redirect(redirect_url)
+
+
+class CustomSocialSignupView(SocialSignupView):
+    """
+    Custom social signup view that ensures Google OAuth users bypass email verification.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Override dispatch to mark email as verified for Google OAuth users before processing.
+        """
+        # Check if this is a Google OAuth login
+        if request.user.is_authenticated:
+            user = request.user
+            # Check if user has a Google social account
+            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+            
+            if has_google_account and user.email:
+                # Force mark email as verified
+                EmailAddress.objects.update_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={
+                        'verified': True,
+                        'primary': True
+                    }
+                )
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.info(f"CUSTOM VIEW: Marked email as verified for Google OAuth user: {user.email}")
+        
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        """
+        Override form_valid to ensure email is verified before redirect.
+        """
+        response = super().form_valid(form)
+        
+        # After form is valid, ensure email is verified for Google OAuth users
+        if self.request.user.is_authenticated:
+            user = self.request.user
+            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+            
+            if has_google_account and user.email:
+                # Force mark email as verified
+                EmailAddress.objects.update_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={
+                        'verified': True,
+                        'primary': True
+                    }
+                )
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.info(f"CUSTOM VIEW form_valid: Marked email as verified for Google OAuth user: {user.email}")
+        
+        return response
+
+
+class CustomConnectionsView(ConnectionsView):
+    """
+    Custom connections view that ensures Google OAuth users bypass email verification.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Override dispatch to mark email as verified for Google OAuth users.
+        """
+        if request.user.is_authenticated:
+            user = request.user
+            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+            
+            if has_google_account and user.email:
+                # Force mark email as verified
+                EmailAddress.objects.update_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={
+                        'verified': True,
+                        'primary': True
+                    }
+                )
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.info(f"CUSTOM CONNECTIONS VIEW: Marked email as verified for Google OAuth user: {user.email}")
+        
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CustomEmailVerificationSentView(EmailVerificationSentView):
+    """
+    Custom email verification sent view that redirects Google OAuth users directly to dashboard.
+    This view is called when allauth wants to show the email verification page.
+    For Google OAuth users, we bypass this and redirect to dashboard instead.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Override dispatch to check if user has Google OAuth and redirect accordingly.
+        """
+        if request.user.is_authenticated:
+            user = request.user
+            # Check if user has a Google social account
+            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+            
+            if has_google_account:
+                # For Google OAuth users, mark email as verified and redirect to dashboard
+                if user.email:
+                    # Force mark email as verified
+                    EmailAddress.objects.update_or_create(
+                        user=user,
+                        email=user.email,
+                        defaults={
+                            'verified': True,
+                            'primary': True
+                        }
+                    )
+                    user.email_verified = True
+                    user.save(update_fields=['email_verified'])
+                    logger.info(
+                        f"CUSTOM EMAIL VERIFICATION VIEW: Bypassed email verification for Google OAuth user: {user.email}"
+                    )
+                
+                # Redirect to dashboard instead of showing email verification page
+                if user.is_approved or user.is_superuser:
+                    current_language = get_language()
+                    if current_language != settings.LANGUAGE_CODE:
+                        return redirect(f'/{current_language}/dashboard/')
+                    return redirect('/dashboard/')
+                else:
+                    return redirect('/')
+        
+        # For regular users, show the email verification page
+        return super().dispatch(request, *args, **kwargs)
 

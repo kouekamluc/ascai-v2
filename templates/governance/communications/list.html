@@ -1,0 +1,56 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Communications" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Communications" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{% trans "Communications" %}</h2>
+        <p class="text-sm text-gray-600 mt-1">{% trans "Official association communications" %}</p>
+    </div>
+    <a href="{% url 'governance:communication_create' %}" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {% trans "Create Communication" %}
+    </a>
+</div>
+
+{% if communications %}
+<div class="space-y-4">
+    {% for communication in communications %}
+    <div class="governance-card hover:shadow-lg transition-shadow">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex items-center space-x-3 mb-2">
+                    <h3 class="text-lg font-bold text-gray-900">{{ communication.title }}</h3>
+                    <span class="px-3 py-1 rounded text-xs font-semibold
+                        {% if communication.is_published %}bg-green-100 text-green-800
+                        {% elif communication.president_approved %}bg-blue-100 text-blue-800
+                        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {% if communication.is_published %}{% trans "Published" %}
+                        {% elif communication.president_approved %}{% trans "Approved" %}
+                        {% else %}{% trans "Pending" %}{% endif %}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-600 mb-2">{{ communication.get_communication_type_display }}</p>
+                <p class="text-sm text-gray-700">{{ communication.content|truncatewords:30 }}</p>
+                <p class="text-xs text-gray-500 mt-2">{{ communication.publication_date|date:"d M Y" }}</p>
+            </div>
+            <a href="{% url 'governance:communication_detail' communication.pk %}" class="btn-secondary ml-4">
+                {% trans "View" %}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p class="text-gray-500">{% trans "No communications found" %}</p>
+</div>
+{% endif %}
+{% endblock %}
+

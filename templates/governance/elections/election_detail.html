@@ -100,11 +100,11 @@
                         {% for candidate_data in position_data.candidates %}
                         <div class="p-3 bg-gray-50 rounded-lg {% if candidate_data == position_data.winner %}border-2 border-green-500{% endif %}">
                             <div class="flex items-center justify-between mb-2">
-                                <p class="font-semibold text-gray-900">{{ candidate_data.candidate.get_display_name }}</p>
+                                <p class="font-semibold text-gray-900">{{ candidate_data.candidacy.candidate.get_display_name }}</p>
                                 <span class="text-lg font-bold text-cameroon-green">{{ candidate_data.votes }}</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-cameroon-green h-2 rounded-full" style="width: {{ candidate_data.votes_percent }}%"></div>
+                                <div class="bg-cameroon-green h-2 rounded-full" style="width: {{ candidate_data.votes_percent|floatformat:0 }}%"></div>
                             </div>
                             <p class="text-xs text-gray-600 mt-1">{{ candidate_data.votes_percent|floatformat:1 }}%</p>
                         </div>

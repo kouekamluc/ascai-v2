@@ -1,0 +1,39 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Request Extraordinary Assembly" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Request Extraordinary Assembly" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <div class="governance-card mb-6">
+        <h3 class="text-lg font-semibold mb-2">{% trans "Requirements" %}</h3>
+        <p class="text-sm text-gray-700 mb-4">
+            {% trans "An Extraordinary General Assembly can be requested by 1/4 of the duly registered active members (Article 6, 11)." %}
+        </p>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p class="text-sm text-blue-900">
+                <strong>{% trans "Current Status" %}:</strong><br>
+                {% trans "Active Members" %}: {{ quorum_status.total_active_members }}<br>
+                {% trans "Required Requests" %}: {{ quorum_status.required }}<br>
+                {% trans "Current Requests" %}: {{ quorum_status.current_requests }}
+            </p>
+        </div>
+    </div>
+
+    <form method="post" class="governance-card">
+        {% csrf_token %}
+        <div class="mb-6">
+            <p class="text-sm text-gray-700">
+                {% trans "By submitting this request, you are adding your name to the list of members requesting an Extraordinary General Assembly." %}
+            </p>
+        </div>
+        <div class="flex items-center justify-end space-x-4">
+            <a href="{% url 'governance:member_portal' %}" class="btn-secondary">{% trans "Cancel" %}</a>
+            <button type="submit" class="btn-primary">{% trans "Submit Request" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

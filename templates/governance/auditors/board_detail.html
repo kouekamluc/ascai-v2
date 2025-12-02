@@ -64,7 +64,7 @@
                 {% for report in audit_reports %}
                 <a href="{% url 'governance:audit_report_list' %}?board={{ board.pk }}" class="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <p class="font-semibold text-gray-900 text-sm">{{ report.period_start|date:"d M Y" }} - {{ report.period_end|date:"d M Y" }}</p>
-                    <p class="text-xs text-gray-600 mt-1">{{ report.get_financial_verification_status_display }}</p>
+                    <p class="text-xs text-gray-600 mt-1">{{ report.financial_verification_status|title }}</p>
                 </a>
                 {% endfor %}
             </div>

@@ -1,0 +1,63 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Upload Document" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Upload Document" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <form method="post" enctype="multipart/form-data" class="governance-card">
+        {% csrf_token %}
+        <div class="space-y-6">
+            <div>
+                <label for="{{ form.document_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.document_type.label }} *
+                </label>
+                {{ form.document_type }}
+                {% if form.document_type.errors %}<p class="mt-1 text-sm text-red-600">{{ form.document_type.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.title.label }} *
+                </label>
+                {{ form.title }}
+                {% if form.title.errors %}<p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="{{ form.language.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.language.label }} *
+                    </label>
+                    {{ form.language }}
+                    {% if form.language.errors %}<p class="mt-1 text-sm text-red-600">{{ form.language.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.version.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.version.label }}
+                    </label>
+                    {{ form.version }}
+                </div>
+            </div>
+            <div>
+                <label for="{{ form.file.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.file.label }} *
+                </label>
+                {{ form.file }}
+                {% if form.file.errors %}<p class="mt-1 text-sm text-red-600">{{ form.file.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.description.label }}
+                </label>
+                {{ form.description }}
+            </div>
+        </div>
+        <div class="mt-6 flex items-center justify-end space-x-4">
+            <a href="{% url 'governance:association_document_list' %}" class="btn-secondary">{% trans "Cancel" %}</a>
+            <button type="submit" class="btn-primary">{% trans "Upload Document" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
