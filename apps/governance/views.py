@@ -737,7 +737,6 @@ class ExpenseApprovalView(ExpenseApprovalRequiredMixin, DetailView):
                 approval.signer_position = position  # Attach to approval object
         
         context['approvals'] = approvals
-        context['signer_positions'] = signer_positions
         approval_status = check_expense_approval_status(transaction)
         context['approval_status'] = approval_status
         context['signed_count'] = approval_status['signed_count']
@@ -1200,7 +1199,7 @@ class AuditReportListView(GovernanceRequiredMixin, ListView):
 class AuditReportCreateView(FinancialManagementRequiredMixin, CreateView):
     """Create audit report (quarterly as per Article 18)."""
     model = AuditReport
-    fields = ['board', 'period_start', 'period_end', 'report_date', 'findings', 
+    fields = ['board', 'period_start', 'period_end', 'report_date', 'findings',
               'recommendations', 'financial_verification_status']
     template_name = 'governance/auditors/audit_report_form.html'
     success_url = reverse_lazy('governance:audit_report_list')

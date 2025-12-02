@@ -573,6 +573,12 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         if sociallogin.account.provider == 'google':
             email = sociallogin.account.extra_data.get('email')
             if email:
+                # CRITICAL: Mark email addresses in sociallogin as verified BEFORE allauth processes
+                # This tells allauth that the email is already verified and no verification is needed
+                for email_address in sociallogin.email_addresses:
+                    email_address.verified = True
+                    logger.info(f"PRE-SOCIAL-LOGIN: Marked email in sociallogin as verified: {email}")
+                
                 # Check if user already exists
                 try:
                     user = User.objects.get(email=email)
