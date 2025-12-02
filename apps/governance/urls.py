@@ -144,5 +144,12 @@ urlpatterns = [
     path('assemblies/propose-agenda-item/', views.propose_agenda_item, name='propose_agenda_item'),
     path('assemblies/request-extraordinary/', views.request_extraordinary_assembly, name='request_extraordinary_assembly'),
     path('votes/<int:vote_id>/publish/', views.publish_vote_results, name='publish_vote_results'),
+    
+    # Rules of Procedure Amendments (Article 47)
+    path('amendments/', views.RulesOfProcedureAmendmentListView.as_view(), name='amendment_list'),
+    path('amendments/<int:pk>/', views.RulesOfProcedureAmendmentDetailView.as_view(), name='amendment_detail'),
+    path('amendments/propose/', views.RulesOfProcedureAmendmentCreateView.as_view(), name='amendment_propose'),
+    path('amendments/<int:pk>/edit/', views.RulesOfProcedureAmendmentUpdateView.as_view(), name='amendment_edit'),
+    path('amendments/<int:pk>/delete/', views.RulesOfProcedureAmendmentDeleteView.as_view(), name='amendment_delete'),
 ]
 

@@ -10,6 +10,7 @@ from .models import (
     FinancialTransaction, MembershipDues, Contribution,
     ExecutiveBoard, ExecutivePosition, BoardMeeting,
     Election, Candidacy, Communication, AssociationEvent,
+    RulesOfProcedureAmendment,
 )
 
 
@@ -364,4 +365,43 @@ class AssociationEventForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 5}),
             'report': forms.Textarea(attrs={'rows': 10}),
         }
+
+
+class RulesOfProcedureAmendmentForm(forms.ModelForm):
+    """Form for proposing Rules of Procedure amendments (Article 47 - 30-day deadline)."""
+    
+    class Meta:
+        model = RulesOfProcedureAmendment
+        fields = ['title', 'description', 'proposed_article', 'target_assembly', 'proposal_date']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-input'}),
+            'description': forms.Textarea(attrs={'rows': 6, 'class': 'form-textarea'}),
+            'proposed_article': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'e.g., Article 5'}),
+            'target_assembly': forms.Select(attrs={'class': 'form-select'}),
+            'proposal_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+        }
+        labels = {
+            'proposed_article': _('Article Number (if applicable)'),
+            'target_assembly': _('Target Assembly'),
+            'proposal_date': _('Proposal Date'),
+        }
+        help_texts = {
+            'target_assembly': _('Assembly where this amendment will be discussed'),
+            'proposal_date': _('Must be at least 30 days before the target assembly (Article 47)'),
+        }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        target_assembly = cleaned_data.get('target_assembly')
+        proposal_date = cleaned_data.get('proposal_date')
+        
+        if target_assembly and proposal_date and target_assembly.date:
+            days_before = (target_assembly.date.date() - proposal_date).days
+            if days_before < 30:
+                raise forms.ValidationError(
+                    _('Amendment proposals must be submitted at least 30 days before the assembly (Article 47). '
+                      f'Currently {days_before} days before assembly.')
+                )
+        
+        return cleaned_data
 

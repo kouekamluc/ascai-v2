@@ -5,9 +5,10 @@
 
 {% block content %}
 {% if not_member %}
-<div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-    <p class="text-red-800">{% trans "You must be a registered member to participate in assemblies." %}</p>
-    <a href="{% url 'governance:member_register' %}" class="mt-2 inline-block btn-primary text-sm">
+<div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+    <p class="text-blue-800 mb-3">{% trans "You can attend this assembly as a guest, sympathizer, or authority (Article 5)." %}</p>
+    <p class="text-sm text-blue-700 mb-3">{% trans "Note: Only registered active members can vote." %}</p>
+    <a href="{% url 'governance:member_register' %}" class="mt-2 inline-block btn-secondary text-sm">
         {% trans "Register as Member" %}
     </a>
 </div>
@@ -39,6 +40,35 @@
     {% if not attendance %}
     <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p class="text-blue-800 mb-3">{% trans "Register your attendance for this assembly" %}</p>
+        {% if not_member %}
+        <form method="post" action="{% url 'governance:register_attendance' assembly.pk %}" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="attendee_name" class="block text-sm font-medium text-gray-700 mb-2">
+                    {% trans "Your Name" %} *
+                </label>
+                <input type="text" name="attendee_name" id="attendee_name" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green">
+            </div>
+            <div>
+                <label for="attendee_type" class="block text-sm font-medium text-gray-700 mb-2">
+                    {% trans "Attendee Type" %} *
+                </label>
+                <select name="attendee_type" id="attendee_type" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green">
+                    <option value="sympathizer">{% trans "Sympathizer" %}</option>
+                    <option value="guest">{% trans "Guest" %}</option>
+                    <option value="authority">{% trans "Authority/Institution" %}</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {% trans "Register Attendance" %}
+            </button>
+        </form>
+        {% else %}
         <form method="post" action="{% url 'governance:register_attendance' assembly.pk %}">
             {% csrf_token %}
             <button type="submit" class="btn-primary">
@@ -48,6 +78,7 @@
                 {% trans "Register Attendance" %}
             </button>
         </form>
+        {% endif %}
     </div>
     {% else %}
     <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -90,45 +121,145 @@
     <div class="space-y-6">
         {% for vote in votes %}
         <div class="p-4 border border-gray-200 rounded-lg">
-            <h4 class="font-semibold text-gray-900 mb-3">{{ vote.question }}</h4>
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="font-semibold text-gray-900">{{ vote.question }}</h4>
+                {% if vote.is_published %}
+                <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                    {% trans "Published" %}
+                </span>
+                {% endif %}
+            </div>
             
-            {% if member and member.is_active_member %}
-            <form method="post" action="{% url 'governance:cast_vote' vote.pk %}" class="mb-4">
-                {% csrf_token %}
-                <div class="grid grid-cols-3 gap-3">
-                    <button type="submit" name="choice" value="yes" class="p-3 bg-green-50 border-2 border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-colors">
-                        <p class="font-bold text-green-700">✓ {% trans "Yes" %}</p>
-                    </button>
-                    <button type="submit" name="choice" value="no" class="p-3 bg-red-50 border-2 border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors">
-                        <p class="font-bold text-red-700">✗ {% trans "No" %}</p>
-                    </button>
-                    <button type="submit" name="choice" value="abstain" class="p-3 bg-gray-50 border-2 border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-colors">
-                        <p class="font-bold text-gray-700">— {% trans "Abstain" %}</p>
-                    </button>
-                </div>
-            </form>
-            {% elif not member %}
-            <p class="text-sm text-gray-600 mb-3">{% trans "You must be a registered member to vote." %}</p>
-            {% elif not member.is_active_member %}
-            <p class="text-sm text-gray-600 mb-3">{% trans "Only active members can vote." %}</p>
+            {% if vote.agenda_item %}
+            <p class="text-sm text-gray-600 mb-3">
+                <span class="font-medium">{% trans "Agenda Item" %}:</span> {{ vote.agenda_item.title }}
+            </p>
             {% endif %}
             
-            <div class="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
-                <div class="text-center p-3 bg-green-50 rounded-lg">
-                    <p class="text-2xl font-bold text-green-600">{{ vote.votes_yes }}</p>
-                    <p class="text-xs text-gray-600">{% trans "Yes" %}</p>
+            {% if vote.calculated_results %}
+            {% with results=vote.calculated_results %}
+                {% if vote.id in user_votes %}
+                <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-sm text-blue-800">
+                        <strong>{% trans "Your vote" %}:</strong> 
+                        {% if user_votes|get_item:vote.id == 'yes' %}
+                            <span class="text-green-700">✓ {% trans "Yes" %}</span>
+                        {% elif user_votes|get_item:vote.id == 'no' %}
+                            <span class="text-red-700">✗ {% trans "No" %}</span>
+                        {% else %}
+                            <span class="text-gray-700">— {% trans "Abstain" %}</span>
+                        {% endif %}
+                    </p>
                 </div>
-                <div class="text-center p-3 bg-red-50 rounded-lg">
-                    <p class="text-2xl font-bold text-red-600">{{ vote.votes_no }}</p>
-                    <p class="text-xs text-gray-600">{% trans "No" %}</p>
+                {% elif can_vote and member and member.is_active_member %}
+                <form method="post" action="{% url 'governance:cast_vote' vote.pk %}" class="mb-4">
+                    {% csrf_token %}
+                    <p class="text-sm text-gray-600 mb-3">{% trans "Cast your vote:" %}</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button type="submit" name="choice" value="yes" class="p-3 bg-green-50 border-2 border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-colors">
+                            <p class="font-bold text-green-700">✓ {% trans "Yes" %}</p>
+                        </button>
+                        <button type="submit" name="choice" value="no" class="p-3 bg-red-50 border-2 border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors">
+                            <p class="font-bold text-red-700">✗ {% trans "No" %}</p>
+                        </button>
+                        <button type="submit" name="choice" value="abstain" class="p-3 bg-gray-50 border-2 border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-colors">
+                            <p class="font-bold text-gray-700">— {% trans "Abstain" %}</p>
+                        </button>
+                    </div>
+                </form>
+                {% elif not member %}
+                <p class="text-sm text-gray-600 mb-3">{% trans "You must be a registered member to vote." %}</p>
+                {% elif not member.is_active_member %}
+                <p class="text-sm text-gray-600 mb-3">{% trans "Only active members can vote." %}</p>
+                {% endif %}
+                
+                <div class="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
+                    <div class="text-center p-3 bg-green-50 rounded-lg">
+                        <p class="text-2xl font-bold text-green-600">{{ results.yes }}</p>
+                        <p class="text-xs text-gray-600">{% trans "Yes" %}</p>
+                        {% if results.total_votes > 0 %}
+                        <p class="text-xs text-gray-500 mt-1">{{ results.yes_percent|floatformat:1 }}%</p>
+                        {% endif %}
+                    </div>
+                    <div class="text-center p-3 bg-red-50 rounded-lg">
+                        <p class="text-2xl font-bold text-red-600">{{ results.no }}</p>
+                        <p class="text-xs text-gray-600">{% trans "No" %}</p>
+                        {% if results.total_votes > 0 %}
+                        <p class="text-xs text-gray-500 mt-1">{{ results.no_percent|floatformat:1 }}%</p>
+                        {% endif %}
+                    </div>
+                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                        <p class="text-2xl font-bold text-gray-600">{{ results.abstain }}</p>
+                        <p class="text-xs text-gray-600">{% trans "Abstain" %}</p>
+                        {% if results.total_votes > 0 %}
+                        <p class="text-xs text-gray-500 mt-1">{{ results.abstain_percent|floatformat:1 }}%</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="text-center p-3 bg-gray-50 rounded-lg">
-                    <p class="text-2xl font-bold text-gray-600">{{ vote.votes_abstain }}</p>
-                    <p class="text-xs text-gray-600">{% trans "Abstain" %}</p>
+                
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <strong>{% trans "Total votes" %}:</strong> {{ results.total_votes }}
+                            </p>
+                            {% if results.result %}
+                            <p class="mt-2 font-semibold text-gray-900">
+                                {% trans "Result" %}: 
+                                {% if results.result == 'approved' %}
+                                    <span class="text-green-700">{% trans "Approved" %}</span>
+                                {% elif results.result == 'rejected' %}
+                                    <span class="text-red-700">{% trans "Rejected" %}</span>
+                                {% else %}
+                                    <span class="text-gray-700">{% trans "Tied" %}</span>
+                                {% endif %}
+                            </p>
+                            {% endif %}
+                        </div>
+                        {% if vote.is_published and vote.published_date %}
+                        <p class="text-xs text-gray-500">
+                            {% trans "Published" %}: {{ vote.published_date|date:"d M Y" }}
+                        </p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-            {% if vote.result %}
-            <p class="mt-4 font-semibold text-gray-900">{% trans "Result" %}: {{ vote.result }}</p>
+            {% endwith %}
+            {% else %}
+                {% if can_vote and member and member.is_active_member %}
+                <form method="post" action="{% url 'governance:cast_vote' vote.pk %}" class="mb-4">
+                    {% csrf_token %}
+                    <p class="text-sm text-gray-600 mb-3">{% trans "Cast your vote:" %}</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button type="submit" name="choice" value="yes" class="p-3 bg-green-50 border-2 border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-colors">
+                            <p class="font-bold text-green-700">✓ {% trans "Yes" %}</p>
+                        </button>
+                        <button type="submit" name="choice" value="no" class="p-3 bg-red-50 border-2 border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors">
+                            <p class="font-bold text-red-700">✗ {% trans "No" %}</p>
+                        </button>
+                        <button type="submit" name="choice" value="abstain" class="p-3 bg-gray-50 border-2 border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-colors">
+                            <p class="font-bold text-gray-700">— {% trans "Abstain" %}</p>
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+                
+                <div class="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
+                    <div class="text-center p-3 bg-green-50 rounded-lg">
+                        <p class="text-2xl font-bold text-green-600">{{ vote.votes_yes }}</p>
+                        <p class="text-xs text-gray-600">{% trans "Yes" %}</p>
+                    </div>
+                    <div class="text-center p-3 bg-red-50 rounded-lg">
+                        <p class="text-2xl font-bold text-red-600">{{ vote.votes_no }}</p>
+                        <p class="text-xs text-gray-600">{% trans "No" %}</p>
+                    </div>
+                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                        <p class="text-2xl font-bold text-gray-600">{{ vote.votes_abstain }}</p>
+                        <p class="text-xs text-gray-600">{% trans "Abstain" %}</p>
+                    </div>
+                </div>
+                {% if vote.result %}
+                <p class="mt-4 font-semibold text-gray-900">{% trans "Result" %}: {{ vote.result }}</p>
+                {% endif %}
             {% endif %}
         </div>
         {% endfor %}

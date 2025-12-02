@@ -39,7 +39,8 @@ from .utils import (
     check_executive_board_vacancy, get_executive_board_vacancies,
     calculate_financial_summary, check_expense_approval_status,
     check_extraordinary_assembly_quorum, check_assembly_notice_period,
-    check_agenda_item_proposal_deadline
+    check_agenda_item_proposal_deadline, check_agenda_structure_requirements,
+    check_general_report_requirement, check_assembly_frequency_compliance
 )
 from .forms import (
     MemberForm, MemberSelfRegistrationForm, GeneralAssemblyForm, AgendaItemForm, AssemblyAttendanceForm,
@@ -142,10 +143,15 @@ class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
         member.membership_start_date = timezone.now().date()
         
         # Set default values - verification will be done by admin
-        
-        # Verification fields are set to False initially - admin will verify
         member.lazio_residence_verified = False
-        member.cameroonian_origin_verified = False
+        
+        # Sympathizers don't require Cameroonian origin verification (Article 2)
+        # They are anyone sharing ideals living in Italy (not necessarily Cameroonian)
+        if member.member_type == 'sympathizer':
+            member.cameroonian_origin_verified = False  # Not required for sympathizers
+        else:
+            member.cameroonian_origin_verified = False  # Will be verified by admin for other types
+        
         member.is_active_member = False  # Will be activated after verification and payment
         
         member.save()
@@ -157,10 +163,16 @@ class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
             reason=_('Initial registration - pending admin verification')
         )
         
-        messages.success(
-            self.request,
-            _('Successfully registered as ASCAI member! Your membership is pending admin verification. Once verified and you pay your dues, you will have full member privileges.')
-        )
+        if member.member_type == 'sympathizer':
+            messages.success(
+                self.request,
+                _('Successfully registered as ASCAI sympathizer! Sympathizers are anyone sharing our ideals living in Italy. Your membership is pending admin verification. Once verified and you pay your dues (€5), you will have full member privileges.')
+            )
+        else:
+            messages.success(
+                self.request,
+                _('Successfully registered as ASCAI member! Your membership is pending admin verification. Once verified and you pay your dues, you will have full member privileges.')
+            )
         return redirect('governance:member_portal')
     
     def get_form_kwargs(self):
@@ -234,7 +246,7 @@ def request_dues_payment(request, dues_id):
 
 
 class AssemblyParticipationView(LoginRequiredMixin, DetailView):
-    """View for users to participate in assemblies (attendance, voting)."""
+    """View for users to participate in assemblies (attendance, voting) - Article 5 allows all to attend."""
     model = GeneralAssembly
     template_name = 'governance/member_portal/assembly_participate.html'
     context_object_name = 'assembly'
@@ -242,21 +254,26 @@ class AssemblyParticipationView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        
-        # Check if user is a member
-        try:
-            member = user.member_profile
-        except Member.DoesNotExist:
-            context['not_member'] = True
-            return context
-        
         assembly = self.get_object()
         
-        # Check attendance
-        attendance = AssemblyAttendance.objects.filter(
-            assembly=assembly,
-            user=user
-        ).first()
+        # Check if user is a member
+        member = None
+        try:
+            member = user.member_profile
+            context['not_member'] = False
+        except Member.DoesNotExist:
+            context['not_member'] = True
+        
+        # Check attendance (for members, check by user; for non-members, we'll check by name in template)
+        attendance = None
+        if member:
+            attendance = AssemblyAttendance.objects.filter(
+                assembly=assembly,
+                user=user
+            ).first()
+        else:
+            # For non-members, check if they've registered with their name
+            # This will be handled in the template with a form
         
         # Get agenda items
         agenda_items = assembly.agenda_items.all().order_by('order')
@@ -264,12 +281,27 @@ class AssemblyParticipationView(LoginRequiredMixin, DetailView):
         # Get votes for this assembly
         votes = assembly.votes.all()
         
-        # Check which items user has voted on
+        # Check which items user has voted on (only for members)
         user_votes = {}
+        vote_results = {}
+        can_vote = False
+        
+        # Check if user can vote (active member and assembly is open)
+        if member and member.is_active_member:
+            if assembly.status == 'scheduled' or assembly.status == 'completed':
+                if assembly.date.date() <= timezone.now().date():
+                    can_vote = True
+        
         for vote in votes:
-            vote_record = AssemblyVoteRecord.objects.filter(vote=vote, voter=user).first()
-            if vote_record:
-                user_votes[vote.id] = vote_record.choice
+            if member:
+                vote_record = AssemblyVoteRecord.objects.filter(vote=vote, voter=user).first()
+                if vote_record:
+                    user_votes[vote.id] = vote_record.choice
+            
+            # Calculate results for each vote and attach to vote object
+            results = calculate_assembly_vote_results(vote)
+            vote_results[vote.id] = results
+            vote.calculated_results = results  # Attach to vote object for template access
         
         context.update({
             'member': member,
@@ -277,32 +309,75 @@ class AssemblyParticipationView(LoginRequiredMixin, DetailView):
             'agenda_items': agenda_items,
             'votes': votes,
             'user_votes': user_votes,
+            'vote_results': vote_results,
+            'can_vote': can_vote,
         })
         return context
 
 
 @login_required
 def register_attendance(request, assembly_id):
-    """User registers their attendance at an assembly."""
+    """User registers their attendance at an assembly (Article 5 - allows members, sympathizers, guests, authorities)."""
     assembly = get_object_or_404(GeneralAssembly, pk=assembly_id)
     user = request.user
     
+    # Check if user is a member
     try:
         member = user.member_profile
+        attendee_type = 'member' if member.is_active_member else 'sympathizer'
+        user_provided = user
+        attendee_name = None
     except Member.DoesNotExist:
-        messages.error(request, _('You must be a registered member to attend assemblies.'))
-        return redirect('governance:member_register')
+        # Non-member registration (guest, authority, or sympathizer not yet registered)
+        # Allow registration but require attendee_type and name
+        attendee_type = request.POST.get('attendee_type', 'guest')
+        attendee_name = request.POST.get('attendee_name', '').strip()
+        
+        if not attendee_name:
+            messages.error(request, _('Please provide your name for attendance registration.'))
+            return redirect('governance:assembly_participate', pk=assembly_id)
+        
+        if attendee_type not in ['sympathizer', 'guest', 'authority']:
+            attendee_type = 'guest'
+        
+        user_provided = None
+        member = None
     
-    # Check if already registered
-    attendance, created = AssemblyAttendance.objects.get_or_create(
-        assembly=assembly,
-        user=user,
-        defaults={
-            'attended': True,
-            'attendee_type': 'member' if member.is_active_member else 'sympathizer',
-            'registration_date': timezone.now(),
-        }
-    )
+    # Check if already registered (for members, check by user; for non-members, check by name)
+    if user_provided:
+        attendance, created = AssemblyAttendance.objects.get_or_create(
+            assembly=assembly,
+            user=user_provided,
+            defaults={
+                'attended': True,
+                'attendee_type': attendee_type,
+                'registration_date': timezone.now(),
+            }
+        )
+    else:
+        # For non-members, check if name already registered for this assembly
+        existing = AssemblyAttendance.objects.filter(
+            assembly=assembly,
+            attendee_name=attendee_name,
+            user__isnull=True
+        ).first()
+        
+        if existing:
+            attendance = existing
+            created = False
+            attendance.attended = True
+            attendance.attendee_type = attendee_type
+            attendance.save()
+        else:
+            attendance = AssemblyAttendance.objects.create(
+                assembly=assembly,
+                user=None,
+                attendee_name=attendee_name,
+                attendee_type=attendee_type,
+                attended=True,
+                registration_date=timezone.now(),
+            )
+            created = True
     
     if not created:
         attendance.attended = True
@@ -354,13 +429,24 @@ def cast_vote(request, vote_id):
     """User casts a vote on an assembly item."""
     vote = get_object_or_404(AssemblyVote, pk=vote_id)
     user = request.user
+    assembly = vote.assembly
+    
+    # Check if assembly is open for voting
+    if assembly.status != 'scheduled' and assembly.status != 'completed':
+        messages.error(request, _('This assembly is not open for voting.'))
+        return redirect('governance:assembly_participate', pk=assembly.pk)
+    
+    # Check if assembly date has passed (voting should be during or after assembly)
+    if assembly.date.date() > timezone.now().date():
+        messages.error(request, _('Voting is only available on or after the assembly date.'))
+        return redirect('governance:assembly_participate', pk=assembly.pk)
     
     # Check if user is a member
     try:
         member = user.member_profile
         if not member.is_active_member:
             messages.error(request, _('Only active members can vote.'))
-            return redirect('governance:assembly_participate', pk=vote.assembly.pk)
+            return redirect('governance:assembly_participate', pk=assembly.pk)
     except Member.DoesNotExist:
         messages.error(request, _('You must be a registered member to vote.'))
         return redirect('governance:member_register')
@@ -369,13 +455,13 @@ def cast_vote(request, vote_id):
     existing_vote = AssemblyVoteRecord.objects.filter(vote=vote, voter=user).first()
     if existing_vote:
         messages.warning(request, _('You have already voted on this item.'))
-        return redirect('governance:assembly_participate', pk=vote.assembly.pk)
+        return redirect('governance:assembly_participate', pk=assembly.pk)
     
     # Get vote choice from POST
     choice = request.POST.get('choice')
     if choice not in ['yes', 'no', 'abstain']:
         messages.error(request, _('Invalid vote choice.'))
-        return redirect('governance:assembly_participate', pk=vote.assembly.pk)
+        return redirect('governance:assembly_participate', pk=assembly.pk)
     
     # Create vote record
     AssemblyVoteRecord.objects.create(
@@ -384,17 +470,25 @@ def cast_vote(request, vote_id):
         choice=choice
     )
     
-    # Update vote counts
-    if choice == 'yes':
-        vote.votes_yes += 1
-    elif choice == 'no':
-        vote.votes_no += 1
-    else:
-        vote.votes_abstain += 1
+    # Recalculate vote counts from all records (more accurate)
+    vote_records = vote.vote_records.all()
+    vote.votes_yes = vote_records.filter(choice='yes').count()
+    vote.votes_no = vote_records.filter(choice='no').count()
+    vote.votes_abstain = vote_records.filter(choice='abstain').count()
+    
+    # Calculate and set result using utility function
+    results = calculate_assembly_vote_results(vote)
+    if results['result'] == 'approved':
+        vote.result = _('Approved')
+    elif results['result'] == 'rejected':
+        vote.result = _('Rejected')
+    elif results['result'] == 'tied':
+        vote.result = _('Tied')
+    
     vote.save()
     
     messages.success(request, _('Vote cast successfully!'))
-    return redirect('governance:assembly_participate', pk=vote.assembly.pk)
+    return redirect('governance:assembly_participate', pk=assembly.pk)
 
 
 # ============================================================================
@@ -684,7 +778,22 @@ class GeneralAssemblyDetailView(GovernanceRequiredMixin, DetailView):
         # Calculate vote results for each vote
         vote_results = {}
         for vote in context['votes']:
-            vote_results[vote.id] = calculate_assembly_vote_results(vote)
+            results = calculate_assembly_vote_results(vote)
+            vote_results[vote.id] = results
+            vote.calculated_results = results  # Attach to vote object for template access
+            # Sync vote counts with actual records (in case of discrepancies)
+            if vote.votes_yes != results['yes'] or vote.votes_no != results['no'] or vote.votes_abstain != results['abstain']:
+                vote.votes_yes = results['yes']
+                vote.votes_no = results['no']
+                vote.votes_abstain = results['abstain']
+                # Update result field
+                if results['result'] == 'approved':
+                    vote.result = _('Approved')
+                elif results['result'] == 'rejected':
+                    vote.result = _('Rejected')
+                elif results['result'] == 'tied':
+                    vote.result = _('Tied')
+                vote.save(update_fields=['votes_yes', 'votes_no', 'votes_abstain', 'result'])
         context['vote_results'] = vote_results
         
         # Check notice period compliance
@@ -753,7 +862,7 @@ class AgendaItemDeleteView(AssemblyManagementRequiredMixin, DeleteView):
 
 
 class AssemblyAttendanceCreateView(AssemblyManagementRequiredMixin, CreateView):
-    """Create assembly attendance record."""
+    """Create assembly attendance record (allows guests, authorities, sympathizers - Article 5)."""
     model = AssemblyAttendance
     form_class = AssemblyAttendanceForm
     template_name = 'governance/assemblies/attendance_form.html'
@@ -765,6 +874,13 @@ class AssemblyAttendanceCreateView(AssemblyManagementRequiredMixin, CreateView):
         if assembly_id:
             initial['assembly'] = assembly_id
         return initial
+    
+    def form_valid(self, form):
+        # If user is not provided but attendee_name is, ensure user is None
+        if not form.instance.user and form.instance.attendee_name:
+            form.instance.user = None
+        messages.success(self.request, _('Attendance record created successfully.'))
+        return super().form_valid(form)
 
 
 class AssemblyAttendanceUpdateView(AssemblyManagementRequiredMixin, UpdateView):
@@ -1015,6 +1131,20 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
         )['total'] or 0
         net_balance = total_income - total_expenses
         
+        # Get unpublished votes approaching or past 30-day deadline (Article 24)
+        unpublished_votes = AssemblyVote.objects.filter(is_published=False).select_related('assembly')
+        overdue_votes = [v for v in unpublished_votes if v.is_publication_overdue]
+        approaching_deadline_votes = [
+            v for v in unpublished_votes 
+            if not v.is_publication_overdue and v.days_until_publication_deadline is not None and v.days_until_publication_deadline <= 7
+        ]
+        
+        # Check 6-month general report requirement (Article 45)
+        report_status = check_general_report_requirement()
+        
+        # Check assembly frequency compliance (Article 2)
+        frequency_status = check_assembly_frequency_compliance()
+        
         # Statistics
         context['stats'] = {
             'total_members': Member.objects.count(),
@@ -1032,6 +1162,8 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
             'total_income': total_income,
             'total_expenses': total_expenses,
             'net_balance': net_balance,
+            'overdue_vote_publications': len(overdue_votes),
+            'approaching_deadline_votes': len(approaching_deadline_votes),
         }
         
         # Recent activity
@@ -1040,6 +1172,10 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
         context['recent_elections'] = Election.objects.all().order_by('-start_date')[:3]
         context['pending_disciplinary_cases'] = DisciplinaryCase.objects.filter(status='pending').count()
         context['pending_audit_reports'] = AuditReport.objects.filter(financial_verification_status='pending').count()
+        context['overdue_votes'] = overdue_votes[:10]
+        context['approaching_deadline_votes'] = approaching_deadline_votes[:10]
+        context['report_status'] = report_status
+        context['frequency_status'] = frequency_status
         
         return context
 
@@ -1206,8 +1342,12 @@ class CandidacyCreateView(LoginRequiredMixin, CreateView):
         return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
-        # Check eligibility before allowing application
-        eligibility = check_candidacy_eligibility(self.request.user, form.instance.position)
+        # Check eligibility before allowing application (including Electoral Commission check - Article 33)
+        eligibility = check_candidacy_eligibility(
+            self.request.user, 
+            form.instance.position,
+            election=form.instance.election
+        )
         
         if not eligibility['eligible']:
             for reason in eligibility['reasons']:
@@ -2124,9 +2264,79 @@ def publish_vote_results(request, vote_id):
         messages.error(request, _('You do not have permission to publish vote results.'))
         return redirect('governance:assembly_detail', pk=vote.assembly.pk)
     
+    # Recalculate results before publishing
+    results = calculate_assembly_vote_results(vote)
+    
+    # Sync vote counts
+    vote.votes_yes = results['yes']
+    vote.votes_no = results['no']
+    vote.votes_abstain = results['abstain']
+    
+    # Set result
+    if results['result'] == 'approved':
+        vote.result = _('Approved')
+    elif results['result'] == 'rejected':
+        vote.result = _('Rejected')
+    elif results['result'] == 'tied':
+        vote.result = _('Tied')
+    
     vote.is_published = True
     vote.published_date = timezone.now().date()
     vote.save()
     
     messages.success(request, _('Vote results published!'))
     return redirect('governance:assembly_detail', pk=vote.assembly.pk)
+
+
+# Rules of Procedure Amendment Views (Article 47)
+class RulesOfProcedureAmendmentListView(GovernanceRequiredMixin, ListView):
+    """List all Rules of Procedure amendment proposals."""
+    model = RulesOfProcedureAmendment
+    template_name = 'governance/amendments/amendment_list.html'
+    context_object_name = 'amendments'
+    paginate_by = 20
+
+
+class RulesOfProcedureAmendmentDetailView(GovernanceRequiredMixin, DetailView):
+    """View details of an amendment proposal."""
+    model = RulesOfProcedureAmendment
+    template_name = 'governance/amendments/amendment_detail.html'
+    context_object_name = 'amendment'
+
+
+class RulesOfProcedureAmendmentCreateView(LoginRequiredMixin, CreateView):
+    """Members propose Rules of Procedure amendments (Article 47 - 30-day deadline)."""
+    model = RulesOfProcedureAmendment
+    form_class = RulesOfProcedureAmendmentForm
+    template_name = 'governance/amendments/amendment_form.html'
+    success_url = reverse_lazy('governance:member_portal')
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user is a member
+        if not hasattr(request.user, 'member_profile'):
+            messages.error(request, _('You must be a registered member to propose amendments.'))
+            return redirect('governance:member_register')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        form.instance.proposed_by = self.request.user
+        messages.success(
+            self.request,
+            _('Amendment proposal submitted! It will be reviewed and added to the assembly agenda if it meets the 30-day deadline.')
+        )
+        return super().form_valid(form)
+
+
+class RulesOfProcedureAmendmentUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+    """Update amendment proposal (admin only)."""
+    model = RulesOfProcedureAmendment
+    form_class = RulesOfProcedureAmendmentForm
+    template_name = 'governance/amendments/amendment_form.html'
+    success_url = reverse_lazy('governance:amendment_list')
+
+
+class RulesOfProcedureAmendmentDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+    """Delete amendment proposal."""
+    model = RulesOfProcedureAmendment
+    template_name = 'governance/amendments/amendment_confirm_delete.html'
+    success_url = reverse_lazy('governance:amendment_list')

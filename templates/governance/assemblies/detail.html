@@ -133,7 +133,89 @@
     <div class="space-y-4">
         {% for vote in votes %}
         <div class="p-4 border border-gray-200 rounded-lg">
-            <h4 class="font-semibold mb-2">{{ vote.question }}</h4>
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="font-semibold">{{ vote.question }}</h4>
+                <div class="flex items-center gap-2">
+                    {% if vote.is_published %}
+                    <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                        {% trans "Published" %}
+                    </span>
+                    {% else %}
+                    <span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
+                        {% trans "Not Published" %}
+                    </span>
+                    {% endif %}
+                    {% if not vote.is_published and perms.governance.manage_assembly %}
+                    <form method="post" action="{% url 'governance:publish_vote_results' vote.pk %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-xs text-blue-600 hover:underline">
+                            {% trans "Publish" %}
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if vote.agenda_item %}
+            <p class="text-sm text-gray-600 mb-3">
+                <span class="font-medium">{% trans "Agenda Item" %}:</span> {{ vote.agenda_item.title }}
+            </p>
+            {% endif %}
+            
+            {% if vote.calculated_results %}
+            {% with results=vote.calculated_results %}
+            <div class="grid grid-cols-3 gap-4 mt-3">
+                <div class="text-center p-3 bg-green-50 rounded-lg">
+                    <p class="text-2xl font-bold text-green-600">{{ results.yes }}</p>
+                    <p class="text-xs text-gray-600">{% trans "Yes" %}</p>
+                    {% if results.total_votes > 0 %}
+                    <p class="text-xs text-gray-500 mt-1">{{ results.yes_percent|floatformat:1 }}%</p>
+                    {% endif %}
+                </div>
+                <div class="text-center p-3 bg-red-50 rounded-lg">
+                    <p class="text-2xl font-bold text-red-600">{{ results.no }}</p>
+                    <p class="text-xs text-gray-600">{% trans "No" %}</p>
+                    {% if results.total_votes > 0 %}
+                    <p class="text-xs text-gray-500 mt-1">{{ results.no_percent|floatformat:1 }}%</p>
+                    {% endif %}
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <p class="text-2xl font-bold text-gray-600">{{ results.abstain }}</p>
+                    <p class="text-xs text-gray-600">{% trans "Abstain" %}</p>
+                    {% if results.total_votes > 0 %}
+                    <p class="text-xs text-gray-500 mt-1">{{ results.abstain_percent|floatformat:1 }}%</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">
+                            <strong>{% trans "Total votes" %}:</strong> {{ results.total_votes }}
+                        </p>
+                        {% if results.result %}
+                        <p class="mt-2 font-semibold text-gray-900">
+                            {% trans "Result" %}: 
+                            {% if results.result == 'approved' %}
+                                <span class="text-green-700">{% trans "Approved" %}</span>
+                            {% elif results.result == 'rejected' %}
+                                <span class="text-red-700">{% trans "Rejected" %}</span>
+                            {% else %}
+                                <span class="text-gray-700">{% trans "Tied" %}</span>
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% if vote.is_published and vote.published_date %}
+                    <p class="text-xs text-gray-500">
+                        {% trans "Published" %}: {{ vote.published_date|date:"d M Y" }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endwith %}
+            {% else %}
             <div class="grid grid-cols-3 gap-4 mt-3">
                 <div class="text-center p-3 bg-green-50 rounded-lg">
                     <p class="text-2xl font-bold text-green-600">{{ vote.votes_yes }}</p>
@@ -150,6 +232,7 @@
             </div>
             {% if vote.result %}
             <p class="mt-3 font-semibold text-gray-900">{% trans "Result" %}: {{ vote.result }}</p>
+            {% endif %}
             {% endif %}
         </div>
         {% endfor %}

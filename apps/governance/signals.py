@@ -7,7 +7,8 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import (
     Member, MembershipStatus, ExecutivePosition, BoardMeeting,
-    GeneralAssembly, MembershipDues, FinancialTransaction, ExpenseApproval
+    GeneralAssembly, MembershipDues, FinancialTransaction, ExpenseApproval,
+    BoardOfAuditors, AuditorMember
 )
 
 
@@ -164,6 +165,42 @@ def check_expense_approval_complete(sender, instance, **kwargs):
             if transaction.status != 'approved':
                 transaction.status = 'approved'
                 transaction.save(update_fields=['status'])
+
+
+@receiver(post_save, sender=BoardOfAuditors)
+def auto_include_founding_members_and_former_presidents(sender, instance, created, **kwargs):
+    """
+    Automatically include founding members and former presidents in Board of Auditors (Article 8).
+    This is a backup signal in case the save() method doesn't run.
+    """
+    if created:
+        # Auto-add founding members
+        founding_members = Member.objects.filter(is_founding_member=True)
+        for member in founding_members:
+            AuditorMember.objects.get_or_create(
+                board=instance,
+                user=member.user,
+                defaults={
+                    'is_founding_member': True,
+                }
+            )
+        
+        # Auto-add former presidents (from ExecutivePosition history)
+        former_presidents = ExecutivePosition.objects.filter(
+            position='president',
+            status__in=['resigned', 'replaced'],
+            end_date__isnull=False
+        ).select_related('user').distinct('user')
+        
+        for position in former_presidents:
+            if position.user:
+                AuditorMember.objects.get_or_create(
+                    board=instance,
+                    user=position.user,
+                    defaults={
+                        'is_former_president': True,
+                    }
+                )
 
 
 

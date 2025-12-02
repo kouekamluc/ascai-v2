@@ -119,11 +119,13 @@ def calculate_election_results(election):
 # ELIGIBILITY CHECKING ALGORITHMS
 # ============================================================================
 
-def check_candidacy_eligibility(user, position):
+def check_candidacy_eligibility(user, position, election=None):
     """
     Check if a user is eligible to run for a position (Article 33).
     Returns dict with eligibility status and reasons.
     """
+    from .models import ElectoralCommission, CommissionMember
+    
     eligibility = {
         'eligible': True,
         'reasons': [],
@@ -137,6 +139,19 @@ def check_candidacy_eligibility(user, position):
         eligibility['eligible'] = False
         eligibility['reasons'].append('User is not a registered member')
         return eligibility
+    
+    # Check if user is a member of Electoral Commission (Article 33 - cannot be candidate)
+    if election and election.commission:
+        is_commission_member = CommissionMember.objects.filter(
+            commission=election.commission,
+            user=user
+        ).exists()
+        if is_commission_member:
+            eligibility['eligible'] = False
+            eligibility['reasons'].append(
+                'Members of the Electoral Commission cannot be candidates (Article 33)'
+            )
+            return eligibility
     
     # Check 1+ year seniority
     if member.membership_start_date:
@@ -361,11 +376,18 @@ def check_executive_board_vacancy(board, position):
             if position_obj.user not in meeting.attendees.all():
                 absences += 1
         
-        if absences >= 6:  # 2 assemblies + 4 meetings
+        if absences >= 6:  # 2 assemblies + 4 meetings (Article 13)
+            # Automatically mark as resigned
+            if position_obj.status != 'resigned':
+                position_obj.status = 'resigned'
+                position_obj.end_date = timezone.now().date()
+                position_obj.save(update_fields=['status', 'end_date'])
+            
             return {
                 'is_vacant': True,
                 'position': position_obj,
-                'reason': f'Excessive absences: {absences} missed meetings/assemblies'
+                'reason': f'Excessive absences: {absences} missed meetings/assemblies (automatic resignation per Article 13)',
+                'auto_resigned': True
             }
     
     return {
@@ -528,5 +550,119 @@ def check_agenda_item_proposal_deadline(assembly, proposal_date):
         'days': days_before,
         'required': 14,
         'message': f'Proposal deadline: {days_before} days before assembly (required: 14 days)' if compliant else f'Too late: {days_before} days before assembly (required: 14 days)'
+    }
+
+
+def check_general_report_requirement():
+    """
+    Check if 6-month general report requirement is met (Article 45).
+    Returns dict with compliance status and next due date.
+    """
+    from .models import FinancialReport
+    
+    # Get the most recent general report (annual or quarterly)
+    last_report = FinancialReport.objects.filter(
+        report_type__in=['annual', 'quarterly']
+    ).order_by('-period_end').first()
+    
+    today = timezone.now().date()
+    
+    if not last_report:
+        return {
+            'compliant': False,
+            'last_report_date': None,
+            'days_overdue': None,
+            'next_due_date': today + timedelta(days=180),
+            'message': 'No general reports found. First report due within 6 months.'
+        }
+    
+    # Calculate next due date (6 months after last report period end)
+    next_due_date = last_report.period_end + timedelta(days=180)
+    days_overdue = (today - next_due_date).days if today > next_due_date else None
+    
+    return {
+        'compliant': days_overdue is None or days_overdue <= 0,
+        'last_report_date': last_report.period_end,
+        'days_overdue': days_overdue,
+        'next_due_date': next_due_date,
+        'message': f'Last report: {last_report.period_end}. Next due: {next_due_date}. ' + 
+                   (f'Overdue by {days_overdue} days' if days_overdue else f'Due in {(next_due_date - today).days} days')
+    }
+
+
+def check_agenda_structure_requirements(assembly):
+    """
+    Check if assembly agenda meets required structure (Article 21).
+    Required items: contemplation, minutes reading, finance, activities, miscellaneous.
+    Returns dict with compliance status and missing items.
+    """
+    if not assembly:
+        return {
+            'compliant': False,
+            'missing_items': [],
+            'message': 'Assembly not provided'
+        }
+    
+    agenda_items = assembly.agenda_items.all()
+    item_types = set(agenda_items.values_list('item_type', flat=True))
+    
+    # Article 21 requires: contemplation, minutes reading, finance, activities, miscellaneous
+    required_types = {'finance', 'activities', 'miscellaneous'}
+    # Note: 'contemplation' and 'minutes reading' might be special items or handled differently
+    # For now, we check for the main categories
+    
+    missing_items = required_types - item_types
+    
+    return {
+        'compliant': len(missing_items) == 0,
+        'missing_items': list(missing_items),
+        'has_finance': 'finance' in item_types,
+        'has_activities': 'activities' in item_types,
+        'has_miscellaneous': 'miscellaneous' in item_types,
+        'message': f'Missing required agenda items: {", ".join(missing_items)}' if missing_items else 'All required agenda items present'
+    }
+
+
+def check_assembly_frequency_compliance():
+    """
+    Check if assembly frequency meets requirements (Article 2).
+    Requirements: at least twice a year, every quarter at most.
+    Returns dict with compliance status.
+    """
+    from .models import GeneralAssembly
+    
+    today = timezone.now().date()
+    one_year_ago = today - timedelta(days=365)
+    
+    # Get assemblies in the last year
+    recent_assemblies = GeneralAssembly.objects.filter(
+        date__gte=one_year_ago,
+        status__in=['completed', 'in_progress']
+    ).order_by('date')
+    
+    assembly_count = recent_assemblies.count()
+    
+    # Check if at least 2 assemblies per year
+    meets_minimum = assembly_count >= 2
+    
+    # Check if no more than quarterly (every 3 months)
+    meets_maximum = True
+    if assembly_count > 0:
+        # Check gaps between assemblies
+        for i in range(len(recent_assemblies) - 1):
+            gap_days = (recent_assemblies[i + 1].date.date() - recent_assemblies[i].date.date()).days
+            if gap_days < 90:  # Less than 3 months
+                meets_maximum = False
+                break
+    
+    return {
+        'compliant': meets_minimum and meets_maximum,
+        'assembly_count': assembly_count,
+        'meets_minimum': meets_minimum,
+        'meets_maximum': meets_maximum,
+        'message': f'Assembly frequency: {assembly_count} assemblies in last year. ' +
+                   ('Meets requirements' if (meets_minimum and meets_maximum) else
+                    ('Too few assemblies (minimum 2 per year)' if not meets_minimum else
+                     'Too frequent assemblies (maximum quarterly)'))
     }
 

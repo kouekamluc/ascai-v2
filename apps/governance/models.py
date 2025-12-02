@@ -95,6 +95,12 @@ class Member(models.Model):
         verbose_name=_('Last Assembly Attendance')
     )
     
+    is_founding_member = models.BooleanField(
+        default=False,
+        verbose_name=_('Founding Member'),
+        help_text=_('Founding member of ASCAI Association (automatically included in Board of Auditors per Article 8)')
+    )
+    
     notes = models.TextField(
         blank=True,
         null=True,
@@ -548,6 +554,104 @@ class AgendaItem(models.Model):
         return f"{self.assembly} - {self.title}"
 
 
+class RulesOfProcedureAmendment(models.Model):
+    """
+    Rules of Procedure amendment proposals (Article 47).
+    Members can propose amendments 30 days before assembly.
+    """
+    STATUS_CHOICES = [
+        ('proposed', _('Proposed')),
+        ('approved', _('Approved for Assembly')),
+        ('rejected', _('Rejected')),
+        ('discussed', _('Discussed')),
+        ('adopted', _('Adopted')),
+        ('withdrawn', _('Withdrawn')),
+    ]
+    
+    title = models.CharField(
+        max_length=200,
+        verbose_name=_('Amendment Title')
+    )
+    
+    description = models.TextField(
+        verbose_name=_('Amendment Description'),
+        help_text=_('Detailed description of the proposed amendment')
+    )
+    
+    proposed_article = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name=_('Article Number'),
+        help_text=_('Article number being amended (if applicable)')
+    )
+    
+    proposed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='proposed_amendments',
+        verbose_name=_('Proposed By')
+    )
+    
+    proposal_date = models.DateField(
+        default=timezone.now,
+        verbose_name=_('Proposal Date')
+    )
+    
+    target_assembly = models.ForeignKey(
+        GeneralAssembly,
+        on_delete=models.CASCADE,
+        related_name='amendment_proposals',
+        verbose_name=_('Target Assembly'),
+        help_text=_('Assembly where this amendment will be discussed')
+    )
+    
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='proposed',
+        verbose_name=_('Status')
+    )
+    
+    # Validation: must be proposed 30 days before assembly (Article 47)
+    meets_deadline = models.BooleanField(
+        default=False,
+        verbose_name=_('Meets 30-Day Deadline'),
+        help_text=_('Proposed at least 30 days before assembly')
+    )
+    
+    discussion_notes = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Discussion Notes')
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = _('Rules of Procedure Amendment')
+        verbose_name_plural = _('Rules of Procedure Amendments')
+        ordering = ['-proposal_date', '-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.target_assembly}"
+    
+    def check_30_day_deadline(self):
+        """Check if proposal meets 30-day deadline requirement (Article 47)."""
+        if not self.target_assembly or not self.target_assembly.date:
+            return False
+        
+        days_before = (self.target_assembly.date.date() - self.proposal_date).days
+        return days_before >= 30
+    
+    def save(self, *args, **kwargs):
+        """Auto-check 30-day deadline on save."""
+        self.meets_deadline = self.check_30_day_deadline()
+        super().save(*args, **kwargs)
+
+
 class AssemblyAttendance(models.Model):
     """
     Track attendance at General Assemblies (Article 5).
@@ -711,6 +815,32 @@ class AssemblyVote(models.Model):
     def total_votes(self):
         """Calculate total votes cast."""
         return self.votes_yes + self.votes_no + self.votes_abstain
+    
+    @property
+    def days_since_assembly(self):
+        """Calculate days since assembly date (for 30-day publication deadline - Article 24)."""
+        if self.assembly and self.assembly.date:
+            delta = timezone.now().date() - self.assembly.date.date()
+            return delta.days
+        return None
+    
+    @property
+    def is_publication_overdue(self):
+        """Check if vote results publication is overdue (Article 24 - 30 days)."""
+        if self.is_published:
+            return False
+        days = self.days_since_assembly
+        return days is not None and days > 30
+    
+    @property
+    def days_until_publication_deadline(self):
+        """Calculate days remaining until 30-day publication deadline."""
+        if self.is_published:
+            return None
+        days = self.days_since_assembly
+        if days is not None:
+            return max(0, 30 - days)
+        return None
 
 
 class AssemblyVoteRecord(models.Model):
@@ -1088,6 +1218,14 @@ class FinancialReport(models.Model):
     
     def __str__(self):
         return f"{self.get_report_type_display()} Report - {self.period_start} to {self.period_end}"
+    
+    @property
+    def days_since_period_end(self):
+        """Calculate days since report period ended."""
+        if self.period_end:
+            delta = timezone.now().date() - self.period_end
+            return delta.days
+        return None
 
 
 class ExpenseApproval(models.Model):
@@ -1497,6 +1635,40 @@ class BoardOfAuditors(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        """Auto-include founding members and former presidents when board is created (Article 8)."""
+        created = self.pk is None
+        super().save(*args, **kwargs)
+        
+        if created:
+            # Auto-add founding members
+            founding_members = Member.objects.filter(is_founding_member=True)
+            for member in founding_members:
+                AuditorMember.objects.get_or_create(
+                    board=self,
+                    user=member.user,
+                    defaults={
+                        'is_founding_member': True,
+                    }
+                )
+            
+            # Auto-add former presidents (from ExecutivePosition history)
+            former_presidents = ExecutivePosition.objects.filter(
+                position='president',
+                status__in=['resigned', 'replaced'],
+                end_date__isnull=False
+            ).select_related('user').distinct('user')
+            
+            for position in former_presidents:
+                if position.user:
+                    AuditorMember.objects.get_or_create(
+                        board=self,
+                        user=position.user,
+                        defaults={
+                            'is_former_president': True,
+                        }
+                    )
 
 
 class AuditorMember(models.Model):
