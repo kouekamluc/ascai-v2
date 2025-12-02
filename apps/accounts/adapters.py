@@ -625,6 +625,8 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         This allows existing users to login with Google OAuth.
         CRITICAL: Mark email as verified immediately for Google OAuth users.
         """
+        from allauth.account.models import EmailAddress
+        
         # CRITICAL: For Google OAuth, mark email as verified BEFORE any checks
         if sociallogin.account.provider == 'google':
             email = sociallogin.account.extra_data.get('email')
@@ -639,8 +641,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 # Also ensure the email_address objects are properly set up
                 # This is critical - allauth checks these objects during the callback
                 if not sociallogin.email_addresses:
-                    # Create email address object if it doesn't exist
-                    from allauth.account.models import EmailAddress
                     # We'll create it later, but mark it as verified in the sociallogin state
                     logger.info(f"PRE-SOCIAL-LOGIN: No email_addresses in sociallogin, will be created in populate_user")
                 
