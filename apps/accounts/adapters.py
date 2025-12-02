@@ -801,16 +801,19 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 logger.info(f"SAVE_USER: Marked email in sociallogin as verified BEFORE super: {email_addr.email}")
         
         # Call super to create/link the user
+        # This will call sociallogin.save() which creates EmailAddress via setup_user_email()
         user = super().save_user(request, sociallogin, form)
         
         # Check if this is a new user or an existing user being linked
         is_new_user = existing_user is None
         
         # CRITICAL: Mark email as verified IMMEDIATELY for ALL Google OAuth users
-        # This must happen IMMEDIATELY after user is created, before allauth checks
+        # Note: super().save_user() already creates EmailAddress via sociallogin.save()
+        # We need to update it after it's created, but handle the case where it might already exist
         if user.email and sociallogin.account.provider == 'google':
-            # Force mark as verified in EmailAddress - this is what allauth checks
-            email_address, created = EmailAddress.objects.update_or_create(
+            # Use get_or_create to safely get the EmailAddress that allauth just created
+            # If it already exists (from pre_social_login), get it; otherwise create it
+            email_address, created = EmailAddress.objects.get_or_create(
                 user=user,
                 email=user.email,
                 defaults={
@@ -818,14 +821,19 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                     'primary': True
                 }
             )
-            # Force save to ensure it's persisted
-            email_address.verified = True
-            email_address.save()
-            
-            logger.info(
-                f"CRITICAL: Marked EmailAddress as verified for Google OAuth user: {user.email} "
-                f"(created={created}, verified={email_address.verified})"
-            )
+            # Always update to ensure it's verified (in case it was created by allauth without verified=True)
+            if not email_address.verified:
+                email_address.verified = True
+                email_address.primary = True
+                email_address.save()
+                logger.info(
+                    f"CRITICAL: Updated EmailAddress as verified for Google OAuth user: {user.email} "
+                    f"(was created by allauth without verified=True)"
+                )
+            else:
+                logger.info(
+                    f"CRITICAL: EmailAddress already verified for Google OAuth user: {user.email}"
+                )
             
             # Also mark in User model
             user.email_verified = True
