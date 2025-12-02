@@ -30,6 +30,7 @@ from .models import (
     DisciplinaryCase, DisciplinarySanction,
     AssociationEvent, EventOrganizingCommittee,
     AssociationDocument, Communication,
+    RulesOfProcedureAmendment,
     EXECUTIVE_POSITION_CHOICES,
 )
 from .utils import (
@@ -47,6 +48,7 @@ from .forms import (
     AssemblyVoteForm, FinancialTransactionForm, MembershipDuesForm, ContributionForm,
     ExecutiveBoardForm, ExecutivePositionForm, BoardMeetingForm,
     ElectionForm, CandidacyForm, CommunicationForm, AssociationEventForm,
+    RulesOfProcedureAmendmentForm,
 )
 
 
@@ -271,9 +273,8 @@ class AssemblyParticipationView(LoginRequiredMixin, DetailView):
                 assembly=assembly,
                 user=user
             ).first()
-        else:
-            # For non-members, check if they've registered with their name
-            # This will be handled in the template with a form
+        # For non-members, check if they've registered with their name
+        # This will be handled in the template with a form
         
         # Get agenda items
         agenda_items = assembly.agenda_items.all().order_by('order')
