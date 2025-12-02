@@ -450,6 +450,36 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         """
         return True
     
+    def require_email_verification(self, request, user):
+        """
+        Override to skip email verification requirement for Google OAuth users.
+        This is called by allauth to determine if email verification is required.
+        Return False for Google OAuth users to skip email verification.
+        """
+        # Check if user has a Google social account
+        from allauth.socialaccount.models import SocialAccount
+        has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+        
+        if has_google_account:
+            # For Google OAuth users, mark email as verified and skip verification requirement
+            if user.email:
+                EmailAddress.objects.update_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={
+                        'verified': True,
+                        'primary': True
+                    }
+                )
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+                logger.info(f"REQUIRE_EMAIL_VERIFICATION: Skipped email verification requirement for Google OAuth user: {user.email}")
+            # Return False to indicate email verification is NOT required
+            return False
+        
+        # For regular users, use default behavior (check ACCOUNT_EMAIL_VERIFICATION setting)
+        return super().require_email_verification(request, user) if hasattr(super(), 'require_email_verification') else True
+    
     def respond_email_verification_sent(self, request, user):
         """
         Override to prevent email verification redirect for Google OAuth users.
