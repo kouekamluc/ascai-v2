@@ -713,6 +713,46 @@ class AssemblyVote(models.Model):
         return self.votes_yes + self.votes_no + self.votes_abstain
 
 
+class AssemblyVoteRecord(models.Model):
+    """
+    Individual vote records for assembly votes.
+    Tracks who voted and their choice (for show of hands) or just that they voted (for secret ballot).
+    """
+    vote = models.ForeignKey(
+        AssemblyVote,
+        on_delete=models.CASCADE,
+        related_name='vote_records',
+        verbose_name=_('Assembly Vote')
+    )
+    
+    voter = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='assembly_vote_records',
+        verbose_name=_('Voter')
+    )
+    
+    choice = models.CharField(
+        max_length=10,
+        choices=[('yes', _('Yes')), ('no', _('No')), ('abstain', _('Abstain'))],
+        verbose_name=_('Choice')
+    )
+    
+    vote_timestamp = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Vote Timestamp')
+    )
+    
+    class Meta:
+        verbose_name = _('Assembly Vote Record')
+        verbose_name_plural = _('Assembly Vote Records')
+        unique_together = [['vote', 'voter']]
+        ordering = ['vote', 'vote_timestamp']
+    
+    def __str__(self):
+        return f"{self.voter.get_display_name()} - {self.get_choice_display()} ({self.vote})"
+
+
 # ============================================================================
 # FINANCIAL MANAGEMENT
 # ============================================================================

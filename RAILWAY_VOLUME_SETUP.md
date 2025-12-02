@@ -162,3 +162,5 @@ For application-specific issues, check:
 - `config/settings/production.py` for media configuration
 - `scripts/entrypoint.sh` for volume setup logic
 
+
+

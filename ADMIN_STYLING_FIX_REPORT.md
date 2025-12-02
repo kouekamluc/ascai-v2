@@ -113,3 +113,5 @@ urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 The Django admin styling issue has been resolved by disabling WhiteNoise middleware in development mode. Django's built-in staticfiles app now handles static file serving correctly, and the admin interface should display with proper styling.
 
+
+

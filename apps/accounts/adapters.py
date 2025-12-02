@@ -412,6 +412,95 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 # but this is a safety check
                 logger.warning(f"activate_url is not absolute: {activate_url}")
         return super().render_mail(template_prefix, email, context, headers)
+    
+    def is_email_verified(self, request, email_address):
+        """
+        Override to skip email verification for social account users.
+        Google OAuth users have pre-verified emails, so we can skip verification.
+        """
+        # Check if user has a social account (Google OAuth)
+        # This works even if user is not authenticated yet
+        user = email_address.user
+        if user:
+            from allauth.socialaccount.models import SocialAccount
+            has_social_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+            
+            if has_social_account:
+                # For Google OAuth users, emails are pre-verified
+                # Mark as verified if not already
+                if not email_address.verified:
+                    email_address.verified = True
+                    email_address.save()
+                    user.email_verified = True
+                    user.save(update_fields=['email_verified'])
+                    logger.info(f"Marked email as verified for Google OAuth user: {user.email}")
+                return True
+        
+        # For regular users, use default behavior
+        return super().is_email_verified(request, email_address)
+    
+    def get_login_redirect_url(self, request):
+        """
+        Redirect users to dashboard after login, skipping email verification for Google OAuth users.
+        """
+        if request.user.is_authenticated:
+            user = request.user
+            
+            # Check if user has a Google social account
+            from allauth.socialaccount.models import SocialAccount
+            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
+            
+            # For Google OAuth users, ensure email is verified and skip verification page
+            if has_google_account:
+                # Ensure email is marked as verified
+                if user.email:
+                    EmailAddress.objects.update_or_create(
+                        user=user,
+                        email=user.email,
+                        defaults={
+                            'verified': True,
+                            'primary': True
+                        }
+                    )
+                    if not user.email_verified:
+                        user.email_verified = True
+                        user.save(update_fields=['email_verified'])
+                
+                # Redirect to dashboard if approved, otherwise home
+                if user.is_approved or user.is_superuser:
+                    from django.conf import settings
+                    from django.utils.translation import get_language
+                    
+                    current_language = get_language()
+                    if current_language != settings.LANGUAGE_CODE:
+                        return f'/{current_language}/dashboard/'
+                    return '/dashboard/'
+                else:
+                    return '/'
+            
+            # For regular users, check email verification
+            # If email is verified, redirect to dashboard
+            if user.email_verified or EmailAddress.objects.filter(
+                user=user,
+                email=user.email,
+                verified=True
+            ).exists():
+                if user.is_approved or user.is_superuser:
+                    from django.conf import settings
+                    from django.utils.translation import get_language
+                    
+                    current_language = get_language()
+                    if current_language != settings.LANGUAGE_CODE:
+                        return f'/{current_language}/dashboard/'
+                    return '/dashboard/'
+        
+        # Fallback to default behavior - check if method exists in parent
+        try:
+            return super().get_login_redirect_url(request)
+        except AttributeError:
+            # Method doesn't exist in parent, use settings default
+            from django.conf import settings
+            return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -624,4 +713,42 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         Allow social account signups.
         """
         return True
+    
+    def get_login_redirect_url(self, request):
+        """
+        Redirect Google OAuth users directly to dashboard after login.
+        This bypasses email verification since Google emails are already verified.
+        """
+        # Check if user is authenticated (they should be after social login)
+        if request.user.is_authenticated:
+            user = request.user
+            
+            # For Google OAuth users, ensure email is verified and redirect to dashboard
+            # Google emails are pre-verified, so we can skip email confirmation
+            if user.email_verified or EmailAddress.objects.filter(
+                user=user, 
+                email=user.email, 
+                verified=True
+            ).exists():
+                # Redirect to dashboard if user is approved, otherwise home
+                if user.is_approved or user.is_superuser:
+                    from django.conf import settings
+                    from django.utils.translation import get_language
+                    
+                    # Handle language prefix
+                    current_language = get_language()
+                    if current_language != settings.LANGUAGE_CODE:
+                        return f'/{current_language}/dashboard/'
+                    return '/dashboard/'
+                else:
+                    # User not approved yet, redirect to home
+                    return '/'
+        
+        # Fallback to default behavior - check if method exists in parent
+        try:
+            return super().get_login_redirect_url(request)
+        except AttributeError:
+            # Method doesn't exist in parent, use settings default
+            from django.conf import settings
+            return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
 

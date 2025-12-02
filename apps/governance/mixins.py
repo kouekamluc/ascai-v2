@@ -57,3 +57,5 @@ class ExpenseApprovalRequiredMixin(GovernanceRequiredMixin, PermissionRequiredMi
     permission_required = 'governance.approve_expense'
     raise_exception = True
 
+
+

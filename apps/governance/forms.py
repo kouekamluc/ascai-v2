@@ -316,13 +316,25 @@ class CandidacyForm(forms.ModelForm):
     
     class Meta:
         model = Candidacy
-        fields = ['election', 'position', 'application_date', 'status',
+        fields = ['election', 'candidate', 'position', 'application_date', 'status',
                   'seniority_verified', 'lazio_residence_verified', 
                   'cameroonian_origin_verified', 'eligibility_notes']
         widgets = {
-            'application_date': forms.DateInput(attrs={'type': 'date'}),
-            'eligibility_notes': forms.Textarea(attrs={'rows': 4}),
+            'candidate': forms.Select(attrs={'class': 'form-input'}),
+            'application_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'eligibility_notes': forms.Textarea(attrs={'rows': 4, 'class': 'form-textarea'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filter users who are members and could be candidates
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        # Only show users who have member profiles
+        self.fields['candidate'].queryset = User.objects.filter(
+            member_profile__isnull=False
+        ).order_by('username')
+        self.fields['candidate'].required = True
 
 
 class CommunicationForm(forms.ModelForm):
