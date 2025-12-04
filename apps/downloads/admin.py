@@ -3,11 +3,12 @@ Admin configuration for downloads app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin
 from .models import Document
 
 
 @admin.register(Document)
-class DocumentAdmin(admin.ModelAdmin):
+class DocumentAdmin(ModelAdmin):
     """Admin interface for Document."""
     list_display = ['title', 'category', 'file_type', 'download_count', 'is_active', 'uploaded_by', 'uploaded_at']
     list_filter = ['category', 'is_active', 'file_type', 'uploaded_at']

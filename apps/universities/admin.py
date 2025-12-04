@@ -3,10 +3,11 @@ Admin configuration for universities app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin, TabularInline
 from .models import University, UniversityProgram, SavedUniversity
 
 
-class UniversityProgramInline(admin.TabularInline):
+class UniversityProgramInline(TabularInline):
     """Inline admin for university programs."""
     model = UniversityProgram
     extra = 1
@@ -14,7 +15,7 @@ class UniversityProgramInline(admin.TabularInline):
 
 
 @admin.register(University)
-class UniversityAdmin(admin.ModelAdmin):
+class UniversityAdmin(ModelAdmin):
     """Admin interface for University model."""
     list_display = ['name', 'city', 'website', 'created_at']
     list_filter = ['city', 'created_at']
@@ -45,7 +46,7 @@ class UniversityAdmin(admin.ModelAdmin):
 
 
 @admin.register(UniversityProgram)
-class UniversityProgramAdmin(admin.ModelAdmin):
+class UniversityProgramAdmin(ModelAdmin):
     """Admin interface for UniversityProgram model."""
     list_display = ['name', 'university', 'degree_type', 'field', 'language', 'tuition']
     list_filter = ['degree_type', 'language', 'university']
@@ -54,12 +55,14 @@ class UniversityProgramAdmin(admin.ModelAdmin):
 
 
 @admin.register(SavedUniversity)
-class SavedUniversityAdmin(admin.ModelAdmin):
+class SavedUniversityAdmin(ModelAdmin):
     """Admin interface for SavedUniversity model."""
     list_display = ['user', 'university', 'saved_at']
     list_filter = ['saved_at']
     search_fields = ['user__username', 'university__name']
     raw_id_fields = ['user', 'university']
+
+
 
 
 

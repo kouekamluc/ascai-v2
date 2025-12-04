@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
 from allauth.account.models import EmailAddress
+from unfold.admin import ModelAdmin
 import logging
 
 from .models import User, UserDocument
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin, ModelAdmin):
     """
     Custom admin interface for User model.
     """
@@ -280,7 +281,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 @admin.register(UserDocument)
-class UserDocumentAdmin(admin.ModelAdmin):
+class UserDocumentAdmin(ModelAdmin):
     """Admin interface for user documents."""
     list_display = ['user', 'document_type', 'is_verified', 'uploaded_at']
     list_filter = ['document_type', 'is_verified', 'uploaded_at']

@@ -3,11 +3,12 @@ Admin configuration for scholarships app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin
 from .models import Scholarship, SavedScholarship
 
 
 @admin.register(Scholarship)
-class ScholarshipAdmin(admin.ModelAdmin):
+class ScholarshipAdmin(ModelAdmin):
     """Admin interface for Scholarship model."""
     list_display = ['title', 'provider', 'amount', 'currency', 'level', 'region', 'is_disco_lazio', 'status', 'application_deadline', 'created_at']
     list_filter = ['status', 'is_disco_lazio', 'level', 'region', 'currency', 'created_at']
@@ -40,7 +41,7 @@ class ScholarshipAdmin(admin.ModelAdmin):
 
 
 @admin.register(SavedScholarship)
-class SavedScholarshipAdmin(admin.ModelAdmin):
+class SavedScholarshipAdmin(ModelAdmin):
     """Admin interface for SavedScholarship model."""
     list_display = ['user', 'scholarship', 'saved_at']
     list_filter = ['saved_at']

@@ -3,6 +3,7 @@ Admin configuration for dashboard app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin, TabularInline
 from .models import (
     SupportTicket, TicketReply, CommunityGroup, GroupDiscussion, GroupAnnouncement, GroupFile,
     UserStorySubmission, StoryImage, EventRegistration, SavedDocument,
@@ -10,7 +11,7 @@ from .models import (
 )
 
 
-class TicketReplyInline(admin.TabularInline):
+class TicketReplyInline(TabularInline):
     """Inline admin for ticket replies."""
     model = TicketReply
     extra = 0
@@ -36,7 +37,7 @@ class TicketReplyInline(admin.TabularInline):
 
 
 @admin.register(SupportTicket)
-class SupportTicketAdmin(admin.ModelAdmin):
+class SupportTicketAdmin(ModelAdmin):
     list_display = ['user', 'subject', 'status', 'created_at', 'updated_at']
     list_filter = ['status', 'created_at']
     search_fields = ['subject', 'message', 'user__username', 'user__email']
@@ -70,7 +71,7 @@ class SupportTicketAdmin(admin.ModelAdmin):
 
 
 @admin.register(TicketReply)
-class TicketReplyAdmin(admin.ModelAdmin):
+class TicketReplyAdmin(ModelAdmin):
     list_display = ['ticket', 'author', 'is_admin_reply', 'created_at']
     list_filter = ['is_admin_reply', 'created_at']
     search_fields = ['message', 'ticket__subject', 'author__username']
@@ -85,7 +86,7 @@ class TicketReplyAdmin(admin.ModelAdmin):
 
 
 @admin.register(CommunityGroup)
-class CommunityGroupAdmin(admin.ModelAdmin):
+class CommunityGroupAdmin(ModelAdmin):
     list_display = ['name', 'category', 'is_public', 'created_by', 'created_at', 'member_count']
     list_filter = ['category', 'is_public', 'created_at']
     search_fields = ['name', 'description']
@@ -99,7 +100,7 @@ class CommunityGroupAdmin(admin.ModelAdmin):
 
 
 @admin.register(GroupDiscussion)
-class GroupDiscussionAdmin(admin.ModelAdmin):
+class GroupDiscussionAdmin(ModelAdmin):
     list_display = ['title', 'group', 'author', 'created_at']
     list_filter = ['group', 'created_at']
     search_fields = ['title', 'content', 'author__username']
@@ -107,7 +108,7 @@ class GroupDiscussionAdmin(admin.ModelAdmin):
 
 
 @admin.register(GroupAnnouncement)
-class GroupAnnouncementAdmin(admin.ModelAdmin):
+class GroupAnnouncementAdmin(ModelAdmin):
     list_display = ['title', 'group', 'author', 'is_pinned', 'created_at']
     list_filter = ['group', 'is_pinned', 'created_at']
     search_fields = ['title', 'content']
@@ -115,7 +116,7 @@ class GroupAnnouncementAdmin(admin.ModelAdmin):
 
 
 @admin.register(GroupFile)
-class GroupFileAdmin(admin.ModelAdmin):
+class GroupFileAdmin(ModelAdmin):
     list_display = ['title', 'group', 'uploaded_by', 'uploaded_at']
     list_filter = ['group', 'uploaded_at']
     search_fields = ['title', 'description']
@@ -123,14 +124,14 @@ class GroupFileAdmin(admin.ModelAdmin):
 
 
 @admin.register(StoryImage)
-class StoryImageAdmin(admin.ModelAdmin):
+class StoryImageAdmin(ModelAdmin):
     list_display = ['caption', 'uploaded_at']
     search_fields = ['caption']
     readonly_fields = ['uploaded_at']
 
 
 @admin.register(UserStorySubmission)
-class UserStorySubmissionAdmin(admin.ModelAdmin):
+class UserStorySubmissionAdmin(ModelAdmin):
     list_display = ['title', 'user', 'status', 'is_anonymous', 'submitted_at', 'reviewed_at']
     list_filter = ['status', 'is_anonymous', 'submitted_at']
     search_fields = ['title', 'story', 'user__username']
@@ -171,7 +172,7 @@ class UserStorySubmissionAdmin(admin.ModelAdmin):
 
 
 @admin.register(EventRegistration)
-class EventRegistrationAdmin(admin.ModelAdmin):
+class EventRegistrationAdmin(ModelAdmin):
     list_display = ['user', 'event', 'registration_code', 'attended', 'registered_at']
     list_filter = ['attended', 'registered_at', 'event']
     search_fields = ['user__username', 'event__title', 'registration_code']
@@ -182,7 +183,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
 
 @admin.register(SavedDocument)
-class SavedDocumentAdmin(admin.ModelAdmin):
+class SavedDocumentAdmin(ModelAdmin):
     list_display = ['user', 'document', 'saved_at']
     list_filter = ['saved_at']
     search_fields = ['user__username', 'document__title']
@@ -190,7 +191,7 @@ class SavedDocumentAdmin(admin.ModelAdmin):
 
 
 @admin.register(StudentQuestion)
-class StudentQuestionAdmin(admin.ModelAdmin):
+class StudentQuestionAdmin(ModelAdmin):
     list_display = ['subject', 'user', 'category', 'is_resolved', 'created_at']
     list_filter = ['is_resolved', 'category', 'created_at']
     search_fields = ['subject', 'question', 'user__username']
@@ -216,7 +217,7 @@ class StudentQuestionAdmin(admin.ModelAdmin):
 
 
 @admin.register(OrientationSession)
-class OrientationSessionAdmin(admin.ModelAdmin):
+class OrientationSessionAdmin(ModelAdmin):
     list_display = ['user', 'preferred_date', 'preferred_time', 'is_confirmed', 'created_at']
     list_filter = ['is_confirmed', 'created_at']
     search_fields = ['user__username', 'topics']

@@ -3,11 +3,12 @@ Admin configuration for contact app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin
 from .models import ContactSubmission
 
 
 @admin.register(ContactSubmission)
-class ContactSubmissionAdmin(admin.ModelAdmin):
+class ContactSubmissionAdmin(ModelAdmin):
     """Admin interface for ContactSubmission."""
     list_display = ['name', 'email', 'subject', 'status', 'created_at']
     list_filter = ['status', 'created_at']
@@ -25,6 +26,8 @@ class ContactSubmissionAdmin(admin.ModelAdmin):
             'fields': ('status', 'created_at')
         }),
     )
+
+
 
 
 

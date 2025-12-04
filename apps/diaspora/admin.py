@@ -3,11 +3,12 @@ Admin configuration for diaspora app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin
 from .models import News, Event, Testimonial, SuccessStory, SuccessStoryImage, LifeInItaly
 
 
 @admin.register(News)
-class NewsAdmin(admin.ModelAdmin):
+class NewsAdmin(ModelAdmin):
     """Admin interface for News model."""
     list_display = ['title', 'category', 'author', 'is_published', 'published_at', 'language', 'created_at']
     list_filter = ['category', 'is_published', 'language', 'created_at']
@@ -32,7 +33,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 
 @admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(ModelAdmin):
     """Admin interface for Event model."""
     list_display = ['title', 'location', 'start_datetime', 'end_datetime', 'organizer', 'is_published', 'registration_required']
     list_filter = ['is_published', 'registration_required', 'language', 'start_datetime']
@@ -60,7 +61,7 @@ class EventAdmin(admin.ModelAdmin):
 
 
 @admin.register(Testimonial)
-class TestimonialAdmin(admin.ModelAdmin):
+class TestimonialAdmin(ModelAdmin):
     """Admin interface for Testimonial model."""
     list_display = ['name', 'title', 'location', 'is_featured', 'is_published', 'language', 'created_at']
     list_filter = ['is_featured', 'is_published', 'language', 'created_at']
@@ -89,14 +90,14 @@ class TestimonialAdmin(admin.ModelAdmin):
 
 
 @admin.register(SuccessStoryImage)
-class SuccessStoryImageAdmin(admin.ModelAdmin):
+class SuccessStoryImageAdmin(ModelAdmin):
     """Admin interface for SuccessStoryImage model."""
     list_display = ['caption', 'created_at']
     search_fields = ['caption']
 
 
 @admin.register(SuccessStory)
-class SuccessStoryAdmin(admin.ModelAdmin):
+class SuccessStoryAdmin(ModelAdmin):
     """Admin interface for SuccessStory model."""
     list_display = ['title', 'person_name', 'is_featured', 'is_published', 'language', 'created_at']
     list_filter = ['is_featured', 'is_published', 'language', 'created_at']
@@ -129,7 +130,7 @@ class SuccessStoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(LifeInItaly)
-class LifeInItalyAdmin(admin.ModelAdmin):
+class LifeInItalyAdmin(ModelAdmin):
     """Admin interface for LifeInItaly model."""
     list_display = ['title', 'category', 'is_featured', 'is_published', 'language', 'created_at']
     list_filter = ['category', 'is_featured', 'is_published', 'language', 'created_at']

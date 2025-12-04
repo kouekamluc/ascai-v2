@@ -3,6 +3,7 @@ Admin configuration for governance app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin, TabularInline
 from .models import (
     Member, MembershipStatus,
     ExecutiveBoard, ExecutivePosition, BoardMeeting,
@@ -21,7 +22,7 @@ from .models import (
 # ============================================================================
 
 @admin.register(Member)
-class MemberAdmin(admin.ModelAdmin):
+class MemberAdmin(ModelAdmin):
     list_display = ['user', 'member_type', 'is_active_member', 'lazio_residence_verified', 
                     'cameroonian_origin_verified', 'registration_date']
     list_filter = ['member_type', 'is_active_member', 'lazio_residence_verified', 
@@ -49,7 +50,7 @@ class MemberAdmin(admin.ModelAdmin):
 
 
 @admin.register(MembershipStatus)
-class MembershipStatusAdmin(admin.ModelAdmin):
+class MembershipStatusAdmin(ModelAdmin):
     list_display = ['member', 'status', 'effective_date', 'last_payment_date']
     list_filter = ['status', 'effective_date']
     search_fields = ['member__user__username', 'member__user__email']
@@ -61,14 +62,14 @@ class MembershipStatusAdmin(admin.ModelAdmin):
 # EXECUTIVE BOARD ADMIN
 # ============================================================================
 
-class ExecutivePositionInline(admin.TabularInline):
+class ExecutivePositionInline(TabularInline):
     model = ExecutivePosition
     extra = 0
     fields = ['position', 'user', 'start_date', 'end_date', 'status']
 
 
 @admin.register(ExecutiveBoard)
-class ExecutiveBoardAdmin(admin.ModelAdmin):
+class ExecutiveBoardAdmin(ModelAdmin):
     list_display = ['__str__', 'term_start_date', 'term_end_date', 'is_renewed', 'status']
     list_filter = ['status', 'is_renewed', 'term_start_date']
     search_fields = ['notes']
@@ -78,7 +79,7 @@ class ExecutiveBoardAdmin(admin.ModelAdmin):
 
 
 @admin.register(ExecutivePosition)
-class ExecutivePositionAdmin(admin.ModelAdmin):
+class ExecutivePositionAdmin(ModelAdmin):
     list_display = ['board', 'position', 'user', 'start_date', 'status']
     list_filter = ['position', 'status', 'board']
     search_fields = ['user__username', 'user__email', 'user__full_name']
@@ -86,7 +87,7 @@ class ExecutivePositionAdmin(admin.ModelAdmin):
 
 
 @admin.register(BoardMeeting)
-class BoardMeetingAdmin(admin.ModelAdmin):
+class BoardMeetingAdmin(ModelAdmin):
     list_display = ['board', 'meeting_date', 'location']
     list_filter = ['board', 'meeting_date']
     search_fields = ['agenda', 'minutes', 'decisions']
@@ -98,14 +99,14 @@ class BoardMeetingAdmin(admin.ModelAdmin):
 # GENERAL ASSEMBLY ADMIN
 # ============================================================================
 
-class AgendaItemInline(admin.TabularInline):
+class AgendaItemInline(TabularInline):
     model = AgendaItem
     extra = 0
     fields = ['title', 'item_type', 'proposed_by', 'status', 'order']
 
 
 @admin.register(GeneralAssembly)
-class GeneralAssemblyAdmin(admin.ModelAdmin):
+class GeneralAssemblyAdmin(ModelAdmin):
     list_display = ['__str__', 'assembly_type', 'date', 'location', 'status', 'convocation_date']
     list_filter = ['assembly_type', 'status', 'date']
     search_fields = ['location', 'minutes_en', 'minutes_fr', 'minutes_it']
@@ -133,7 +134,7 @@ class GeneralAssemblyAdmin(admin.ModelAdmin):
 
 
 @admin.register(AgendaItem)
-class AgendaItemAdmin(admin.ModelAdmin):
+class AgendaItemAdmin(ModelAdmin):
     list_display = ['assembly', 'title', 'item_type', 'proposed_by', 'status', 'order']
     list_filter = ['item_type', 'status', 'assembly']
     search_fields = ['title', 'description']
@@ -141,14 +142,14 @@ class AgendaItemAdmin(admin.ModelAdmin):
 
 
 @admin.register(AssemblyAttendance)
-class AssemblyAttendanceAdmin(admin.ModelAdmin):
+class AssemblyAttendanceAdmin(ModelAdmin):
     list_display = ['assembly', 'user', 'attendee_type', 'attended']
     list_filter = ['attendee_type', 'attended', 'assembly']
     search_fields = ['user__username', 'attendee_name']
 
 
 @admin.register(AssemblyVote)
-class AssemblyVoteAdmin(admin.ModelAdmin):
+class AssemblyVoteAdmin(ModelAdmin):
     list_display = ['assembly', 'vote_type', 'voting_method', 'votes_yes', 'votes_no', 
                     'votes_abstain', 'is_published']
     list_filter = ['vote_type', 'voting_method', 'is_published', 'assembly']
@@ -160,7 +161,7 @@ class AssemblyVoteAdmin(admin.ModelAdmin):
 # FINANCIAL ADMIN
 # ============================================================================
 
-class ExpenseApprovalInline(admin.TabularInline):
+class ExpenseApprovalInline(TabularInline):
     model = ExpenseApproval
     extra = 0
     fields = ['signer', 'status', 'signature_date', 'notes']
@@ -168,7 +169,7 @@ class ExpenseApprovalInline(admin.TabularInline):
 
 
 @admin.register(FinancialTransaction)
-class FinancialTransactionAdmin(admin.ModelAdmin):
+class FinancialTransactionAdmin(ModelAdmin):
     list_display = ['__str__', 'transaction_type', 'category', 'amount', 'date', 'status']
     list_filter = ['transaction_type', 'category', 'status', 'date']
     search_fields = ['description']
@@ -178,7 +179,7 @@ class FinancialTransactionAdmin(admin.ModelAdmin):
 
 
 @admin.register(MembershipDues)
-class MembershipDuesAdmin(admin.ModelAdmin):
+class MembershipDuesAdmin(ModelAdmin):
     list_display = ['member', 'year', 'amount', 'due_date', 'payment_date', 'status']
     list_filter = ['status', 'year', 'payment_method']
     search_fields = ['member__user__username', 'member__user__email']
@@ -186,7 +187,7 @@ class MembershipDuesAdmin(admin.ModelAdmin):
 
 
 @admin.register(Contribution)
-class ContributionAdmin(admin.ModelAdmin):
+class ContributionAdmin(ModelAdmin):
     list_display = ['member', 'contribution_type', 'amount', 'date']
     list_filter = ['contribution_type', 'date']
     search_fields = ['member__user__username', 'purpose']
@@ -194,7 +195,7 @@ class ContributionAdmin(admin.ModelAdmin):
 
 
 @admin.register(FinancialReport)
-class FinancialReportAdmin(admin.ModelAdmin):
+class FinancialReportAdmin(ModelAdmin):
     list_display = ['__str__', 'report_type', 'period_start', 'period_end', 
                     'total_income', 'total_expenses', 'balance', 'verified_by']
     list_filter = ['report_type', 'period_start', 'period_end']
@@ -204,7 +205,7 @@ class FinancialReportAdmin(admin.ModelAdmin):
 
 
 @admin.register(ExpenseApproval)
-class ExpenseApprovalAdmin(admin.ModelAdmin):
+class ExpenseApprovalAdmin(ModelAdmin):
     list_display = ['transaction', 'signer', 'status', 'signature_date']
     list_filter = ['status', 'signature_date']
     search_fields = ['transaction__description', 'signer__username']
@@ -214,14 +215,14 @@ class ExpenseApprovalAdmin(admin.ModelAdmin):
 # ELECTORAL SYSTEM ADMIN
 # ============================================================================
 
-class CommissionMemberInline(admin.TabularInline):
+class CommissionMemberInline(TabularInline):
     model = CommissionMember
     extra = 0
     fields = ['user', 'role']
 
 
 @admin.register(ElectoralCommission)
-class ElectoralCommissionAdmin(admin.ModelAdmin):
+class ElectoralCommissionAdmin(ModelAdmin):
     list_display = ['name', 'start_date', 'end_date', 'status']
     list_filter = ['status', 'start_date']
     search_fields = ['name', 'notes']
@@ -231,14 +232,14 @@ class ElectoralCommissionAdmin(admin.ModelAdmin):
 
 
 @admin.register(CommissionMember)
-class CommissionMemberAdmin(admin.ModelAdmin):
+class CommissionMemberAdmin(ModelAdmin):
     list_display = ['commission', 'user', 'role']
     list_filter = ['role', 'commission']
     search_fields = ['user__username', 'user__email']
 
 
 @admin.register(Election)
-class ElectionAdmin(admin.ModelAdmin):
+class ElectionAdmin(ModelAdmin):
     list_display = ['__str__', 'election_type', 'start_date', 'end_date', 'status']
     list_filter = ['status', 'election_type', 'start_date']
     search_fields = ['notes']
@@ -247,7 +248,7 @@ class ElectionAdmin(admin.ModelAdmin):
 
 
 @admin.register(Candidacy)
-class CandidacyAdmin(admin.ModelAdmin):
+class CandidacyAdmin(ModelAdmin):
     list_display = ['candidate', 'election', 'position', 'status', 
                     'seniority_verified', 'lazio_residence_verified', 'cameroonian_origin_verified']
     list_filter = ['position', 'status', 'election', 'seniority_verified', 
@@ -257,7 +258,7 @@ class CandidacyAdmin(admin.ModelAdmin):
 
 
 @admin.register(ElectionVote)
-class ElectionVoteAdmin(admin.ModelAdmin):
+class ElectionVoteAdmin(ModelAdmin):
     list_display = ['election', 'voter', 'candidate', 'position', 'vote_timestamp']
     list_filter = ['election', 'position', 'vote_timestamp']
     search_fields = ['voter__username', 'candidate__candidate__username']
@@ -269,14 +270,14 @@ class ElectionVoteAdmin(admin.ModelAdmin):
 # BOARD OF AUDITORS ADMIN
 # ============================================================================
 
-class AuditorMemberInline(admin.TabularInline):
+class AuditorMemberInline(TabularInline):
     model = AuditorMember
     extra = 0
     fields = ['user', 'is_president', 'is_founding_member', 'is_former_president']
 
 
 @admin.register(BoardOfAuditors)
-class BoardOfAuditorsAdmin(admin.ModelAdmin):
+class BoardOfAuditorsAdmin(ModelAdmin):
     list_display = ['name', 'term_start', 'term_end', 'is_renewed', 'status']
     list_filter = ['status', 'is_renewed', 'term_start']
     search_fields = ['name', 'notes']
@@ -286,14 +287,14 @@ class BoardOfAuditorsAdmin(admin.ModelAdmin):
 
 
 @admin.register(AuditorMember)
-class AuditorMemberAdmin(admin.ModelAdmin):
+class AuditorMemberAdmin(ModelAdmin):
     list_display = ['board', 'user', 'is_president', 'is_founding_member', 'is_former_president']
     list_filter = ['is_president', 'is_founding_member', 'is_former_president', 'board']
     search_fields = ['user__username', 'user__email']
 
 
 @admin.register(AuditReport)
-class AuditReportAdmin(admin.ModelAdmin):
+class AuditReportAdmin(ModelAdmin):
     list_display = ['__str__', 'board', 'period_start', 'period_end', 
                     'report_date', 'financial_verification_status']
     list_filter = ['financial_verification_status', 'report_date', 'board']
@@ -306,14 +307,14 @@ class AuditReportAdmin(admin.ModelAdmin):
 # DISCIPLINARY SYSTEM ADMIN
 # ============================================================================
 
-class DisciplinarySanctionInline(admin.TabularInline):
+class DisciplinarySanctionInline(TabularInline):
     model = DisciplinarySanction
     extra = 0
     fields = ['sanction_type', 'applied_date', 'applied_by', 'status', 'expiration_date']
 
 
 @admin.register(DisciplinaryCase)
-class DisciplinaryCaseAdmin(admin.ModelAdmin):
+class DisciplinaryCaseAdmin(ModelAdmin):
     list_display = ['member', 'violation_type', 'reported_by', 'reported_date', 'status']
     list_filter = ['violation_type', 'status', 'reported_date']
     search_fields = ['description', 'evidence', 'member__user__username']
@@ -323,7 +324,7 @@ class DisciplinaryCaseAdmin(admin.ModelAdmin):
 
 
 @admin.register(DisciplinarySanction)
-class DisciplinarySanctionAdmin(admin.ModelAdmin):
+class DisciplinarySanctionAdmin(ModelAdmin):
     list_display = ['case', 'sanction_type', 'applied_date', 'applied_by', 'status']
     list_filter = ['sanction_type', 'status', 'applied_date']
     search_fields = ['case__member__user__username', 'notes']
@@ -335,14 +336,14 @@ class DisciplinarySanctionAdmin(admin.ModelAdmin):
 # EVENTS ADMIN
 # ============================================================================
 
-class EventOrganizingCommitteeInline(admin.TabularInline):
+class EventOrganizingCommitteeInline(TabularInline):
     model = EventOrganizingCommittee
     extra = 0
     filter_horizontal = ['members']
 
 
 @admin.register(AssociationEvent)
-class AssociationEventAdmin(admin.ModelAdmin):
+class AssociationEventAdmin(ModelAdmin):
     list_display = ['title', 'event_type', 'start_date', 'location', 'budget', 'revenue', 'expenses']
     list_filter = ['event_type', 'start_date']
     search_fields = ['title', 'description', 'location']
@@ -352,7 +353,7 @@ class AssociationEventAdmin(admin.ModelAdmin):
 
 
 @admin.register(EventOrganizingCommittee)
-class EventOrganizingCommitteeAdmin(admin.ModelAdmin):
+class EventOrganizingCommitteeAdmin(ModelAdmin):
     list_display = ['event', 'role']
     list_filter = ['event']
     filter_horizontal = ['members']
@@ -363,7 +364,7 @@ class EventOrganizingCommitteeAdmin(admin.ModelAdmin):
 # ============================================================================
 
 @admin.register(AssociationDocument)
-class AssociationDocumentAdmin(admin.ModelAdmin):
+class AssociationDocumentAdmin(ModelAdmin):
     list_display = ['title', 'document_type', 'language', 'version', 'publication_date', 'is_active']
     list_filter = ['document_type', 'language', 'is_active', 'publication_date']
     search_fields = ['title', 'description']
@@ -372,7 +373,7 @@ class AssociationDocumentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Communication)
-class CommunicationAdmin(admin.ModelAdmin):
+class CommunicationAdmin(ModelAdmin):
     list_display = ['title', 'communication_type', 'target_audience', 
                     'publication_channels', 'is_published', 'president_approved', 'publication_date']
     list_filter = ['communication_type', 'target_audience', 'publication_channels', 

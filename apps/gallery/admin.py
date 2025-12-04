@@ -3,10 +3,11 @@ Admin configuration for gallery app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin, TabularInline
 from .models import GalleryAlbum, GalleryImage, GalleryVideo
 
 
-class GalleryImageInline(admin.TabularInline):
+class GalleryImageInline(TabularInline):
     """Inline admin for gallery images."""
     model = GalleryImage
     extra = 3
@@ -14,7 +15,7 @@ class GalleryImageInline(admin.TabularInline):
 
 
 @admin.register(GalleryAlbum)
-class GalleryAlbumAdmin(admin.ModelAdmin):
+class GalleryAlbumAdmin(ModelAdmin):
     """Admin interface for GalleryAlbum."""
     list_display = ['title', 'event', 'created_by', 'created_at']
     list_filter = ['created_at']
@@ -29,7 +30,7 @@ class GalleryAlbumAdmin(admin.ModelAdmin):
 
 
 @admin.register(GalleryImage)
-class GalleryImageAdmin(admin.ModelAdmin):
+class GalleryImageAdmin(ModelAdmin):
     """Admin interface for GalleryImage."""
     list_display = ['album', 'caption', 'order', 'uploaded_at']
     list_filter = ['uploaded_at', 'album']
@@ -38,7 +39,7 @@ class GalleryImageAdmin(admin.ModelAdmin):
 
 
 @admin.register(GalleryVideo)
-class GalleryVideoAdmin(admin.ModelAdmin):
+class GalleryVideoAdmin(ModelAdmin):
     """Admin interface for GalleryVideo."""
     list_display = ['title', 'video_type', 'event', 'created_by', 'created_at']
     list_filter = ['video_type', 'created_at', 'event']
