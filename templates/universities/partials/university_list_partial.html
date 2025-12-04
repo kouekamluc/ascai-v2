@@ -50,8 +50,8 @@
             </p>
             {% endif %}
             
-            <!-- Save to Favorites (Students Only) -->
-            {% if user.is_authenticated and user.is_student %}
+            <!-- Save to Favorites -->
+            {% if user.is_authenticated %}
             <form hx-post="{% url 'universities:toggle_save' university.slug %}" 
                   hx-target="#save-btn-{{ university.id }}" 
                   hx-swap="outerHTML" 
@@ -173,8 +173,8 @@
             </p>
             {% endif %}
             
-            <!-- Save to Favorites (Students Only) -->
-            {% if user.is_authenticated and user.is_student %}
+            <!-- Save to Favorites -->
+            {% if user.is_authenticated %}
             <form hx-post="{% url 'universities:toggle_save' university.slug %}" 
                   hx-target="#save-btn-{{ university.id }}" 
                   hx-swap="outerHTML" 

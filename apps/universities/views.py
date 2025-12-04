@@ -119,13 +119,12 @@ class UniversityDetailView(DetailView):
         context['can_save'] = False
         
         if self.request.user.is_authenticated:
-            # Only students can save universities
-            context['can_save'] = hasattr(self.request.user, 'is_student') and self.request.user.is_student
-            if context['can_save']:
-                context['is_saved'] = SavedUniversity.objects.filter(
-                    user=self.request.user,
-                    university=self.object
-                ).exists()
+            # All authenticated users can save universities
+            context['can_save'] = True
+            context['is_saved'] = SavedUniversity.objects.filter(
+                user=self.request.user,
+                university=self.object
+            ).exists()
         
         return context
 
@@ -133,17 +132,7 @@ class UniversityDetailView(DetailView):
 @login_required
 @require_http_methods(["POST"])
 def toggle_save_university(request, slug):
-    """Toggle save/unsave university (HTMX endpoint). Only students can save."""
-    # Check if user is a student
-    if not hasattr(request.user, 'is_student') or not request.user.is_student:
-        if request.headers.get('HX-Request'):
-            return render(request, 'universities/partials/save_button.html', {
-                'university': get_object_or_404(University, slug=slug),
-                'is_saved': False,
-                'error': _('Only students can save universities to favorites.')
-            })
-        return JsonResponse({'error': _('Only students can save universities to favorites.')}, status=403)
-    
+    """Toggle save/unsave university (HTMX endpoint). All authenticated users can save."""
     university = get_object_or_404(University, slug=slug)
     saved, created = SavedUniversity.objects.get_or_create(
         user=request.user,
