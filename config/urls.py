@@ -33,7 +33,6 @@ urlpatterns += i18n_patterns(
     path('accounts/', include('allauth.urls')),  # Django allauth URLs
     path('accounts/', include('apps.accounts.urls')),  # Custom accounts URLs (profile, etc.)
     path('dashboard/', include('apps.dashboard.urls')),
-    path('students/', include('apps.students.urls')),
     path('diaspora/', include('apps.diaspora.urls')),
     path('community/', include('apps.community.urls')),
     path('mentorship/', include('apps.mentorship.urls')),
