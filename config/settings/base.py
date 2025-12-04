@@ -13,6 +13,10 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-producti
 
 # Application definition
 INSTALLED_APPS = [
+    # Django Unfold must be before django.contrib.admin
+    'unfold',  # Modern Django admin theme
+    'unfold.contrib.filters',  # Enhanced filters for Unfold
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -425,6 +429,20 @@ CKEDITOR_CONFIGS = {
         'filebrowserBrowseUrl': '/ckeditor/browse/',
         # Allow all file types in uploads
         'allowedContent': True,
+    },
+}
+
+# Django Unfold Configuration
+UNFOLD = {
+    "SITE_TITLE": "ASCAI Lazio Administration",
+    "SITE_HEADER": "ASCAI Lazio Admin",
+    "SITE_URL": "/",
+    "SITE_SYMBOL": "settings",  # Icon from Material Icons
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
     },
 }
 
