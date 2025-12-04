@@ -6,8 +6,25 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.forms import Textarea
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
-from unfold.widgets import WysiwygWidget
+
+# Try to import WYSIWYG widget - fallback to Textarea if not available
+# Note: WYSIWYG widget availability depends on django-unfold version
+# In some versions, the widget may not be directly importable
+WysiwygWidget = None
+try:
+    # Try different possible import paths for WYSIWYG widget
+    from unfold.widgets import WysiwygWidget
+except (ImportError, AttributeError):
+    try:
+        from unfold.contrib.forms.widgets import WysiwygWidget
+    except (ImportError, AttributeError):
+        try:
+            from unfold.contrib.forms.widgets import TrixWidget as WysiwygWidget
+        except (ImportError, AttributeError):
+            # WYSIWYG not available in this version - will use Textarea fallback
+            WysiwygWidget = None
 
 
 class BaseAdmin(ModelAdmin):
@@ -15,8 +32,10 @@ class BaseAdmin(ModelAdmin):
     Base admin class with automatic WYSIWYG editor for all TextField fields.
     
     This class automatically replaces all TextField widgets with Unfold's
-    WysiwygWidget (Trix editor), allowing admins to format content with
-    Bold, Italic, Lists, and other formatting options.
+    WYSIWYG editor (Trix) when available, allowing admins to format content
+    with Bold, Italic, Lists, and other formatting options.
+    
+    If WYSIWYG widget is not available, falls back to standard Textarea.
     
     Usage:
         from config.admin import BaseAdmin
@@ -25,9 +44,11 @@ class BaseAdmin(ModelAdmin):
         class PostAdmin(BaseAdmin):
             list_display = ['title', 'author', 'created_at']
     """
+    # Set formfield_overrides based on widget availability
+    # Use WYSIWYG widget if available, otherwise fallback to Textarea
     formfield_overrides = {
         models.TextField: {
-            'widget': WysiwygWidget,
+            'widget': WysiwygWidget if WysiwygWidget is not None else Textarea(attrs={'rows': 10, 'cols': 80}),
         },
     }
 
