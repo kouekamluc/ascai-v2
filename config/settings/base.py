@@ -4,6 +4,7 @@ Base settings for ASCAI Lazio project.
 import os
 from pathlib import Path
 from decouple import config
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -16,6 +17,7 @@ INSTALLED_APPS = [
     # Django Unfold must be before django.contrib.admin
     'unfold',  # Modern Django admin theme
     'unfold.contrib.filters',  # Enhanced filters for Unfold
+    'unfold.contrib.forms',  # WYSIWYG editor support (Trix editor)
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -123,6 +125,7 @@ USE_TZ = True
 LANGUAGES = [
     ('en', 'English'),
     ('fr', 'Français'),
+    ('it', 'Italiano'),
 ]
 
 LOCALE_PATHS = [
@@ -433,16 +436,145 @@ CKEDITOR_CONFIGS = {
 }
 
 # Django Unfold Configuration
+# Professional Association Management Portal theme
 UNFOLD = {
-    "SITE_TITLE": "ASCAI Lazio Administration",
-    "SITE_HEADER": "ASCAI Lazio Admin",
+    "SITE_TITLE": _("Association Management Portal"),
+    "SITE_HEADER": _("ASCAI Lazio Administration"),
     "SITE_URL": "/",
-    "SITE_SYMBOL": "settings",  # Icon from Material Icons
+    "SITE_SYMBOL": "admin_panel_settings",  # Material Icons symbol
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
+    "ENVIRONMENT": "ASCAI Lazio",  # Environment badge
+    "DASHBOARD_CALLBACK": "config.admin.dashboard_callback",  # Dynamic dashboard
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": True,
+        "navigation": [
+            {
+                "title": _("Content Management"),
+                "icon": "article",
+                "items": [
+                    {
+                        "title": _("News & Announcements"),
+                        "icon": "newspaper",
+                        "link": "admin:diaspora_news_changelist",
+                    },
+                    {
+                        "title": _("Events"),
+                        "icon": "event",
+                        "link": "admin:diaspora_event_changelist",
+                    },
+                    {
+                        "title": _("Success Stories"),
+                        "icon": "star",
+                        "link": "admin:diaspora_successstory_changelist",
+                    },
+                    {
+                        "title": _("Life in Italy"),
+                        "icon": "info",
+                        "link": "admin:diaspora_lifeinitaly_changelist",
+                    },
+                    {
+                        "title": _("Forum Posts"),
+                        "icon": "forum",
+                        "link": "admin:community_forumpost_changelist",
+                    },
+                ],
+            },
+            {
+                "title": _("User Management"),
+                "icon": "people",
+                "items": [
+                    {
+                        "title": _("Users"),
+                        "icon": "person",
+                        "link": "admin:accounts_user_changelist",
+                    },
+                    {
+                        "title": _("Mentors"),
+                        "icon": "school",
+                        "link": "admin:mentorship_mentorprofile_changelist",
+                    },
+                    {
+                        "title": _("Testimonials"),
+                        "icon": "rate_review",
+                        "link": "admin:diaspora_testimonial_changelist",
+                    },
+                ],
+            },
+            {
+                "title": _("Resources"),
+                "icon": "folder",
+                "items": [
+                    {
+                        "title": _("Universities"),
+                        "icon": "account_balance",
+                        "link": "admin:universities_university_changelist",
+                    },
+                    {
+                        "title": _("Scholarships"),
+                        "icon": "card_giftcard",
+                        "link": "admin:scholarships_scholarship_changelist",
+                    },
+                    {
+                        "title": _("Documents"),
+                        "icon": "description",
+                        "link": "admin:downloads_document_changelist",
+                    },
+                    {
+                        "title": _("Gallery"),
+                        "icon": "photo_library",
+                        "link": "admin:gallery_photo_changelist",
+                    },
+                ],
+            },
+            {
+                "title": _("Settings"),
+                "icon": "settings",
+                "items": [
+                    {
+                        "title": _("Governance"),
+                        "icon": "gavel",
+                        "link": "admin:governance_member_changelist",
+                    },
+                    {
+                        "title": _("Contact Messages"),
+                        "icon": "mail",
+                        "link": "admin:contact_contactmessage_changelist",
+                    },
+                ],
+            },
+        ],
+    },
+    "STYLES": [
+        {
+            "source": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        },
+    ],
+    "SCRIPTS": [],
+    "COLORS": {
+        "primary": {
+            "50": "250 250 252",
+            "100": "244 244 247",
+            "200": "228 228 234",
+            "300": "200 200 210",
+            "400": "156 156 171",
+            "500": "30 58 138",  # Navy Blue primary
+            "600": "30 64 175",
+            "700": "29 78 216",
+            "800": "30 58 138",
+            "900": "30 41 59",
+            "950": "15 23 42",
+        },
+    },
+    "EXTENSIONS": {
+        "modeltranslation": {
+            "flags": {
+                "en": "🇬🇧",
+                "fr": "🇫🇷",
+                "it": "🇮🇹",
+            },
+        },
     },
 }
 

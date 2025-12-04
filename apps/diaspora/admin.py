@@ -3,13 +3,18 @@ Admin configuration for diaspora app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from unfold.admin import ModelAdmin
+from config.admin import BaseAdmin, ModelAdmin
 from .models import News, Event, Testimonial, SuccessStory, SuccessStoryImage, LifeInItaly
 
 
 @admin.register(News)
-class NewsAdmin(ModelAdmin):
-    """Admin interface for News model."""
+class NewsAdmin(BaseAdmin):
+    """
+    Admin interface for News model.
+    
+    Uses BaseAdmin which automatically provides WYSIWYG editor (Trix)
+    for the 'content' TextField, allowing rich text formatting.
+    """
     list_display = ['title', 'category', 'author', 'is_published', 'published_at', 'language', 'created_at']
     list_filter = ['category', 'is_published', 'language', 'created_at']
     search_fields = ['title', 'content', 'author__username']
@@ -33,8 +38,13 @@ class NewsAdmin(ModelAdmin):
 
 
 @admin.register(Event)
-class EventAdmin(ModelAdmin):
-    """Admin interface for Event model."""
+class EventAdmin(BaseAdmin):
+    """
+    Admin interface for Event model.
+    
+    Uses BaseAdmin which automatically provides WYSIWYG editor (Trix)
+    for the 'description' TextField, allowing rich text formatting.
+    """
     list_display = ['title', 'location', 'start_datetime', 'end_datetime', 'organizer', 'is_published', 'registration_required']
     list_filter = ['is_published', 'registration_required', 'language', 'start_datetime']
     search_fields = ['title', 'description', 'location', 'organizer__username']
@@ -61,8 +71,13 @@ class EventAdmin(ModelAdmin):
 
 
 @admin.register(Testimonial)
-class TestimonialAdmin(ModelAdmin):
-    """Admin interface for Testimonial model."""
+class TestimonialAdmin(BaseAdmin):
+    """
+    Admin interface for Testimonial model.
+    
+    Uses BaseAdmin which automatically provides WYSIWYG editor (Trix)
+    for the 'testimonial' TextField, allowing rich text formatting.
+    """
     list_display = ['name', 'title', 'location', 'is_featured', 'is_published', 'language', 'created_at']
     list_filter = ['is_featured', 'is_published', 'language', 'created_at']
     search_fields = ['name', 'title', 'testimonial']
@@ -97,8 +112,13 @@ class SuccessStoryImageAdmin(ModelAdmin):
 
 
 @admin.register(SuccessStory)
-class SuccessStoryAdmin(ModelAdmin):
-    """Admin interface for SuccessStory model."""
+class SuccessStoryAdmin(BaseAdmin):
+    """
+    Admin interface for SuccessStory model.
+    
+    Uses BaseAdmin which automatically provides WYSIWYG editor (Trix)
+    for the 'story' TextField, allowing rich text formatting.
+    """
     list_display = ['title', 'person_name', 'is_featured', 'is_published', 'language', 'created_at']
     list_filter = ['is_featured', 'is_published', 'language', 'created_at']
     search_fields = ['title', 'person_name', 'person_title', 'story']
@@ -130,8 +150,13 @@ class SuccessStoryAdmin(ModelAdmin):
 
 
 @admin.register(LifeInItaly)
-class LifeInItalyAdmin(ModelAdmin):
-    """Admin interface for LifeInItaly model."""
+class LifeInItalyAdmin(BaseAdmin):
+    """
+    Admin interface for LifeInItaly model.
+    
+    Uses BaseAdmin which automatically provides WYSIWYG editor (Trix)
+    for the 'content' TextField, allowing rich text formatting.
+    """
     list_display = ['title', 'category', 'is_featured', 'is_published', 'language', 'created_at']
     list_filter = ['category', 'is_featured', 'is_published', 'language', 'created_at']
     search_fields = ['title', 'content']
