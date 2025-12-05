@@ -513,6 +513,37 @@ UNFOLD = {
         "show_all_applications": True,
         "navigation": [
             {
+                "title": _("Notifications & Enquiries"),
+                "icon": "notifications_active",
+                "items": [
+                    {
+                        "title": _("Contact Messages"),
+                        "icon": "mail",
+                        "link": "/admin/contact/contactsubmission/",
+                    },
+                    {
+                        "title": _("Mentorship Requests"),
+                        "icon": "school",
+                        "link": "/admin/mentorship/mentorshiprequest/",
+                    },
+                    {
+                        "title": _("Orientation Sessions"),
+                        "icon": "event_note",
+                        "link": "/admin/dashboard/orientationsession/",
+                    },
+                    {
+                        "title": _("Support Tickets"),
+                        "icon": "confirmation_number",
+                        "link": "/admin/dashboard/supportticket/",
+                    },
+                    {
+                        "title": _("Student Questions"),
+                        "icon": "help",
+                        "link": "/admin/dashboard/studentquestion/",
+                    },
+                ],
+            },
+            {
                 "title": _("Content Management"),
                 "icon": "article",
                 "items": [
@@ -640,11 +671,6 @@ UNFOLD = {
                 "icon": "support_agent",
                 "items": [
                     {
-                        "title": _("Support Tickets"),
-                        "icon": "confirmation_number",
-                        "link": "/admin/dashboard/supportticket/",
-                    },
-                    {
                         "title": _("Ticket Replies"),
                         "icon": "reply",
                         "link": "/admin/dashboard/ticketreply/",
@@ -663,16 +689,6 @@ UNFOLD = {
                         "title": _("Group Announcements"),
                         "icon": "campaign",
                         "link": "/admin/dashboard/groupannouncement/",
-                    },
-                    {
-                        "title": _("Student Questions"),
-                        "icon": "help",
-                        "link": "/admin/dashboard/studentquestion/",
-                    },
-                    {
-                        "title": _("Orientation Sessions"),
-                        "icon": "event_note",
-                        "link": "/admin/dashboard/orientationsession/",
                     },
                     {
                         "title": _("User Stories"),
@@ -741,11 +757,6 @@ UNFOLD = {
                 "title": _("Administration"),
                 "icon": "settings",
                 "items": [
-                    {
-                        "title": _("Contact Messages"),
-                        "icon": "mail",
-                        "link": "/admin/contact/contactsubmission/",
-                    },
                     {
                         "title": _("Event Registrations"),
                         "icon": "event_available",
