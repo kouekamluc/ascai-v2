@@ -6,6 +6,13 @@ from pathlib import Path
 from decouple import config
 from django.utils.translation import gettext_lazy as _
 
+
+def _get_navigation_with_counts(request):
+    """Helper function to get navigation with notification counts."""
+    # Import here to avoid circular imports
+    from config.admin import get_notification_navigation
+    return get_notification_navigation(request)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -511,40 +518,8 @@ UNFOLD = {
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": True,
-        "navigation": [
-            {
-                "title": _("Notifications & Enquiries"),
-                "icon": "notifications_active",
-                "items": [
-                    {
-                        "title": _("Contact Messages"),
-                        "icon": "mail",
-                        "link": "/admin/contact/contactsubmission/",
-                    },
-                    {
-                        "title": _("Mentorship Requests"),
-                        "icon": "school",
-                        "link": "/admin/mentorship/mentorshiprequest/",
-                    },
-                    {
-                        "title": _("Orientation Sessions"),
-                        "icon": "event_note",
-                        "link": "/admin/dashboard/orientationsession/",
-                    },
-                    {
-                        "title": _("Support Tickets"),
-                        "icon": "confirmation_number",
-                        "link": "/admin/dashboard/supportticket/",
-                    },
-                    {
-                        "title": _("Student Questions"),
-                        "icon": "help",
-                        "link": "/admin/dashboard/studentquestion/",
-                    },
-                ],
-            },
-            {
-                "title": _("Content Management"),
+        "navigation": lambda request: _get_navigation_with_counts(request),
+    },
                 "icon": "article",
                 "items": [
                     {

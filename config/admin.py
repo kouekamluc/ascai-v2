@@ -214,6 +214,322 @@ def dashboard_callback(request, context):
     return context
 
 
+def get_notification_counts():
+    """
+    Get notification counts for admin sidebar badges.
+    
+    Returns:
+        dict: Dictionary with notification counts for each category
+    """
+    try:
+        from apps.contact.models import ContactSubmission
+        from apps.mentorship.models import MentorshipRequest
+        from apps.dashboard.models import OrientationSession, StudentQuestion, SupportTicket
+        
+        counts = {
+            'contact': ContactSubmission.objects.filter(status='new').count(),
+            'mentorship': MentorshipRequest.objects.filter(status='pending').count(),
+            'orientation': OrientationSession.objects.filter(is_confirmed=False).count(),
+            'tickets': SupportTicket.objects.filter(status__in=['open', 'pending']).count(),
+            'questions': StudentQuestion.objects.filter(is_resolved=False).count(),
+        }
+        counts['total'] = sum(counts.values())
+        return counts
+    except Exception:
+        # Return zeros if models aren't available (e.g., during migrations)
+        return {
+            'contact': 0,
+            'mentorship': 0,
+            'orientation': 0,
+            'tickets': 0,
+            'questions': 0,
+            'total': 0,
+        }
+
+
+def get_notification_navigation(request):
+    """
+    Get navigation items with notification badge counts.
+    
+    This function dynamically generates the full navigation with current
+    notification counts displayed in the titles.
+    
+    Args:
+        request: The HTTP request object
+    
+    Returns:
+        list: Complete navigation items with badge counts in titles
+    """
+    counts = get_notification_counts()
+    
+    # Helper to format title with count badge
+    def format_with_badge(title, count):
+        if count > 0:
+            return f"{title} 🔴 {count}"
+        return title
+    
+    # Return full navigation with notification counts
+    return [
+        {
+            "title": format_with_badge(_("Notifications & Enquiries"), counts['total']),
+            "icon": "notifications_active",
+            "items": [
+                {
+                    "title": format_with_badge(_("Contact Messages"), counts['contact']),
+                    "icon": "mail",
+                    "link": "/admin/contact/contactsubmission/",
+                },
+                {
+                    "title": format_with_badge(_("Mentorship Requests"), counts['mentorship']),
+                    "icon": "school",
+                    "link": "/admin/mentorship/mentorshiprequest/",
+                },
+                {
+                    "title": format_with_badge(_("Orientation Sessions"), counts['orientation']),
+                    "icon": "event_note",
+                    "link": "/admin/dashboard/orientationsession/",
+                },
+                {
+                    "title": format_with_badge(_("Support Tickets"), counts['tickets']),
+                    "icon": "confirmation_number",
+                    "link": "/admin/dashboard/supportticket/",
+                },
+                {
+                    "title": format_with_badge(_("Student Questions"), counts['questions']),
+                    "icon": "help",
+                    "link": "/admin/dashboard/studentquestion/",
+                },
+            ],
+        },
+        {
+            "title": _("Content Management"),
+            "icon": "article",
+            "items": [
+                {
+                    "title": _("News & Announcements"),
+                    "icon": "newspaper",
+                    "link": "/admin/diaspora/news/",
+                },
+                {
+                    "title": _("Events"),
+                    "icon": "event",
+                    "link": "/admin/diaspora/event/",
+                },
+                {
+                    "title": _("Success Stories"),
+                    "icon": "star",
+                    "link": "/admin/diaspora/successstory/",
+                },
+                {
+                    "title": _("Life in Italy"),
+                    "icon": "info",
+                    "link": "/admin/diaspora/lifeinitaly/",
+                },
+                {
+                    "title": _("Testimonials"),
+                    "icon": "rate_review",
+                    "link": "/admin/diaspora/testimonial/",
+                },
+                {
+                    "title": _("Forum Categories"),
+                    "icon": "category",
+                    "link": "/admin/community/forumcategory/",
+                },
+                {
+                    "title": _("Forum Threads"),
+                    "icon": "forum",
+                    "link": "/admin/community/forumthread/",
+                },
+                {
+                    "title": _("Forum Posts"),
+                    "icon": "comment",
+                    "link": "/admin/community/forumpost/",
+                },
+            ],
+        },
+        {
+            "title": _("User Management"),
+            "icon": "people",
+            "items": [
+                {
+                    "title": _("Users"),
+                    "icon": "person",
+                    "link": "/admin/accounts/user/",
+                },
+                {
+                    "title": _("User Documents"),
+                    "icon": "description",
+                    "link": "/admin/accounts/userdocument/",
+                },
+                {
+                    "title": _("Mentors"),
+                    "icon": "school",
+                    "link": "/admin/mentorship/mentorprofile/",
+                },
+                {
+                    "title": _("Mentorship Requests"),
+                    "icon": "handshake",
+                    "link": "/admin/mentorship/mentorshiprequest/",
+                },
+                {
+                    "title": _("Mentorship Messages"),
+                    "icon": "message",
+                    "link": "/admin/mentorship/mentorshipmessage/",
+                },
+                {
+                    "title": _("Mentor Ratings"),
+                    "icon": "star_rate",
+                    "link": "/admin/mentorship/mentorrating/",
+                },
+            ],
+        },
+        {
+            "title": _("Resources & Education"),
+            "icon": "folder",
+            "items": [
+                {
+                    "title": _("Universities"),
+                    "icon": "account_balance",
+                    "link": "/admin/universities/university/",
+                },
+                {
+                    "title": _("University Programs"),
+                    "icon": "menu_book",
+                    "link": "/admin/universities/universityprogram/",
+                },
+                {
+                    "title": _("Scholarships"),
+                    "icon": "card_giftcard",
+                    "link": "/admin/scholarships/scholarship/",
+                },
+                {
+                    "title": _("Documents"),
+                    "icon": "description",
+                    "link": "/admin/downloads/document/",
+                },
+                {
+                    "title": _("Gallery Albums"),
+                    "icon": "photo_album",
+                    "link": "/admin/gallery/galleryalbum/",
+                },
+                {
+                    "title": _("Gallery Images"),
+                    "icon": "photo_library",
+                    "link": "/admin/gallery/galleryimage/",
+                },
+                {
+                    "title": _("Gallery Videos"),
+                    "icon": "video_library",
+                    "link": "/admin/gallery/galleryvideo/",
+                },
+            ],
+        },
+        {
+            "title": _("Support & Community"),
+            "icon": "support_agent",
+            "items": [
+                {
+                    "title": _("Ticket Replies"),
+                    "icon": "reply",
+                    "link": "/admin/dashboard/ticketreply/",
+                },
+                {
+                    "title": _("Community Groups"),
+                    "icon": "groups",
+                    "link": "/admin/dashboard/communitygroup/",
+                },
+                {
+                    "title": _("Group Discussions"),
+                    "icon": "forum",
+                    "link": "/admin/dashboard/groupdiscussion/",
+                },
+                {
+                    "title": _("Group Announcements"),
+                    "icon": "campaign",
+                    "link": "/admin/dashboard/groupannouncement/",
+                },
+                {
+                    "title": _("User Stories"),
+                    "icon": "article",
+                    "link": "/admin/dashboard/userstorysubmission/",
+                },
+            ],
+        },
+        {
+            "title": _("Governance"),
+            "icon": "gavel",
+            "items": [
+                {
+                    "title": _("Members"),
+                    "icon": "people",
+                    "link": "/admin/governance/member/",
+                },
+                {
+                    "title": _("Membership Status"),
+                    "icon": "badge",
+                    "link": "/admin/governance/membershipstatus/",
+                },
+                {
+                    "title": _("Executive Board"),
+                    "icon": "groups",
+                    "link": "/admin/governance/executiveboard/",
+                },
+                {
+                    "title": _("Executive Positions"),
+                    "icon": "work",
+                    "link": "/admin/governance/executiveposition/",
+                },
+                {
+                    "title": _("Board Meetings"),
+                    "icon": "meeting_room",
+                    "link": "/admin/governance/boardmeeting/",
+                },
+                {
+                    "title": _("General Assembly"),
+                    "icon": "people_outline",
+                    "link": "/admin/governance/generalassembly/",
+                },
+                {
+                    "title": _("Elections"),
+                    "icon": "how_to_vote",
+                    "link": "/admin/governance/election/",
+                },
+                {
+                    "title": _("Financial Transactions"),
+                    "icon": "account_balance_wallet",
+                    "link": "/admin/governance/financialtransaction/",
+                },
+                {
+                    "title": _("Membership Dues"),
+                    "icon": "payment",
+                    "link": "/admin/governance/membershipdues/",
+                },
+                {
+                    "title": _("Financial Reports"),
+                    "icon": "assessment",
+                    "link": "/admin/governance/financialreport/",
+                },
+            ],
+        },
+        {
+            "title": _("Administration"),
+            "icon": "settings",
+            "items": [
+                {
+                    "title": _("Event Registrations"),
+                    "icon": "event_available",
+                    "link": "/admin/dashboard/eventregistration/",
+                },
+                {
+                    "title": _("Saved Documents"),
+                    "icon": "bookmark",
+                    "link": "/admin/dashboard/saveddocument/",
+                },
+            ],
+        },
+    ]
+
+
 # Configure the default admin site (Unfold will automatically style it)
 # These use gettext_lazy so they will be translated based on the current language
 admin.site.site_header = _('ASCAI Lazio Administration')
