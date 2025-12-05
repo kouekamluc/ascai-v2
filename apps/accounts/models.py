@@ -20,6 +20,7 @@ class User(AbstractUser):
     LANGUAGE_CHOICES = [
         ('en', _('English')),
         ('fr', _('Français')),
+        ('it', _('Italiano')),
     ]
     
     phone = models.CharField(

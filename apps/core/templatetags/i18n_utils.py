@@ -34,6 +34,13 @@ def translate_current_url(context, language):
             path_without_lang = '/'
             break
     
+    # Handle admin paths (not in i18n_patterns) - just return current path
+    if current_path.startswith('/admin/'):
+        return current_path
+    
+    # Handle dashboard paths - they're in i18n_patterns but need special handling
+    # Dashboard paths like /dashboard/ or /fr/dashboard/ should work correctly
+    
     # Ensure path starts with /
     if not path_without_lang.startswith('/'):
         path_without_lang = '/' + path_without_lang

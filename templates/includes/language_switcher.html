@@ -4,7 +4,7 @@
 
 <div class="relative" x-data="{ open: false }">
     <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-cameroon-green bg-gray-50 hover:bg-cameroon-green/5 rounded-lg transition-all duration-200 border border-gray-200 hover:border-cameroon-green/30">
-        <span class="text-lg">{% if CURRENT_LANGUAGE == 'en' %}🇬🇧{% else %}🇫🇷{% endif %}</span>
+        <span class="text-lg">{% if CURRENT_LANGUAGE == 'en' %}🇬🇧{% elif CURRENT_LANGUAGE == 'fr' %}🇫🇷{% elif CURRENT_LANGUAGE == 'it' %}🇮🇹{% else %}🌐{% endif %}</span>
         <span class="uppercase font-semibold">{{ CURRENT_LANGUAGE }}</span>
         <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -19,17 +19,25 @@
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
          @click.away="open = false" 
+         @click.stop
          x-cloak 
-         class="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100">
+         class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl py-2 z-[9999] border border-gray-100"
+         style="pointer-events: auto; position: absolute;">
         {% for lang_code, lang_name in LANGUAGES %}
-            {% if lang_code != CURRENT_LANGUAGE %}
-                <form action="{% url 'set_language' %}" method="post" class="inline w-full">
+            {% if lang_code == CURRENT_LANGUAGE %}
+                <div class="px-4 py-2.5 text-sm text-cameroon-green bg-cameroon-green/5 font-semibold flex items-center space-x-2 border-b border-gray-100">
+                    <span class="text-lg">{% if lang_code == 'en' %}🇬🇧{% elif lang_code == 'fr' %}🇫🇷{% elif lang_code == 'it' %}🇮🇹{% else %}🌐{% endif %}</span>
+                    <span>{{ lang_name }}</span>
+                    <span class="ml-auto text-xs">{% trans 'Current' %}</span>
+                </div>
+            {% else %}
+                <form action="{% url 'set_language' %}" method="post" class="m-0 w-full" @click.stop>
                     {% csrf_token %}
                     <input type="hidden" name="language" value="{{ lang_code }}">
                     {% translate_current_url lang_code as translated_url %}
-                    <input type="hidden" name="next" value="{{ translated_url }}">
-                    <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-cameroon-green/5 hover:text-cameroon-green transition-colors duration-150 flex items-center space-x-2">
-                        <span class="text-lg">{% if lang_code == 'en' %}🇬🇧{% else %}🇫🇷{% endif %}</span>
+                    <input type="hidden" name="next" value="{% if translated_url %}{{ translated_url }}{% elif request %}{{ request.get_full_path }}{% else %}/{% endif %}">
+                    <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-cameroon-green/5 hover:text-cameroon-green transition-colors duration-150 flex items-center space-x-2 cursor-pointer border-0 bg-transparent" style="pointer-events: auto; z-index: 10000;">
+                        <span class="text-lg">{% if lang_code == 'en' %}🇬🇧{% elif lang_code == 'fr' %}🇫🇷{% elif lang_code == 'it' %}🇮🇹{% else %}🌐{% endif %}</span>
                         <span class="font-medium">{{ lang_name }}</span>
                     </button>
                 </form>

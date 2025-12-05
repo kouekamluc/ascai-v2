@@ -22,3 +22,7 @@ class GalleryConfig(AppConfig):
 
 
 
+
+
+
+

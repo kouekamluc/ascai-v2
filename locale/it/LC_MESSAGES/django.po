@@ -1,0 +1,1465 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ASCAI Lazio 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"PO-Revision-Date: 2024-12-04 12:00+0000\n"
+"Last-Translator: ASCAI Lazio Team\n"
+"Language-Team: Italian <it@li.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Contact Page Translations
+msgid "Contact Us"
+msgstr "Contattaci"
+
+msgid "We would love to hear from you. Send us a message and we will respond as soon as possible."
+msgstr "Ci piacerebbe sentirti. Inviaci un messaggio e ti risponderemo il prima possibile."
+
+msgid "Send us a Message"
+msgstr "Inviaci un messaggio"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Subject"
+msgstr "Oggetto"
+
+msgid "Message"
+msgstr "Messaggio"
+
+msgid "Send Message"
+msgstr "Invia messaggio"
+
+msgid "Contact Information"
+msgstr "Informazioni di contatto"
+
+msgid "Office Address"
+msgstr "Indirizzo ufficio"
+
+msgid "ASCAI Lazio"
+msgstr "ASCAI Lazio"
+
+msgid "Lazio Region"
+msgstr "Regione Lazio"
+
+msgid "Rome, Italy"
+msgstr "Roma, Italia"
+
+msgid "Office Hours"
+msgstr "Orari d'ufficio"
+
+msgid "Monday - Friday"
+msgstr "Lunedì - Venerdì"
+
+msgid "Saturday"
+msgstr "Sabato"
+
+msgid "Sunday"
+msgstr "Domenica"
+
+msgid "Closed"
+msgstr "Chiuso"
+
+msgid "ASCAI Lazio Location"
+msgstr "Posizione ASCAI Lazio"
+
+msgid "Thank you!"
+msgstr "Grazie!"
+
+msgid "Your message has been sent successfully. We will get back to you soon."
+msgstr "Il tuo messaggio è stato inviato con successo. Ti risponderemo presto."
+
+msgid "Message Sent!"
+msgstr "Messaggio inviato!"
+
+msgid "Thank you for contacting us. We will get back to you as soon as possible."
+msgstr "Grazie per averci contattato. Ti risponderemo il prima possibile."
+
+msgid "Close"
+msgstr "Chiudi"
+
+msgid "Message Sent"
+msgstr "Messaggio inviato"
+
+msgid "Message Sent Successfully!"
+msgstr "Messaggio inviato con successo!"
+
+msgid "Return to Home"
+msgstr "Torna alla home"
+
+msgid "Thank you for your message! We will get back to you soon."
+msgstr "Grazie per il tuo messaggio! Ti risponderemo presto."
+
+# Universities Module Translations
+msgid "Universities"
+msgstr "Università"
+
+msgid "Universities in Lazio"
+msgstr "Università nel Lazio"
+
+msgid "Search Universities"
+msgstr "Cerca università"
+
+msgid "Search by name, city, or description..."
+msgstr "Cerca per nome, città o descrizione..."
+
+msgid "City"
+msgstr "Città"
+
+msgid "All Cities"
+msgstr "Tutte le città"
+
+msgid "Rome"
+msgstr "Roma"
+
+msgid "Cassino"
+msgstr "Cassino"
+
+msgid "Viterbo"
+msgstr "Viterbo"
+
+msgid "Latina"
+msgstr "Latina"
+
+msgid "Frosinone"
+msgstr "Frosinone"
+
+msgid "Rieti"
+msgstr "Rieti"
+
+msgid "Degree Level"
+msgstr "Livello di laurea"
+
+msgid "All Degrees"
+msgstr "Tutti i livelli"
+
+msgid "Bachelor"
+msgstr "Laurea triennale"
+
+msgid "Master"
+msgstr "Laurea magistrale"
+
+msgid "PhD"
+msgstr "Dottorato"
+
+msgid "Field of Study"
+msgstr "Campo di studio"
+
+msgid "All Fields"
+msgstr "Tutti i campi"
+
+msgid "Engineering"
+msgstr "Ingegneria"
+
+msgid "Medicine"
+msgstr "Medicina"
+
+msgid "Law"
+msgstr "Giurisprudenza"
+
+msgid "Business"
+msgstr "Economia"
+
+msgid "Arts"
+msgstr "Arti"
+
+msgid "Sciences"
+msgstr "Scienze"
+
+msgid "Min Tuition (€)"
+msgstr "Tasse min. (€)"
+
+msgid "Max Tuition (€)"
+msgstr "Tasse max. (€)"
+
+msgid "Min"
+msgstr "Min"
+
+msgid "Max"
+msgstr "Max"
+
+msgid "Clear Filters"
+msgstr "Cancella filtri"
+
+msgid "Loading..."
+msgstr "Caricamento..."
+
+msgid "No universities found"
+msgstr "Nessuna università trovata"
+
+msgid "Try adjusting your filters or search terms."
+msgstr "Prova ad aggiustare i filtri o i termini di ricerca."
+
+msgid "Save to Favorites"
+msgstr "Salva nei preferiti"
+
+msgid "Remove from Favorites"
+msgstr "Rimuovi dai preferiti"
+
+msgid "View Details"
+msgstr "Visualizza dettagli"
+
+msgid "Tuition:"
+msgstr "Tasse di iscrizione:"
+
+msgid "From"
+msgstr "Da"
+
+msgid "Up to"
+msgstr "Fino a"
+
+msgid "Address"
+msgstr "Indirizzo"
+
+msgid "Website"
+msgstr "Sito web"
+
+msgid "Phone"
+msgstr "Telefono"
+
+msgid "Description"
+msgstr "Descrizione"
+
+msgid "Tuition Range"
+msgstr "Fascia di tasse"
+
+msgid "Languages of Instruction"
+msgstr "Lingue di insegnamento"
+
+msgid "Degree Types"
+msgstr "Tipi di laurea"
+
+msgid "Fields of Study"
+msgstr "Campi di studio"
+
+msgid "Programs"
+msgstr "Programmi"
+
+msgid "Degree:"
+msgstr "Laurea:"
+
+msgid "Field:"
+msgstr "Campo:"
+
+msgid "Duration:"
+msgstr "Durata:"
+
+msgid "Language:"
+msgstr "Lingua:"
+
+msgid "years"
+msgstr "anni"
+
+msgid "Page"
+msgstr "Pagina"
+
+msgid "of"
+msgstr "di"
+
+msgid "Previous"
+msgstr "Precedente"
+
+msgid "Next"
+msgstr "Successivo"
+
+msgid "Only students can save universities to favorites."
+msgstr "Solo gli studenti possono salvare le università nei preferiti."
+
+# Navigation and Common Strings
+msgid "Home"
+msgstr "Home"
+
+msgid "Students"
+msgstr "Studenti"
+
+msgid "Diaspora"
+msgstr "Diaspora"
+
+msgid "Community"
+msgstr "Comunità"
+
+msgid "Mentorship"
+msgstr "Mentorato"
+
+msgid "Scholarships"
+msgstr "Borse di studio"
+
+msgid "Gallery"
+msgstr "Galleria"
+
+msgid "Downloads"
+msgstr "Download"
+
+msgid "Contact"
+msgstr "Contatti"
+
+msgid "Login"
+msgstr "Accedi"
+
+msgid "Register"
+msgstr "Registrati"
+
+msgid "Profile"
+msgstr "Profilo"
+
+msgid "Logout"
+msgstr "Esci"
+
+msgid "Admin"
+msgstr "Amministrazione"
+
+msgid "Welcome to ASCAI Lazio"
+msgstr "Benvenuto in ASCAI Lazio"
+
+msgid "Association of Cameroonian Students and Academics in the Lazio Region, Italy"
+msgstr "Associazione degli Studenti e Accademici Camerunesi nella Regione Lazio, Italia"
+
+msgid "Join Community"
+msgstr "Unisciti alla comunità"
+
+msgid "Cameroonians in Lazio"
+msgstr "Camerunesi nel Lazio"
+
+msgid "The Cameroonian community in Lazio, Italy, represents a vibrant and growing diaspora of students, academics, and professionals. Our community is dedicated to supporting one another through academic excellence, cultural preservation, and mutual assistance."
+msgstr "La comunità camerunese nel Lazio, Italia, rappresenta una diaspora vivace e in crescita di studenti, accademici e professionisti. La nostra comunità è dedicata al sostegno reciproco attraverso l'eccellenza accademica, la preservazione culturale e l'assistenza reciproca."
+
+msgid "ASCAI Lazio serves as a bridge connecting Cameroonian students and academics across universities in Rome and the wider Lazio region. We provide essential resources, mentorship opportunities, and a supportive network to help our members thrive in their academic and professional journeys."
+msgstr "ASCAI Lazio funge da ponte che collega studenti e accademici camerunesi nelle università di Roma e nella più ampia regione del Lazio. Forniamo risorse essenziali, opportunità di mentorato e una rete di supporto per aiutare i nostri membri a prosperare nei loro percorsi accademici e professionali."
+
+msgid "Through cultural events, academic workshops, and community initiatives, we celebrate our heritage while embracing our role in the Italian academic and social landscape."
+msgstr "Attraverso eventi culturali, workshop accademici e iniziative comunitarie, celebriamo il nostro patrimonio abbracciando il nostro ruolo nel panorama accademico e sociale italiano."
+
+msgid "Our Community"
+msgstr "La nostra comunità"
+
+msgid "Students across major universities in Lazio"
+msgstr "Studenti nelle principali università del Lazio"
+
+msgid "Academics and researchers in various fields"
+msgstr "Accademici e ricercatori in vari campi"
+
+msgid "Professionals contributing to Italian society"
+msgstr "Professionisti che contribuiscono alla società italiana"
+
+msgid "Cultural ambassadors promoting diversity"
+msgstr "Ambasciatori culturali che promuovono la diversità"
+
+msgid "Our Mission"
+msgstr "La nostra missione"
+
+msgid "Academic Support"
+msgstr "Supporto accademico"
+
+msgid "Supporting Cameroonian students in Lazio with information, guidance, and resources."
+msgstr "Supporto agli studenti camerunesi nel Lazio con informazioni, orientamento e risorse."
+
+msgid "Community Unity"
+msgstr "Unità della comunità"
+
+msgid "Promoting diaspora unity, cultural exchange, and integration."
+msgstr "Promozione dell'unità della diaspora, dello scambio culturale e dell'integrazione."
+
+msgid "Opportunities"
+msgstr "Opportunità"
+
+msgid "Providing mentorship, orientation, and scholarship opportunities."
+msgstr "Fornitura di opportunità di mentorato, orientamento e borse di studio."
+
+msgid "Latest News"
+msgstr "Ultime notizie"
+
+msgid "View All"
+msgstr "Vedi tutto"
+
+msgid "Loading news..."
+msgstr "Caricamento notizie..."
+
+msgid "Upcoming Events"
+msgstr "Prossimi eventi"
+
+msgid "Loading events..."
+msgstr "Caricamento eventi..."
+
+msgid "Registration Required"
+msgstr "Registrazione richiesta"
+
+msgid "Success Stories"
+msgstr "Storie di successo"
+
+msgid "Loading stories..."
+msgstr "Caricamento storie..."
+
+msgid "Read More"
+msgstr "Leggi di più"
+
+msgid "Join Our Community"
+msgstr "Unisciti alla nostra comunità"
+
+msgid "Connect with fellow Cameroonian students and academics in Lazio"
+msgstr "Connettiti con altri studenti e accademici camerunesi nel Lazio"
+
+msgid "Register Now"
+msgstr "Registrati ora"
+
+msgid "Studying in Lazio – Complete Guide"
+msgstr "Studiare nel Lazio – Guida completa"
+
+msgid "Studying in Lazio"
+msgstr "Studiare nel Lazio"
+
+msgid "Complete Guide"
+msgstr "Guida completa"
+
+msgid "Your comprehensive resource for studying, living, and thriving in the Lazio region of Italy. Find universities, scholarships, programs, and essential information for Cameroonian students."
+msgstr "La tua risorsa completa per studiare, vivere e prosperare nella regione del Lazio in Italia. Trova università, borse di studio, programmi e informazioni essenziali per gli studenti camerunesi."
+
+msgid "Active Scholarships"
+msgstr "Borse di studio attive"
+
+msgid "Resources & Documents"
+msgstr "Risorse e documenti"
+
+msgid "Enrollment Process"
+msgstr "Processo di iscrizione"
+
+msgid "University Enrollment Process in Lazio"
+msgstr "Processo di iscrizione universitaria nel Lazio"
+
+msgid "Step 1: Choose Your University and Program"
+msgstr "Passo 1: Scegli la tua università e il tuo programma"
+
+msgid "Research universities and programs that match your interests and qualifications. Visit our"
+msgstr "Ricerca università e programmi che corrispondono ai tuoi interessi e qualifiche. Visita il nostro"
+
+msgid "Universities Directory"
+msgstr "Elenco università"
+
+msgid "for detailed information."
+msgstr "per informazioni dettagliate."
+
+msgid "Step 2: Check Admission Requirements"
+msgstr "Passo 2: Verifica i requisiti di ammissione"
+
+msgid "Each university and program has specific admission requirements. Common requirements include:"
+msgstr "Ogni università e programma ha requisiti di ammissione specifici. I requisiti comuni includono:"
+
+msgid "Academic transcripts"
+msgstr "Trascrizioni accademiche"
+
+msgid "Language proficiency certificates (Italian/English)"
+msgstr "Certificati di competenza linguistica (italiano/inglese)"
+
+msgid "Entrance exams (for some programs)"
+msgstr "Esami di ammissione (per alcuni programmi)"
+
+msgid "Motivation letter"
+msgstr "Lettera di motivazione"
+
+msgid "Letters of recommendation"
+msgstr "Lettere di raccomandazione"
+
+msgid "Testimonials"
+msgstr "Testimonianze"
+
+msgid "Testimonials from Cameroonians in Lazio"
+msgstr "Testimonianze di camerunesi nel Lazio"
+
+msgid "Read about the experiences of Cameroonians living and studying in Lazio, Italy."
+msgstr "Leggi le esperienze di camerunesi che vivono e studiano nel Lazio, Italia."
+
+msgid "All Languages"
+msgstr "Tutte le lingue"
+
+msgid "English"
+msgstr "Inglese"
+
+msgid "French"
+msgstr "Francese"
+
+msgid "Filter"
+msgstr "Filtra"
+
+# Footer Translations
+msgid "About ASCAI Lazio"
+msgstr "Chi siamo - ASCAI Lazio"
+
+msgid "Association of Cameroonian Students and Academics in the Lazio Region, Italy."
+msgstr "Associazione degli Studenti e Accademici Camerunesi nella Regione Lazio, Italia."
+
+msgid "Quick Links"
+msgstr "Link rapidi"
+
+msgid "Resources"
+msgstr "Risorse"
+
+msgid "Diaspora News"
+msgstr "Notizie della diaspora"
+
+msgid "Lazio Region, Italy"
+msgstr "Regione Lazio, Italia"
+
+msgid "All rights reserved."
+msgstr "Tutti i diritti riservati."
+
+# Scholarships Translations
+msgid "DISCO Lazio Scholarships"
+msgstr "Borse di studio DISCO Lazio"
+
+msgid "This is a DISCO Lazio scholarship opportunity."
+msgstr "Questa è un'opportunità di borsa di studio DISCO Lazio."
+
+msgid "Remove"
+msgstr "Rimuovi"
+
+msgid "Save"
+msgstr "Salva"
+
+msgid "Application Deadline:"
+msgstr "Scadenza domanda:"
+
+msgid "Eligibility Criteria"
+msgstr "Criteri di eleggibilità"
+
+msgid "Requirements Document"
+msgstr "Documento dei requisiti"
+
+msgid "Download Requirements PDF"
+msgstr "Scarica PDF dei requisiti"
+
+msgid "Apply Now"
+msgstr "Candidati ora"
+
+msgid "Search"
+msgstr "Cerca"
+
+msgid "Search scholarships..."
+msgstr "Cerca borse di studio..."
+
+msgid "Level"
+msgstr "Livello"
+
+msgid "All Levels"
+msgstr "Tutti i livelli"
+
+msgid "Bachelor's Degree"
+msgstr "Laurea triennale"
+
+msgid "Master's Degree"
+msgstr "Laurea magistrale"
+
+msgid "Region"
+msgstr "Regione"
+
+msgid "All Regions"
+msgstr "Tutte le regioni"
+
+msgid "Lazio"
+msgstr "Lazio"
+
+msgid "Other"
+msgstr "Altro"
+
+msgid "Deadline"
+msgstr "Scadenza"
+
+msgid "All Deadlines"
+msgstr "Tutte le scadenze"
+
+msgid "Upcoming"
+msgstr "In arrivo"
+
+msgid "This Month"
+msgstr "Questo mese"
+
+msgid "Past Deadlines"
+msgstr "Scadenze passate"
+
+msgid "DISCO Lazio Scholarships Only"
+msgstr "Solo borse DISCO Lazio"
+
+msgid "Deadline:"
+msgstr "Scadenza:"
+
+msgid "Learn More"
+msgstr "Scopri di più"
+
+msgid "No scholarships found."
+msgstr "Nessuna borsa di studio trovata."
+
+msgid "Discover funding opportunities through the DISCO Lazio program for students in the Lazio region."
+msgstr "Scopri opportunità di finanziamento attraverso il programma DISCO Lazio per gli studenti nella regione del Lazio."
+
+msgid "About DISCO Lazio"
+msgstr "Informazioni su DISCO Lazio"
+
+msgid "DISCO Lazio is a regional scholarship program designed to support students pursuing higher education in the Lazio region of Italy."
+msgstr "DISCO Lazio è un programma regionale di borse di studio progettato per supportare gli studenti che perseguono l'istruzione superiore nella regione del Lazio in Italia."
+
+msgid "These scholarships are awarded based on financial need and academic merit. Eligible students can receive financial support to cover tuition fees and living expenses."
+msgstr "Queste borse di studio sono assegnate in base al bisogno finanziario e al merito accademico. Gli studenti idonei possono ricevere supporto finanziario per coprire le tasse universitarie e le spese di soggiorno."
+
+msgid "Available DISCO Lazio Scholarships"
+msgstr "Borse di studio DISCO Lazio disponibili"
+
+msgid "No DISCO Lazio scholarships available at this time."
+msgstr "Nessuna borsa di studio DISCO Lazio disponibile al momento."
+
+# Community Translations
+msgid "Community Forum"
+msgstr "Forum della comunità"
+
+msgid "Connect, share, and learn with the ASCAI community"
+msgstr "Connettiti, condividi e impara con la comunità ASCAI"
+
+msgid "New Thread"
+msgstr "Nuovo thread"
+
+msgid "threads"
+msgstr "thread"
+
+msgid "View Threads"
+msgstr "Visualizza thread"
+
+msgid "No categories available yet."
+msgstr "Nessuna categoria disponibile ancora."
+
+msgid "Forum Threads"
+msgstr "Thread del forum"
+
+msgid "Filter by Category"
+msgstr "Filtra per categoria"
+
+msgid "All Categories"
+msgstr "Tutte le categorie"
+
+msgid "Search threads..."
+msgstr "Cerca thread..."
+
+msgid "Pinned"
+msgstr "In evidenza"
+
+msgid "Locked"
+msgstr "Bloccato"
+
+msgid "views"
+msgstr "visualizzazioni"
+
+# Mentorship Translations
+msgid "Mentor Dashboard"
+msgstr "Dashboard del mentore"
+
+msgid "You need to create a mentor profile first."
+msgstr "Devi prima creare un profilo mentore."
+
+msgid "Create Mentor Profile"
+msgstr "Crea profilo mentore"
+
+msgid "Total Requests"
+msgstr "Richieste totali"
+
+msgid "Pending Requests"
+msgstr "Richieste in sospeso"
+
+msgid "Students Helped"
+msgstr "Studenti aiutati"
+
+msgid "Mentorship Requests"
+msgstr "Richieste di mentorato"
+
+msgid "No mentorship requests yet."
+msgstr "Nessuna richiesta di mentorato ancora."
+
+msgid "Mentor"
+msgstr "Mentore"
+
+msgid "Student"
+msgstr "Studente"
+
+msgid "Initial Message"
+msgstr "Messaggio iniziale"
+
+msgid "Messages"
+msgstr "Messaggi"
+
+msgid "Waiting for mentor to accept your request."
+msgstr "In attesa che il mentore accetti la tua richiesta."
+
+msgid "This request has been closed."
+msgstr "Questa richiesta è stata chiusa."
+
+# Dashboard Translations
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "ASCAI Lazio Reserved Area - Private Dashboard"
+msgstr "Area riservata ASCAI Lazio - Dashboard privata"
+
+msgid "Saved Universities"
+msgstr "Università salvate"
+
+msgid "Saved Scholarships"
+msgstr "Borse di studio salvate"
+
+msgid "Open Tickets"
+msgstr "Ticket aperti"
+
+msgid "Quick Actions"
+msgstr "Azioni rapide"
+
+msgid "Upcoming Events"
+msgstr "Prossimi eventi"
+
+msgid "View Ticket"
+msgstr "Visualizza ticket"
+
+msgid "No upcoming events"
+msgstr "Nessun evento in arrivo"
+
+msgid "Recent Support Tickets"
+msgstr "Ticket di supporto recenti"
+
+msgid "No support tickets yet"
+msgstr "Nessun ticket di supporto ancora"
+
+msgid "Suggested Groups"
+msgstr "Gruppi suggeriti"
+
+msgid "members"
+msgstr "membri"
+
+msgid "View"
+msgstr "Visualizza"
+
+msgid "No suggested groups"
+msgstr "Nessun gruppo suggerito"
+
+msgid "My Profile"
+msgstr "Il mio profilo"
+
+msgid "Resources"
+msgstr "Risorse"
+
+msgid "New Student Guide"
+msgstr "Guida per nuovi studenti"
+
+msgid "Community Groups"
+msgstr "Gruppi della comunità"
+
+msgid "Events"
+msgstr "Eventi"
+
+msgid "Downloads"
+msgstr "Download"
+
+msgid "Submit Story"
+msgstr "Invia storia"
+
+msgid "Support"
+msgstr "Supporto"
+
+msgid "Support Tickets"
+msgstr "Ticket di supporto"
+
+msgid "Saved Items"
+msgstr "Elementi salvati"
+
+msgid "Back to Site"
+msgstr "Torna al sito"
+
+msgid "Profile Information"
+msgstr "Informazioni profilo"
+
+msgid "Edit Profile"
+msgstr "Modifica profilo"
+
+msgid "Username"
+msgstr "Nome utente"
+
+msgid "Full Name"
+msgstr "Nome completo"
+
+msgid "Verified"
+msgstr "Verificato"
+
+msgid "Not Verified"
+msgstr "Non verificato"
+
+msgid "City in Lazio"
+msgstr "Città nel Lazio"
+
+msgid "University"
+msgstr "Università"
+
+msgid "Occupation"
+msgstr "Occupazione"
+
+msgid "Arrival Year in Italy"
+msgstr "Anno di arrivo in Italia"
+
+msgid "Bio"
+msgstr "Biografia"
+
+msgid "Change Password"
+msgstr "Cambia password"
+
+msgid "Manage Documents"
+msgstr "Gestisci documenti"
+
+msgid "Notification Settings"
+msgstr "Impostazioni notifiche"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Save Changes"
+msgstr "Salva modifiche"
+
+msgid "My Saved Items"
+msgstr "I miei elementi salvati"
+
+msgid "Saved Documents"
+msgstr "Documenti salvati"
+
+msgid "Download"
+msgstr "Scarica"
+
+msgid "No saved items yet."
+msgstr "Nessun elemento salvato ancora."
+
+msgid "Browse Universities"
+msgstr "Sfoglia università"
+
+msgid "Browse Scholarships"
+msgstr "Sfoglia borse di studio"
+
+msgid "Browse Documents"
+msgstr "Sfoglia documenti"
+
+msgid "Registered"
+msgstr "Registrato"
+
+msgid "Register"
+msgstr "Registrati"
+
+msgid "No registration required"
+msgstr "Registrazione non richiesta"
+
+msgid "No upcoming events."
+msgstr "Nessun evento in arrivo."
+
+msgid "Available Groups"
+msgstr "Gruppi disponibili"
+
+msgid "My Groups"
+msgstr "I miei gruppi"
+
+msgid "View Group"
+msgstr "Visualizza gruppo"
+
+msgid "No groups available."
+msgstr "Nessun gruppo disponibile."
+
+msgid "My Support Tickets"
+msgstr "I miei ticket di supporto"
+
+msgid "Create Ticket"
+msgstr "Crea ticket"
+
+msgid "Subject"
+msgstr "Oggetto"
+
+msgid "Status"
+msgstr "Stato"
+
+msgid "Created"
+msgstr "Creato"
+
+msgid "Actions"
+msgstr "Azioni"
+
+msgid "No support tickets yet."
+msgstr "Nessun ticket di supporto ancora."
+
+msgid "Create Your First Ticket"
+msgstr "Crea il tuo primo ticket"
+
+msgid "Create Support Ticket"
+msgstr "Crea ticket di supporto"
+
+msgid "Submit Ticket"
+msgstr "Invia ticket"
+
+msgid "New Student Assistance Guide"
+msgstr "Guida all'assistenza per nuovi studenti"
+
+msgid "Welcome to Italy!"
+msgstr "Benvenuto in Italia!"
+
+msgid "This guide will help you navigate the essential steps for settling in Italy as a new student."
+msgstr "Questa guida ti aiuterà a navigare i passaggi essenziali per stabilirti in Italia come nuovo studente."
+
+msgid "Read more"
+msgstr "Leggi di più"
+
+msgid "Need Help?"
+msgstr "Hai bisogno di aiuto?"
+
+msgid "Have questions? Submit them and our team will assist you."
+msgstr "Hai domande? Inviaci e il nostro team ti assisterà."
+
+msgid "Ask a Question"
+msgstr "Fai una domanda"
+
+msgid "Book Orientation Session"
+msgstr "Prenota sessione di orientamento"
+
+msgid "Schedule a one-on-one orientation session with our team."
+msgstr "Programma una sessione di orientamento individuale con il nostro team."
+
+msgid "Book Session"
+msgstr "Prenota sessione"
+
+msgid "View Full Mentor Dashboard"
+msgstr "Visualizza dashboard completo del mentore"
+
+# Account/Auth Translations
+msgid "Welcome Back"
+msgstr "Bentornato"
+
+msgid "Sign in to your account"
+msgstr "Accedi al tuo account"
+
+msgid "Username or Email"
+msgstr "Nome utente o Email"
+
+msgid "Enter your username or email"
+msgstr "Inserisci il tuo nome utente o email"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Enter your password"
+msgstr "Inserisci la tua password"
+
+msgid "Remember me"
+msgstr "Ricordami"
+
+msgid "Forgot password?"
+msgstr "Password dimenticata?"
+
+msgid "Sign In"
+msgstr "Accedi"
+
+msgid "Don't have an account?"
+msgstr "Non hai un account?"
+
+msgid "Sign up"
+msgstr "Registrati"
+
+msgid "Sign Up"
+msgstr "Registrati"
+
+msgid "Create Account"
+msgstr "Crea account"
+
+msgid "Join ASCAI Lazio community"
+msgstr "Unisciti alla comunità ASCAI Lazio"
+
+msgid "Choose a username"
+msgstr "Scegli un nome utente"
+
+msgid "Enter your email"
+msgstr "Inserisci la tua email"
+
+msgid "Password (again)"
+msgstr "Password (di nuovo)"
+
+msgid "Confirm your password"
+msgstr "Conferma la tua password"
+
+msgid "Already have an account?"
+msgstr "Hai già un account?"
+
+msgid "Sign in"
+msgstr "Accedi"
+
+msgid "Confirm Email"
+msgstr "Conferma email"
+
+msgid "Confirm Email Address"
+msgstr "Conferma indirizzo email"
+
+msgid "Please confirm that"
+msgstr "Si prega di confermare che"
+
+msgid "is an email address for user"
+msgstr "è un indirizzo email per l'utente"
+
+msgid "Confirm"
+msgstr "Conferma"
+
+msgid "Invalid Confirmation Link"
+msgstr "Link di conferma non valido"
+
+msgid "This email confirmation link expired or is invalid. Please"
+msgstr "Questo link di conferma email è scaduto o non valido. Si prega di"
+
+msgid "request a new one"
+msgstr "richiedere uno nuovo"
+
+msgid "Password Reset"
+msgstr "Reimposta password"
+
+msgid "Reset Password"
+msgstr "Reimposta password"
+
+msgid "Enter your email to receive reset instructions"
+msgstr "Inserisci la tua email per ricevere le istruzioni di reimpostazione"
+
+msgid "Reset My Password"
+msgstr "Reimposta la mia password"
+
+msgid "Back to login"
+msgstr "Torna al login"
+
+msgid "Password Reset Sent"
+msgstr "Reimpostazione password inviata"
+
+msgid "Password Reset Email Sent"
+msgstr "Email di reimpostazione password inviata"
+
+msgid "We have sent you an email. If you have not received it please check your spam folder. Otherwise contact us if you do not receive it in a few minutes."
+msgstr "Ti abbiamo inviato un'email. Se non l'hai ricevuta, controlla la cartella spam. Altrimenti contattaci se non la ricevi entro pochi minuti."
+
+msgid "Back to Login"
+msgstr "Torna al login"
+
+msgid "Email Verification Sent"
+msgstr "Verifica email inviata"
+
+msgid "Verify Your Email"
+msgstr "Verifica la tua email"
+
+msgid "We have sent an email to you for verification. Follow the link provided to finalize the signup process. If you do not see the verification email in your main inbox, check your spam folder. Please contact us if you do not receive the verification email within a few minutes."
+msgstr "Ti abbiamo inviato un'email per la verifica. Segui il link fornito per finalizzare il processo di registrazione. Se non vedi l'email di verifica nella tua casella principale, controlla la cartella spam. Si prega di contattarci se non ricevi l'email di verifica entro pochi minuti."
+
+msgid "Go to Home"
+msgstr "Vai alla home"
+
+msgid "Submit Your Story"
+msgstr "Invia la tua storia"
+
+msgid "Share your success story with the ASCAI community. Your story will be reviewed by our team before publication."
+msgstr "Condividi la tua storia di successo con la comunità ASCAI. La tua storia sarà revisionata dal nostro team prima della pubblicazione."
+
+msgid "Optional"
+msgstr "Opzionale"
+
+msgid "My Questions"
+msgstr "Le mie domande"
+
+msgid "Student Questions"
+msgstr "Domande degli studenti"
+
+msgid "Resolved"
+msgstr "Risolto"
+
+msgid "Pending"
+msgstr "In sospeso"
+
+msgid "Response:"
+msgstr "Risposta:"
+
+msgid "No questions yet."
+msgstr "Nessuna domanda ancora."
+
+msgid "Ask Your First Question"
+msgstr "Fai la tua prima domanda"
+
+msgid "Change Password"
+msgstr "Cambia password"
+
+msgid "The password reset link was invalid, possibly because it has already been used. Please request a new password reset."
+msgstr "Il link di reimpostazione password non era valido, probabilmente perché è già stato utilizzato. Si prega di richiedere una nuova reimpostazione password."
+
+msgid "Request New Link"
+msgstr "Richiedi nuovo link"
+
+msgid "New Password"
+msgstr "Nuova password"
+
+msgid "New Password (again)"
+msgstr "Nuova password (di nuovo)"
+
+msgid "Password Changed"
+msgstr "Password modificata"
+
+msgid "Your password has been changed successfully. You can now sign in with your new password."
+msgstr "La tua password è stata modificata con successo. Ora puoi accedere con la tua nuova password."
+
+msgid "Reserved Downloads"
+msgstr "Download riservati"
+
+msgid "Private Documents"
+msgstr "Documenti privati"
+
+msgid "My Saved Documents"
+msgstr "I miei documenti salvati"
+
+msgid "No documents available."
+msgstr "Nessun documento disponibile."
+
+msgid "Leave Group"
+msgstr "Lascia gruppo"
+
+msgid "Join Group"
+msgstr "Unisciti al gruppo"
+
+msgid "discussions"
+msgstr "discussioni"
+
+msgid "Discussions"
+msgstr "Discussioni"
+
+msgid "New Discussion"
+msgstr "Nuova discussione"
+
+msgid "By"
+msgstr "Da"
+
+msgid "No discussions yet."
+msgstr "Nessuna discussione ancora."
+
+msgid "Announcements"
+msgstr "Annunci"
+
+msgid "You must join this group to view discussions and announcements."
+msgstr "Devi unirti a questo gruppo per visualizzare discussioni e annunci."
+
+msgid "Event Ticket"
+msgstr "Biglietto evento"
+
+msgid "Registration Code"
+msgstr "Codice di registrazione"
+
+msgid "Please present this ticket (or QR code) at the event entrance."
+msgstr "Si prega di presentare questo biglietto (o codice QR) all'ingresso dell'evento."
+
+msgid "Print Ticket"
+msgstr "Stampa biglietto"
+
+msgid "Last updated"
+msgstr "Ultimo aggiornamento"
+
+msgid "Your Message"
+msgstr "Il tuo messaggio"
+
+msgid "Admin Response"
+msgstr "Risposta amministratore"
+
+msgid "Conversation"
+msgstr "Conversazione"
+
+msgid "Admin"
+msgstr "Amministratore"
+
+msgid "Add Reply"
+msgstr "Aggiungi risposta"
+
+msgid "Back to Tickets"
+msgstr "Torna ai ticket"
+
+msgid "Send Reply"
+msgstr "Invia risposta"
+
+msgid "My Story Submissions"
+msgstr "Le mie storie inviate"
+
+msgid "My Stories"
+msgstr "Le mie storie"
+
+msgid "Submit New Story"
+msgstr "Invia nuova storia"
+
+msgid "Submitted"
+msgstr "Inviato"
+
+msgid "No story submissions yet."
+msgstr "Nessuna storia inviata ancora."
+
+msgid "Submit Your First Story"
+msgstr "Invia la tua prima storia"
+
+# Model field translations
+msgid "Phone Number"
+msgstr "Numero di telefono"
+
+msgid "Role"
+msgstr "Ruolo"
+
+msgid "Approved"
+msgstr "Approvato"
+
+msgid "Designates whether this user has been approved by an admin."
+msgstr "Indica se questo utente è stato approvato da un amministratore."
+
+msgid "Bio"
+msgstr "Biografia"
+
+msgid "A short biography about yourself."
+msgstr "Una breve biografia su di te."
+
+msgid "Avatar"
+msgstr "Avatar"
+
+msgid "Language Preference"
+msgstr "Preferenza lingua"
+
+msgid "Created At"
+msgstr "Creato il"
+
+msgid "Updated At"
+msgstr "Aggiornato il"
+
+msgid "Full Name"
+msgstr "Nome completo"
+
+msgid "Your full name"
+msgstr "Il tuo nome completo"
+
+msgid "University"
+msgstr "Università"
+
+msgid "Field of Study / Profession"
+msgstr "Campo di studio / Professione"
+
+msgid "Profession"
+msgstr "Professione"
+
+msgid "Occupation"
+msgstr "Occupazione"
+
+msgid "Date of Birth"
+msgstr "Data di nascita"
+
+msgid "Email Verified"
+msgstr "Email verificata"
+
+msgid "Notification Preferences"
+msgstr "Preferenze notifiche"
+
+msgid "User notification settings"
+msgstr "Impostazioni notifiche utente"
+
+msgid "User"
+msgstr "Utente"
+
+msgid "Users"
+msgstr "Utenti"
+
+msgid "Hello"
+msgstr "Ciao"
+
+msgid "Great news! Your account has been approved by an administrator."
+msgstr "Grandi notizie! Il tuo account è stato approvato da un amministratore."
+
+msgid "You can now log in to your account and access all features of the ASCAI Lazio platform."
+msgstr "Ora puoi accedere al tuo account e utilizzare tutte le funzionalità della piattaforma ASCAI Lazio."
+
+msgid "Login URL"
+msgstr "URL di accesso"
+
+msgid "Thank you for your patience."
+msgstr "Grazie per la tua pazienza."
+
+msgid "ASCAI Lazio - Association of Cameroonian Students and Academics in Lazio"
+msgstr "ASCAI Lazio - Associazione degli Studenti e Accademici Camerunesi nel Lazio"
+
+msgid "Your ASCAI Lazio Account Has Been Approved"
+msgstr "Il tuo account ASCAI Lazio è stato approvato"
+
+msgid "Please log in to access governance features."
+msgstr "Si prega di accedere per accedere alle funzionalità di governance."
+
+msgid "Your account is pending admin approval."
+msgstr "Il tuo account è in attesa di approvazione amministratore."
+
+msgid "Please log in to access the reserved area."
+msgstr "Si prega di accedere per accedere all'area riservata."
+
+msgid "Your account is pending admin approval. You will receive an email when your account is approved."
+msgstr "Il tuo account è in attesa di approvazione amministratore. Riceverai un'email quando il tuo account sarà approvato."
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "Description"
+msgstr "Descrizione"
+
+msgid "Order"
+msgstr "Ordine"
+
+msgid "Category"
+msgstr "Categoria"
+
+msgid "Categories"
+msgstr "Categorie"
+
+msgid "Title"
+msgstr "Titolo"
+
+msgid "Author"
+msgstr "Autore"
+
+msgid "Content"
+msgstr "Contenuto"
+
+msgid "Pinned"
+msgstr "In evidenza"
+
+msgid "Locked"
+msgstr "Bloccato"
+
+msgid "Views"
+msgstr "Visualizzazioni"
+
+msgid "Upvotes"
+msgstr "Voti positivi"
+
+msgid "Thread"
+msgstr "Thread"
+
+msgid "Threads"
+msgstr "Thread"
+
+msgid "Post"
+msgstr "Post"
+
+msgid "Posts"
+msgstr "Post"
+
+msgid "Marked as Solution"
+msgstr "Contrassegnato come soluzione"
+
+msgid "New"
+msgstr "Nuovo"
+
+msgid "Read"
+msgstr "Letto"
+
+msgid "Replied"
+msgstr "Risposto"
+
+msgid "Contact Submission"
+msgstr "Invio contatto"
+
+msgid "Contact Submissions"
+msgstr "Invii contatto"
+
+msgid "University Name"
+msgstr "Nome università"
+
+msgid "Minimum Tuition (EUR)"
+msgstr "Tasse minime (EUR)"
+
+msgid "Maximum Tuition (EUR)"
+msgstr "Tasse massime (EUR)"
+
+msgid "List of languages offered (e.g., [\"Italian\", \"English\"])"
+msgstr "Elenco delle lingue offerte (es. [\"Italiano\", \"Inglese\"])"
+
+msgid "List of degree types (e.g., [\"Bachelor\", \"Master\", \"PhD\"])"
+msgstr "Elenco dei tipi di laurea (es. [\"Laurea triennale\", \"Laurea magistrale\", \"Dottorato\"])"
+
+msgid "List of fields (e.g., [\"Engineering\", \"Medicine\", \"Law\"])"
+msgstr "Elenco dei campi (es. [\"Ingegneria\", \"Medicina\", \"Giurisprudenza\"])"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "Program Name"
+msgstr "Nome programma"
+
+msgid "Degree Type"
+msgstr "Tipo di laurea"
+
+msgid "Duration (Years)"
+msgstr "Durata (Anni)"
+
+msgid "Language of Instruction"
+msgstr "Lingua di insegnamento"
+
+msgid "Tuition (EUR)"
+msgstr "Tasse (EUR)"
+
+msgid "Requirements"
+msgstr "Requisiti"
+
+msgid "Program"
+msgstr "Programma"
+
+msgid "Programs"
+msgstr "Programmi"
+
+msgid "Saved At"
+msgstr "Salvato il"
+
+msgid "Saved University"
+msgstr "Università salvata"
+
+msgid "Saved Universities"
+msgstr "Università salvate"
+
+msgid "Worker"
+msgstr "Lavoratore"
+
+msgid "Job Seeker"
+msgstr "Cercatore di lavoro"
+
+msgid "Researcher"
+msgstr "Ricercatore"
+
+msgid "Italiano"
+msgstr "Italiano"
+
+msgid "Current"
+msgstr "Corrente"
+
+msgid "Association Management Portal"
+msgstr "Portale di Gestione dell'Associazione"
+
+msgid "Content Management"
+msgstr "Gestione contenuti"
+
+msgid "News & Announcements"
+msgstr "Notizie e annunci"
+
+msgid "Life in Italy"
+msgstr "Vita in Italia"
+
+msgid "Forum Posts"
+msgstr "Post del forum"
+
+msgid "User Management"
+msgstr "Gestione utenti"
+
+msgid "ASCAI Lazio Administration"
+msgstr "Amministrazione ASCAI Lazio"
+
+msgid "ASCAI Lazio Admin"
+msgstr "Admin ASCAI Lazio"
+
+msgid "Welcome to ASCAI Lazio Administration"
+msgstr "Benvenuto nell'Amministrazione ASCAI Lazio"
+

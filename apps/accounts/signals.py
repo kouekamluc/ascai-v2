@@ -15,14 +15,18 @@ from .models import User
 logger = logging.getLogger(__name__)
 
 # Import allauth signals if available
+# Signals are imported in apps.py ready() method, so allauth should be loaded by then
+ALLAUTH_AVAILABLE = False
 try:
     from allauth.account.signals import email_confirmed, email_address_verified
     from allauth.socialaccount.signals import social_account_added, pre_social_login
     from allauth.account.models import EmailAddress
     ALLAUTH_AVAILABLE = True
 except ImportError:
-    ALLAUTH_AVAILABLE = False
-    logger.warning("django-allauth signals not available")
+    # Allauth signals not available - this is normal if allauth is not installed
+    # or if signals are being imported before allauth is fully loaded
+    # Signals will be registered when this module is imported from apps.py ready() method
+    pass
 
 
 @receiver(pre_save, sender=User)
@@ -140,6 +144,7 @@ def send_approval_email(sender, instance, created, **kwargs):
 
 
 # Signal to sync User.email_verified when EmailAddress is verified
+# Only register allauth signals if allauth is available
 if ALLAUTH_AVAILABLE:
     @receiver(email_confirmed)
     def update_user_email_verified(sender, request, email_address, **kwargs):
@@ -207,6 +212,7 @@ if ALLAUTH_AVAILABLE:
             logger.error(f"Failed to mark email as verified for social account: {str(e)}", exc_info=True)
     
     # Also handle the pre_social_login signal more aggressively
+    if ALLAUTH_AVAILABLE:
     try:
         from allauth.socialaccount.signals import pre_social_login
         @receiver(pre_social_login)
@@ -243,7 +249,7 @@ if ALLAUTH_AVAILABLE:
                             logger.info(f"SIGNAL (pre_social_login): User doesn't exist yet, will be created and verified")
             except Exception as e:
                 logger.error(f"Failed to force email verification in pre_social_login: {str(e)}", exc_info=True)
-    except ImportError:
+    except (ImportError, AttributeError):
         pass
     
     # Also handle pre_social_login signal to mark email verified even earlier
@@ -291,6 +297,6 @@ if ALLAUTH_AVAILABLE:
                             logger.info(f"SIGNAL (pre_social_login): User doesn't exist yet, email marked as verified in sociallogin object")
             except Exception as e:
                 logger.error(f"Failed to mark email as verified in pre_social_login: {str(e)}", exc_info=True)
-    except ImportError:
+    except (ImportError, AttributeError):
         pass
 

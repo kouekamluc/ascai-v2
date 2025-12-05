@@ -5,7 +5,7 @@ from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.forms import SignupForm, LoginForm
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from allauth.exceptions import ImmediateHttpResponse
+from allauth.core.exceptions import ImmediateHttpResponse
 from django import forms
 from django.core.exceptions import ValidationError
 from django.conf import settings

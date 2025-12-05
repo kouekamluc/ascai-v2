@@ -161,7 +161,8 @@ def dashboard_callback(request, context):
 
 
 # Configure the default admin site (Unfold will automatically style it)
-admin.site.site_header = _('Association Management Portal')
+# These use gettext_lazy so they will be translated based on the current language
+admin.site.site_header = _('ASCAI Lazio Administration')
 admin.site.site_title = _('ASCAI Lazio Admin')
 admin.site.index_title = _('Welcome to ASCAI Lazio Administration')
 

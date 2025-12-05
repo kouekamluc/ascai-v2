@@ -14,7 +14,7 @@ from apps.accounts.views import CustomConfirmEmailView, CustomEmailVerificationS
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('i18n/setlang/', set_language, name='set_language'),
-    path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     # Healthcheck endpoint (outside i18n_patterns for reliability)
     path('health/', HealthCheckView.as_view(), name='health'),
     # Email confirmation URL (outside i18n_patterns so it works from email links without language prefix)

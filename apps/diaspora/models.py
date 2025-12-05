@@ -26,6 +26,7 @@ class News(models.Model):
     LANGUAGE_CHOICES = [
         ('en', _('English')),
         ('fr', _('Français')),
+        ('it', _('Italiano')),
     ]
     
     title = models.CharField(max_length=200, verbose_name=_('Title'))
@@ -93,6 +94,7 @@ class Event(models.Model):
     LANGUAGE_CHOICES = [
         ('en', _('English')),
         ('fr', _('Français')),
+        ('it', _('Italiano')),
     ]
     
     title = models.CharField(max_length=200, verbose_name=_('Title'))
@@ -159,6 +161,7 @@ class Testimonial(models.Model):
     LANGUAGE_CHOICES = [
         ('en', _('English')),
         ('fr', _('Français')),
+        ('it', _('Italiano')),
     ]
     
     name = models.CharField(max_length=200, verbose_name=_('Name'))
@@ -214,6 +217,7 @@ class SuccessStory(models.Model):
     LANGUAGE_CHOICES = [
         ('en', _('English')),
         ('fr', _('Français')),
+        ('it', _('Italiano')),
     ]
     
     title = models.CharField(max_length=200, verbose_name=_('Title'))
@@ -313,6 +317,7 @@ class LifeInItaly(models.Model):
     LANGUAGE_CHOICES = [
         ('en', _('English')),
         ('fr', _('Français')),
+        ('it', _('Italiano')),
     ]
     
     title = models.CharField(max_length=200, verbose_name=_('Title'))

@@ -31,8 +31,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_filters',
     'storages',
-    'ckeditor',
-    'ckeditor_uploader',
+    'django_ckeditor_5',  # CKEditor 5 (replaces deprecated django-ckeditor)
     
     # Django Allauth
     'django.contrib.sites',
@@ -311,14 +310,92 @@ EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)  # 10 second timeo
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ASCAI Lazio <noreply@ascailazio.org>')
 CONTACT_EMAIL = config('CONTACT_EMAIL', default='info@ascailazio.org')
 
-# CKEditor Configuration
-CKEDITOR_UPLOAD_PATH = 'uploads/'
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'full',
-        'height': 300,
-        'width': '100%',
+# CKEditor 5 Configuration (replaces deprecated CKEditor 4)
+customColorPalette = [
+    {
+        'color': 'hsl(4, 90%, 58%)',
+        'label': 'Red'
     },
+    {
+        'color': 'hsl(340, 82%, 52%)',
+        'label': 'Pink'
+    },
+    {
+        'color': 'hsl(291, 64%, 42%)',
+        'label': 'Purple'
+    },
+    {
+        'color': 'hsl(262, 52%, 47%)',
+        'label': 'Deep Purple'
+    },
+    {
+        'color': 'hsl(231, 48%, 48%)',
+        'label': 'Indigo'
+    },
+    {
+        'color': 'hsl(207, 90%, 54%)',
+        'label': 'Blue'
+    },
+]
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+    },
+    'extends': {
+        'blockToolbar': [
+            'paragraph', 'heading1', 'heading2', 'heading3',
+            '|',
+            'bulletedList', 'numberedList',
+            '|',
+            'blockQuote',
+        ],
+        'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+        'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                    'insertTable',],
+        'image': {
+            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+            'styles': [
+                'full',
+                'side',
+                'alignLeft',
+                'alignRight',
+                'alignCenter',
+            ]
+
+        },
+        'table': {
+            'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+            'tableProperties', 'tableCellProperties' ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            }
+        },
+        'heading' : {
+            'options': [
+                { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
+                { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
+                { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
+                { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+            ]
+        }
+    },
+    'list': {
+        'properties': {
+            'styles': 'true',
+            'startIndex': 'true',
+            'reversed': 'true',
+        }
+    }
 }
 
 # Login/Logout URLs (using allauth)
@@ -415,30 +492,14 @@ ALLOWED_DOCUMENT_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt',
 ALLOWED_VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg', '.mov']
 ALLOWED_FILE_EXTENSIONS = ALLOWED_IMAGE_EXTENSIONS + ALLOWED_DOCUMENT_EXTENSIONS + ALLOWED_VIDEO_EXTENSIONS
 
-# CKEditor Upload Settings
-# CKEditor uploads will use the same S3 storage as other media files
-# The upload path 'uploads/' will be under 'media/uploads/' in S3
-CKEDITOR_UPLOAD_PATH = 'uploads/'
-CKEDITOR_ALLOW_NONIMAGE_FILES = True  # Allow non-image files in CKEditor
-
-# CKEditor Configuration with upload support
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'full',
-        'height': 300,
-        'width': '100%',
-        # Upload settings - CKEditor will use the configured storage backend (S3)
-        'filebrowserUploadUrl': '/ckeditor/upload/',
-        'filebrowserBrowseUrl': '/ckeditor/browse/',
-        # Allow all file types in uploads
-        'allowedContent': True,
-    },
-}
+# CKEditor 5 upload settings
+# CKEditor 5 uploads will use the same S3 storage as other media files
+CKEDITOR_5_UPLOAD_PATH = 'uploads/'
 
 # Django Unfold Configuration
 # Professional Association Management Portal theme
 UNFOLD = {
-    "SITE_TITLE": _("Association Management Portal"),
+    "SITE_TITLE": _("ASCAI Lazio Administration"),
     "SITE_HEADER": _("ASCAI Lazio Administration"),
     "SITE_URL": "/",
     "SITE_SYMBOL": "admin_panel_settings",  # Material Icons symbol
@@ -446,6 +507,7 @@ UNFOLD = {
     "SHOW_VIEW_ON_SITE": True,
     "ENVIRONMENT": "ASCAI Lazio",  # Environment badge
     "DASHBOARD_CALLBACK": "config.admin.dashboard_callback",  # Dynamic dashboard
+    "SHOW_LANGUAGES": True,  # Enable language switcher in admin
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": True,

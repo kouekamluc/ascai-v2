@@ -307,9 +307,21 @@ else:
 if EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
     logger.error(
         "ERROR: Console email backend is configured in production! "
-        "Emails will not be sent. Please set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend "
-        "and configure SMTP settings in your environment variables."
+        "Emails will not be sent. Please configure BREVO_API_KEY to use Brevo backend "
+        "or set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend with SMTP settings."
     )
+elif EMAIL_BACKEND == 'anymail.backends.brevo.EmailBackend':
+    # Verify Brevo API key is set
+    brevo_api_key = config('BREVO_API_KEY', default='')
+    if not brevo_api_key:
+        logger.error(
+            "ERROR: Brevo email backend is configured but BREVO_API_KEY is missing. "
+            "Emails will not be sent. Please set BREVO_API_KEY in your environment variables."
+        )
+    else:
+        logger.info(
+            f"✅ Email backend configured: {EMAIL_BACKEND} (Brevo API) - Production ready"
+        )
 elif EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
     if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
         logger.error(
@@ -328,57 +340,13 @@ elif EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
 else:
     logger.warning(
         f"Email backend is set to {EMAIL_BACKEND}. "
-        "Make sure this is the correct backend for production."
+        "Make sure this is the correct backend for production. "
+        "Recommended: anymail.backends.brevo.EmailBackend (set BREVO_API_KEY)"
     )
 
-# Auto-update Site domain to match Railway domain for email confirmation URLs
-# This ensures email links use the correct domain (ascai.up.railway.app) instead of ascai.org
-try:
-    from django.contrib.sites.models import Site
-    from django.db import transaction
-    
-    # Get the primary Railway domain from ALLOWED_HOSTS
-    railway_domain = None
-    for host in ALLOWED_HOSTS:
-        if 'railway.app' in host and not host.startswith('.') and host not in ['healthcheck.railway.app']:
-            railway_domain = host
-            break
-    
-    # If not found, try environment variable
-    if not railway_domain:
-        railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
-    
-    # If still not found, use hardcoded Railway domain
-    if not railway_domain:
-        railway_domain = 'ascai.up.railway.app'
-    
-    # Update Site domain if it's different (especially if it's ascai.org)
-    try:
-        with transaction.atomic():
-            site = Site.objects.get(pk=SITE_ID)
-            if site.domain != railway_domain:
-                old_domain = site.domain
-                site.domain = railway_domain
-                site.name = 'ASCAI Lazio'
-                site.save(update_fields=['domain', 'name'])
-                logger.info(
-                    f"✅ Updated Site domain from '{old_domain}' to '{railway_domain}' "
-                    f"for email confirmation URLs"
-                )
-            else:
-                logger.info(f"✅ Site domain is already set to '{railway_domain}'")
-    except Site.DoesNotExist:
-        # Create the site if it doesn't exist
-        Site.objects.create(
-            pk=SITE_ID,
-            domain=railway_domain,
-            name='ASCAI Lazio'
-        )
-        logger.info(f"✅ Created Site with domain '{railway_domain}'")
-    except Exception as e:
-        logger.warning(f"⚠️  Could not auto-update Site domain: {str(e)}. Email links may use wrong domain.")
-except Exception as e:
-    logger.warning(f"⚠️  Site domain auto-update failed: {str(e)}. Run 'python manage.py update_site_domain' manually.")
+# Note: Site domain auto-update is now handled by the update_site_domain management command
+# which runs automatically in entrypoint.sh after migrations.
+# This ensures Django apps are fully loaded before attempting to update the Site model.
 
 # Logging - Enhanced for production debugging
 LOGGING = {

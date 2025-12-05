@@ -115,3 +115,7 @@ The Django admin styling issue has been resolved by disabling WhiteNoise middlew
 
 
 
+
+
+
+

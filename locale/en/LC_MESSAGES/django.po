@@ -1200,3 +1200,214 @@ msgstr "No story submissions yet."
 
 msgid "Submit Your First Story"
 msgstr "Submit Your First Story"
+
+# Model field translations
+msgid "Phone Number"
+msgstr "Phone Number"
+
+msgid "Role"
+msgstr "Role"
+
+msgid "Approved"
+msgstr "Approved"
+
+msgid "Designates whether this user has been approved by an admin."
+msgstr "Designates whether this user has been approved by an admin."
+
+msgid "A short biography about yourself."
+msgstr "A short biography about yourself."
+
+msgid "Avatar"
+msgstr "Avatar"
+
+msgid "Language Preference"
+msgstr "Language Preference"
+
+msgid "Created At"
+msgstr "Created At"
+
+msgid "Updated At"
+msgstr "Updated At"
+
+msgid "Your full name"
+msgstr "Your full name"
+
+msgid "Field of Study / Profession"
+msgstr "Field of Study / Profession"
+
+msgid "Profession"
+msgstr "Profession"
+
+msgid "Occupation"
+msgstr "Occupation"
+
+msgid "Date of Birth"
+msgstr "Date of Birth"
+
+msgid "Email Verified"
+msgstr "Email Verified"
+
+msgid "Notification Preferences"
+msgstr "Notification Preferences"
+
+msgid "User notification settings"
+msgstr "User notification settings"
+
+msgid "User"
+msgstr "User"
+
+msgid "Users"
+msgstr "Users"
+
+msgid "Hello"
+msgstr "Hello"
+
+msgid "Great news! Your account has been approved by an administrator."
+msgstr "Great news! Your account has been approved by an administrator."
+
+msgid "You can now log in to your account and access all features of the ASCAI Lazio platform."
+msgstr "You can now log in to your account and access all features of the ASCAI Lazio platform."
+
+msgid "Login URL"
+msgstr "Login URL"
+
+msgid "Thank you for your patience."
+msgstr "Thank you for your patience."
+
+msgid "ASCAI Lazio - Association of Cameroonian Students and Academics in Lazio"
+msgstr "ASCAI Lazio - Association of Cameroonian Students and Academics in Lazio"
+
+msgid "Your ASCAI Lazio Account Has Been Approved"
+msgstr "Your ASCAI Lazio Account Has Been Approved"
+
+msgid "Please log in to access governance features."
+msgstr "Please log in to access governance features."
+
+msgid "Your account is pending admin approval."
+msgstr "Your account is pending admin approval."
+
+msgid "Please log in to access the reserved area."
+msgstr "Please log in to access the reserved area."
+
+msgid "Your account is pending admin approval. You will receive an email when your account is approved."
+msgstr "Your account is pending admin approval. You will receive an email when your account is approved."
+
+msgid "Order"
+msgstr "Order"
+
+msgid "Upvotes"
+msgstr "Upvotes"
+
+msgid "Marked as Solution"
+msgstr "Marked as Solution"
+
+msgid "University Name"
+msgstr "University Name"
+
+msgid "Minimum Tuition (EUR)"
+msgstr "Minimum Tuition (EUR)"
+
+msgid "Maximum Tuition (EUR)"
+msgstr "Maximum Tuition (EUR)"
+
+msgid "List of languages offered (e.g., [\"Italian\", \"English\"])"
+msgstr "List of languages offered (e.g., [\"Italian\", \"English\"])"
+
+msgid "List of degree types (e.g., [\"Bachelor\", \"Master\", \"PhD\"])"
+msgstr "List of degree types (e.g., [\"Bachelor\", \"Master\", \"PhD\"])"
+
+msgid "List of fields (e.g., [\"Engineering\", \"Medicine\", \"Law\"])"
+msgstr "List of fields (e.g., [\"Engineering\", \"Medicine\", \"Law\"])"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "Program Name"
+msgstr "Program Name"
+
+msgid "Degree Type"
+msgstr "Degree Type"
+
+msgid "Duration (Years)"
+msgstr "Duration (Years)"
+
+msgid "Language of Instruction"
+msgstr "Language of Instruction"
+
+msgid "Tuition (EUR)"
+msgstr "Tuition (EUR)"
+
+msgid "Requirements"
+msgstr "Requirements"
+
+msgid "Program"
+msgstr "Program"
+
+msgid "Saved At"
+msgstr "Saved At"
+
+msgid "Saved University"
+msgstr "Saved University"
+
+msgid "Worker"
+msgstr "Worker"
+
+msgid "Job Seeker"
+msgstr "Job Seeker"
+
+msgid "Researcher"
+msgstr "Researcher"
+
+msgid "Italiano"
+msgstr "Italian"
+
+msgid "ASCAI Lazio Administration"
+msgstr "ASCAI Lazio Administration"
+
+msgid "ASCAI Lazio Admin"
+msgstr "ASCAI Lazio Admin"
+
+msgid "Welcome to ASCAI Lazio Administration"
+msgstr "Welcome to ASCAI Lazio Administration"
+
+msgid "Association Management Portal"
+msgstr "Association Management Portal"
+
+msgid "Current"
+msgstr "Current"
+
+msgid "Association Management Portal"
+msgstr "Association Management Portal"
+
+msgid "Content Management"
+msgstr "Content Management"
+
+msgid "News & Announcements"
+msgstr "News & Announcements"
+
+msgid "Life in Italy"
+msgstr "Life in Italy"
+
+msgid "Forum Posts"
+msgstr "Forum Posts"
+
+msgid "User Management"
+msgstr "User Management"
+
+msgid "Content Management"
+msgstr "Content Management"
+
+msgid "News & Announcements"
+msgstr "News & Announcements"
+
+msgid "Life in Italy"
+msgstr "Life in Italy"
+
+msgid "Forum Posts"
+msgstr "Forum Posts"
+
+msgid "User Management"
+msgstr "User Management"
+
+msgid "Mentors"
+msgstr "Mentors"

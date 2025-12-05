@@ -204,3 +204,7 @@ All templates extend `governance/base.html` and use:
 - Use semantic HTML elements
 - Include loading states where appropriate
 
+
+
+
+

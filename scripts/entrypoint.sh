@@ -104,6 +104,29 @@ echo "✓ Media directory setup complete"
 echo "Ensuring admin user exists..."
 python manage.py create_admin --update || echo "⚠ Warning: Could not create/update admin user, but continuing..."
 
+# Update Site domain for email confirmation URLs
+echo "Updating Site domain for email confirmation URLs..."
+python manage.py update_site_domain || echo "⚠ Warning: Could not update Site domain, but continuing..."
+
+# Populate universities and scholarships data
+# Set POPULATE_DATA=true to enable automatic population on container startup
+# Set POPULATE_DATA_CLEAR=true to clear existing data before populating
+if [ "${POPULATE_DATA:-false}" = "true" ]; then
+    echo "Populating universities and scholarships data..."
+    
+    if [ "${POPULATE_DATA_CLEAR:-false}" = "true" ]; then
+        echo "Clearing existing data before populating..."
+        python manage.py populate_universities --clear || echo "⚠ Warning: Could not populate universities, but continuing..."
+        python manage.py populate_scholarships --clear || echo "⚠ Warning: Could not populate scholarships, but continuing..."
+    else
+        python manage.py populate_universities || echo "⚠ Warning: Could not populate universities, but continuing..."
+        python manage.py populate_scholarships || echo "⚠ Warning: Could not populate scholarships, but continuing..."
+    fi
+    echo "✓ Data population complete"
+else
+    echo "ℹ Data population skipped (set POPULATE_DATA=true to enable)"
+fi
+
 # Set up Google OAuth SocialApplication if credentials are provided
 echo "Setting up Google OAuth..."
 # Support both GOOGLE_CLIENT_ID and GOOGLE_OAUTH2_CLIENT_ID for flexibility
