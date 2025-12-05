@@ -11,7 +11,7 @@
                         <div class="flex-1">
                             <h3 class="text-lg font-semibold mb-2 text-gray-900">{{ document.title }}</h3>
                             {% if document.description %}
-                            <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ document.description|truncatewords:15 }}</p>
+                            <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ document.description|striptags|truncatewords:15 }}</p>
                             {% endif %}
                         </div>
                         <div class="ml-2">

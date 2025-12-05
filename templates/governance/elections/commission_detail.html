@@ -33,7 +33,7 @@
             {% if commission.notes %}
             <div class="mt-4">
                 <dt class="text-sm font-medium text-gray-500 mb-2">{% trans "Notes" %}</dt>
-                <dd class="text-sm text-gray-700">{{ commission.notes|linebreaks }}</dd>
+                <dd class="text-sm text-gray-700 prose prose-sm max-w-none">{{ commission.notes|safe }}</dd>
             </div>
             {% endif %}
         </div>

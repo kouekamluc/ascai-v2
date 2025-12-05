@@ -62,7 +62,7 @@
         {% endif %}
         
         <p class="text-gray-700 mb-4 line-clamp-3 text-sm leading-relaxed flex-grow">
-            {{ scholarship.description|truncatewords:30 }}
+            {{ scholarship.description|striptags|truncatewords:30 }}
         </p>
         
         {% if scholarship.application_deadline %}

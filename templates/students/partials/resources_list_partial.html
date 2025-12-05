@@ -11,7 +11,7 @@
             </div>
             
             {% if document.description %}
-            <p class="text-gray-700 text-sm mb-3">{{ document.description }}</p>
+            <p class="text-gray-700 text-sm mb-3">{{ document.description|striptags|truncatewords:20 }}</p>
             {% endif %}
             
             <div class="flex items-center gap-4 text-sm text-gray-600">

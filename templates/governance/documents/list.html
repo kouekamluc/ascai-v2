@@ -35,7 +35,7 @@
                     {% if document.is_active %}<span class="px-2 py-1 rounded bg-green-100 text-green-800 text-xs">{% trans "Active" %}</span>{% endif %}
                 </div>
                 {% if document.description %}
-                <p class="text-sm text-gray-700">{{ document.description|truncatewords:20 }}</p>
+                <p class="text-sm text-gray-700">{{ document.description|striptags|truncatewords:20 }}</p>
                 {% endif %}
                 <p class="text-xs text-gray-500 mt-2">{{ document.publication_date|date:"d M Y" }}</p>
             </div>
