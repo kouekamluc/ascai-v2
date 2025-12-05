@@ -10,6 +10,12 @@ from .models import (
 from apps.accounts.models import User, UserDocument
 from apps.universities.models import University
 
+# Import CKEditor 5 widget for rich text editing
+try:
+    from django_ckeditor_5.widgets import CKEditor5Widget
+except ImportError:
+    CKEditor5Widget = None
+
 
 class ProfileUpdateForm(forms.ModelForm):
     """Form for updating user profile."""
@@ -67,7 +73,7 @@ class ProfileUpdateForm(forms.ModelForm):
             'language_preference': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green'
             }),
-            'bio': forms.Textarea(attrs={
+            'bio': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
                 'rows': 4
             }),
@@ -105,7 +111,7 @@ class SupportTicketForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
                 'placeholder': _('Enter ticket subject')
             }),
-            'message': forms.Textarea(attrs={
+            'message': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
                 'rows': 6,
                 'placeholder': _('Describe your issue or question')
@@ -123,7 +129,7 @@ class GroupDiscussionForm(forms.ModelForm):
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green'
             }),
-            'content': forms.Textarea(attrs={
+            'content': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
                 'rows': 6
             }),
@@ -140,7 +146,7 @@ class StorySubmissionForm(forms.ModelForm):
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green'
             }),
-            'story': forms.Textarea(attrs={
+            'story': CKEditor5Widget(config_name='extends') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
                 'rows': 10
             }),
@@ -163,7 +169,7 @@ class StudentQuestionForm(forms.ModelForm):
             'subject': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green'
             }),
-            'question': forms.Textarea(attrs={
+            'question': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
                 'rows': 6
             }),
@@ -204,7 +210,7 @@ class TicketReplyForm(forms.ModelForm):
         model = TicketReply
         fields = ['message']
         widgets = {
-            'message': forms.Textarea(attrs={
+            'message': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
                 'rows': 6,
                 'placeholder': _('Type your reply here...')

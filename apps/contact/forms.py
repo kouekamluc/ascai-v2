@@ -5,6 +5,12 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import ContactSubmission
 
+# Import CKEditor 5 widget for rich text editing
+try:
+    from django_ckeditor_5.widgets import CKEditor5Widget
+except ImportError:
+    CKEditor5Widget = None
+
 
 class ContactForm(forms.ModelForm):
     """Contact form."""
@@ -37,7 +43,7 @@ class ContactForm(forms.ModelForm):
                 'autocapitalize': 'sentences',
                 'spellcheck': 'true'
             }),
-            'message': forms.Textarea(attrs={
+            'message': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-colors duration-200 resize-y bg-white text-gray-900',
                 'rows': 6,
                 'placeholder': _('Your message'),

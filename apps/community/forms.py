@@ -5,6 +5,12 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import ForumThread, ForumPost, ForumCategory
 
+# Import CKEditor 5 widget for rich text editing
+try:
+    from django_ckeditor_5.widgets import CKEditor5Widget
+except ImportError:
+    CKEditor5Widget = None
+
 
 class ThreadForm(forms.ModelForm):
     """Form for creating forum threads."""
@@ -20,7 +26,7 @@ class ThreadForm(forms.ModelForm):
             'category': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent'
             }),
-            'content': forms.Textarea(attrs={
+            'content': CKEditor5Widget(config_name='extends') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',
                 'rows': 10,
                 'placeholder': _('Thread content')
@@ -35,7 +41,7 @@ class PostForm(forms.ModelForm):
         model = ForumPost
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={
+            'content': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',
                 'rows': 5,
                 'placeholder': _('Your reply...')

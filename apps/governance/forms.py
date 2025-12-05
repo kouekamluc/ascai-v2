@@ -5,6 +5,12 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from datetime import timedelta
+
+# Import CKEditor 5 widget for rich text editing
+try:
+    from django_ckeditor_5.widgets import CKEditor5Widget
+except ImportError:
+    CKEditor5Widget = None
 from .models import (
     Member, GeneralAssembly, AgendaItem, AssemblyAttendance, AssemblyVote,
     FinancialTransaction, MembershipDues, Contribution,
@@ -364,7 +370,7 @@ class CommunicationForm(forms.ModelForm):
                   'publication_channels', 'is_published', 'requires_president_approval',
                   'president_approved']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 10}),
+            'content': CKEditor5Widget(config_name='extends') if CKEditor5Widget else forms.Textarea(attrs={'rows': 10}),
             'publication_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 

@@ -5,6 +5,12 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import MentorProfile, MentorshipRequest, MentorshipMessage, MentorRating
 
+# Import CKEditor 5 widget for rich text editing
+try:
+    from django_ckeditor_5.widgets import CKEditor5Widget
+except ImportError:
+    CKEditor5Widget = None
+
 
 class MentorProfileForm(forms.ModelForm):
     """Form for creating mentor profile."""
@@ -20,7 +26,7 @@ class MentorProfileForm(forms.ModelForm):
             'years_experience': forms.NumberInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green'
             }),
-            'bio': forms.Textarea(attrs={
+            'bio': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green',
                 'rows': 8
             }),
@@ -40,7 +46,7 @@ class MentorshipRequestForm(forms.ModelForm):
             'subject': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green'
             }),
-            'message': forms.Textarea(attrs={
+            'message': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green',
                 'rows': 6
             }),
@@ -54,7 +60,7 @@ class MentorshipMessageForm(forms.ModelForm):
         model = MentorshipMessage
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={
+            'content': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green',
                 'rows': 4,
                 'placeholder': _('Type your message...')
@@ -72,7 +78,7 @@ class MentorRatingForm(forms.ModelForm):
             'rating': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green'
             }),
-            'comment': forms.Textarea(attrs={
+            'comment': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green',
                 'rows': 4,
                 'placeholder': _('Share your experience (optional)...')
@@ -94,7 +100,7 @@ class MentorProfileUpdateForm(forms.ModelForm):
             'years_experience': forms.NumberInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green'
             }),
-            'bio': forms.Textarea(attrs={
+            'bio': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green',
                 'rows': 8
             }),
