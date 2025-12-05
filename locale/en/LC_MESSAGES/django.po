@@ -1619,3 +1619,468 @@ msgstr "Track all income and expenses"
 
 msgid "Add Transaction"
 msgstr "Add Transaction"
+
+# Governance Model Choices - Executive Positions
+msgid "President"
+msgstr "President"
+
+msgid "Vice-President"
+msgstr "Vice-President"
+
+msgid "Secretary General"
+msgstr "Secretary General"
+
+msgid "Deputy Secretary General"
+msgstr "Deputy Secretary General"
+
+msgid "Treasurer"
+msgstr "Treasurer"
+
+msgid "Statutory Auditor"
+msgstr "Statutory Auditor"
+
+msgid "Communication and Culture Manager"
+msgstr "Communication and Culture Manager"
+
+# Member Types
+msgid "Student Member"
+msgstr "Student Member"
+
+msgid "Active Member"
+msgstr "Active Member"
+
+msgid "Sympathizer"
+msgstr "Sympathizer"
+
+# Member Status
+msgid "Inactive"
+msgstr "Inactive"
+
+msgid "Suspended"
+msgstr "Suspended"
+
+msgid "Expelled"
+msgstr "Expelled"
+
+# Executive Board Status
+msgid "Completed"
+msgstr "Completed"
+
+msgid "Terminated"
+msgstr "Terminated"
+
+# Executive Position Status
+msgid "Resigned"
+msgstr "Resigned"
+
+msgid "Replaced"
+msgstr "Replaced"
+
+# Assembly Types
+msgid "Ordinary General Assembly (AGM)"
+msgstr "Ordinary General Assembly (AGM)"
+
+msgid "Extraordinary General Assembly (AGEX)"
+msgstr "Extraordinary General Assembly (AGEX)"
+
+msgid "Elective General Assembly (EGM)"
+msgstr "Elective General Assembly (EGM)"
+
+# Assembly Status
+msgid "Scheduled"
+msgstr "Scheduled"
+
+msgid "Cancelled"
+msgstr "Cancelled"
+
+# Agenda Item Types
+msgid "Finance"
+msgstr "Finance"
+
+msgid "Activities"
+msgstr "Activities"
+
+msgid "Miscellaneous"
+msgstr "Miscellaneous"
+
+msgid "Statute Amendment"
+msgstr "Statute Amendment"
+
+msgid "Election"
+msgstr "Election"
+
+msgid "Other"
+msgstr "Other"
+
+# Agenda Item Status
+msgid "Proposed"
+msgstr "Proposed"
+
+msgid "Approved"
+msgstr "Approved"
+
+msgid "Discussed"
+msgstr "Discussed"
+
+msgid "Resolved"
+msgstr "Resolved"
+
+# Assembly Vote Status
+msgid "Approved for Assembly"
+msgstr "Approved for Assembly"
+
+msgid "Rejected"
+msgstr "Rejected"
+
+msgid "Adopted"
+msgstr "Adopted"
+
+# Attendee Types
+msgid "Guest"
+msgstr "Guest"
+
+msgid "Authority/Institution"
+msgstr "Authority/Institution"
+
+# Vote Types
+msgid "Resolution"
+msgstr "Resolution"
+
+msgid "Amendment"
+msgstr "Amendment"
+
+# Voting Methods
+msgid "Show of Hands"
+msgstr "Show of Hands"
+
+msgid "Secret Ballot"
+msgstr "Secret Ballot"
+
+# Transaction Types
+msgid "Income"
+msgstr "Income"
+
+msgid "Expense"
+msgstr "Expense"
+
+# Transaction Categories
+msgid "Membership Fees"
+msgstr "Membership Fees"
+
+msgid "Event Proceeds"
+msgstr "Event Proceeds"
+
+msgid "Donations"
+msgstr "Donations"
+
+msgid "Bequests"
+msgstr "Bequests"
+
+msgid "Financial Aid"
+msgstr "Financial Aid"
+
+# Transaction Status
+msgid "Paid"
+msgstr "Paid"
+
+msgid "Overdue"
+msgstr "Overdue"
+
+msgid "Waived"
+msgstr "Waived"
+
+# Payment Methods
+msgid "Cash"
+msgstr "Cash"
+
+msgid "Bank Transfer"
+msgstr "Bank Transfer"
+
+msgid "Online Payment"
+msgstr "Online Payment"
+
+# Contribution Types
+msgid "Annual Dues"
+msgstr "Annual Dues"
+
+msgid "Event Contribution"
+msgstr "Event Contribution"
+
+msgid "Donation"
+msgstr "Donation"
+
+# Report Types
+msgid "Quarterly"
+msgstr "Quarterly"
+
+msgid "Annual"
+msgstr "Annual"
+
+msgid "Event-Based"
+msgstr "Event-Based"
+
+# Expense Approval Status
+msgid "Signed"
+msgstr "Signed"
+
+# Electoral Commission Status
+# Election Types
+msgid "Executive Board"
+msgstr "Executive Board"
+
+# Election Status
+msgid "In Progress"
+msgstr "In Progress"
+
+# Candidacy Status
+msgid "Withdrawn"
+msgstr "Withdrawn"
+
+# Board of Auditors Status
+# Auditor Roles
+msgid "Secretary"
+msgstr "Secretary"
+
+msgid "Communication Officer"
+msgstr "Communication Officer"
+
+msgid "Advisor"
+msgstr "Advisor"
+
+# Disciplinary Violation Types
+msgid "Confusion in Forums/Social Networks/Debates"
+msgstr "Confusion in Forums/Social Networks/Debates"
+
+msgid "Public Insult"
+msgstr "Public Insult"
+
+msgid "Intentional Assault and Battery"
+msgstr "Intentional Assault and Battery"
+
+msgid "Non-compliance with Statutes and Rules"
+msgstr "Non-compliance with Statutes and Rules"
+
+msgid "General Indiscipline"
+msgstr "General Indiscipline"
+
+# Disciplinary Case Status
+msgid "Under Review"
+msgstr "Under Review"
+
+msgid "Dismissed"
+msgstr "Dismissed"
+
+# Sanction Types
+msgid "Request for Explanation"
+msgstr "Request for Explanation"
+
+msgid "Warning"
+msgstr "Warning"
+
+msgid "Blame"
+msgstr "Blame"
+
+msgid "Exclusion"
+msgstr "Exclusion"
+
+# Sanction Status
+msgid "Appealed"
+msgstr "Appealed"
+
+msgid "Expired"
+msgstr "Expired"
+
+# Event Types
+msgid "Cultural"
+msgstr "Cultural"
+
+msgid "Educational"
+msgstr "Educational"
+
+msgid "Social"
+msgstr "Social"
+
+msgid "National Day - February 11"
+msgstr "National Day - February 11"
+
+msgid "National Day - May 20"
+msgstr "National Day - May 20"
+
+# Document Types
+msgid "Statute"
+msgstr "Statute"
+
+msgid "Rules of Procedure"
+msgstr "Rules of Procedure"
+
+msgid "Minutes"
+msgstr "Minutes"
+
+msgid "Report"
+msgstr "Report"
+
+msgid "Financial Report"
+msgstr "Financial Report"
+
+# Communication Types
+msgid "Announcement"
+msgstr "Announcement"
+
+msgid "Notice"
+msgstr "Notice"
+
+# Target Audience
+msgid "All Members"
+msgstr "All Members"
+
+msgid "Active Members"
+msgstr "Active Members"
+
+msgid "General Assembly"
+msgstr "General Assembly"
+
+msgid "Public"
+msgstr "Public"
+
+# Publication Channels
+msgid "WhatsApp Forum"
+msgstr "WhatsApp Forum"
+
+msgid "Social Networks"
+msgstr "Social Networks"
+
+msgid "Both"
+msgstr "Both"
+
+msgid "Internal Only"
+msgstr "Internal Only"
+
+# Additional Template Strings
+msgid "Elections"
+msgstr "Elections"
+
+msgid "Executive Board elections and voting"
+msgstr "Executive Board elections and voting"
+
+msgid "Create Election"
+msgstr "Create Election"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "End"
+
+msgid "Commission"
+msgstr "Commission"
+
+msgid "candidacies"
+msgstr "candidacies"
+
+msgid "No elections found"
+msgstr "No elections found"
+
+msgid "Membership Dues"
+msgstr "Membership Dues"
+
+msgid "Track annual membership fees"
+msgstr "Track annual membership fees"
+
+msgid "Record Payment"
+msgstr "Record Payment"
+
+msgid "Year"
+msgstr "Year"
+
+msgid "Due Date"
+msgstr "Due Date"
+
+msgid "Payment Date"
+msgstr "Payment Date"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "No dues records found"
+msgstr "No dues records found"
+
+msgid "Create Executive Board"
+msgstr "Create Executive Board"
+
+msgid "Vacant"
+msgstr "Vacant"
+
+msgid "No executive boards yet"
+msgstr "No executive boards yet"
+
+msgid "Convocation Date"
+msgstr "Convocation Date"
+
+msgid "Notice Period"
+msgstr "Notice Period"
+
+msgid "days"
+msgstr "days"
+
+msgid "Agenda Items"
+msgstr "Agenda Items"
+
+msgid "Add Item"
+msgstr "Add Item"
+
+msgid "Proposed by"
+msgstr "Proposed by"
+
+msgid "No agenda items"
+msgstr "No agenda items"
+
+msgid "Attendance"
+msgstr "Attendance"
+
+msgid "Record Attendance"
+msgstr "Record Attendance"
+
+msgid "Attended"
+msgstr "Attended"
+
+msgid "Absent"
+msgstr "Absent"
+
+msgid "No attendance records"
+msgstr "No attendance records"
+
+msgid "My Membership Dues"
+msgstr "My Membership Dues"
+
+msgid "View and manage your annual membership fees"
+msgstr "View and manage your annual membership fees"
+
+msgid "Back to Portal"
+msgstr "Back to Portal"
+
+msgid "Annual Dues"
+msgstr "Annual Dues"
+
+msgid "Payment Instructions"
+msgstr "Payment Instructions"
+
+msgid "To pay your membership dues, click the button below to submit a payment request. An administrator will process your payment and update your status."
+msgstr "To pay your membership dues, click the button below to submit a payment request. An administrator will process your payment and update your status."
+
+msgid "Request Payment Processing"
+msgstr "Request Payment Processing"
+
+msgid "Your dues for"
+msgstr "Your dues for"
+
+msgid "have been paid."
+msgstr "have been paid."
+
+msgid "Payment received on"
+msgstr "Payment received on"
+
+msgid "Dues History"
+msgstr "Dues History"
+
+msgid "No dues records"
+msgstr "No dues records"

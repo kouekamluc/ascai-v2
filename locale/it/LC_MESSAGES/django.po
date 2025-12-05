@@ -1671,3 +1671,466 @@ msgstr "Traccia tutte le entrate e le spese"
 msgid "Add Transaction"
 msgstr "Aggiungi transazione"
 
+# Governance Model Choices - Executive Positions
+msgid "President"
+msgstr "Presidente"
+
+msgid "Vice-President"
+msgstr "Vice-Presidente"
+
+msgid "Secretary General"
+msgstr "Segretario Generale"
+
+msgid "Deputy Secretary General"
+msgstr "Vice Segretario Generale"
+
+msgid "Treasurer"
+msgstr "Tesoriere"
+
+msgid "Statutory Auditor"
+msgstr "Revisore dei Conti"
+
+msgid "Communication and Culture Manager"
+msgstr "Responsabile Comunicazione e Cultura"
+
+# Member Types
+msgid "Student Member"
+msgstr "Membro Studente"
+
+msgid "Active Member"
+msgstr "Membro Attivo"
+
+msgid "Sympathizer"
+msgstr "Simpatizzante"
+
+# Member Status
+msgid "Inactive"
+msgstr "Inattivo"
+
+msgid "Suspended"
+msgstr "Sospeso"
+
+msgid "Expelled"
+msgstr "Espulso"
+
+# Executive Board Status
+msgid "Completed"
+msgstr "Completato"
+
+msgid "Terminated"
+msgstr "Terminato"
+
+# Executive Position Status
+msgid "Resigned"
+msgstr "Dimesso"
+
+msgid "Replaced"
+msgstr "Sostituito"
+
+# Assembly Types
+msgid "Ordinary General Assembly (AGM)"
+msgstr "Assemblea Generale Ordinaria (AGO)"
+
+msgid "Extraordinary General Assembly (AGEX)"
+msgstr "Assemblea Generale Straordinaria (AGEX)"
+
+msgid "Elective General Assembly (EGM)"
+msgstr "Assemblea Generale Elettiva (AGE)"
+
+# Assembly Status
+msgid "Scheduled"
+msgstr "Programmato"
+
+msgid "Cancelled"
+msgstr "Annullato"
+
+# Agenda Item Types
+msgid "Finance"
+msgstr "Finanze"
+
+msgid "Activities"
+msgstr "Attività"
+
+msgid "Miscellaneous"
+msgstr "Varie"
+
+msgid "Statute Amendment"
+msgstr "Modifica Statuto"
+
+msgid "Election"
+msgstr "Elezione"
+
+msgid "Other"
+msgstr "Altro"
+
+# Agenda Item Status
+msgid "Proposed"
+msgstr "Proposto"
+
+msgid "Approved"
+msgstr "Approvato"
+
+msgid "Discussed"
+msgstr "Discusso"
+
+msgid "Resolved"
+msgstr "Risolto"
+
+# Assembly Vote Status
+msgid "Approved for Assembly"
+msgstr "Approvato per l'Assemblea"
+
+msgid "Rejected"
+msgstr "Respinto"
+
+msgid "Adopted"
+msgstr "Adottato"
+
+# Attendee Types
+msgid "Guest"
+msgstr "Ospite"
+
+msgid "Authority/Institution"
+msgstr "Autorità/Istituzione"
+
+# Vote Types
+msgid "Resolution"
+msgstr "Risoluzione"
+
+msgid "Amendment"
+msgstr "Emendamento"
+
+# Voting Methods
+msgid "Show of Hands"
+msgstr "Per alzata di mano"
+
+msgid "Secret Ballot"
+msgstr "Voto segreto"
+
+# Transaction Types
+msgid "Income"
+msgstr "Entrate"
+
+msgid "Expense"
+msgstr "Spese"
+
+# Transaction Categories
+msgid "Membership Fees"
+msgstr "Quote associative"
+
+msgid "Event Proceeds"
+msgstr "Proventi eventi"
+
+msgid "Donations"
+msgstr "Donazioni"
+
+msgid "Bequests"
+msgstr "Lasciti"
+
+msgid "Financial Aid"
+msgstr "Aiuto finanziario"
+
+# Transaction Status
+msgid "Paid"
+msgstr "Pagato"
+
+msgid "Overdue"
+msgstr "Scaduto"
+
+msgid "Waived"
+msgstr "Esonerato"
+
+# Payment Methods
+msgid "Cash"
+msgstr "Contanti"
+
+msgid "Bank Transfer"
+msgstr "Bonifico bancario"
+
+msgid "Online Payment"
+msgstr "Pagamento online"
+
+# Contribution Types
+msgid "Annual Dues"
+msgstr "Quote annuali"
+
+msgid "Event Contribution"
+msgstr "Contributo evento"
+
+msgid "Donation"
+msgstr "Donazione"
+
+# Report Types
+msgid "Quarterly"
+msgstr "Trimestrale"
+
+msgid "Annual"
+msgstr "Annuale"
+
+msgid "Event-Based"
+msgstr "Basato su evento"
+
+# Expense Approval Status
+msgid "Signed"
+msgstr "Firmato"
+
+# Election Types
+msgid "Executive Board"
+msgstr "Consiglio Esecutivo"
+
+# Election Status
+msgid "In Progress"
+msgstr "In corso"
+
+# Candidacy Status
+msgid "Withdrawn"
+msgstr "Ritirato"
+
+# Auditor Roles
+msgid "Secretary"
+msgstr "Segretario"
+
+msgid "Communication Officer"
+msgstr "Responsabile Comunicazione"
+
+msgid "Advisor"
+msgstr "Consigliere"
+
+# Disciplinary Violation Types
+msgid "Confusion in Forums/Social Networks/Debates"
+msgstr "Confusione nei Forum/Reti Sociali/Dibattiti"
+
+msgid "Public Insult"
+msgstr "Insulto pubblico"
+
+msgid "Intentional Assault and Battery"
+msgstr "Lesioni e percosse intenzionali"
+
+msgid "Non-compliance with Statutes and Rules"
+msgstr "Mancato rispetto di Statuto e Regolamenti"
+
+msgid "General Indiscipline"
+msgstr "Indisciplina generale"
+
+# Disciplinary Case Status
+msgid "Under Review"
+msgstr "In revisione"
+
+msgid "Dismissed"
+msgstr "Respinto"
+
+# Sanction Types
+msgid "Request for Explanation"
+msgstr "Richiesta di spiegazione"
+
+msgid "Warning"
+msgstr "Avvertimento"
+
+msgid "Blame"
+msgstr "Biasimo"
+
+msgid "Exclusion"
+msgstr "Esclusione"
+
+# Sanction Status
+msgid "Appealed"
+msgstr "Appellato"
+
+msgid "Expired"
+msgstr "Scaduto"
+
+# Event Types
+msgid "Cultural"
+msgstr "Culturale"
+
+msgid "Educational"
+msgstr "Educativo"
+
+msgid "Social"
+msgstr "Sociale"
+
+msgid "National Day - February 11"
+msgstr "Giornata Nazionale - 11 Febbraio"
+
+msgid "National Day - May 20"
+msgstr "Giornata Nazionale - 20 Maggio"
+
+# Document Types
+msgid "Statute"
+msgstr "Statuto"
+
+msgid "Rules of Procedure"
+msgstr "Regolamento Interno"
+
+msgid "Minutes"
+msgstr "Verbale"
+
+msgid "Report"
+msgstr "Rapporto"
+
+msgid "Financial Report"
+msgstr "Rapporto finanziario"
+
+# Communication Types
+msgid "Announcement"
+msgstr "Annuncio"
+
+msgid "Notice"
+msgstr "Avviso"
+
+# Target Audience
+msgid "All Members"
+msgstr "Tutti i membri"
+
+msgid "Active Members"
+msgstr "Membri attivi"
+
+msgid "General Assembly"
+msgstr "Assemblea Generale"
+
+msgid "Public"
+msgstr "Pubblico"
+
+# Publication Channels
+msgid "WhatsApp Forum"
+msgstr "Forum WhatsApp"
+
+msgid "Social Networks"
+msgstr "Reti sociali"
+
+msgid "Both"
+msgstr "Entrambi"
+
+msgid "Internal Only"
+msgstr "Solo interno"
+
+# Additional Template Strings
+msgid "Elections"
+msgstr "Elezioni"
+
+msgid "Executive Board elections and voting"
+msgstr "Elezioni e votazioni del Consiglio Esecutivo"
+
+msgid "Create Election"
+msgstr "Crea elezione"
+
+msgid "Start"
+msgstr "Inizio"
+
+msgid "End"
+msgstr "Fine"
+
+msgid "Commission"
+msgstr "Commissione"
+
+msgid "candidacies"
+msgstr "candidature"
+
+msgid "No elections found"
+msgstr "Nessuna elezione trovata"
+
+msgid "Membership Dues"
+msgstr "Quote associative"
+
+msgid "Track annual membership fees"
+msgstr "Traccia le quote associative annuali"
+
+msgid "Record Payment"
+msgstr "Registra pagamento"
+
+msgid "Year"
+msgstr "Anno"
+
+msgid "Due Date"
+msgstr "Data di scadenza"
+
+msgid "Payment Date"
+msgstr "Data di pagamento"
+
+msgid "N/A"
+msgstr "N/D"
+
+msgid "No dues records found"
+msgstr "Nessun record di quote trovato"
+
+msgid "Create Executive Board"
+msgstr "Crea Consiglio Esecutivo"
+
+msgid "Vacant"
+msgstr "Vacante"
+
+msgid "No executive boards yet"
+msgstr "Nessun consiglio esecutivo ancora"
+
+msgid "Convocation Date"
+msgstr "Data di convocazione"
+
+msgid "Notice Period"
+msgstr "Periodo di preavviso"
+
+msgid "days"
+msgstr "giorni"
+
+msgid "Agenda Items"
+msgstr "Punti all'ordine del giorno"
+
+msgid "Add Item"
+msgstr "Aggiungi punto"
+
+msgid "Proposed by"
+msgstr "Proposto da"
+
+msgid "No agenda items"
+msgstr "Nessun punto all'ordine del giorno"
+
+msgid "Attendance"
+msgstr "Presenza"
+
+msgid "Record Attendance"
+msgstr "Registra presenza"
+
+msgid "Attended"
+msgstr "Presente"
+
+msgid "Absent"
+msgstr "Assente"
+
+msgid "No attendance records"
+msgstr "Nessun record di presenza"
+
+msgid "My Membership Dues"
+msgstr "Le mie quote associative"
+
+msgid "View and manage your annual membership fees"
+msgstr "Visualizza e gestisci le tue quote associative annuali"
+
+msgid "Back to Portal"
+msgstr "Torna al portale"
+
+msgid "Annual Dues"
+msgstr "Quote annuali"
+
+msgid "Payment Instructions"
+msgstr "Istruzioni di pagamento"
+
+msgid "To pay your membership dues, click the button below to submit a payment request. An administrator will process your payment and update your status."
+msgstr "Per pagare le tue quote associative, clicca il pulsante qui sotto per inviare una richiesta di pagamento. Un amministratore elaborerà il tuo pagamento e aggiornerà il tuo stato."
+
+msgid "Request Payment Processing"
+msgstr "Richiedi elaborazione pagamento"
+
+msgid "Your dues for"
+msgstr "Le tue quote per"
+
+msgid "have been paid."
+msgstr "sono state pagate."
+
+msgid "Payment received on"
+msgstr "Pagamento ricevuto il"
+
+msgid "Dues History"
+msgstr "Storico quote"
+
+msgid "No dues records"
+msgstr "Nessun record di quote"
+
