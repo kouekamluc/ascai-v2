@@ -1301,6 +1301,7 @@ class DashboardMentorListView(DashboardRequiredMixin, ListView):
     paginate_by = 12
     
     def get_queryset(self):
+        from apps.mentorship.models import MentorProfile
         queryset = MentorProfile.objects.filter(is_approved=True).select_related('user')
         
         search = self.request.GET.get('search')
@@ -1332,6 +1333,7 @@ class DashboardMentorListView(DashboardRequiredMixin, ListView):
         return queryset
     
     def get_context_data(self, **kwargs):
+        from apps.mentorship.models import MentorProfile
         context = super().get_context_data(**kwargs)
         context['specializations'] = MentorProfile.objects.filter(
             is_approved=True
