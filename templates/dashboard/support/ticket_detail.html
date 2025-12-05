@@ -3,6 +3,10 @@
 
 {% block page_heading %}{{ ticket.subject }}{% endblock %}
 
+{% block extra_css %}
+{% if reply_form %}{{ reply_form.media.css }}{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="space-y-6">
     <div class="dashboard-card">

@@ -3,7 +3,7 @@ Admin configuration for universities app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from unfold.admin import ModelAdmin, TabularInline
+from config.admin import BaseAdmin, ModelAdmin, TabularInline
 from .models import University, UniversityProgram, SavedUniversity
 
 
@@ -15,7 +15,7 @@ class UniversityProgramInline(TabularInline):
 
 
 @admin.register(University)
-class UniversityAdmin(ModelAdmin):
+class UniversityAdmin(BaseAdmin):
     """Admin interface for University model."""
     list_display = ['name', 'city', 'website', 'created_at']
     list_filter = ['city', 'created_at']

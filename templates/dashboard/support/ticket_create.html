@@ -16,37 +16,23 @@
         {% csrf_token %}
         
         <div class="space-y-6">
-            <div>
-                <label for="{{ form.subject.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
-                    {{ form.subject.label }}
-                    {% if form.subject.field.required %}<span class="text-red-500">*</span>{% endif %}
+            {% for field in form %}
+            <div class="{% if field.name == 'message' %}md:col-span-2{% endif %}">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
                 </label>
-                <input type="text" name="{{ form.subject.name }}" id="{{ form.subject.id_for_label }}" value="{{ form.subject.value|default:'' }}" class="form-input" placeholder="{% trans 'Enter ticket subject' %}">
-                {% if form.subject.errors %}
+                {{ field }}
+                {% if field.errors %}
                 <p class="mt-1 text-sm text-red-600 flex items-center">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    {{ form.subject.errors.0 }}
+                    {{ field.errors.0 }}
                 </p>
                 {% endif %}
             </div>
-            
-            <div>
-                <label for="{{ form.message.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
-                    {{ form.message.label }}
-                    {% if form.message.field.required %}<span class="text-red-500">*</span>{% endif %}
-                </label>
-                <textarea name="{{ form.message.name }}" id="{{ form.message.id_for_label }}" class="form-textarea" rows="8" placeholder="{% trans 'Describe your issue or question in detail...' %}">{{ form.message.value|default:'' }}</textarea>
-                {% if form.message.errors %}
-                <p class="mt-1 text-sm text-red-600 flex items-center">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    {{ form.message.errors.0 }}
-                </p>
-                {% endif %}
-            </div>
+            {% endfor %}
         </div>
         
         <div class="section-divider"></div>

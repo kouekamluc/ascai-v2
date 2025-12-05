@@ -148,6 +148,31 @@ def dashboard_callback(request, context):
         ).count(),
     }
     
+    # Notification counts - items that need admin attention
+    from apps.contact.models import ContactSubmission
+    from apps.dashboard.models import OrientationSession, StudentQuestion
+    
+    notification_counts = {
+        'new_contact_submissions': ContactSubmission.objects.filter(
+            status='new'
+        ).count(),
+        'pending_mentorship_requests': MentorshipRequest.objects.filter(
+            status='pending'
+        ).count(),
+        'unconfirmed_orientation_sessions': OrientationSession.objects.filter(
+            is_confirmed=False
+        ).count(),
+        'open_support_tickets': SupportTicket.objects.filter(
+            status__in=['open', 'pending']
+        ).count(),
+        'unresolved_student_questions': StudentQuestion.objects.filter(
+            is_resolved=False
+        ).count(),
+    }
+    
+    # Total notifications count
+    total_notifications = sum(notification_counts.values())
+    
     # Recent activity (last 5 items)
     recent_news = News.objects.order_by('-created_at')[:5]
     recent_events = Event.objects.filter(
@@ -155,6 +180,17 @@ def dashboard_callback(request, context):
     ).order_by('start_datetime')[:5]
     recent_tickets = SupportTicket.objects.filter(
         status__in=['open', 'pending']
+    ).order_by('-created_at')[:5]
+    
+    # Recent enquiries that need attention
+    recent_contact_submissions = ContactSubmission.objects.filter(
+        status='new'
+    ).order_by('-created_at')[:5]
+    recent_mentorship_requests = MentorshipRequest.objects.filter(
+        status='pending'
+    ).order_by('-created_at')[:5]
+    recent_orientation_sessions = OrientationSession.objects.filter(
+        is_confirmed=False
     ).order_by('-created_at')[:5]
     
     # Add all statistics to context
@@ -165,9 +201,14 @@ def dashboard_callback(request, context):
         'resource_stats': resource_stats,
         'support_stats': support_stats,
         'mentorship_stats': mentorship_stats,
+        'notification_counts': notification_counts,
+        'total_notifications': total_notifications,
         'recent_news': recent_news,
         'recent_events': recent_events,
         'recent_tickets': recent_tickets,
+        'recent_contact_submissions': recent_contact_submissions,
+        'recent_mentorship_requests': recent_mentorship_requests,
+        'recent_orientation_sessions': recent_orientation_sessions,
     })
     
     return context

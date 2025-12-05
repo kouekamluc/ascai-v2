@@ -3,6 +3,10 @@
 
 {% block title %}{% trans 'Contact Us' %} - ASCAI Lazio{% endblock %}
 
+{% block extra_css %}
+{{ form.media.css }}
+{% endblock %}
+
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="text-center mb-12">
@@ -122,6 +126,7 @@
 </div>
 
 {% block extra_js %}
+{{ form.media.js }}
 <script>
     // Handle HTMX success response for contact form
     document.body.addEventListener('htmx:afterSwap', function(event) {

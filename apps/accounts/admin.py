@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from allauth.account.models import EmailAddress
 from unfold.admin import ModelAdmin
+from config.admin import BaseAdmin
 import logging
 
 from .models import User, UserDocument
@@ -46,6 +47,18 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     )
     
     actions = ['approve_users', 'reject_users', 'verify_emails', 'mark_emails_unverified', 'resend_verification_emails']
+    
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        """Override to use CKEditor 5 for bio TextField."""
+        from django.db import models
+        from django.forms import Textarea
+        try:
+            from django_ckeditor_5.widgets import CKEditor5Widget
+            if isinstance(db_field, models.TextField) and db_field.name == 'bio':
+                kwargs['widget'] = CKEditor5Widget(config_name='default')
+        except ImportError:
+            pass
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
     
     def save_model(self, request, obj, form, change):
         """Override save to auto-approve superusers and staff."""

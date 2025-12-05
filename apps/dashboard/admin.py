@@ -3,7 +3,7 @@ Admin configuration for dashboard app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from unfold.admin import ModelAdmin, TabularInline
+from config.admin import BaseAdmin, ModelAdmin, TabularInline
 from .models import (
     SupportTicket, TicketReply, CommunityGroup, GroupDiscussion, GroupAnnouncement, GroupFile,
     UserStorySubmission, StoryImage, EventRegistration, SavedDocument,
@@ -37,12 +37,13 @@ class TicketReplyInline(TabularInline):
 
 
 @admin.register(SupportTicket)
-class SupportTicketAdmin(ModelAdmin):
-    list_display = ['user', 'subject', 'status', 'created_at', 'updated_at']
+class SupportTicketAdmin(BaseAdmin):
+    list_display = ['user', 'subject', 'status_badge', 'created_at', 'updated_at']
     list_filter = ['status', 'created_at']
     search_fields = ['subject', 'message', 'user__username', 'user__email']
     readonly_fields = ['user', 'created_at', 'updated_at']
     inlines = [TicketReplyInline]
+    list_display_links = ['user', 'subject']
     fieldsets = (
         (_('Ticket Information'), {
             'fields': ('user', 'subject', 'message', 'status')
@@ -56,6 +57,27 @@ class SupportTicketAdmin(ModelAdmin):
         }),
     )
     
+    def status_badge(self, obj):
+        """Display status with a badge indicator for open/pending tickets."""
+        from django.utils.html import format_html
+        if obj.status in ['open', 'pending']:
+            return format_html(
+                '<span style="background-color: #dc3545; color: white; padding: 3px 8px; '
+                'border-radius: 12px; font-size: 11px; font-weight: bold;">ACTION NEEDED</span> '
+                '<span>{}</span>',
+                obj.get_status_display()
+            )
+        elif obj.status == 'resolved':
+            return format_html(
+                '<span style="background-color: #28a745; color: white; padding: 3px 8px; '
+                'border-radius: 12px; font-size: 11px; font-weight: bold;">RESOLVED</span> '
+                '<span>{}</span>',
+                obj.get_status_display()
+            )
+        return obj.get_status_display()
+    status_badge.short_description = _('Status')
+    status_badge.admin_order_field = 'status'
+    
     def save_model(self, request, obj, form, change):
         if change and 'status' in form.changed_data and obj.status == 'resolved':
             from django.utils import timezone
@@ -68,10 +90,19 @@ class SupportTicketAdmin(ModelAdmin):
         # Delete removed instances
         for obj in formset.deleted_objects:
             obj.delete()
+    
+    def changelist_view(self, request, extra_context=None):
+        """Add notification count to changelist context."""
+        extra_context = extra_context or {}
+        open_count = SupportTicket.objects.filter(status__in=['open', 'pending']).count()
+        if open_count > 0:
+            extra_context['notification_count'] = open_count
+            extra_context['notification_message'] = _('{} open support ticket(s)').format(open_count)
+        return super().changelist_view(request, extra_context)
 
 
 @admin.register(TicketReply)
-class TicketReplyAdmin(ModelAdmin):
+class TicketReplyAdmin(BaseAdmin):
     list_display = ['ticket', 'author', 'is_admin_reply', 'created_at']
     list_filter = ['is_admin_reply', 'created_at']
     search_fields = ['message', 'ticket__subject', 'author__username']
@@ -100,7 +131,7 @@ class CommunityGroupAdmin(ModelAdmin):
 
 
 @admin.register(GroupDiscussion)
-class GroupDiscussionAdmin(ModelAdmin):
+class GroupDiscussionAdmin(BaseAdmin):
     list_display = ['title', 'group', 'author', 'created_at']
     list_filter = ['group', 'created_at']
     search_fields = ['title', 'content', 'author__username']
@@ -108,7 +139,7 @@ class GroupDiscussionAdmin(ModelAdmin):
 
 
 @admin.register(GroupAnnouncement)
-class GroupAnnouncementAdmin(ModelAdmin):
+class GroupAnnouncementAdmin(BaseAdmin):
     list_display = ['title', 'group', 'author', 'is_pinned', 'created_at']
     list_filter = ['group', 'is_pinned', 'created_at']
     search_fields = ['title', 'content']
@@ -131,7 +162,7 @@ class StoryImageAdmin(ModelAdmin):
 
 
 @admin.register(UserStorySubmission)
-class UserStorySubmissionAdmin(ModelAdmin):
+class UserStorySubmissionAdmin(BaseAdmin):
     list_display = ['title', 'user', 'status', 'is_anonymous', 'submitted_at', 'reviewed_at']
     list_filter = ['status', 'is_anonymous', 'submitted_at']
     search_fields = ['title', 'story', 'user__username']
@@ -191,11 +222,12 @@ class SavedDocumentAdmin(ModelAdmin):
 
 
 @admin.register(StudentQuestion)
-class StudentQuestionAdmin(ModelAdmin):
-    list_display = ['subject', 'user', 'category', 'is_resolved', 'created_at']
+class StudentQuestionAdmin(BaseAdmin):
+    list_display = ['subject', 'user', 'category', 'resolution_badge', 'created_at']
     list_filter = ['is_resolved', 'category', 'created_at']
     search_fields = ['subject', 'question', 'user__username']
     readonly_fields = ['user', 'created_at', 'resolved_at']
+    list_display_links = ['subject', 'user']
     fieldsets = (
         (_('Question'), {
             'fields': ('user', 'subject', 'question', 'category')
@@ -209,19 +241,45 @@ class StudentQuestionAdmin(ModelAdmin):
         }),
     )
     
+    def resolution_badge(self, obj):
+        """Display resolution status with a badge indicator."""
+        from django.utils.html import format_html
+        if not obj.is_resolved:
+            return format_html(
+                '<span style="background-color: #dc3545; color: white; padding: 3px 8px; '
+                'border-radius: 12px; font-size: 11px; font-weight: bold;">UNRESOLVED</span>'
+            )
+        else:
+            return format_html(
+                '<span style="background-color: #28a745; color: white; padding: 3px 8px; '
+                'border-radius: 12px; font-size: 11px; font-weight: bold;">RESOLVED</span>'
+            )
+    resolution_badge.short_description = _('Status')
+    resolution_badge.admin_order_field = 'is_resolved'
+    
     def save_model(self, request, obj, form, change):
         if change and 'is_resolved' in form.changed_data and obj.is_resolved:
             from django.utils import timezone
             obj.resolved_at = timezone.now()
         super().save_model(request, obj, form, change)
+    
+    def changelist_view(self, request, extra_context=None):
+        """Add notification count to changelist context."""
+        extra_context = extra_context or {}
+        unresolved_count = StudentQuestion.objects.filter(is_resolved=False).count()
+        if unresolved_count > 0:
+            extra_context['notification_count'] = unresolved_count
+            extra_context['notification_message'] = _('{} unresolved student question(s)').format(unresolved_count)
+        return super().changelist_view(request, extra_context)
 
 
 @admin.register(OrientationSession)
 class OrientationSessionAdmin(ModelAdmin):
-    list_display = ['user', 'preferred_date', 'preferred_time', 'is_confirmed', 'created_at']
+    list_display = ['user', 'preferred_date', 'preferred_time', 'confirmation_badge', 'created_at']
     list_filter = ['is_confirmed', 'created_at']
     search_fields = ['user__username', 'topics']
     readonly_fields = ['user', 'created_at']
+    list_display_links = ['user', 'preferred_date']
     fieldsets = (
         (_('Session Request'), {
             'fields': ('user', 'preferred_date', 'preferred_time', 'topics')
@@ -234,3 +292,28 @@ class OrientationSessionAdmin(ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    def confirmation_badge(self, obj):
+        """Display confirmation status with a badge indicator."""
+        from django.utils.html import format_html
+        if not obj.is_confirmed:
+            return format_html(
+                '<span style="background-color: #dc3545; color: white; padding: 3px 8px; '
+                'border-radius: 12px; font-size: 11px; font-weight: bold;">NEW BOOKING</span>'
+            )
+        else:
+            return format_html(
+                '<span style="background-color: #28a745; color: white; padding: 3px 8px; '
+                'border-radius: 12px; font-size: 11px; font-weight: bold;">CONFIRMED</span>'
+            )
+    confirmation_badge.short_description = _('Status')
+    confirmation_badge.admin_order_field = 'is_confirmed'
+    
+    def changelist_view(self, request, extra_context=None):
+        """Add notification count to changelist context."""
+        extra_context = extra_context or {}
+        unconfirmed_count = OrientationSession.objects.filter(is_confirmed=False).count()
+        if unconfirmed_count > 0:
+            extra_context['notification_count'] = unconfirmed_count
+            extra_context['notification_message'] = _('{} unconfirmed orientation session(s)').format(unconfirmed_count)
+        return super().changelist_view(request, extra_context)

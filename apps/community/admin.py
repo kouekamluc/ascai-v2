@@ -3,7 +3,7 @@ Admin configuration for community app.
 """
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from unfold.admin import ModelAdmin
+from config.admin import BaseAdmin, ModelAdmin
 from .models import ForumCategory, ForumThread, ForumPost, ThreadUpvote, PostUpvote
 
 
@@ -15,7 +15,7 @@ class ForumCategoryAdmin(ModelAdmin):
 
 
 @admin.register(ForumThread)
-class ForumThreadAdmin(ModelAdmin):
+class ForumThreadAdmin(BaseAdmin):
     """Admin interface for ForumThread."""
     list_display = ['title', 'category', 'author', 'is_pinned', 'is_locked', 'views_count', 'upvotes_count', 'created_at']
     list_filter = ['category', 'is_pinned', 'is_locked', 'created_at']
@@ -25,7 +25,7 @@ class ForumThreadAdmin(ModelAdmin):
 
 
 @admin.register(ForumPost)
-class ForumPostAdmin(ModelAdmin):
+class ForumPostAdmin(BaseAdmin):
     """Admin interface for ForumPost."""
     list_display = ['thread', 'author', 'is_solution', 'upvotes_count', 'created_at']
     list_filter = ['is_solution', 'created_at']

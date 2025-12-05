@@ -66,6 +66,7 @@
     </style>
     
     {% block extra_css %}{% endblock %}
+    {% if form %}{{ form.media.css }}{% endif %}
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <!-- Navigation -->
@@ -88,6 +89,7 @@
     </div>
     
     {% block extra_js %}{% endblock %}
+    {% if form %}{{ form.media.js }}{% endif %}
 </body>
 </html>
 
