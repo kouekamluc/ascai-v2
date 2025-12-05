@@ -484,6 +484,173 @@ def check_expense_approval_status(transaction):
     }
 
 
+def calculate_dues_totals(queryset=None, year=None, status=None):
+    """
+    Calculate comprehensive dues totals and statistics.
+    
+    Args:
+        queryset: Optional queryset to calculate from (if None, uses all dues)
+        year: Optional year filter
+        status: Optional status filter
+    
+    Returns:
+        dict with comprehensive dues statistics:
+        - total_owed: Total amount of pending + overdue dues
+        - total_collected: Total amount of paid dues
+        - total_pending: Total amount and count of pending dues
+        - total_overdue: Total amount and count of overdue dues
+        - total_paid: Total amount and count of paid dues
+        - total_waived: Total amount and count of waived dues
+        - grand_total: Total amount of all dues (all statuses)
+        - by_status: Breakdown by status
+        - by_year: Breakdown by year (if applicable)
+    """
+    from decimal import Decimal
+    
+    if queryset is None:
+        queryset = MembershipDues.objects.all()
+    
+    if year:
+        queryset = queryset.filter(year=year)
+    if status:
+        queryset = queryset.filter(status=status)
+    
+    # Calculate totals by status
+    status_totals = queryset.values('status').annotate(
+        total_amount=Sum('amount'),
+        count=Count('id')
+    )
+    
+    # Initialize totals
+    totals = {
+        'total_owed': Decimal('0.00'),
+        'total_collected': Decimal('0.00'),
+        'total_pending': {'amount': Decimal('0.00'), 'count': 0},
+        'total_overdue': {'amount': Decimal('0.00'), 'count': 0},
+        'total_paid': {'amount': Decimal('0.00'), 'count': 0},
+        'total_waived': {'amount': Decimal('0.00'), 'count': 0},
+        'grand_total': Decimal('0.00'),
+        'by_status': {},
+        'by_year': {},
+        'total_count': 0,
+    }
+    
+    # Process status totals
+    for stat in status_totals:
+        status_key = stat['status']
+        amount = stat['total_amount'] or Decimal('0.00')
+        count = stat['count'] or 0
+        
+        totals['by_status'][status_key] = {
+            'amount': amount,
+            'count': count
+        }
+        
+        totals['grand_total'] += amount
+        totals['total_count'] += count
+        
+        if status_key == 'paid':
+            totals['total_collected'] += amount
+            totals['total_paid'] = {'amount': amount, 'count': count}
+        elif status_key == 'pending':
+            totals['total_owed'] += amount
+            totals['total_pending'] = {'amount': amount, 'count': count}
+        elif status_key == 'overdue':
+            totals['total_owed'] += amount
+            totals['total_overdue'] = {'amount': amount, 'count': count}
+        elif status_key == 'waived':
+            totals['total_waived'] = {'amount': amount, 'count': count}
+    
+    # Also calculate dues that are past their due date (for financial tracking)
+    # This gives admins visibility into dues that should be marked overdue
+    today = timezone.now().date()
+    pending_past_due = queryset.filter(
+        status='pending',
+        due_date__lt=today
+    ).aggregate(
+        total_amount=Sum('amount'),
+        count=Count('id')
+    )
+    
+    pending_past_due_amount = pending_past_due['total_amount'] or Decimal('0.00')
+    pending_past_due_count = pending_past_due['count'] or 0
+    
+    # Add this as additional information (not modifying the status-based totals)
+    totals['pending_past_due'] = {
+        'amount': pending_past_due_amount,
+        'count': pending_past_due_count
+    }
+    
+    # Calculate effective total owed (status overdue + pending past due)
+    totals['effective_total_owed'] = totals['total_owed'] + pending_past_due_amount
+    
+    # Calculate totals by year if not filtering by year
+    if not year:
+        year_totals = queryset.values('year').annotate(
+            total_amount=Sum('amount'),
+            count=Count('id')
+        ).order_by('-year')
+        
+        for year_stat in year_totals:
+            year_key = year_stat['year']
+            totals['by_year'][year_key] = {
+                'amount': year_stat['total_amount'] or Decimal('0.00'),
+                'count': year_stat['count'] or 0
+            }
+    
+    return totals
+
+
+def calculate_dues_summary():
+    """
+    Calculate overall dues summary for all members across all years.
+    Returns comprehensive statistics for dashboard display.
+    """
+    all_dues = MembershipDues.objects.all()
+    current_year = timezone.now().year
+    
+    # Overall totals
+    overall_totals = calculate_dues_totals(queryset=all_dues)
+    
+    # Current year totals
+    current_year_dues = all_dues.filter(year=current_year)
+    current_year_totals = calculate_dues_totals(queryset=current_year_dues, year=current_year)
+    
+    # Overdue dues - check both status='overdue' and pending dues past due_date
+    today = timezone.now().date()
+    overdue_dues_list = []
+    
+    # Get dues marked as overdue
+    overdue_by_status = all_dues.filter(status='overdue')
+    overdue_dues_list.extend(overdue_by_status)
+    
+    # Also get pending dues that are past their due date
+    pending_past_due = all_dues.filter(
+        status='pending',
+        due_date__lt=today
+    )
+    overdue_dues_list.extend(pending_past_due)
+    
+    # Calculate overdue amount
+    overdue_amount = sum(dues.amount for dues in overdue_dues_list)
+    
+    # Also check for dues that are past 3 months (membership loss threshold)
+    severely_overdue = []
+    for dues in all_dues.filter(status__in=['pending', 'overdue']):
+        if dues.is_overdue:  # This checks for 3 months past due date
+            severely_overdue.append(dues)
+    
+    return {
+        'overall': overall_totals,
+        'current_year': current_year_totals,
+        'overdue_count': len(overdue_dues_list),
+        'overdue_amount': overdue_amount,
+        'severely_overdue_count': len(severely_overdue),
+        'severely_overdue_amount': sum(dues.amount for dues in severely_overdue),
+        'current_year_number': current_year,
+    }
+
+
 # ============================================================================
 # ASSEMBLY MANAGEMENT ALGORITHMS
 # ============================================================================

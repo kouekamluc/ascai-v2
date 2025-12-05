@@ -41,7 +41,8 @@ from .utils import (
     calculate_financial_summary, check_expense_approval_status,
     check_extraordinary_assembly_quorum, check_assembly_notice_period,
     check_agenda_item_proposal_deadline, check_agenda_structure_requirements,
-    check_general_report_requirement, check_assembly_frequency_compliance
+    check_general_report_requirement, check_assembly_frequency_compliance,
+    calculate_dues_totals, calculate_dues_summary
 )
 from .forms import (
     MemberForm, MemberSelfRegistrationForm, GeneralAssemblyForm, AgendaItemForm, AssemblyAttendanceForm,
@@ -1024,9 +1025,51 @@ class MembershipDuesListView(FinancialManagementRequiredMixin, ListView):
         # Filter by year
         year = self.request.GET.get('year')
         if year:
-            queryset = queryset.filter(year=year)
+            try:
+                year = int(year)
+                queryset = queryset.filter(year=year)
+            except (ValueError, TypeError):
+                pass
         
         return queryset.order_by('-year', '-due_date')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get filter parameters
+        status_filter = self.request.GET.get('status')
+        year_filter = self.request.GET.get('year')
+        
+        try:
+            year_filter = int(year_filter) if year_filter else None
+        except (ValueError, TypeError):
+            year_filter = None
+        
+        # Get filtered queryset for calculations
+        queryset = MembershipDues.objects.all()
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        if year_filter:
+            queryset = queryset.filter(year=year_filter)
+        
+        # Calculate comprehensive totals
+        totals = calculate_dues_totals(
+            queryset=queryset,
+            year=year_filter,
+            status=status_filter
+        )
+        
+        # Get overall summary (all dues)
+        summary = calculate_dues_summary()
+        
+        context['totals'] = totals
+        context['summary'] = summary
+        context['current_filters'] = {
+            'status': status_filter,
+            'year': year_filter,
+        }
+        
+        return context
 
 
 class MembershipDuesCreateView(FinancialManagementRequiredMixin, CreateView):
@@ -1159,6 +1202,10 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
         # Check assembly frequency compliance (Article 2)
         frequency_status = check_assembly_frequency_compliance()
         
+        # Dues summary calculations
+        dues_summary = calculate_dues_summary()
+        all_dues_totals = calculate_dues_totals()
+        
         # Statistics
         context['stats'] = {
             'total_members': Member.objects.count(),
@@ -1169,6 +1216,11 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
                 date__gte=timezone.now()
             ).count(),
             'pending_dues': MembershipDues.objects.filter(status='pending').count(),
+            'pending_dues_amount': all_dues_totals['total_pending']['amount'],
+            'total_owed_dues': all_dues_totals['total_owed'],
+            'total_collected_dues': all_dues_totals['total_collected'],
+            'overdue_dues_count': all_dues_totals['total_overdue']['count'],
+            'overdue_dues_amount': all_dues_totals['total_overdue']['amount'],
             'pending_expenses': FinancialTransaction.objects.filter(
                 transaction_type='expense',
                 status='pending'
@@ -1179,6 +1231,9 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
             'overdue_vote_publications': len(overdue_votes),
             'approaching_deadline_votes': len(approaching_deadline_votes),
         }
+        
+        # Add dues summary to context
+        context['dues_summary'] = dues_summary
         
         # Recent activity
         context['recent_assemblies'] = GeneralAssembly.objects.all().order_by('-date')[:5]

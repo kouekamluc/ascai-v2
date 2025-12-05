@@ -67,9 +67,9 @@
     <div class="stat-card border-l-4 border-yellow-500">
         <div class="flex items-center justify-between">
             <div class="flex-1">
-                <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans "Pending Dues" %}</p>
-                <p class="text-4xl font-bold text-gray-900 mt-2 mb-1">{{ stats.pending_dues }}</p>
-                <p class="text-xs text-gray-500">{% trans "Needs payment" %}</p>
+                <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans "Total Dues Owed" %}</p>
+                <p class="text-4xl font-bold text-yellow-600 mt-2 mb-1">€{{ stats.total_owed_dues|floatformat:2 }}</p>
+                <p class="text-xs text-gray-500">{% trans "Pending" %}: {{ stats.pending_dues }} | {% trans "Overdue" %}: {{ stats.overdue_dues_count }}</p>
             </div>
             <div class="w-16 h-16 bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-xl flex items-center justify-center shadow-sm">
                 <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,6 +79,24 @@
         </div>
         <a href="{% url 'governance:membership_dues' %}" class="text-sm text-yellow-600 hover:underline mt-4 inline-block">
             {% trans "View All" %} →
+        </a>
+    </div>
+    
+    <div class="stat-card border-l-4 border-emerald-500">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans "Dues Collected" %}</p>
+                <p class="text-4xl font-bold text-emerald-600 mt-2 mb-1">€{{ stats.total_collected_dues|floatformat:2 }}</p>
+                <p class="text-xs text-gray-500">{% trans "Total paid" %}</p>
+            </div>
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-xl flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+        <a href="{% url 'governance:membership_dues' %}?status=paid" class="text-sm text-emerald-600 hover:underline mt-4 inline-block">
+            {% trans "View Paid" %} →
         </a>
     </div>
     

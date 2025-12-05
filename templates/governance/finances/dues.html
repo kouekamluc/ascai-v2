@@ -24,11 +24,138 @@
             <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>{% trans "Pending" %}</option>
             <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>{% trans "Paid" %}</option>
             <option value="overdue" {% if request.GET.status == 'overdue' %}selected{% endif %}>{% trans "Overdue" %}</option>
+            <option value="waived" {% if request.GET.status == 'waived' %}selected{% endif %}>{% trans "Waived" %}</option>
         </select>
         <input type="number" name="year" placeholder="{% trans 'Year' %}" value="{{ request.GET.year }}" class="form-input">
         <button type="submit" class="btn-secondary">{% trans "Filter" %}</button>
     </form>
 </div>
+
+<!-- Financial Summary Section -->
+{% if totals %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- Total Owed -->
+    <div class="governance-card border-l-4 border-yellow-500">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans "Total Owed" %}</p>
+                <p class="text-3xl font-bold text-yellow-600 mt-2 mb-1">€{{ totals.total_owed|floatformat:2 }}</p>
+                <p class="text-xs text-gray-500">
+                    {% trans "Pending" %}: {{ totals.total_pending.count }} | 
+                    {% trans "Overdue" %}: {{ totals.total_overdue.count }}
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Collected -->
+    <div class="governance-card border-l-4 border-green-500">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans "Total Collected" %}</p>
+                <p class="text-3xl font-bold text-green-600 mt-2 mb-1">€{{ totals.total_collected|floatformat:2 }}</p>
+                <p class="text-xs text-gray-500">{% trans "Paid" %}: {{ totals.total_paid.count }}</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grand Total -->
+    <div class="governance-card border-l-4 border-blue-500">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans "Grand Total" %}</p>
+                <p class="text-3xl font-bold text-blue-600 mt-2 mb-1">€{{ totals.grand_total|floatformat:2 }}</p>
+                <p class="text-xs text-gray-500">{% trans "All Dues" %}: {{ totals.total_count }}</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overdue Amount -->
+    <div class="governance-card border-l-4 border-red-500">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">{% trans "Overdue Amount" %}</p>
+                <p class="text-3xl font-bold text-red-600 mt-2 mb-1">€{{ totals.total_overdue.amount|floatformat:2 }}</p>
+                <p class="text-xs text-gray-500">{% trans "Count" %}: {{ totals.total_overdue.count }}</p>
+            </div>
+            <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overall Summary (if not filtered) -->
+{% if summary and not current_filters.status and not current_filters.year %}
+<div class="governance-card mb-6">
+    <h3 class="text-lg font-bold text-gray-900 mb-4">{% trans "Overall Financial Summary" %}</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">{% trans "Total All Time Owed" %}</p>
+            <p class="text-2xl font-bold text-gray-900">€{{ summary.overall.total_owed|floatformat:2 }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">{% trans "Total All Time Collected" %}</p>
+            <p class="text-2xl font-bold text-gray-900">€{{ summary.overall.total_collected|floatformat:2 }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">{% trans "Current Year" %} ({{ summary.current_year_number }})</p>
+            <p class="text-2xl font-bold text-gray-900">€{{ summary.current_year.total_owed|floatformat:2 }}</p>
+            <p class="text-xs text-gray-500 mt-1">{% trans "Owed this year" %}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Status Breakdown -->
+{% if totals.by_status %}
+<div class="governance-card mb-6">
+    <h3 class="text-lg font-bold text-gray-900 mb-4">{% trans "Breakdown by Status" %}</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {% for status, data in totals.by_status.items %}
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm font-semibold text-gray-600 mb-1">{{ status|capfirst }}</p>
+            <p class="text-xl font-bold text-gray-900">€{{ data.amount|floatformat:2 }}</p>
+            <p class="text-xs text-gray-500">{{ data.count }} {% trans "records" %}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Year Breakdown (if available and not filtered by year) -->
+{% if totals.by_year and not current_filters.year %}
+<div class="governance-card mb-6">
+    <h3 class="text-lg font-bold text-gray-900 mb-4">{% trans "Breakdown by Year" %}</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for year, data in totals.by_year.items %}
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm font-semibold text-gray-600 mb-1">{{ year }}</p>
+            <p class="text-xl font-bold text-gray-900">€{{ data.amount|floatformat:2 }}</p>
+            <p class="text-xs text-gray-500">{{ data.count }} {% trans "records" %}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endif %}
 
 <!-- Mobile Card View -->
 <div class="block md:hidden space-y-4">
