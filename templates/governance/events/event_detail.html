@@ -31,7 +31,7 @@
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500">{% trans "Description" %}</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ event.description|linebreaks }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900 prose prose-sm max-w-none">{{ event.description|safe }}</dd>
                 </div>
             </dl>
         </div>

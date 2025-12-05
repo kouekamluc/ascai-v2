@@ -32,7 +32,7 @@
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500">{% trans "Description" %}</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ case.description|linebreaks }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900 prose prose-sm max-w-none">{{ case.description|safe }}</dd>
                 </div>
                 {% if case.evidence %}
                 <div>

@@ -5,7 +5,7 @@
         <p class="text-sm {% if message.sender == user %}text-white/80{% else %}text-gray-500{% endif %} mb-1">
             {{ message.sender.username }} • {{ message.created_at|date:"d M Y, H:i" }}
         </p>
-        <p>{{ message.content|linebreaks }}</p>
+        <div class="prose prose-sm max-w-none">{{ message.content|safe }}</div>
     </div>
 </div>
 {% empty %}

@@ -45,7 +45,7 @@
         </div>
         
         <div class="prose max-w-none mb-6 text-gray-700 leading-relaxed">
-            {{ thread.content|linebreaks }}
+            {{ thread.content|safe }}
         </div>
         
         <div class="flex gap-4 items-center flex-wrap pt-6 border-t border-gray-200">
@@ -131,7 +131,7 @@
                     </div>
                 </div>
                 <div class="prose max-w-none mb-4 text-gray-700 leading-relaxed ml-16">
-                    {{ post.content|linebreaks }}
+                    {{ post.content|safe }}
                 </div>
                 <div class="flex items-center gap-4 ml-16 flex-wrap">
                     <form hx-post="{% url 'community:upvote_post' post.id %}" hx-target="#upvote-post-{{ post.id }}" hx-swap="outerHTML" class="inline">

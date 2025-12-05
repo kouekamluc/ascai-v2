@@ -87,7 +87,7 @@
                     </div>
                     <h3 class="font-bold text-gray-900">{% trans 'Address' %}</h3>
                 </div>
-                <p class="text-gray-700 leading-relaxed">{{ university.address|linebreaks }}</p>
+                <div class="text-gray-700 leading-relaxed prose prose-sm max-w-none">{{ university.address|safe }}</div>
             </div>
             {% endif %}
             {% if university.website %}
@@ -143,7 +143,7 @@
                 {% trans 'About' %}
             </h2>
             <div class="prose prose-lg max-w-none">
-                <p class="text-gray-700 leading-relaxed text-lg">{{ university.description|linebreaks }}</p>
+                <div class="text-gray-700 leading-relaxed text-lg">{{ university.description|safe }}</div>
             </div>
         </div>
         
@@ -282,7 +282,7 @@
                 
                 {% if program.description %}
                 <div class="pt-4 border-t border-gray-200">
-                    <p class="text-gray-600 text-sm leading-relaxed">{{ program.description|truncatewords:40 }}</p>
+                    <div class="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none">{{ program.description|safe }}</div>
                 </div>
                 {% endif %}
             </div>

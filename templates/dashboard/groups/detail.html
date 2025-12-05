@@ -10,7 +10,7 @@
             <div class="flex-1">
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ group.name }}</h2>
                 <p class="text-sm text-gray-600 mb-4">{{ group.get_category_display }}</p>
-                <p class="text-gray-700 leading-relaxed">{{ group.description }}</p>
+                <div class="text-gray-700 leading-relaxed prose prose-sm max-w-none">{{ group.description|safe }}</div>
             </div>
             <form method="post" action="{% url 'dashboard:group_join' group.slug %}">
                 {% csrf_token %}
@@ -113,7 +113,7 @@
                     {% endif %}
                 </div>
                 <h4 class="font-bold text-gray-900 mb-2">{{ announcement.title }}</h4>
-                <p class="text-sm text-gray-700 mb-3">{{ announcement.content|truncatewords:20 }}</p>
+                <p class="text-sm text-gray-700 mb-3">{{ announcement.content|striptags|truncatewords:20 }}</p>
                 <p class="text-xs text-gray-500">{{ announcement.created_at|date:"M d, Y" }}</p>
             </div>
             {% endfor %}
