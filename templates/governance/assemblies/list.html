@@ -4,14 +4,14 @@
 {% block page_heading %}{% trans "General Assemblies" %}{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
+<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
-        <h1 class="text-3xl font-bold">{% trans "General Assemblies" %}</h1>
-        <p class="text-gray-600 mt-1">{% trans "Manage assembly meetings and agendas" %}</p>
+        <h1 class="text-2xl sm:text-3xl font-bold">{% trans "General Assemblies" %}</h1>
+        <p class="text-gray-600 mt-1 text-sm sm:text-base">{% trans "Manage assembly meetings and agendas" %}</p>
     </div>
     {% if perms.governance.add_generalassembly %}
-    <a href="{% url 'governance:assembly_create' %}" class="btn-primary">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="{% url 'governance:assembly_create' %}" class="btn-primary w-full sm:w-auto text-center">
+        <svg class="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
         {% trans "Schedule Assembly" %}
@@ -19,7 +19,62 @@
     {% endif %}
 </div>
 
-<div class="governance-card overflow-hidden">
+<!-- Mobile Card View -->
+<div class="block md:hidden space-y-4">
+    {% for assembly in assemblies %}
+        <div class="governance-card">
+            <div class="space-y-3">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="px-3 py-1 rounded bg-purple-100 text-purple-800 font-semibold text-sm">
+                            {{ assembly.get_assembly_type_display }}
+                        </span>
+                    </div>
+                    <span class="px-3 py-1 text-xs rounded font-semibold
+                        {% if assembly.status == 'completed' %}bg-green-100 text-green-800
+                        {% elif assembly.status == 'scheduled' %}bg-blue-100 text-blue-800
+                        {% elif assembly.status == 'cancelled' %}bg-red-100 text-red-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ assembly.get_status_display }}
+                    </span>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-900 text-lg">{{ assembly.date|date:"d M Y" }}</p>
+                    <p class="text-sm text-gray-600">{{ assembly.date|date:"H:i" }}</p>
+                </div>
+                {% if assembly.location %}
+                <div>
+                    <p class="text-sm text-gray-500">{% trans "Location" %}:</p>
+                    <p class="text-gray-900">{{ assembly.location }}</p>
+                </div>
+                {% endif %}
+                <div class="pt-2 border-t border-gray-200">
+                    <p class="text-sm text-gray-500">{% trans "Convocation" %}:</p>
+                    <p class="text-sm text-gray-600">{{ assembly.convocation_date|date:"d M Y" }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ assembly.notice_period_days }} {% trans "days notice" %}</p>
+                </div>
+                <div>
+                    <a href="{% url 'governance:assembly_detail' assembly.pk %}" class="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium">
+                        {% trans "View Details" %} →
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="governance-card">
+            <div class="text-center py-12">
+                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <p class="text-gray-500 text-lg">{% trans "No assemblies found" %}</p>
+                <p class="text-gray-400 text-sm mt-2">{% trans "Schedule your first assembly to get started" %}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Desktop Table View -->
+<div class="governance-card overflow-hidden hidden md:block">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -35,23 +90,23 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 {% for assembly in assemblies %}
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4">
                             <span class="px-3 py-1 rounded bg-purple-100 text-purple-800 font-semibold text-sm">
                                 {{ assembly.get_assembly_type_display }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4">
                             <p class="font-semibold text-gray-900">{{ assembly.date|date:"d M Y" }}</p>
                             <p class="text-sm text-gray-600">{{ assembly.date|date:"H:i" }}</p>
                         </td>
                         <td class="px-6 py-4">
                             <p class="text-gray-900">{{ assembly.location|default:"-" }}</p>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4">
                             <p class="text-sm text-gray-600">{{ assembly.convocation_date|date:"d M Y" }}</p>
                             <p class="text-xs text-gray-500">{{ assembly.notice_period_days }} {% trans "days notice" %}</p>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4">
                             <span class="px-3 py-1 text-xs rounded font-semibold
                                 {% if assembly.status == 'completed' %}bg-green-100 text-green-800
                                 {% elif assembly.status == 'scheduled' %}bg-blue-100 text-blue-800
@@ -60,7 +115,7 @@
                                 {{ assembly.get_status_display }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4">
                             <a href="{% url 'governance:assembly_detail' assembly.pk %}" class="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium">
                                 {% trans "View Details" %} →
                             </a>
@@ -83,15 +138,15 @@
 </div>
 
 {% if is_paginated %}
-<div class="mt-6 flex justify-center items-center gap-4">
+<div class="mt-6 flex flex-col sm:flex-row justify-center items-center gap-4">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="btn-secondary">← {% trans "Previous" %}</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn-secondary w-full sm:w-auto text-center">← {% trans "Previous" %}</a>
     {% endif %}
     <span class="px-4 py-2 text-sm text-gray-600">
         {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
     </span>
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="btn-secondary">{% trans "Next" %} →</a>
+        <a href="?page={{ page_obj.next_page_number }}" class="btn-secondary w-full sm:w-auto text-center">{% trans "Next" %} →</a>
     {% endif %}
 </div>
 {% endif %}
