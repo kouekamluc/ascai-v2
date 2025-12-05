@@ -1390,3 +1390,211 @@ msgstr "Publications du forum"
 
 msgid "User Management"
 msgstr "Gestion des utilisateurs"
+
+# Governance Translations
+msgid "Governance Dashboard"
+msgstr "Tableau de bord de gouvernance"
+
+msgid "ASCAI Governance Dashboard"
+msgstr "Tableau de bord de gouvernance ASCAI"
+
+msgid "Total Members"
+msgstr "Total des membres"
+
+msgid "Active:"
+msgstr "Actif :"
+
+msgid "Executive Board"
+msgstr "Conseil exécutif"
+
+msgid "No active board"
+msgstr "Aucun conseil actif"
+
+msgid "View Board"
+msgstr "Voir le conseil"
+
+msgid "Upcoming Assemblies"
+msgstr "Assemblées à venir"
+
+msgid "Scheduled"
+msgstr "Planifié"
+
+msgid "Pending Dues"
+msgstr "Cotisations en attente"
+
+msgid "Needs payment"
+msgstr "Nécessite un paiement"
+
+msgid "Pending Expenses"
+msgstr "Dépenses en attente"
+
+msgid "Awaiting approval"
+msgstr "En attente d'approbation"
+
+msgid "Total Income"
+msgstr "Revenus totaux"
+
+msgid "All time"
+msgstr "Tout le temps"
+
+msgid "View Income"
+msgstr "Voir les revenus"
+
+msgid "Total Expenses"
+msgstr "Dépenses totales"
+
+msgid "View Expenses"
+msgstr "Voir les dépenses"
+
+msgid "Net Balance"
+msgstr "Solde net"
+
+msgid "Income - Expenses"
+msgstr "Revenus - Dépenses"
+
+msgid "Recent Assemblies"
+msgstr "Assemblées récentes"
+
+msgid "Latest general assemblies"
+msgstr "Dernières assemblées générales"
+
+msgid "Recent Transactions"
+msgstr "Transactions récentes"
+
+msgid "Latest financial activity"
+msgstr "Dernière activité financière"
+
+msgid "No assemblies yet"
+msgstr "Aucune assemblée pour le moment"
+
+msgid "No transactions yet"
+msgstr "Aucune transaction pour le moment"
+
+msgid "General Assemblies"
+msgstr "Assemblées générales"
+
+msgid "Manage assembly meetings and agendas"
+msgstr "Gérer les réunions d'assemblée et les ordres du jour"
+
+msgid "Schedule Assembly"
+msgstr "Planifier une assemblée"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Date & Time"
+msgstr "Date et heure"
+
+msgid "Location"
+msgstr "Lieu"
+
+msgid "Convocation"
+msgstr "Convocation"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "days notice"
+msgstr "jours d'avis"
+
+msgid "View Details"
+msgstr "Voir les détails"
+
+msgid "No assemblies found"
+msgstr "Aucune assemblée trouvée"
+
+msgid "Schedule your first assembly to get started"
+msgstr "Planifiez votre première assemblée pour commencer"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "of"
+msgstr "sur"
+
+msgid "Previous"
+msgstr "Précédent"
+
+msgid "Next"
+msgstr "Suivant"
+
+msgid "Member Directory"
+msgstr "Répertoire des membres"
+
+msgid "Manage ASCAI association members"
+msgstr "Gérer les membres de l'association ASCAI"
+
+msgid "Add Member"
+msgstr "Ajouter un membre"
+
+msgid "Search by name or email..."
+msgstr "Rechercher par nom ou email..."
+
+msgid "All Types"
+msgstr "Tous les types"
+
+msgid "All Statuses"
+msgstr "Tous les statuts"
+
+msgid "Active"
+msgstr "Actif"
+
+msgid "Inactive"
+msgstr "Inactif"
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Registered"
+msgstr "Enregistré"
+
+msgid "No user"
+msgstr "Aucun utilisateur"
+
+msgid "View"
+msgstr "Voir"
+
+msgid "No members found"
+msgstr "Aucun membre trouvé"
+
+msgid "Try adjusting your filters"
+msgstr "Essayez d'ajuster vos filtres"
+
+msgid "My ASCAI Membership"
+msgstr "Mon adhésion ASCAI"
+
+msgid "Membership Pending Verification"
+msgstr "Adhésion en attente de vérification"
+
+msgid "Your membership is pending admin verification. Once verified and you pay your dues, you'll have full access to all member features including voting rights."
+msgstr "Votre adhésion est en attente de vérification par l'administrateur. Une fois vérifiée et après avoir payé vos cotisations, vous aurez accès à toutes les fonctionnalités des membres, y compris le droit de vote."
+
+msgid "Your membership is pending activation. Please pay your annual dues to become an active member."
+msgstr "Votre adhésion est en attente d'activation. Veuillez payer vos cotisations annuelles pour devenir membre actif."
+
+msgid "Member Status"
+msgstr "Statut du membre"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Current Year Dues"
+msgstr "Cotisations de l'année en cours"
+
+msgid "No dues for this year"
+msgstr "Aucune cotisation pour cette année"
+
+msgid "Financial Transactions"
+msgstr "Transactions financières"
+
+msgid "Track all income and expenses"
+msgstr "Suivre tous les revenus et dépenses"
+
+msgid "Add Transaction"
+msgstr "Ajouter une transaction"

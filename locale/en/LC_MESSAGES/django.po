@@ -1411,3 +1411,211 @@ msgstr "User Management"
 
 msgid "Mentors"
 msgstr "Mentors"
+
+# Governance Translations
+msgid "Governance Dashboard"
+msgstr "Governance Dashboard"
+
+msgid "ASCAI Governance Dashboard"
+msgstr "ASCAI Governance Dashboard"
+
+msgid "Total Members"
+msgstr "Total Members"
+
+msgid "Active:"
+msgstr "Active:"
+
+msgid "Executive Board"
+msgstr "Executive Board"
+
+msgid "No active board"
+msgstr "No active board"
+
+msgid "View Board"
+msgstr "View Board"
+
+msgid "Upcoming Assemblies"
+msgstr "Upcoming Assemblies"
+
+msgid "Scheduled"
+msgstr "Scheduled"
+
+msgid "Pending Dues"
+msgstr "Pending Dues"
+
+msgid "Needs payment"
+msgstr "Needs payment"
+
+msgid "Pending Expenses"
+msgstr "Pending Expenses"
+
+msgid "Awaiting approval"
+msgstr "Awaiting approval"
+
+msgid "Total Income"
+msgstr "Total Income"
+
+msgid "All time"
+msgstr "All time"
+
+msgid "View Income"
+msgstr "View Income"
+
+msgid "Total Expenses"
+msgstr "Total Expenses"
+
+msgid "View Expenses"
+msgstr "View Expenses"
+
+msgid "Net Balance"
+msgstr "Net Balance"
+
+msgid "Income - Expenses"
+msgstr "Income - Expenses"
+
+msgid "Recent Assemblies"
+msgstr "Recent Assemblies"
+
+msgid "Latest general assemblies"
+msgstr "Latest general assemblies"
+
+msgid "Recent Transactions"
+msgstr "Recent Transactions"
+
+msgid "Latest financial activity"
+msgstr "Latest financial activity"
+
+msgid "No assemblies yet"
+msgstr "No assemblies yet"
+
+msgid "No transactions yet"
+msgstr "No transactions yet"
+
+msgid "General Assemblies"
+msgstr "General Assemblies"
+
+msgid "Manage assembly meetings and agendas"
+msgstr "Manage assembly meetings and agendas"
+
+msgid "Schedule Assembly"
+msgstr "Schedule Assembly"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Date & Time"
+msgstr "Date & Time"
+
+msgid "Location"
+msgstr "Location"
+
+msgid "Convocation"
+msgstr "Convocation"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "days notice"
+msgstr "days notice"
+
+msgid "View Details"
+msgstr "View Details"
+
+msgid "No assemblies found"
+msgstr "No assemblies found"
+
+msgid "Schedule your first assembly to get started"
+msgstr "Schedule your first assembly to get started"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "of"
+msgstr "of"
+
+msgid "Previous"
+msgstr "Previous"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "Member Directory"
+msgstr "Member Directory"
+
+msgid "Manage ASCAI association members"
+msgstr "Manage ASCAI association members"
+
+msgid "Add Member"
+msgstr "Add Member"
+
+msgid "Search by name or email..."
+msgstr "Search by name or email..."
+
+msgid "All Types"
+msgstr "All Types"
+
+msgid "All Statuses"
+msgstr "All Statuses"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Inactive"
+msgstr "Inactive"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Registered"
+msgstr "Registered"
+
+msgid "No user"
+msgstr "No user"
+
+msgid "View"
+msgstr "View"
+
+msgid "No members found"
+msgstr "No members found"
+
+msgid "Try adjusting your filters"
+msgstr "Try adjusting your filters"
+
+msgid "My ASCAI Membership"
+msgstr "My ASCAI Membership"
+
+msgid "Membership Pending Verification"
+msgstr "Membership Pending Verification"
+
+msgid "Your membership is pending admin verification. Once verified and you pay your dues, you'll have full access to all member features including voting rights."
+msgstr "Your membership is pending admin verification. Once verified and you pay your dues, you'll have full access to all member features including voting rights."
+
+msgid "Your membership is pending activation. Please pay your annual dues to become an active member."
+msgstr "Your membership is pending activation. Please pay your annual dues to become an active member."
+
+msgid "Member Status"
+msgstr "Member Status"
+
+msgid "Pending"
+msgstr "Pending"
+
+msgid "Current Year Dues"
+msgstr "Current Year Dues"
+
+msgid "No dues for this year"
+msgstr "No dues for this year"
+
+msgid "Financial Transactions"
+msgstr "Financial Transactions"
+
+msgid "Track all income and expenses"
+msgstr "Track all income and expenses"
+
+msgid "Add Transaction"
+msgstr "Add Transaction"
