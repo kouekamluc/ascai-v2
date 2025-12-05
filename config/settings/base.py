@@ -519,27 +519,42 @@ UNFOLD = {
                     {
                         "title": _("News & Announcements"),
                         "icon": "newspaper",
-                        "link": "admin:diaspora_news_changelist",
+                        "link": "/admin/diaspora/news/",
                     },
                     {
                         "title": _("Events"),
                         "icon": "event",
-                        "link": "admin:diaspora_event_changelist",
+                        "link": "/admin/diaspora/event/",
                     },
                     {
                         "title": _("Success Stories"),
                         "icon": "star",
-                        "link": "admin:diaspora_successstory_changelist",
+                        "link": "/admin/diaspora/successstory/",
                     },
                     {
                         "title": _("Life in Italy"),
                         "icon": "info",
-                        "link": "admin:diaspora_lifeinitaly_changelist",
+                        "link": "/admin/diaspora/lifeinitaly/",
+                    },
+                    {
+                        "title": _("Testimonials"),
+                        "icon": "rate_review",
+                        "link": "/admin/diaspora/testimonial/",
+                    },
+                    {
+                        "title": _("Forum Categories"),
+                        "icon": "category",
+                        "link": "/admin/community/forumcategory/",
+                    },
+                    {
+                        "title": _("Forum Threads"),
+                        "icon": "forum",
+                        "link": "/admin/community/forumthread/",
                     },
                     {
                         "title": _("Forum Posts"),
-                        "icon": "forum",
-                        "link": "admin:community_forumpost_changelist",
+                        "icon": "comment",
+                        "link": "/admin/community/forumpost/",
                     },
                 ],
             },
@@ -550,59 +565,196 @@ UNFOLD = {
                     {
                         "title": _("Users"),
                         "icon": "person",
-                        "link": "admin:accounts_user_changelist",
+                        "link": "/admin/accounts/user/",
+                    },
+                    {
+                        "title": _("User Documents"),
+                        "icon": "description",
+                        "link": "/admin/accounts/userdocument/",
                     },
                     {
                         "title": _("Mentors"),
                         "icon": "school",
-                        "link": "admin:mentorship_mentorprofile_changelist",
+                        "link": "/admin/mentorship/mentorprofile/",
                     },
                     {
-                        "title": _("Testimonials"),
-                        "icon": "rate_review",
-                        "link": "admin:diaspora_testimonial_changelist",
+                        "title": _("Mentorship Requests"),
+                        "icon": "handshake",
+                        "link": "/admin/mentorship/mentorshiprequest/",
+                    },
+                    {
+                        "title": _("Mentorship Messages"),
+                        "icon": "message",
+                        "link": "/admin/mentorship/mentorshipmessage/",
+                    },
+                    {
+                        "title": _("Mentor Ratings"),
+                        "icon": "star_rate",
+                        "link": "/admin/mentorship/mentorrating/",
                     },
                 ],
             },
             {
-                "title": _("Resources"),
+                "title": _("Resources & Education"),
                 "icon": "folder",
                 "items": [
                     {
                         "title": _("Universities"),
                         "icon": "account_balance",
-                        "link": "admin:universities_university_changelist",
+                        "link": "/admin/universities/university/",
+                    },
+                    {
+                        "title": _("University Programs"),
+                        "icon": "menu_book",
+                        "link": "/admin/universities/universityprogram/",
                     },
                     {
                         "title": _("Scholarships"),
                         "icon": "card_giftcard",
-                        "link": "admin:scholarships_scholarship_changelist",
+                        "link": "/admin/scholarships/scholarship/",
                     },
                     {
                         "title": _("Documents"),
                         "icon": "description",
-                        "link": "admin:downloads_document_changelist",
+                        "link": "/admin/downloads/document/",
                     },
                     {
-                        "title": _("Gallery"),
+                        "title": _("Gallery Albums"),
+                        "icon": "photo_album",
+                        "link": "/admin/gallery/galleryalbum/",
+                    },
+                    {
+                        "title": _("Gallery Images"),
                         "icon": "photo_library",
-                        "link": "admin:gallery_photo_changelist",
+                        "link": "/admin/gallery/galleryimage/",
+                    },
+                    {
+                        "title": _("Gallery Videos"),
+                        "icon": "video_library",
+                        "link": "/admin/gallery/galleryvideo/",
                     },
                 ],
             },
             {
-                "title": _("Settings"),
+                "title": _("Support & Community"),
+                "icon": "support_agent",
+                "items": [
+                    {
+                        "title": _("Support Tickets"),
+                        "icon": "confirmation_number",
+                        "link": "/admin/dashboard/supportticket/",
+                    },
+                    {
+                        "title": _("Ticket Replies"),
+                        "icon": "reply",
+                        "link": "/admin/dashboard/ticketreply/",
+                    },
+                    {
+                        "title": _("Community Groups"),
+                        "icon": "groups",
+                        "link": "/admin/dashboard/communitygroup/",
+                    },
+                    {
+                        "title": _("Group Discussions"),
+                        "icon": "forum",
+                        "link": "/admin/dashboard/groupdiscussion/",
+                    },
+                    {
+                        "title": _("Group Announcements"),
+                        "icon": "campaign",
+                        "link": "/admin/dashboard/groupannouncement/",
+                    },
+                    {
+                        "title": _("Student Questions"),
+                        "icon": "help",
+                        "link": "/admin/dashboard/studentquestion/",
+                    },
+                    {
+                        "title": _("Orientation Sessions"),
+                        "icon": "event_note",
+                        "link": "/admin/dashboard/orientationsession/",
+                    },
+                    {
+                        "title": _("User Stories"),
+                        "icon": "article",
+                        "link": "/admin/dashboard/userstorysubmission/",
+                    },
+                ],
+            },
+            {
+                "title": _("Governance"),
+                "icon": "gavel",
+                "items": [
+                    {
+                        "title": _("Members"),
+                        "icon": "people",
+                        "link": "/admin/governance/member/",
+                    },
+                    {
+                        "title": _("Membership Status"),
+                        "icon": "badge",
+                        "link": "/admin/governance/membershipstatus/",
+                    },
+                    {
+                        "title": _("Executive Board"),
+                        "icon": "groups",
+                        "link": "/admin/governance/executiveboard/",
+                    },
+                    {
+                        "title": _("Executive Positions"),
+                        "icon": "work",
+                        "link": "/admin/governance/executiveposition/",
+                    },
+                    {
+                        "title": _("Board Meetings"),
+                        "icon": "meeting_room",
+                        "link": "/admin/governance/boardmeeting/",
+                    },
+                    {
+                        "title": _("General Assembly"),
+                        "icon": "people_outline",
+                        "link": "/admin/governance/generalassembly/",
+                    },
+                    {
+                        "title": _("Elections"),
+                        "icon": "how_to_vote",
+                        "link": "/admin/governance/election/",
+                    },
+                    {
+                        "title": _("Financial Transactions"),
+                        "icon": "account_balance_wallet",
+                        "link": "/admin/governance/financialtransaction/",
+                    },
+                    {
+                        "title": _("Membership Dues"),
+                        "icon": "payment",
+                        "link": "/admin/governance/membershipdues/",
+                    },
+                    {
+                        "title": _("Financial Reports"),
+                        "icon": "assessment",
+                        "link": "/admin/governance/financialreport/",
+                    },
+                ],
+            },
+            {
+                "title": _("Administration"),
                 "icon": "settings",
                 "items": [
                     {
-                        "title": _("Governance"),
-                        "icon": "gavel",
-                        "link": "admin:governance_member_changelist",
-                    },
-                    {
                         "title": _("Contact Messages"),
                         "icon": "mail",
-                        "link": "admin:contact_contactmessage_changelist",
+                        "link": "/admin/contact/contactsubmission/",
+                    },
+                    {
+                        "title": _("Event Registrations"),
+                        "icon": "event_available",
+                        "link": "/admin/dashboard/eventregistration/",
+                    },
+                    {
+                        "title": _("Saved Documents"),
+                        "icon": "bookmark",
+                        "link": "/admin/dashboard/saveddocument/",
                     },
                 ],
             },
