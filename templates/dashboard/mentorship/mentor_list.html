@@ -1,0 +1,141 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'Browse Mentors' %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">{% trans 'Find a Mentor' %}</h1>
+        <a href="{% url 'dashboard:mentorship_dashboard' %}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+            {% trans 'Back to Dashboard' %}
+        </a>
+    </div>
+    
+    <!-- Search and Filters -->
+    <div class="dashboard-card">
+        <form method="get" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Search' %}</label>
+                    <input type="text" name="search" id="search" value="{{ request.GET.search }}" 
+                           placeholder="{% trans 'Search by name or specialization...' %}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
+                </div>
+                <div>
+                    <label for="specialization" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Specialization' %}</label>
+                    <select name="specialization" id="specialization" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
+                        <option value="">{% trans 'All Specializations' %}</option>
+                        {% for spec in specializations %}
+                        <option value="{{ spec }}" {% if request.GET.specialization == spec %}selected{% endif %}>{{ spec }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="availability" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Availability' %}</label>
+                    <select name="availability" id="availability" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
+                        <option value="">{% trans 'All' %}</option>
+                        <option value="available" {% if request.GET.availability == 'available' %}selected{% endif %}>{% trans 'Available' %}</option>
+                        <option value="busy" {% if request.GET.availability == 'busy' %}selected{% endif %}>{% trans 'Busy' %}</option>
+                        <option value="unavailable" {% if request.GET.availability == 'unavailable' %}selected{% endif %}>{% trans 'Unavailable' %}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-4 items-end">
+                <div>
+                    <label for="sort" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Sort By' %}</label>
+                    <select name="sort" id="sort" 
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
+                        <option value="rating" {% if request.GET.sort == 'rating' or not request.GET.sort %}selected{% endif %}>{% trans 'Highest Rated' %}</option>
+                        <option value="students" {% if request.GET.sort == 'students' %}selected{% endif %}>{% trans 'Most Students Helped' %}</option>
+                        <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>{% trans 'Newest' %}</option>
+                    </select>
+                </div>
+                <button type="submit" class="px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                    {% trans 'Search' %}
+                </button>
+                {% if request.GET.search or request.GET.specialization or request.GET.availability %}
+                <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                    {% trans 'Clear' %}
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    
+    <!-- Mentors Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for mentor in mentors %}
+        <div class="dashboard-card hover:shadow-lg transition">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h3 class="text-xl font-semibold">{{ mentor.user.get_full_name|default:mentor.user.username }}</h3>
+                    <p class="text-sm text-gray-600">{{ mentor.specialization }}</p>
+                </div>
+                <span class="px-2 py-1 text-xs rounded-full {% if mentor.availability_status == 'available' %}bg-green-100 text-green-700{% elif mentor.availability_status == 'busy' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-700{% endif %}">
+                    {{ mentor.get_availability_status_display }}
+                </span>
+            </div>
+            
+            <p class="text-gray-700 mb-4 line-clamp-3">{{ mentor.bio|striptags|truncatewords:30 }}</p>
+            
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500">{% trans 'Rating' %}</p>
+                        <p class="text-lg font-bold text-yellow-600">{{ mentor.rating }}/5</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">{% trans 'Students Helped' %}</p>
+                        <p class="text-lg font-bold text-cameroon-green">{{ mentor.students_helped }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">{% trans 'Experience' %}</p>
+                        <p class="text-lg font-bold text-blue-600">{{ mentor.years_experience }} {% trans 'years' %}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="{% url 'dashboard:mentorship_mentor_detail' mentor.pk %}" class="block w-full text-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                {% trans 'View Profile' %}
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <p class="text-gray-500 text-lg mb-4">{% trans 'No mentors found.' %}</p>
+            {% if request.GET.search or request.GET.specialization or request.GET.availability %}
+            <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="inline-block px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                {% trans 'Clear Filters' %}
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="flex justify-center items-center gap-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.specialization %}&specialization={{ request.GET.specialization }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+           class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+            {% trans 'Previous' %}
+        </a>
+        {% endif %}
+        
+        <span class="px-4 py-2 text-gray-700">
+            {% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.specialization %}&specialization={{ request.GET.specialization }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+           class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+            {% trans 'Next' %}
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

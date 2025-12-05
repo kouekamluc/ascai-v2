@@ -55,9 +55,39 @@
             </button>
         </form>
         {% elif request.status == 'pending' %}
+        {% if is_mentor %}
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p class="text-yellow-800 mb-4">{% trans 'You have a pending mentorship request. Please accept or reject it.' %}</p>
+            <div class="flex gap-4">
+                <form method="post" action="{% url 'dashboard:mentorship_accept_request' request.pk %}" 
+                      hx-post="{% url 'dashboard:mentorship_accept_request' request.pk %}" 
+                      hx-target="body" 
+                      hx-swap="none"
+                      hx-on::after-request="if(event.detail.xhr.status === 200) { window.location.reload(); }"
+                      class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        {% trans 'Accept Request' %}
+                    </button>
+                </form>
+                <form method="post" action="{% url 'dashboard:mentorship_reject_request' request.pk %}" 
+                      hx-post="{% url 'dashboard:mentorship_reject_request' request.pk %}" 
+                      hx-target="body" 
+                      hx-swap="none"
+                      hx-on::after-request="if(event.detail.xhr.status === 200) { window.location.reload(); }"
+                      class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        {% trans 'Reject Request' %}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
         <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p class="text-yellow-800">{% trans 'Waiting for mentor to accept your request.' %}</p>
         </div>
+        {% endif %}
         {% else %}
         <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
             <p class="text-gray-700">{% trans 'This request has been closed.' %}</p>
@@ -83,8 +113,8 @@
         {% if is_student and not request.has_rating %}
         <h2 class="text-2xl font-bold mb-4">{% trans 'Complete Mentorship' %}</h2>
         <p class="text-gray-600 mb-4">{% trans 'If you have completed your mentorship session, you can mark it as completed and rate your mentor.' %}</p>
-        <form method="post" action="{% url 'mentorship:complete_request' request.pk %}" 
-              hx-post="{% url 'mentorship:complete_request' request.pk %}" 
+        <form method="post" action="{% url 'dashboard:mentorship_complete_request' request.pk %}" 
+              hx-post="{% url 'dashboard:mentorship_complete_request' request.pk %}" 
               hx-target="body" 
               hx-swap="none"
               hx-on::after-request="if(event.detail.xhr.status === 200) { window.location.reload(); }"
@@ -118,19 +148,19 @@
         {% if is_mentor %}
         <div class="mt-6">
             <h2 class="text-xl font-bold mb-4">{% trans 'Mentor Actions' %}</h2>
-            {% if request.status == 'accepted' %}
-            <form method="post" action="{% url 'mentorship:complete_request' request.pk %}" 
-                  hx-post="{% url 'mentorship:complete_request' request.pk %}" 
-                  hx-target="body" 
-                  hx-swap="none"
-                  hx-on::after-request="if(event.detail.xhr.status === 200) { window.location.reload(); }"
-                  class="inline">
-                {% csrf_token %}
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    {% trans 'Mark as Completed' %}
-                </button>
-            </form>
-            {% endif %}
+        {% if request.status == 'accepted' %}
+        <form method="post" action="{% url 'dashboard:mentorship_complete_request' request.pk %}" 
+              hx-post="{% url 'dashboard:mentorship_complete_request' request.pk %}" 
+              hx-target="body" 
+              hx-swap="none"
+              hx-on::after-request="if(event.detail.xhr.status === 200) { window.location.reload(); }"
+              class="inline">
+            {% csrf_token %}
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                {% trans 'Mark as Completed' %}
+            </button>
+        </form>
+        {% endif %}
         </div>
         {% endif %}
     </div>

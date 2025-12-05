@@ -62,6 +62,13 @@ urlpatterns = [
     path('mentorship/mentor/', views.DashboardMentorManagementView.as_view(), name='mentorship_mentor_management'),
     path('mentorship/student/', views.DashboardStudentRequestsView.as_view(), name='mentorship_student_requests'),
     path('mentorship/requests/<int:pk>/', views.DashboardRequestDetailView.as_view(), name='mentorship_request_detail'),
+    path('mentorship/requests/<int:request_id>/accept/', views.dashboard_accept_request, name='mentorship_accept_request'),
+    path('mentorship/requests/<int:request_id>/reject/', views.dashboard_reject_request, name='mentorship_reject_request'),
+    path('mentorship/requests/<int:request_id>/complete/', views.dashboard_complete_request, name='mentorship_complete_request'),
+    path('mentorship/availability/update/', views.dashboard_update_availability, name='mentorship_update_availability'),
+    path('mentorship/browse/', views.DashboardMentorListView.as_view(), name='mentorship_browse_mentors'),
+    path('mentorship/browse/<int:pk>/', views.DashboardMentorDetailView.as_view(), name='mentorship_mentor_detail'),
+    path('mentorship/browse/<int:mentor_id>/request/', views.DashboardMentorshipRequestCreateView.as_view(), name='mentorship_create_request'),
     
     # Personalization
     path('saved-items/', views.SavedItemsView.as_view(), name='saved_items'),

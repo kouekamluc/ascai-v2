@@ -43,12 +43,15 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
                 'You have received a new mentorship request from {student_name}.\n\n'
                 'Subject: {subject}\n\n'
                 'Message: {message}\n\n'
-                'View and respond to the request: {url}'
+                'View and respond to the request:\n'
+                'Dashboard: {dashboard_url}\n'
+                'Direct: {direct_url}'
             ).format(
                 student_name=student.get_full_name() or student.username,
                 subject=instance.subject,
                 message=instance.message,
-                url=f"{site_url}/mentorship/requests/{instance.pk}/"
+                dashboard_url=f"{site_url}/dashboard/mentorship/requests/{instance.pk}/",
+                direct_url=f"{site_url}/mentorship/requests/{instance.pk}/"
             )
             
             send_mail(
@@ -73,33 +76,42 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
                 message = _(
                     'Great news! {mentor_name} has accepted your mentorship request.\n\n'
                     'Subject: {subject}\n\n'
-                    'You can now start messaging: {url}'
+                    'You can now start messaging:\n'
+                    'Dashboard: {dashboard_url}\n'
+                    'Direct: {direct_url}'
                 ).format(
                     mentor_name=mentor.get_full_name() or mentor.username,
                     subject=instance.subject,
-                    url=f"{site_url}/mentorship/requests/{instance.pk}/"
+                    dashboard_url=f"{site_url}/dashboard/mentorship/requests/{instance.pk}/",
+                    direct_url=f"{site_url}/mentorship/requests/{instance.pk}/"
                 )
             elif instance.status == 'rejected':
                 subject = _('Mentorship Request Update')
                 message = _(
                     '{mentor_name} has declined your mentorship request.\n\n'
                     'Subject: {subject}\n\n'
-                    'You can find other mentors: {url}'
+                    'You can find other mentors:\n'
+                    'Dashboard: {dashboard_url}\n'
+                    'Direct: {direct_url}'
                 ).format(
                     mentor_name=mentor.get_full_name() or mentor.username,
                     subject=instance.subject,
-                    url=f"{site_url}/mentorship/"
+                    dashboard_url=f"{site_url}/dashboard/mentorship/browse/",
+                    direct_url=f"{site_url}/mentorship/"
                 )
             elif instance.status == 'completed':
                 subject = _('Mentorship Completed')
                 message = _(
                     'Your mentorship with {mentor_name} has been marked as completed.\n\n'
                     'Subject: {subject}\n\n'
-                    'Please rate your mentor: {url}'
+                    'Please rate your mentor:\n'
+                    'Dashboard: {dashboard_url}\n'
+                    'Direct: {direct_url}'
                 ).format(
                     mentor_name=mentor.get_full_name() or mentor.username,
                     subject=instance.subject,
-                    url=f"{site_url}/mentorship/requests/{instance.pk}/rate/"
+                    dashboard_url=f"{site_url}/dashboard/mentorship/requests/{instance.pk}/",
+                    direct_url=f"{site_url}/mentorship/requests/{instance.pk}/rate/"
                 )
             else:
                 return  # Don't send email for other status changes
@@ -137,12 +149,15 @@ def notify_new_message(sender, instance, created, **kwargs):
                 'You have received a new message from {sender_name}.\n\n'
                 'Request: {subject}\n\n'
                 'Message: {content}\n\n'
-                'Reply: {url}'
+                'Reply:\n'
+                'Dashboard: {dashboard_url}\n'
+                'Direct: {direct_url}'
             ).format(
                 sender_name=sender_name,
                 subject=request.subject,
                 content=instance.content[:200],  # Truncate long messages
-                url=f"{site_url}/mentorship/requests/{request.pk}/"
+                dashboard_url=f"{site_url}/dashboard/mentorship/requests/{request.pk}/",
+                direct_url=f"{site_url}/mentorship/requests/{request.pk}/"
             )
             
             send_mail(

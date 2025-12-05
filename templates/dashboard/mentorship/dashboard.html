@@ -16,23 +16,52 @@
         {% else %}
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">{% trans 'Mentor Dashboard' %}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                 <div class="bg-gray-50 rounded-lg p-4">
                     <p class="text-sm text-gray-600">{% trans 'Total Requests' %}</p>
-                    <p class="text-2xl font-bold text-cameroon-green">{{ requests.count }}</p>
+                    <p class="text-2xl font-bold text-cameroon-green">{{ total_requests|default:0 }}</p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-4">
                     <p class="text-sm text-gray-600">{% trans 'Pending Requests' %}</p>
-                    <p class="text-2xl font-bold text-yellow-600">{{ requests|length }}</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ pending_count|default:0 }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-600">{% trans 'Active Mentorships' %}</p>
+                    <p class="text-2xl font-bold text-blue-600">{{ accepted_count|default:0 }}</p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-4">
                     <p class="text-sm text-gray-600">{% trans 'Students Helped' %}</p>
                     <p class="text-2xl font-bold text-green-600">{{ mentor_profile.students_helped }}</p>
                 </div>
             </div>
-            <a href="{% url 'dashboard:mentorship_mentor_management' %}" class="text-cameroon-green hover:underline">
-                {% trans 'Manage Mentorship Requests' %} →
-            </a>
+            
+            {% if recent_requests %}
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-3">{% trans 'Recent Requests' %}</h3>
+                <div class="space-y-2">
+                    {% for request in recent_requests %}
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium">{{ request.subject|truncatewords:10 }}</p>
+                            <p class="text-sm text-gray-600">{{ request.student.get_full_name|default:request.student.username }}</p>
+                        </div>
+                        <a href="{% url 'dashboard:mentorship_request_detail' request.pk %}" class="text-cameroon-green hover:underline text-sm">
+                            {% trans 'View' %} →
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="flex gap-4">
+                <a href="{% url 'dashboard:mentorship_mentor_management' %}" class="px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                    {% trans 'Manage All Requests' %}
+                </a>
+                <a href="{% url 'dashboard:mentorship_profile_update' %}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                    {% trans 'Edit Profile' %}
+                </a>
+            </div>
         </div>
         {% endif %}
     {% endif %}
@@ -40,26 +69,64 @@
     {% if user.is_student %}
     <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">{% trans 'My Mentorship Requests' %}</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-sm text-gray-600">{% trans 'Total' %}</p>
+                <p class="text-2xl font-bold text-cameroon-green">{{ my_total_requests|default:0 }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-sm text-gray-600">{% trans 'Pending' %}</p>
+                <p class="text-2xl font-bold text-yellow-600">{{ my_pending_count|default:0 }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-sm text-gray-600">{% trans 'Active' %}</p>
+                <p class="text-2xl font-bold text-blue-600">{{ my_accepted_count|default:0 }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-sm text-gray-600">{% trans 'Completed' %}</p>
+                <p class="text-2xl font-bold text-green-600">{{ my_completed_count|default:0 }}</p>
+            </div>
+        </div>
+        
         {% if my_requests %}
-        <div class="space-y-4">
+        <div class="space-y-4 mb-6">
             {% for request in my_requests %}
-            <div class="border border-gray-200 rounded-lg p-4">
-                <h3 class="font-semibold text-gray-900">{{ request.subject }}</h3>
-                <p class="text-sm text-gray-600 mt-1">{{ request.message|truncatewords:20 }}</p>
-                <div class="flex items-center justify-between mt-3">
-                    <span class="text-sm text-gray-500">{{ request.get_status_display }}</span>
-                    <a href="{% url 'dashboard:mentorship_request_detail' request.pk %}" class="text-cameroon-green hover:underline">
-                        {% trans 'View Details' %} →
-                    </a>
+            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-900">{{ request.subject }}</h3>
+                        <p class="text-sm text-gray-600 mt-1">{% trans 'Mentor' %}: {{ request.mentor.user.get_full_name|default:request.mentor.user.username }}</p>
+                        <p class="text-sm text-gray-500 mt-1">{{ request.message|truncatewords:20 }}</p>
+                    </div>
+                    <div class="ml-4 text-right">
+                        <span class="inline-block px-3 py-1 {% if request.status == 'pending' %}bg-yellow-100 text-yellow-700{% elif request.status == 'accepted' %}bg-green-100 text-green-700{% elif request.status == 'rejected' %}bg-red-100 text-red-700{% else %}bg-gray-100 text-gray-700{% endif %} rounded-full text-sm mb-2">
+                            {{ request.get_status_display }}
+                        </span>
+                        <br>
+                        <a href="{% url 'dashboard:mentorship_request_detail' request.pk %}" class="text-cameroon-green hover:underline text-sm">
+                            {% trans 'View Details' %} →
+                        </a>
+                    </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+        <div class="flex gap-4">
+            <a href="{% url 'dashboard:mentorship_student_requests' %}" class="px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                {% trans 'View All Requests' %}
+            </a>
+            <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                {% trans 'Find a Mentor' %}
+            </a>
+        </div>
         {% else %}
-        <p class="text-gray-500 mb-4">{% trans 'No mentorship requests yet.' %}</p>
-        <a href="{% url 'mentorship:index' %}" target="_blank" class="px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
-            {% trans 'Find a Mentor' %} ({% trans 'Opens in new tab' %})
-        </a>
+        <div class="text-center py-8">
+            <p class="text-gray-500 mb-4">{% trans 'No mentorship requests yet.' %}</p>
+            <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 inline-block">
+                {% trans 'Find a Mentor' %}
+            </a>
+        </div>
         {% endif %}
     </div>
     {% endif %}

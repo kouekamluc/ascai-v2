@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView as DjangoPasswordChangeView
 from django.contrib.auth import update_session_auth_hash
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
-from django.urls import reverse_lazy
+from django.views.decorators.http import require_http_methods
+from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q, Count
 from django.http import JsonResponse, HttpResponse, Http404, FileResponse
@@ -913,11 +914,23 @@ class MentorshipDashboardView(DashboardRequiredMixin, TemplateView):
                 context['requests'] = all_requests[:10]
                 context['pending_count'] = all_requests.filter(status='pending').count()
                 context['accepted_count'] = all_requests.filter(status='accepted').count()
+                context['completed_count'] = all_requests.filter(status='completed').count()
+                context['rejected_count'] = all_requests.filter(status='rejected').count()
+                context['total_requests'] = all_requests.count()
+                
+                # Recent activity
+                context['recent_requests'] = all_requests[:5]
             except MentorProfile.DoesNotExist:
                 context['needs_profile'] = True
         
         if user.is_student:
-            context['my_requests'] = MentorshipRequest.objects.filter(student=user).order_by('-created_at')[:10]
+            from apps.mentorship.models import MentorshipRequest
+            my_requests = MentorshipRequest.objects.filter(student=user).order_by('-created_at')
+            context['my_requests'] = my_requests[:10]
+            context['my_pending_count'] = my_requests.filter(status='pending').count()
+            context['my_accepted_count'] = my_requests.filter(status='accepted').count()
+            context['my_completed_count'] = my_requests.filter(status='completed').count()
+            context['my_total_requests'] = my_requests.count()
         
         return context
 
@@ -929,6 +942,19 @@ class DashboardMentorProfileCreateView(DashboardRequiredMixin, CreateView):
     model = MentorProfile
     form_class = MentorProfileForm
     template_name = 'dashboard/mentorship/profile_create.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Access control: only mentors can create mentor profiles
+        if not request.user.is_mentor:
+            messages.error(request, _('Only mentors can create mentor profiles.'))
+            return redirect('dashboard:mentorship_dashboard')
+        
+        # Check if profile already exists
+        if hasattr(request.user, 'mentor_profile'):
+            messages.info(request, _('You already have a mentor profile.'))
+            return redirect('dashboard:mentorship_profile_update')
+        
+        return super().dispatch(request, *args, **kwargs)
     
     def get_success_url(self):
         return reverse_lazy('dashboard:mentorship_dashboard')
@@ -947,8 +973,17 @@ class DashboardMentorProfileUpdateView(DashboardRequiredMixin, UpdateView):
     form_class = MentorProfileUpdateForm
     template_name = 'dashboard/mentorship/profile_update.html'
     
+    def dispatch(self, request, *args, **kwargs):
+        # Access control: only mentors can update their own profiles
+        if not request.user.is_mentor:
+            messages.error(request, _('Only mentors can update mentor profiles.'))
+            return redirect('dashboard:mentorship_dashboard')
+        
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_queryset(self):
         from apps.mentorship.models import MentorProfile
+        # Only allow users to update their own profile
         return MentorProfile.objects.filter(user=self.request.user)
     
     def get_success_url(self):
@@ -963,17 +998,58 @@ class DashboardMentorManagementView(DashboardRequiredMixin, TemplateView):
     """Full mentor management dashboard within dashboard."""
     template_name = 'dashboard/mentorship/mentor_management.html'
     
+    def dispatch(self, request, *args, **kwargs):
+        # Access control: only mentors can access this view
+        if not request.user.is_mentor:
+            messages.error(request, _('Only mentors can access this page.'))
+            return redirect('dashboard:mentorship_dashboard')
+        
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         from apps.mentorship.models import MentorProfile
         mentor_profile = getattr(self.request.user, 'mentor_profile', None)
         context['in_dashboard'] = True  # Flag for templates
+        
         if mentor_profile:
             all_requests = mentor_profile.requests.all().order_by('-created_at')
+            
+            # Filtering
+            status_filter = self.request.GET.get('status')
+            if status_filter:
+                all_requests = all_requests.filter(status=status_filter)
+            
+            search_query = self.request.GET.get('search')
+            if search_query:
+                all_requests = all_requests.filter(
+                    Q(subject__icontains=search_query) |
+                    Q(message__icontains=search_query) |
+                    Q(student__username__icontains=search_query) |
+                    Q(student__first_name__icontains=search_query) |
+                    Q(student__last_name__icontains=search_query)
+                )
+            
             context['requests'] = all_requests
             context['mentor_profile'] = mentor_profile
-            context['pending_count'] = all_requests.filter(status='pending').count()
-            context['accepted_count'] = all_requests.filter(status='accepted').count()
+            context['pending_count'] = mentor_profile.requests.filter(status='pending').count()
+            context['accepted_count'] = mentor_profile.requests.filter(status='accepted').count()
+            context['completed_count'] = mentor_profile.requests.filter(status='completed').count()
+            context['rejected_count'] = mentor_profile.requests.filter(status='rejected').count()
+            context['total_requests'] = mentor_profile.requests.count()
+            context['current_filter'] = status_filter
+            context['search_query'] = search_query
+            
+            # Statistics
+            context['acceptance_rate'] = (
+                (context['accepted_count'] / context['total_requests'] * 100) 
+                if context['total_requests'] > 0 else 0
+            )
+            context['completion_rate'] = (
+                (context['completed_count'] / context['accepted_count'] * 100) 
+                if context['accepted_count'] > 0 else 0
+            )
+        
         return context
 
 
@@ -983,9 +1059,46 @@ class DashboardStudentRequestsView(DashboardRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['requests'] = MentorshipRequest.objects.filter(
+        from apps.mentorship.models import MentorshipRequest
+        
+        requests = MentorshipRequest.objects.filter(
             student=self.request.user
-        ).order_by('-created_at')
+        ).select_related('mentor', 'mentor__user').order_by('-created_at')
+        
+        # Filtering
+        status_filter = self.request.GET.get('status')
+        if status_filter:
+            requests = requests.filter(status=status_filter)
+        
+        search_query = self.request.GET.get('search')
+        if search_query:
+            requests = requests.filter(
+                Q(subject__icontains=search_query) |
+                Q(message__icontains=search_query) |
+                Q(mentor__user__username__icontains=search_query) |
+                Q(mentor__specialization__icontains=search_query)
+            )
+        
+        context['requests'] = requests
+        context['pending_count'] = MentorshipRequest.objects.filter(
+            student=self.request.user, status='pending'
+        ).count()
+        context['accepted_count'] = MentorshipRequest.objects.filter(
+            student=self.request.user, status='accepted'
+        ).count()
+        context['completed_count'] = MentorshipRequest.objects.filter(
+            student=self.request.user, status='completed'
+        ).count()
+        context['rejected_count'] = MentorshipRequest.objects.filter(
+            student=self.request.user, status='rejected'
+        ).count()
+        context['total_requests'] = MentorshipRequest.objects.filter(
+            student=self.request.user
+        ).count()
+        context['current_filter'] = status_filter
+        context['search_query'] = search_query
+        context['in_dashboard'] = True
+        
         return context
 
 
@@ -1045,6 +1158,277 @@ class DashboardRequestDetailView(DashboardRequiredMixin, DetailView):
             return redirect('dashboard:mentorship_request_detail', pk=self.object.pk)
         
         return JsonResponse({'error': _('Invalid form data.')}, status=400)
+
+
+@login_required
+@require_http_methods(["POST"])
+def dashboard_accept_request(request, request_id):
+    """Accept mentorship request from dashboard (HTMX endpoint)."""
+    from apps.mentorship.models import MentorshipRequest
+    from django.utils import timezone
+    
+    # Access control: only mentor can accept their own requests
+    mentorship_request = get_object_or_404(
+        MentorshipRequest,
+        id=request_id,
+        mentor__user=request.user,
+        status='pending'
+    )
+    
+    # Additional check: ensure user is the mentor
+    if mentorship_request.mentor.user != request.user:
+        messages.error(request, _('You do not have permission to accept this request.'))
+        return JsonResponse({'error': _('Access denied.')}, status=403)
+    
+    mentorship_request.status = 'accepted'
+    mentorship_request.responded_at = timezone.now()
+    mentorship_request.save()
+    
+    messages.success(request, _('Mentorship request accepted successfully!'))
+    
+    # Return HTMX-compatible HTML fragment
+    if request.headers.get('HX-Request'):
+        return render(request, 'mentorship/partials/request_item.html', {
+            'request': mentorship_request,
+            'in_dashboard': True
+        })
+    return redirect('dashboard:mentorship_request_detail', pk=request_id)
+
+
+@login_required
+@require_http_methods(["POST"])
+def dashboard_reject_request(request, request_id):
+    """Reject mentorship request from dashboard (HTMX endpoint)."""
+    from apps.mentorship.models import MentorshipRequest
+    from django.utils import timezone
+    
+    # Access control: only mentor can reject their own requests
+    mentorship_request = get_object_or_404(
+        MentorshipRequest,
+        id=request_id,
+        mentor__user=request.user,
+        status='pending'
+    )
+    
+    # Additional check: ensure user is the mentor
+    if mentorship_request.mentor.user != request.user:
+        messages.error(request, _('You do not have permission to reject this request.'))
+        return JsonResponse({'error': _('Access denied.')}, status=403)
+    
+    mentorship_request.status = 'rejected'
+    mentorship_request.responded_at = timezone.now()
+    mentorship_request.save()
+    
+    messages.info(request, _('Mentorship request rejected.'))
+    
+    # Return HTMX-compatible HTML fragment
+    if request.headers.get('HX-Request'):
+        return render(request, 'mentorship/partials/request_item.html', {
+            'request': mentorship_request,
+            'in_dashboard': True
+        })
+    return redirect('dashboard:mentorship_request_detail', pk=request_id)
+
+
+@login_required
+@require_http_methods(["POST"])
+def dashboard_complete_request(request, request_id):
+    """Mark mentorship request as completed from dashboard (HTMX endpoint)."""
+    from apps.mentorship.models import MentorshipRequest
+    from django.utils import timezone
+    
+    mentorship_request = get_object_or_404(
+        MentorshipRequest,
+        id=request_id
+    )
+    
+    # Only student or mentor can complete
+    if mentorship_request.student != request.user and mentorship_request.mentor.user != request.user:
+        messages.error(request, _('Access denied.'))
+        return JsonResponse({'error': _('Access denied.')}, status=403)
+    
+    if not mentorship_request.can_be_completed():
+        messages.error(request, _('Only accepted requests can be completed.'))
+        return JsonResponse({'error': _('Only accepted requests can be completed.')}, status=400)
+    
+    mentorship_request.status = 'completed'
+    mentorship_request.responded_at = timezone.now()
+    mentorship_request.save()
+    
+    # Increment students helped if mentor completed it
+    if mentorship_request.mentor.user == request.user:
+        mentorship_request.mentor.increment_students_helped()
+    
+    messages.success(request, _('Mentorship request marked as completed.'))
+    
+    # Return HTMX-compatible response
+    if request.headers.get('HX-Request'):
+        return JsonResponse({
+            'status': 'completed',
+            'redirect': reverse('dashboard:mentorship_request_detail', kwargs={'pk': request_id})
+        })
+    return redirect('dashboard:mentorship_request_detail', pk=request_id)
+
+
+@login_required
+@require_http_methods(["POST"])
+def dashboard_update_availability(request):
+    """Update mentor availability status from dashboard (HTMX endpoint)."""
+    from apps.mentorship.models import MentorProfile
+    
+    mentor_profile = get_object_or_404(
+        MentorProfile,
+        user=request.user
+    )
+    
+    new_status = request.POST.get('availability_status')
+    if new_status not in dict(MentorProfile.AVAILABILITY_CHOICES).keys():
+        return JsonResponse({'error': _('Invalid availability status.')}, status=400)
+    
+    mentor_profile.availability_status = new_status
+    mentor_profile.save()
+    
+    messages.success(request, _('Availability status updated successfully.'))
+    return JsonResponse({'status': 'updated', 'availability_status': new_status})
+
+
+class DashboardMentorListView(DashboardRequiredMixin, ListView):
+    """Browse mentors from dashboard."""
+    from apps.mentorship.models import MentorProfile
+    model = MentorProfile
+    template_name = 'dashboard/mentorship/mentor_list.html'
+    context_object_name = 'mentors'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        queryset = MentorProfile.objects.filter(is_approved=True).select_related('user')
+        
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(user__username__icontains=search) |
+                Q(user__first_name__icontains=search) |
+                Q(user__last_name__icontains=search) |
+                Q(specialization__icontains=search) |
+                Q(bio__icontains=search)
+            )
+        
+        specialization = self.request.GET.get('specialization')
+        if specialization:
+            queryset = queryset.filter(specialization__icontains=specialization)
+        
+        availability = self.request.GET.get('availability')
+        if availability:
+            queryset = queryset.filter(availability_status=availability)
+        
+        sort_by = self.request.GET.get('sort', 'rating')
+        if sort_by == 'rating':
+            queryset = queryset.order_by('-rating', '-students_helped')
+        elif sort_by == 'students':
+            queryset = queryset.order_by('-students_helped', '-rating')
+        elif sort_by == 'newest':
+            queryset = queryset.order_by('-created_at')
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['specializations'] = MentorProfile.objects.filter(
+            is_approved=True
+        ).values_list('specialization', flat=True).distinct()
+        context['in_dashboard'] = True
+        return context
+
+
+class DashboardMentorDetailView(DashboardRequiredMixin, DetailView):
+    """View mentor detail from dashboard."""
+    from apps.mentorship.models import MentorProfile
+    model = MentorProfile
+    template_name = 'dashboard/mentorship/mentor_detail.html'
+    context_object_name = 'mentor'
+    
+    def get_queryset(self):
+        return MentorProfile.objects.filter(is_approved=True).select_related('user')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['in_dashboard'] = True
+        
+        if self.request.user.is_authenticated:
+            # Check for existing pending or accepted requests
+            from apps.mentorship.models import MentorshipRequest
+            existing_requests = MentorshipRequest.objects.filter(
+                student=self.request.user,
+                mentor=self.object,
+                status__in=['pending', 'accepted']
+            )
+            context['has_request'] = existing_requests.exists()
+            context['existing_request'] = existing_requests.first()
+        
+        return context
+
+
+class DashboardMentorshipRequestCreateView(DashboardRequiredMixin, CreateView):
+    """Create mentorship request from dashboard."""
+    from apps.mentorship.models import MentorshipRequest
+    from apps.mentorship.forms import MentorshipRequestForm
+    model = MentorshipRequest
+    form_class = MentorshipRequestForm
+    template_name = 'dashboard/mentorship/request_create.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Access control: only students can create requests
+        if not request.user.is_student:
+            messages.error(request, _('Only students can create mentorship requests.'))
+            return redirect('dashboard:mentorship_dashboard')
+        
+        # Check if mentor exists and is approved
+        from apps.mentorship.models import MentorProfile
+        mentor = get_object_or_404(
+            MentorProfile,
+            id=kwargs['mentor_id'],
+            is_approved=True
+        )
+        
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from apps.mentorship.models import MentorProfile
+        mentor = get_object_or_404(MentorProfile, id=self.kwargs['mentor_id'])
+        context['mentor'] = mentor
+        context['mentor_id'] = self.kwargs['mentor_id']
+        context['in_dashboard'] = True
+        return context
+    
+    def form_valid(self, form):
+        from apps.mentorship.models import MentorProfile, MentorshipRequest
+        mentor = get_object_or_404(MentorProfile, id=self.kwargs['mentor_id'])
+        
+        # Prevent duplicate requests
+        existing_request = MentorshipRequest.objects.filter(
+            student=self.request.user,
+            mentor=mentor,
+            status__in=['pending', 'accepted']
+        ).first()
+        
+        if existing_request:
+            messages.error(self.request, _('You already have an active request with this mentor.'))
+            return redirect('dashboard:mentorship_mentor_detail', pk=mentor.pk)
+        
+        # Prevent self-request
+        if mentor.user == self.request.user:
+            messages.error(self.request, _('You cannot request mentorship from yourself.'))
+            return redirect('dashboard:mentorship_mentor_detail', pk=mentor.pk)
+        
+        form.instance.student = self.request.user
+        form.instance.mentor = mentor
+        response = super().form_valid(form)
+        messages.success(self.request, _('Mentorship request sent successfully!'))
+        return response
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:mentorship_student_requests')
 
 
 # Personalization

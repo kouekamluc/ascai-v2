@@ -24,6 +24,20 @@
         </a>
         {% endif %}
         {% if request.status == 'pending' %}
+        {% if in_dashboard %}
+        <form method="post" action="{% url 'dashboard:mentorship_accept_request' request.pk %}" hx-post="{% url 'dashboard:mentorship_accept_request' request.pk %}" hx-target="#request-{{ request.pk }}" hx-swap="outerHTML" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                {% trans 'Accept' %}
+            </button>
+        </form>
+        <form method="post" action="{% url 'dashboard:mentorship_reject_request' request.pk %}" hx-post="{% url 'dashboard:mentorship_reject_request' request.pk %}" hx-target="#request-{{ request.pk }}" hx-swap="outerHTML" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                {% trans 'Reject' %}
+            </button>
+        </form>
+        {% else %}
         <form method="post" action="{% url 'mentorship:accept_request' request.pk %}" hx-post="{% url 'mentorship:accept_request' request.pk %}" hx-target="#request-{{ request.pk }}" hx-swap="outerHTML" class="inline">
             {% csrf_token %}
             <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
@@ -36,13 +50,23 @@
                 {% trans 'Reject' %}
             </button>
         </form>
+        {% endif %}
         {% elif request.status == 'accepted' %}
+        {% if in_dashboard %}
+        <form method="post" action="{% url 'dashboard:mentorship_complete_request' request.pk %}" hx-post="{% url 'dashboard:mentorship_complete_request' request.pk %}" hx-target="#request-{{ request.pk }}" hx-swap="outerHTML" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                {% trans 'Mark as Completed' %}
+            </button>
+        </form>
+        {% else %}
         <form method="post" action="{% url 'mentorship:complete_request' request.pk %}" hx-post="{% url 'mentorship:complete_request' request.pk %}" hx-target="#request-{{ request.pk }}" hx-swap="outerHTML" class="inline">
             {% csrf_token %}
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                 {% trans 'Mark as Completed' %}
             </button>
         </form>
+        {% endif %}
         {% endif %}
     </div>
 </div>
