@@ -3,36 +3,84 @@
 
 {% block title %}{% trans 'Universities' %} - ASCAI Lazio{% endblock %}
 
+{% block extra_css %}
+<style>
+    .university-hero {
+        background: linear-gradient(135deg, #007A5E 0%, #005a45 100%);
+    }
+    .filter-card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.98);
+    }
+    .university-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .university-card:hover {
+        transform: translateY(-4px);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold mb-8">{% trans 'Universities in Lazio' %}</h1>
-    
+<!-- Hero Section -->
+<div class="university-hero text-white py-16 mb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4">{% trans 'Universities in Lazio' %}</h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
+                {% trans 'Discover world-class educational institutions in the Lazio region. Find the perfect university for your academic journey.' %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="filter-card rounded-2xl shadow-xl p-6 md:p-8 mb-8 -mt-8 relative z-10 border border-gray-100">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">{% trans 'Find Your University' %}</h2>
+            <p class="text-gray-600">{% trans 'Use the filters below to narrow down your search' %}</p>
+        </div>
+        
         <form hx-get="{% url 'universities:index' %}" 
               hx-target="#university-list-container" 
               hx-trigger="change from:select, keyup delay:500ms from:input[name='search'], change from:input[type='number']" 
               hx-indicator="#loading"
               hx-push-url="true"
               hx-swap="innerHTML">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <!-- Search -->
                 <div class="lg:col-span-2">
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Search Universities' %}</label>
+                    <label for="search" class="block text-sm font-semibold text-gray-900 mb-2">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            {% trans 'Search Universities' %}
+                        </span>
+                    </label>
                     <input type="text" 
                            id="search"
                            name="search" 
                            value="{{ search_query }}"
                            placeholder="{% trans 'Search by name, city, or description...' %}" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all shadow-sm hover:shadow-md">
                 </div>
                 
                 <!-- City Filter -->
                 <div>
-                    <label for="city" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'City' %}</label>
+                    <label for="city" class="block text-sm font-semibold text-gray-900 mb-2">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            {% trans 'City' %}
+                        </span>
+                    </label>
                     <select id="city" 
                             name="city" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all shadow-sm hover:shadow-md appearance-none bg-white">
                         <option value="">{% trans 'All Cities' %}</option>
                         <option value="rome" {% if filter_city == 'rome' %}selected{% endif %}>{% trans 'Rome' %}</option>
                         <option value="cassino" {% if filter_city == 'cassino' %}selected{% endif %}>{% trans 'Cassino' %}</option>
@@ -45,10 +93,17 @@
                 
                 <!-- Degree Type Filter -->
                 <div>
-                    <label for="degree_type" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Degree Level' %}</label>
+                    <label for="degree_type" class="block text-sm font-semibold text-gray-900 mb-2">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                            {% trans 'Degree Level' %}
+                        </span>
+                    </label>
                     <select id="degree_type" 
                             name="degree_type" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all shadow-sm hover:shadow-md appearance-none bg-white">
                         <option value="">{% trans 'All Degrees' %}</option>
                         <option value="Bachelor" {% if filter_degree_type == 'Bachelor' %}selected{% endif %}>{% trans 'Bachelor' %}</option>
                         <option value="Master" {% if filter_degree_type == 'Master' %}selected{% endif %}>{% trans 'Master' %}</option>
@@ -57,13 +112,20 @@
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Field of Study Filter -->
                 <div>
-                    <label for="field" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Field of Study' %}</label>
+                    <label for="field" class="block text-sm font-semibold text-gray-900 mb-2">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            {% trans 'Field of Study' %}
+                        </span>
+                    </label>
                     <select id="field" 
                             name="field" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all shadow-sm hover:shadow-md appearance-none bg-white">
                         <option value="">{% trans 'All Fields' %}</option>
                         <option value="Engineering" {% if filter_field == 'Engineering' %}selected{% endif %}>{% trans 'Engineering' %}</option>
                         <option value="Medicine" {% if filter_field == 'Medicine' %}selected{% endif %}>{% trans 'Medicine' %}</option>
@@ -76,7 +138,14 @@
                 
                 <!-- Tuition Min -->
                 <div>
-                    <label for="tuition_min" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Min Tuition (€)' %}</label>
+                    <label for="tuition_min" class="block text-sm font-semibold text-gray-900 mb-2">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {% trans 'Min Tuition (€)' %}
+                        </span>
+                    </label>
                     <input type="number" 
                            id="tuition_min"
                            name="tuition_min" 
@@ -84,12 +153,19 @@
                            placeholder="{% trans 'Min' %}" 
                            min="0"
                            step="100"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all shadow-sm hover:shadow-md">
                 </div>
                 
                 <!-- Tuition Max -->
                 <div>
-                    <label for="tuition_max" class="block text-sm font-medium text-gray-700 mb-1">{% trans 'Max Tuition (€)' %}</label>
+                    <label for="tuition_max" class="block text-sm font-semibold text-gray-900 mb-2">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {% trans 'Max Tuition (€)' %}
+                        </span>
+                    </label>
                     <input type="number" 
                            id="tuition_max"
                            name="tuition_max" 
@@ -97,14 +173,17 @@
                            placeholder="{% trans 'Max' %}" 
                            min="0"
                            step="100"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green transition-all shadow-sm hover:shadow-md">
                 </div>
             </div>
             
             <!-- Clear Filters Button -->
-            <div class="mt-4 flex justify-end">
+            <div class="mt-6 flex justify-end">
                 <a href="{% url 'universities:index' %}" 
-                   class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 underline">
+                   class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                     {% trans 'Clear Filters' %}
                 </a>
             </div>
@@ -116,9 +195,9 @@
         {% include 'universities/partials/university_list_partial.html' %}
     </div>
     
-    <div id="loading" class="htmx-indicator text-center py-4">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cameroon-green"></div>
-        <p class="mt-2 text-gray-600">{% trans 'Loading...' %}</p>
+    <div id="loading" class="htmx-indicator text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-cameroon-green border-t-transparent"></div>
+        <p class="mt-4 text-gray-600 font-medium">{% trans 'Loading universities...' %}</p>
     </div>
 </div>
 {% endblock %}
