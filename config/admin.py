@@ -9,33 +9,33 @@ from django.db import models
 from django.forms import Textarea
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
 
-# Try to import WYSIWYG widget - fallback to Textarea if not available
-# Note: WYSIWYG widget availability depends on django-unfold version
-# In some versions, the widget may not be directly importable
-WysiwygWidget = None
+# Import CKEditor 5 widget for rich text editing
+CKEditor5Widget = None
 try:
-    # Try different possible import paths for WYSIWYG widget
-    from unfold.widgets import WysiwygWidget
+    from django_ckeditor_5.widgets import CKEditor5Widget
 except (ImportError, AttributeError):
-    try:
-        from unfold.contrib.forms.widgets import WysiwygWidget
-    except (ImportError, AttributeError):
-        try:
-            from unfold.contrib.forms.widgets import TrixWidget as WysiwygWidget
-        except (ImportError, AttributeError):
-            # WYSIWYG not available in this version - will use Textarea fallback
-            WysiwygWidget = None
+    # CKEditor 5 not available - will use Textarea fallback
+    CKEditor5Widget = None
 
 
 class BaseAdmin(ModelAdmin):
     """
-    Base admin class with automatic WYSIWYG editor for all TextField fields.
+    Base admin class with automatic CKEditor 5 WYSIWYG editor for all TextField fields.
     
-    This class automatically replaces all TextField widgets with Unfold's
-    WYSIWYG editor (Trix) when available, allowing admins to format content
-    with Bold, Italic, Lists, and other formatting options.
+    This class automatically replaces all TextField widgets with CKEditor 5,
+    providing a powerful rich text editor with formatting options including:
+    - Headings, Bold, Italic, Underline
+    - Lists (Bulleted and Numbered)
+    - Links, Images, Tables
+    - Code blocks, Block quotes
+    - Font colors and styles
+    - And much more (configurable in CKEDITOR_5_CONFIGS)
     
-    If WYSIWYG widget is not available, falls back to standard Textarea.
+    CKEditor 5 configuration is defined in settings.py under CKEDITOR_5_CONFIGS.
+    The 'default' config is used for all fields, but you can specify a different
+    config name per field if needed.
+    
+    If CKEditor 5 is not available, falls back to standard Textarea.
     
     Usage:
         from config.admin import BaseAdmin
@@ -43,14 +43,27 @@ class BaseAdmin(ModelAdmin):
         @admin.register(Post)
         class PostAdmin(BaseAdmin):
             list_display = ['title', 'author', 'created_at']
+            
+        # For advanced usage with custom config:
+        class AdvancedPostAdmin(BaseAdmin):
+            def formfield_for_dbfield(self, db_field, request, **kwargs):
+                formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
+                if isinstance(db_field, models.TextField) and db_field.name == 'content':
+                    formfield.widget.config_name = 'extends'
+                return formfield
     """
-    # Set formfield_overrides based on widget availability
-    # Use WYSIWYG widget if available, otherwise fallback to Textarea
-    formfield_overrides = {
-        models.TextField: {
-            'widget': WysiwygWidget if WysiwygWidget is not None else Textarea(attrs={'rows': 10, 'cols': 80}),
-        },
-    }
+    
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        """
+        Override to use CKEditor 5 widget for all TextField fields.
+        """
+        if isinstance(db_field, models.TextField):
+            if CKEditor5Widget is not None:
+                kwargs['widget'] = CKEditor5Widget(config_name='default')
+            else:
+                kwargs.setdefault('widget', Textarea(attrs={'rows': 10, 'cols': 80}))
+        
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 
 def dashboard_callback(request, context):
