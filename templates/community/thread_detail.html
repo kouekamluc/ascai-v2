@@ -66,22 +66,32 @@
                 </div>
             </form>
             
-            {% if user.is_staff %}
-            <div id="moderation-buttons" class="flex gap-2 flex-wrap">
-                <form hx-post="{% url 'community:toggle_thread_pin' thread.slug %}" hx-target="#moderation-buttons" hx-swap="outerHTML">
-                    {% csrf_token %}
-                    <button type="submit" class="px-3 py-2 text-sm {% if thread.is_pinned %}bg-yellow-100 text-yellow-800 hover:bg-yellow-200{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} rounded-lg transition-colors duration-200 font-medium flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path></svg>
-                        {% if thread.is_pinned %}{% trans 'Unpin' %}{% else %}{% trans 'Pin' %}{% endif %}
-                    </button>
-                </form>
-                <form hx-post="{% url 'community:toggle_thread_lock' thread.slug %}" hx-target="#moderation-buttons" hx-swap="outerHTML">
-                    {% csrf_token %}
-                    <button type="submit" class="px-3 py-2 text-sm {% if thread.is_locked %}bg-red-100 text-red-800 hover:bg-red-200{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} rounded-lg transition-colors duration-200 font-medium flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
-                        {% if thread.is_locked %}{% trans 'Unlock' %}{% else %}{% trans 'Lock' %}{% endif %}
-                    </button>
-                </form>
+            <div id="thread-actions" class="flex gap-2 flex-wrap">
+                {% if user == thread.author or user.is_staff %}
+                <a href="{% url 'community:thread_edit' thread.slug %}" class="px-3 py-2 text-sm bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors duration-200 font-medium flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    {% trans 'Edit' %}
+                </a>
+                {% endif %}
+                {% if user.is_staff %}
+                <div id="moderation-buttons" class="flex gap-2 flex-wrap">
+                    <form hx-post="{% url 'community:toggle_thread_pin' thread.slug %}" hx-target="#moderation-buttons" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <button type="submit" class="px-3 py-2 text-sm {% if thread.is_pinned %}bg-yellow-100 text-yellow-800 hover:bg-yellow-200{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} rounded-lg transition-colors duration-200 font-medium flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path></svg>
+                            {% if thread.is_pinned %}{% trans 'Unpin' %}{% else %}{% trans 'Pin' %}{% endif %}
+                        </button>
+                    </form>
+                    <form hx-post="{% url 'community:toggle_thread_lock' thread.slug %}" hx-target="#moderation-buttons" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <button type="submit" class="px-3 py-2 text-sm {% if thread.is_locked %}bg-red-100 text-red-800 hover:bg-red-200{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} rounded-lg transition-colors duration-200 font-medium flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                            {% if thread.is_locked %}{% trans 'Unlock' %}{% else %}{% trans 'Lock' %}{% endif %}
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+                {% if user == thread.author or user.is_staff %}
                 <form hx-post="{% url 'community:delete_thread' thread.slug %}" hx-confirm="{% trans 'Are you sure you want to delete this thread?' %}" onsubmit="return confirm('{% trans 'Are you sure you want to delete this thread?' %}')">
                     {% csrf_token %}
                     <button type="submit" class="px-3 py-2 text-sm bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors duration-200 font-medium flex items-center gap-1">
@@ -89,8 +99,8 @@
                         {% trans 'Delete' %}
                     </button>
                 </form>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
     </div>
     
@@ -123,7 +133,7 @@
                 <div class="prose max-w-none mb-4 text-gray-700 leading-relaxed ml-16">
                     {{ post.content|linebreaks }}
                 </div>
-                <div class="flex items-center gap-4 ml-16">
+                <div class="flex items-center gap-4 ml-16 flex-wrap">
                     <form hx-post="{% url 'community:upvote_post' post.id %}" hx-target="#upvote-post-{{ post.id }}" hx-swap="outerHTML" class="inline">
                         {% csrf_token %}
                         <div id="upvote-post-{{ post.id }}">
@@ -140,7 +150,20 @@
                             {% endif %}
                         </div>
                     </form>
-                    {% if user.is_staff %}
+                    {% if user == thread.author or user.is_staff %}
+                    <form hx-post="{% url 'community:toggle_post_solution' post.id %}" hx-target="closest .border-b" hx-swap="outerHTML" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-sm font-medium flex items-center gap-1 transition-colors duration-200 {% if post.is_solution %}text-green-600 hover:text-green-800{% else %}text-gray-600 hover:text-gray-800{% endif %}">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            {% if post.is_solution %}{% trans 'Unmark Solution' %}{% else %}{% trans 'Mark as Solution' %}{% endif %}
+                        </button>
+                    </form>
+                    {% endif %}
+                    {% if user == post.author or user.is_staff %}
+                    <a href="{% url 'community:post_edit' post.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1 transition-colors duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        {% trans 'Edit' %}
+                    </a>
                     <form hx-post="{% url 'community:delete_post' post.id %}" hx-target="closest .border-b" hx-swap="outerHTML" hx-confirm="{% trans 'Are you sure you want to delete this post?' %}" class="inline">
                         {% csrf_token %}
                         <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1 transition-colors duration-200">

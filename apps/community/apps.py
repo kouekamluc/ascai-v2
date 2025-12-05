@@ -5,6 +5,10 @@ class CommunityConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'apps.community'
     verbose_name = 'Community'
+    
+    def ready(self):
+        """Import signals when app is ready."""
+        import apps.community.signals  # noqa
 
 
 

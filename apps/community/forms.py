@@ -13,11 +13,12 @@ except ImportError:
 
 
 class ThreadForm(forms.ModelForm):
-    """Form for creating forum threads."""
+    """Form for creating and editing forum threads."""
     
     class Meta:
         model = ForumThread
         fields = ['title', 'category', 'content']
+        # Slug is auto-generated, so we don't include it in the form
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent',

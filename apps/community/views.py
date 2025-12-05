@@ -2,14 +2,15 @@
 Views for community/forum app.
 """
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.db.models import Count, Q, F
 from django.utils.translation import gettext_lazy as _
+from django.contrib import messages
 from .models import ForumCategory, ForumThread, ForumPost, ThreadUpvote, PostUpvote
 from .forms import ThreadForm, PostForm
 
@@ -35,7 +36,7 @@ class ThreadListView(ListView):
     
     def get_queryset(self):
         queryset = ForumThread.objects.annotate(
-            post_count=Count('posts')
+            post_count=Count('posts', distinct=True)
         ).select_related('author', 'category')
         
         category_slug = self.request.GET.get('category')
@@ -86,7 +87,8 @@ class ThreadDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['posts'] = self.object.posts.select_related('author').order_by('created_at')
+        # Order posts: solutions first, then by creation date
+        context['posts'] = self.object.posts.select_related('author').order_by('-is_solution', 'created_at')
         
         # Check if user has upvoted
         if self.request.user.is_authenticated:
@@ -167,13 +169,12 @@ def upvote_thread(request, slug):
     
     if not created:
         upvote.delete()
-        thread.upvotes_count = max(0, thread.upvotes_count - 1)
         has_upvoted = False
     else:
-        thread.upvotes_count += 1
         has_upvoted = True
     
-    thread.save()
+    # Refresh thread to get updated count from signals
+    thread.refresh_from_db()
     
     if request.headers.get('HX-Request'):
         return render(request, 'community/partials/upvote_button.html', {
@@ -196,13 +197,12 @@ def upvote_post(request, post_id):
     
     if not created:
         upvote.delete()
-        post.upvotes_count = max(0, post.upvotes_count - 1)
         has_upvoted = False
     else:
-        post.upvotes_count += 1
         has_upvoted = True
     
-    post.save()
+    # Refresh post to get updated count from signals
+    post.refresh_from_db()
     
     if request.headers.get('HX-Request'):
         return render(request, 'community/partials/post_upvote_button.html', {
@@ -256,12 +256,15 @@ def toggle_thread_lock(request, slug):
 @login_required
 @require_http_methods(["POST"])
 def delete_thread(request, slug):
-    """Delete thread (Admin only)."""
-    if not request.user.is_staff:
+    """Delete thread (Author or Admin only)."""
+    thread = get_object_or_404(ForumThread, slug=slug)
+    
+    # Check if user is author or staff
+    if not (request.user == thread.author or request.user.is_staff):
         return JsonResponse({'error': _('Permission denied.')}, status=403)
     
-    thread = get_object_or_404(ForumThread, slug=slug)
     thread.delete()
+    messages.success(request, _('Thread deleted successfully.'))
     
     # For HTMX requests, return a redirect response
     if request.headers.get('HX-Request'):
@@ -276,13 +279,16 @@ def delete_thread(request, slug):
 @login_required
 @require_http_methods(["POST"])
 def delete_post(request, post_id):
-    """Delete post (Admin only)."""
-    if not request.user.is_staff:
+    """Delete post (Author or Admin only)."""
+    post = get_object_or_404(ForumPost, id=post_id)
+    
+    # Check if user is author or staff
+    if not (request.user == post.author or request.user.is_staff):
         return JsonResponse({'error': _('Permission denied.')}, status=403)
     
-    post = get_object_or_404(ForumPost, id=post_id)
     thread = post.thread
     post.delete()
+    messages.success(request, _('Post deleted successfully.'))
     
     if request.headers.get('HX-Request'):
         # Return empty string to remove the element
@@ -290,4 +296,80 @@ def delete_post(request, post_id):
         return HttpResponse('')
     
     return redirect('community:thread_detail', slug=thread.slug)
+
+
+class ThreadUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Update thread view (Author or Admin only)."""
+    model = ForumThread
+    form_class = ThreadForm
+    template_name = 'community/thread_edit.html'
+    
+    def test_func(self):
+        """Check if user is author or staff."""
+        thread = self.get_object()
+        return self.request.user == thread.author or self.request.user.is_staff
+    
+    def form_valid(self, form):
+        messages.success(self.request, _('Thread updated successfully.'))
+        return super().form_valid(form)
+
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Update post view (Author or Admin only)."""
+    model = ForumPost
+    form_class = PostForm
+    template_name = 'community/post_edit.html'
+    
+    def test_func(self):
+        """Check if user is author or staff."""
+        post = self.get_object()
+        return self.request.user == post.author or self.request.user.is_staff
+    
+    def get_success_url(self):
+        return self.object.thread.get_absolute_url()
+    
+    def form_valid(self, form):
+        messages.success(self.request, _('Post updated successfully.'))
+        return super().form_valid(form)
+
+
+@login_required
+@require_http_methods(["POST"])
+def toggle_post_solution(request, post_id):
+    """Toggle post solution status (Thread author or Admin only)."""
+    post = get_object_or_404(ForumPost, id=post_id)
+    thread = post.thread
+    
+    # Check if user is thread author or staff
+    if not (request.user == thread.author or request.user.is_staff):
+        return JsonResponse({'error': _('Permission denied.')}, status=403)
+    
+    # If marking as solution, unmark other solutions in the thread
+    if not post.is_solution:
+        ForumPost.objects.filter(thread=thread, is_solution=True).update(is_solution=False)
+    
+    post.is_solution = not post.is_solution
+    post.save()
+    post.refresh_from_db()
+    
+    if request.headers.get('HX-Request'):
+        # Get upvoted post IDs
+        if request.user.is_authenticated:
+            upvoted_post_ids = list(
+                PostUpvote.objects.filter(
+                    user=request.user,
+                    post__thread=thread
+                ).values_list('post_id', flat=True)
+            )
+        else:
+            upvoted_post_ids = []
+        
+        return render(request, 'community/partials/post_item.html', {
+            'post': post,
+            'user': request.user,
+            'upvoted_post_ids': upvoted_post_ids,
+            'thread': thread
+        })
+    
+    return JsonResponse({'is_solution': post.is_solution})
 
