@@ -1,104 +1,177 @@
 {% load i18n %}
 {% for scholarship in scholarships %}
-<div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-    <div class="flex items-start justify-between mb-3">
-        <div class="flex-1">
-            <h3 class="text-xl font-semibold mb-2">
-                <a href="{% url 'scholarships:detail' scholarship.slug %}" class="hover:text-cameroon-green">
-                    {{ scholarship.title }}
-                </a>
-            </h3>
-            <p class="text-gray-600 mb-2">{{ scholarship.provider }}</p>
-        </div>
-        {% if scholarship.is_disco_lazio %}
-        <span class="px-3 py-1 bg-cameroon-green/10 text-cameroon-green rounded-full text-xs font-semibold whitespace-nowrap ml-2">
-            DISCO Lazio
-        </span>
-        {% endif %}
-    </div>
-    
-    <!-- Badges for Level and Region -->
-    <div class="flex flex-wrap gap-2 mb-3">
-        {% if scholarship.level != 'all' %}
-        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-            {{ scholarship.get_level_display }}
-        </span>
-        {% endif %}
-        {% if scholarship.region != 'all' %}
-        <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
-            {{ scholarship.get_region_display }}
-        </span>
-        {% endif %}
-    </div>
-    
-    {% if scholarship.amount %}
-    <p class="text-cameroon-green font-semibold mb-2 text-lg">
-        {{ scholarship.amount }} {{ scholarship.currency }}
-    </p>
-    {% endif %}
-    
-    <p class="text-gray-700 mb-4 line-clamp-3">{{ scholarship.description|truncatewords:25 }}</p>
-    
-    {% if scholarship.application_deadline %}
-    <p class="text-sm text-gray-500 mb-4">
-        <strong>{% trans 'Deadline:' %}</strong> {{ scholarship.application_deadline|date:"d M Y" }}
-    </p>
-    {% endif %}
-    
-    <div class="flex items-center justify-between mt-4">
-        <a href="{% url 'scholarships:detail' scholarship.slug %}" 
-           class="text-cameroon-green hover:text-cameroon-red font-semibold">
-            {% trans 'Learn More' %} →
-        </a>
-        {% if user.is_authenticated %}
-        <form hx-post="{% url 'scholarships:toggle_save' scholarship.slug %}" 
-              hx-target="this" 
-              hx-swap="outerHTML" 
-              class="inline">
-            {% csrf_token %}
-            {% if scholarship.id in saved_scholarship_ids %}
-            <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                {% trans 'Remove' %}
-            </button>
-            {% else %}
-            <button type="submit" class="text-cameroon-green hover:text-cameroon-red text-sm font-medium">
-                {% trans 'Save' %}
-            </button>
+<div class="scholarship-card">
+    <!-- Card Header -->
+    <div class="scholarship-card-header">
+        <div class="flex items-start justify-between mb-3">
+            <div class="flex-1 min-w-0">
+                <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                    <a href="{% url 'scholarships:detail' scholarship.slug %}" 
+                       class="hover:text-cameroon-green transition-colors">
+                        {{ scholarship.title }}
+                    </a>
+                </h3>
+                <div class="flex items-center text-gray-600">
+                    <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <span class="text-sm font-medium truncate">{{ scholarship.provider }}</span>
+                </div>
+            </div>
+            {% if scholarship.is_disco_lazio %}
+            <span class="ml-3 px-3 py-1.5 bg-gradient-to-r from-cameroon-green to-cameroon-green/80 text-white rounded-full text-xs font-bold whitespace-nowrap shadow-sm flex-shrink-0">
+                DISCO
+            </span>
             {% endif %}
-        </form>
+        </div>
+        
+        <!-- Badges for Level and Region -->
+        <div class="flex flex-wrap gap-2">
+            {% if scholarship.level != 'all' %}
+            <span class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-semibold border border-blue-200">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                {{ scholarship.get_level_display }}
+            </span>
+            {% endif %}
+            {% if scholarship.region != 'all' %}
+            <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md text-xs font-semibold border border-emerald-200">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ scholarship.get_region_display }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Card Body -->
+    <div class="p-6 flex-grow flex flex-col">
+        {% if scholarship.amount %}
+        <div class="mb-4 p-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg">
+            <div class="flex items-baseline">
+                <span class="text-2xl font-bold text-emerald-700">
+                    {{ scholarship.amount|floatformat:0 }}
+                </span>
+                <span class="ml-2 text-sm font-semibold text-emerald-600">
+                    {{ scholarship.currency }}
+                </span>
+            </div>
+        </div>
         {% endif %}
+        
+        <p class="text-gray-700 mb-4 line-clamp-3 text-sm leading-relaxed flex-grow">
+            {{ scholarship.description|truncatewords:30 }}
+        </p>
+        
+        {% if scholarship.application_deadline %}
+        <div class="mb-4">
+            <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span class="text-xs font-medium text-gray-600 mr-2">{% trans 'Deadline:' %}</span>
+                <span class="deadline-badge deadline-upcoming">
+                    {{ scholarship.application_deadline|date:"d M Y" }}
+                </span>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Card Footer -->
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+            <a href="{% url 'scholarships:detail' scholarship.slug %}" 
+               class="inline-flex items-center text-cameroon-green hover:text-cameroon-green/80 font-semibold text-sm transition-colors group">
+                {% trans 'View Details' %}
+                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+            {% if user.is_authenticated %}
+            <form hx-post="{% url 'scholarships:toggle_save' scholarship.slug %}" 
+                  hx-target="this" 
+                  hx-swap="outerHTML" 
+                  class="inline">
+                {% csrf_token %}
+                {% if scholarship.id in saved_scholarship_ids %}
+                <button type="submit" 
+                        class="inline-flex items-center text-red-600 hover:text-red-700 text-sm font-medium transition-colors group"
+                        title="{% trans 'Remove from saved' %}">
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+                {% else %}
+                <button type="submit" 
+                        class="inline-flex items-center text-gray-400 hover:text-cameroon-green text-sm font-medium transition-colors group"
+                        title="{% trans 'Save scholarship' %}">
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                </button>
+                {% endif %}
+            </form>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% empty %}
-<div class="col-span-full bg-white rounded-lg shadow-md p-8 text-center">
-    <p class="text-gray-500 text-lg">{% trans 'No scholarships found.' %}</p>
+<div class="col-span-full bg-white rounded-lg shadow-md p-12 text-center border-2 border-dashed border-gray-200">
+    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>
+    <p class="text-gray-500 text-lg font-medium">{% trans 'No scholarships found.' %}</p>
+    <p class="text-gray-400 text-sm mt-2">{% trans 'Try adjusting your filters to see more results.' %}</p>
 </div>
 {% endfor %}
 
 <!-- Pagination -->
 {% if is_paginated %}
-<div class="col-span-full mt-8 flex justify-center">
-    <div class="flex items-center space-x-2">
+<div class="col-span-full mt-12 flex justify-center">
+    <nav class="flex items-center space-x-2 bg-white rounded-lg shadow-md border border-gray-200 p-2">
         {% if page_obj.has_previous %}
         <a href="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}" 
            hx-get="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
            hx-target="#scholarship-list"
-           class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+           class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-cameroon-green transition-colors">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
             {% trans 'Previous' %}
         </a>
-        {% endif %}
-        <span class="px-4 py-2 text-gray-700">
-            {% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}
+        {% else %}
+        <span class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            {% trans 'Previous' %}
         </span>
+        {% endif %}
+        
+        <span class="px-4 py-2 text-sm font-semibold text-gray-700">
+            {% trans 'Page' %} <span class="text-cameroon-green">{{ page_obj.number }}</span> {% trans 'of' %} {{ page_obj.paginator.num_pages }}
+        </span>
+        
         {% if page_obj.has_next %}
         <a href="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}" 
            hx-get="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
            hx-target="#scholarship-list"
-           class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+           class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-cameroon-green transition-colors">
             {% trans 'Next' %}
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
         </a>
+        {% else %}
+        <span class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed">
+            {% trans 'Next' %}
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </span>
         {% endif %}
-    </div>
+    </nav>
 </div>
 {% endif %}
 

@@ -3,61 +3,209 @@
 
 {% block title %}{% trans 'DISCO Lazio Scholarships' %} - ASCAI Lazio{% endblock %}
 
+{% block extra_css %}
+<style>
+    .disco-hero {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #2563eb 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .disco-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.4;
+    }
+    .info-section {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        padding: 2rem;
+    }
+    .disco-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .disco-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: #3b82f6;
+    }
+    .disco-badge {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg p-8 mb-8">
-        <h1 class="text-4xl font-bold mb-4">🎓 {% trans 'DISCO Lazio Scholarships' %}</h1>
-        <p class="text-xl text-white/80">
-            {% trans 'Discover funding opportunities through the DISCO Lazio program for students in the Lazio region.' %}
-        </p>
-    </div>
-    
-    <div class="mb-6">
-        <h2 class="text-2xl font-semibold mb-4">{% trans 'About DISCO Lazio' %}</h2>
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <p class="text-gray-700 mb-4">
-                {% trans 'DISCO Lazio is a regional scholarship program designed to support students pursuing higher education in the Lazio region of Italy.' %}
-            </p>
-            <p class="text-gray-700">
-                {% trans 'These scholarships are awarded based on financial need and academic merit. Eligible students can receive financial support to cover tuition fees and living expenses.' %}
+<!-- Hero Section -->
+<div class="disco-hero text-white py-16 mb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-6 border-2 border-white/30">
+                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 01.557 1.08l1.524 4.851a2 2 0 01-1.617 2.53l-1.099.26a1 1 0 01-.98-.314l-1.002-1.003a.996.996 0 00-.578-.23l-5-.001a1 1 0 01-1-1v-5.48a1 1 0 01.19-.571l3.5-4.5a1 1 0 011.242-.14l5.5 3.5a1 1 0 01.356.257l4 1.714zm-2.95-1.07a.5.5 0 01.788 0l7 3a.5.5 0 010 .94l-7 3a.5.5 0 01-.788 0l-7-3a.5.5 0 010-.94l7-3z"/>
+                </svg>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-bold mb-4">{% trans 'DISCO Lazio Scholarships' %}</h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
+                {% trans 'Discover funding opportunities through the DISCO Lazio program for students in the Lazio region.' %}
             </p>
         </div>
     </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <!-- About Section -->
+    <div class="info-section mb-12">
+        <div class="flex items-center mb-6">
+            <div class="h-1 w-16 bg-blue-600 rounded-full mr-4"></div>
+            <h2 class="text-3xl font-bold text-gray-900">{% trans 'About DISCO Lazio' %}</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex items-start">
+                <div class="p-3 bg-blue-100 rounded-lg mr-4 flex-shrink-0">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{% trans 'Regional Program' %}</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        {% trans 'DISCO Lazio is a regional scholarship program designed to support students pursuing higher education in the Lazio region of Italy.' %}
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="p-3 bg-blue-100 rounded-lg mr-4 flex-shrink-0">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{% trans 'Financial Support' %}</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        {% trans 'These scholarships are awarded based on financial need and academic merit. Eligible students can receive financial support to cover tuition fees and living expenses.' %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <h2 class="text-2xl font-semibold mb-6">{% trans 'Available DISCO Lazio Scholarships' %}</h2>
+    <!-- Scholarships Section -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+                <div class="h-1 w-16 bg-blue-600 rounded-full mr-4"></div>
+                <h2 class="text-3xl font-bold text-gray-900">{% trans 'Available DISCO Lazio Scholarships' %}</h2>
+            </div>
+            <a href="{% url 'scholarships:index' %}" 
+               class="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center">
+                {% trans 'View All Scholarships' %}
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
     
     {% if disco_scholarships %}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for scholarship in disco_scholarships %}
-        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <div class="flex items-center gap-2 mb-4">
-                <span class="text-2xl">🎓</span>
-                <span class="px-3 py-1 bg-cameroon-green/10 text-cameroon-green rounded-full text-sm font-semibold">DISCO Lazio</span>
+        <div class="disco-card">
+            <!-- Card Header -->
+            <div class="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-b border-blue-100">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="disco-badge">DISCO Lazio</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                    <a href="{% url 'scholarships:detail' scholarship.slug %}" 
+                       class="hover:text-blue-600 transition-colors">
+                        {{ scholarship.title }}
+                    </a>
+                </h3>
+                <div class="flex items-center text-gray-600">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <span class="text-sm font-medium">{{ scholarship.provider }}</span>
+                </div>
             </div>
-            <h3 class="text-xl font-semibold mb-2">
-                <a href="{% url 'scholarships:detail' scholarship.slug %}" class="hover:text-cameroon-green">
-                    {{ scholarship.title }}
-                </a>
-            </h3>
-            <p class="text-gray-600 mb-2">{{ scholarship.provider }}</p>
-            {% if scholarship.amount %}
-            <p class="text-cameroon-green font-semibold mb-4">{{ scholarship.amount }} {{ scholarship.currency }}</p>
-            {% endif %}
-            <p class="text-gray-700 mb-4">{{ scholarship.description|truncatewords:25 }}</p>
-            {% if scholarship.application_deadline %}
-            <p class="text-sm text-gray-500 mb-4">
-                {% trans 'Deadline:' %} {{ scholarship.application_deadline|date:"d M Y" }}
-            </p>
-            {% endif %}
-            <a href="{% url 'scholarships:detail' scholarship.slug %}" class="text-cameroon-green hover:text-cameroon-red font-semibold">
-                {% trans 'Learn More' %} →
-            </a>
+            
+            <!-- Card Body -->
+            <div class="p-6 flex-grow flex flex-col">
+                {% if scholarship.amount %}
+                <div class="mb-4 p-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg">
+                    <div class="flex items-baseline">
+                        <span class="text-2xl font-bold text-emerald-700">
+                            {{ scholarship.amount|floatformat:0 }}
+                        </span>
+                        <span class="ml-2 text-sm font-semibold text-emerald-600">
+                            {{ scholarship.currency }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <p class="text-gray-700 mb-4 line-clamp-3 text-sm leading-relaxed flex-grow">
+                    {{ scholarship.description|truncatewords:30 }}
+                </p>
+                
+                {% if scholarship.application_deadline %}
+                <div class="mb-4">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-xs font-medium text-gray-600 mr-2">{% trans 'Deadline:' %}</span>
+                        <span class="deadline-badge deadline-upcoming">
+                            {{ scholarship.application_deadline|date:"d M Y" }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Card Footer -->
+                <div class="pt-4 border-t border-gray-100 mt-auto">
+                    <a href="{% url 'scholarships:detail' scholarship.slug %}" 
+                       class="inline-flex items-center justify-center w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm transition-all shadow-md hover:shadow-lg">
+                        {% trans 'View Details' %}
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="bg-white rounded-lg shadow-md p-8 text-center">
-        <p class="text-gray-500">{% trans 'No DISCO Lazio scholarships available at this time.' %}</p>
+    <div class="info-section text-center py-16">
+        <svg class="w-20 h-20 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">{% trans 'No Scholarships Available' %}</h3>
+        <p class="text-gray-500">{% trans 'No DISCO Lazio scholarships available at this time. Please check back later.' %}</p>
     </div>
     {% endif %}
 </div>
