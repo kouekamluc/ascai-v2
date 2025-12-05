@@ -35,7 +35,7 @@
     </div>
     <div class="prose max-w-none">
         <p class="text-sm text-gray-600 mb-4">{{ communication.get_communication_type_display }} | {{ communication.get_target_audience_display }}</p>
-        <div class="text-gray-900">{{ communication.content|linebreaks }}</div>
+        <div class="text-gray-900 prose prose-sm max-w-none">{{ communication.content|safe }}</div>
     </div>
 </div>
 {% endblock %}

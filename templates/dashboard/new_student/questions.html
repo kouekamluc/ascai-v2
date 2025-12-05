@@ -28,11 +28,11 @@
                 </span>
                 {% endif %}
             </div>
-            <p class="text-gray-700 mb-4">{{ question.question }}</p>
+            <div class="text-gray-700 mb-4 prose prose-sm max-w-none">{{ question.question|safe }}</div>
             {% if question.admin_response %}
             <div class="border-t border-gray-200 pt-4">
                 <p class="text-sm font-medium text-gray-900 mb-2">{% trans 'Response:' %}</p>
-                <p class="text-gray-700">{{ question.admin_response }}</p>
+                <div class="text-gray-700 prose prose-sm max-w-none">{{ question.admin_response|safe }}</div>
             </div>
             {% endif %}
             <p class="text-sm text-gray-500 mt-4">{{ question.created_at|date:"M d, Y" }}</p>

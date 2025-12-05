@@ -45,7 +45,7 @@
                 {% if user.bio %}
                 <div>
                     <label class="block text-sm font-medium text-gray-700">{% trans 'Bio' %}</label>
-                    <p class="text-gray-900">{{ user.bio }}</p>
+                    <div class="text-gray-900 prose prose-sm max-w-none">{{ user.bio|safe }}</div>
                 </div>
                 {% endif %}
                 

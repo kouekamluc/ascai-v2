@@ -22,7 +22,7 @@
                     {{ story.get_status_display }}
                 </span>
             </div>
-            <p class="text-gray-600 mb-4">{{ story.story|truncatewords:50 }}</p>
+            <p class="text-gray-600 mb-4">{{ story.story|striptags|truncatewords:50 }}</p>
             <div class="flex items-center justify-between text-sm text-gray-500">
                 <span>{% trans 'Submitted' %}: {{ story.submitted_at|date:"M d, Y" }}</span>
                 <a href="{% url 'dashboard:story_detail' story.pk %}" class="text-cameroon-green hover:underline">
