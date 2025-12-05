@@ -5,6 +5,12 @@
 
 {% block content %}
 <div class="space-y-6">
+    <!-- Welcome Section for All Users -->
+    <div class="bg-gradient-to-r from-cameroon-green to-cameroon-green/80 rounded-lg shadow-md p-6 text-white mb-6">
+        <h1 class="text-3xl font-bold mb-2">{% trans 'Mentorship Program' %}</h1>
+        <p class="text-lg opacity-90">{% trans 'Connect with experienced mentors or help students as a mentor' %}</p>
+    </div>
+    
     {% if user.is_mentor %}
         {% if needs_profile %}
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
@@ -64,6 +70,27 @@
             </div>
         </div>
         {% endif %}
+    {% endif %}
+    
+    {% if not user.is_mentor and not user.is_student %}
+    <!-- Default view for users who are neither mentor nor student -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">{% trans 'Looking for a Mentor?' %}</h2>
+            <p class="text-gray-600 mb-6">{% trans 'Connect with experienced mentors who can guide you in your academic and professional journey.' %}</p>
+            <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 inline-block font-semibold">
+                {% trans 'Browse Mentors' %} →
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">{% trans 'Become a Mentor' %}</h2>
+            <p class="text-gray-600 mb-6">{% trans 'Share your knowledge and experience to help students succeed. Create a mentor profile to get started.' %}</p>
+            <a href="{% url 'dashboard:mentorship_profile_create' %}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-block font-semibold">
+                {% trans 'Create Mentor Profile' %} →
+            </a>
+        </div>
+    </div>
     {% endif %}
     
     {% if user.is_student %}

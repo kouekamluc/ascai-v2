@@ -1355,13 +1355,12 @@ class DashboardMentorDetailView(DashboardRequiredMixin, DetailView):
         context['in_dashboard'] = True
         
         if self.request.user.is_authenticated:
-            # Check for existing pending or accepted requests
+            # Check for existing requests (any status)
             from apps.mentorship.models import MentorshipRequest
             existing_requests = MentorshipRequest.objects.filter(
                 student=self.request.user,
-                mentor=self.object,
-                status__in=['pending', 'accepted']
-            )
+                mentor=self.object
+            ).order_by('-created_at')
             context['has_request'] = existing_requests.exists()
             context['existing_request'] = existing_requests.first()
         

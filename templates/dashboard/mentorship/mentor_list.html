@@ -70,11 +70,11 @@
         {% for mentor in mentors %}
         <div class="dashboard-card hover:shadow-lg transition">
             <div class="flex items-start justify-between mb-4">
-                <div>
+                <div class="flex-1">
                     <h3 class="text-xl font-semibold">{{ mentor.user.get_full_name|default:mentor.user.username }}</h3>
                     <p class="text-sm text-gray-600">{{ mentor.specialization }}</p>
                 </div>
-                <span class="px-2 py-1 text-xs rounded-full {% if mentor.availability_status == 'available' %}bg-green-100 text-green-700{% elif mentor.availability_status == 'busy' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-700{% endif %}">
+                <span class="px-2 py-1 text-xs rounded-full whitespace-nowrap {% if mentor.availability_status == 'available' %}bg-green-100 text-green-700{% elif mentor.availability_status == 'busy' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-700{% endif %}">
                     {{ mentor.get_availability_status_display }}
                 </span>
             </div>
@@ -82,25 +82,32 @@
             <p class="text-gray-700 mb-4 line-clamp-3">{{ mentor.bio|striptags|truncatewords:30 }}</p>
             
             <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 flex-wrap">
                     <div>
                         <p class="text-xs text-gray-500">{% trans 'Rating' %}</p>
                         <p class="text-lg font-bold text-yellow-600">{{ mentor.rating }}/5</p>
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500">{% trans 'Students Helped' %}</p>
+                        <p class="text-xs text-gray-500">{% trans 'Students' %}</p>
                         <p class="text-lg font-bold text-cameroon-green">{{ mentor.students_helped }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">{% trans 'Experience' %}</p>
-                        <p class="text-lg font-bold text-blue-600">{{ mentor.years_experience }} {% trans 'years' %}</p>
+                        <p class="text-lg font-bold text-blue-600">{{ mentor.years_experience }}y</p>
                     </div>
                 </div>
             </div>
             
-            <a href="{% url 'dashboard:mentorship_mentor_detail' mentor.pk %}" class="block w-full text-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
-                {% trans 'View Profile' %}
-            </a>
+            <div class="flex gap-2">
+                <a href="{% url 'dashboard:mentorship_mentor_detail' mentor.pk %}" class="flex-1 text-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                    {% trans 'View Profile' %}
+                </a>
+                {% if user.is_student or not user.is_mentor %}
+                <a href="{% url 'dashboard:mentorship_create_request' mentor.pk %}" class="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    {% trans 'Request' %}
+                </a>
+                {% endif %}
+            </div>
         </div>
         {% empty %}
         <div class="col-span-full text-center py-12">
