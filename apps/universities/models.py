@@ -194,3 +194,6 @@ class SavedUniversity(models.Model):
 
 
 
+
+
+
