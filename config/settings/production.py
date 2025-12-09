@@ -30,6 +30,7 @@ ALLOWED_HOSTS = [
     'ascai.org',
     'www.ascai.org',
     '.up.railway.app',
+    'healthcheck.railway.app',  # Railway internal healthcheck domain
     '127.0.0.1'
 ]
 
