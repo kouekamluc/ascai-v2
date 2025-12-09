@@ -314,8 +314,9 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)  # 10 second timeout to prevent blocking
 
 # Email addresses
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ASCAI Lazio <noreply@ascailazio.org>')
-CONTACT_EMAIL = config('CONTACT_EMAIL', default='info@ascailazio.org')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ASCAI Associazione <info@ascai.org>')
+SERVER_EMAIL = config('SERVER_EMAIL', default='info@ascai.org')
+CONTACT_EMAIL = config('CONTACT_EMAIL', default='info@ascai.org')
 
 # CKEditor 5 Configuration (replaces deprecated CKEditor 4)
 customColorPalette = [

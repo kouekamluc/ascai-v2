@@ -263,8 +263,9 @@ else:
 # EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 # EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 # EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ASCAI Lazio <noreply@ascailazio.org>')
-# CONTACT_EMAIL = config('CONTACT_EMAIL', default='info@ascailazio.org')
+# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ASCAI Associazione <info@ascai.org>')
+# SERVER_EMAIL = config('SERVER_EMAIL', default='info@ascai.org')
+# CONTACT_EMAIL = config('CONTACT_EMAIL', default='info@ascai.org')
 #
 # Required environment variables for production:
 # - EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend (MUST be set, not console!)
@@ -273,8 +274,9 @@ else:
 # - EMAIL_USE_TLS=True
 # - EMAIL_HOST_USER=your-email@example.com
 # - EMAIL_HOST_PASSWORD=your-password-or-app-password
-# - DEFAULT_FROM_EMAIL=ASCAI Lazio <noreply@ascailazio.org>
-# - CONTACT_EMAIL=info@ascailazio.org
+# - DEFAULT_FROM_EMAIL=ASCAI Associazione <info@ascai.org>
+# - SERVER_EMAIL=info@ascai.org
+# - CONTACT_EMAIL=info@ascai.org
 
 # Email Configuration Validation and Enforcement
 # Ensure email backend is properly configured for production

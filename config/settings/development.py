@@ -103,8 +103,9 @@ EMAIL_PORT = _config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = _config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = _config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = _config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = _config('DEFAULT_FROM_EMAIL', default='ASCAI Lazio <noreply@ascailazio.org>')
-CONTACT_EMAIL = _config('CONTACT_EMAIL', default='info@ascailazio.org')
+DEFAULT_FROM_EMAIL = _config('DEFAULT_FROM_EMAIL', default='ASCAI Associazione <info@ascai.org>')
+SERVER_EMAIL = _config('SERVER_EMAIL', default='info@ascai.org')
+CONTACT_EMAIL = _config('CONTACT_EMAIL', default='info@ascai.org')
 
 # Debug toolbar (optional - install with: pip install django-debug-toolbar)
 if DEBUG:
