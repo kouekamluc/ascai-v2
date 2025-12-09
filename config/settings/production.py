@@ -25,39 +25,18 @@ if SECRET_KEY == 'django-insecure-change-me-in-production':
         "SECRET_KEY must be set in production. Generate one and set it in your environment variables."
     )
 
-# Get ALLOWED_HOSTS from environment, with fallback to Railway's public domain
-allowed_hosts_str = config('ALLOWED_HOSTS', default='')
-if not allowed_hosts_str:
-    # Try Railway's public domain as fallback
-    railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
-    if railway_domain:
-        allowed_hosts_str = railway_domain
-
-ALLOWED_HOSTS = [s.strip() for s in allowed_hosts_str.split(',')] if allowed_hosts_str else []
-
-# Automatically add Railway's internal domains for healthchecks
-# Django supports leading dot notation for subdomain matching: .railway.app matches *.railway.app
-railway_internal_domains = [
-    'healthcheck.railway.app',
-    '.railway.app',  # Matches all Railway subdomains (e.g., *.railway.app, *.up.railway.app)
-    '.up.railway.app',  # Explicitly match *.up.railway.app subdomains
+# ALLOWED_HOSTS configuration
+ALLOWED_HOSTS = [
+    'ascai.org',
+    'www.ascai.org',
+    '.up.railway.app',
+    '127.0.0.1'
 ]
-
-# Add Railway internal domains if not already present
-for domain in railway_internal_domains:
-    if domain not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(domain)
 
 # Log ALLOWED_HOSTS for debugging (without exposing sensitive info)
 import logging
 logger = logging.getLogger(__name__)
 logger.info(f"ALLOWED_HOSTS configured: {len(ALLOWED_HOSTS)} host(s)")
-
-if not ALLOWED_HOSTS:
-    raise ImproperlyConfigured(
-        "ALLOWED_HOSTS must be set in production. Set it as a comma-separated list of domains, "
-        "or ensure RAILWAY_PUBLIC_DOMAIN is available."
-    )
 
 # Database
 DATABASE_URL = config('DATABASE_URL', default=None)
@@ -103,16 +82,10 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 X_FRAME_OPTIONS = 'DENY'
 
-CSRF_TRUSTED_ORIGINS = config(
-    'CSRF_TRUSTED_ORIGINS',
-    default='',
-    cast=lambda v: [s.strip() for s in v.split(',')] if v else []
-)
-
-# Validate CSRF_TRUSTED_ORIGINS matches ALLOWED_HOSTS
-if not CSRF_TRUSTED_ORIGINS:
-    # Auto-populate from ALLOWED_HOSTS if not set
-    CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS]
+CSRF_TRUSTED_ORIGINS = [
+    'https://ascai.org',
+    'https://www.ascai.org',
+]
 
 # Media files configuration for Railway
 # Railway persistent volumes can be mounted at /data or a custom path
