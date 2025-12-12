@@ -1,5 +1,5 @@
 {% if messages %}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         {% for message in messages %}
             <div class="mb-4 p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% elif message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-700{% else %}bg-cameroon-green/10 text-cameroon-green{% endif %}" 
                  x-data="{ show: true }" 

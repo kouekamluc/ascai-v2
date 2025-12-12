@@ -1,9 +1,12 @@
-{% load i18n %}
+{% load i18n static %}
 <footer class="bg-gray-800 text-white mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <!-- About -->
             <div>
+                <div class="mb-4">
+                    <img src="{% static 'images/apple-touch-icon.png' %}" alt="ASCAI Lazio Logo" class="h-16 w-16 object-contain mb-3" />
+                </div>
                 <h3 class="text-lg font-semibold mb-4">{% trans 'About ASCAI Lazio' %}</h3>
                 <p class="text-gray-300 text-sm">
                     {% trans 'Association of Cameroonian Students and Academics in the Lazio Region, Italy.' %}
@@ -37,7 +40,7 @@
                 <h3 class="text-lg font-semibold mb-4">{% trans 'Contact' %}</h3>
                 <p class="text-gray-300 text-sm mb-4">
                     {% trans 'Lazio Region, Italy' %}<br>
-                    <a href="mailto:info@ascailazio.org" class="hover:text-white transition">info@ascailazio.org</a>
+                    <a href="mailto:info@ascai.org" class="hover:text-white transition">info@ascai.org</a>
                 </p>
                 <!-- Social Media Links -->
                 <div class="flex space-x-4">

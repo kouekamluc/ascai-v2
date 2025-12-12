@@ -28,8 +28,12 @@
 <!-- Hero Section -->
 <section class="hero-section text-white py-20 relative" style="background-image: url('https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&q=100&w=1920'); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <div class="absolute inset-0 bg-black/20"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center">
+            <!-- ASCAI Lazio Logo -->
+            <div class="flex justify-center mb-6">
+                <img src="{% static 'images/web-app-manifest-512x512.png' %}" alt="ASCAI Lazio Logo" class="h-32 w-32 md:h-40 md:w-40 object-contain drop-shadow-2xl" />
+            </div>
             <h1 class="text-4xl md:text-5xl font-bold mb-4">ASCAI Lazio</h1>
             <p class="text-xl mb-8 text-white/90">
                 Cameroonian Community in Rome & Lazio, Italy
@@ -57,7 +61,7 @@
 
 <!-- Introduction to Cameroonians in Lazio -->
 <section class="py-16 bg-gradient-to-b from-white to-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
                 <h2 class="text-3xl md:text-4xl font-bold mb-6 text-cameroon-green">
@@ -100,7 +104,7 @@
 
 <!-- Mission & Objectives -->
 <section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-center mb-12">{% trans 'Our Mission' %}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="text-center p-6 bg-cameroon-green/10 rounded-lg border border-cameroon-green/20">
@@ -125,7 +129,7 @@
 <!-- Latest News -->
 {% if latest_news %}
 <section class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-3xl font-bold">{% trans 'Latest News' %}</h2>
             <a href="{% url 'diaspora:news_list' %}" class="text-cameroon-green hover:text-cameroon-red font-semibold">
@@ -162,7 +166,7 @@
 <!-- Upcoming Events -->
 {% if upcoming_events %}
 <section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-3xl font-bold">{% trans 'Upcoming Events' %}</h2>
             <a href="{% url 'diaspora:event_list' %}" class="text-cameroon-green hover:text-cameroon-red font-semibold">
@@ -222,7 +226,7 @@
 <!-- Success Stories -->
 {% if success_stories %}
 <section class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-center mb-12">{% trans 'Success Stories' %}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container">
             {% for story in success_stories %}

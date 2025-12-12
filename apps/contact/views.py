@@ -41,8 +41,8 @@ This message was sent from the ASCAI Lazio contact form.
 Submitted on: {submission.created_at.strftime('%Y-%m-%d %H:%M:%S')}
 """
             
-            # Get contact email from settings (defaults to info@ascailazio.org)
-            contact_email = getattr(settings, 'CONTACT_EMAIL', 'info@ascailazio.org')
+            # Get contact email from settings (defaults to info@ascai.org)
+            contact_email = getattr(settings, 'CONTACT_EMAIL', 'info@ascai.org')
             
             send_mail(
                 subject=f"ASCAI Lazio Contact: {submission.subject}",

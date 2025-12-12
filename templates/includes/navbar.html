@@ -1,14 +1,12 @@
 {% load i18n static %}
 <nav class="site-navbar bg-white/95 backdrop-blur-md shadow-md sticky top-0 z-50 border-b border-gray-100" x-data="{ mobileMenuOpen: false }">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-20">
             <!-- Logo -->
             <div class="flex-shrink-0">
                 <a href="{% url 'core:home' %}" class="flex items-center group">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-10 h-10 bg-gradient-to-br from-cameroon-green to-cameroon-green/80 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-                            <span class="text-white font-bold text-lg">A</span>
-                        </div>
+                    <div class="flex items-center space-x-3">
+                        <img src="{% static 'images/apple-touch-icon.png' %}" alt="ASCAI Lazio Logo" class="h-12 w-12 object-contain group-hover:scale-105 transition-transform duration-300" />
                         <div class="flex flex-col">
                             <span class="text-xl font-bold bg-gradient-to-r from-cameroon-green to-cameroon-green/80 bg-clip-text text-transparent">ASCAI Lazio</span>
                             <span class="text-xs text-gray-500 -mt-1">Cameroonian Students</span>

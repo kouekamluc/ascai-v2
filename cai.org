@@ -1,0 +1,23 @@
+warning: in the working copy of 'templates/base.html', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/templates/base.html b/templates/base.html[m
+[1mindex a7b6616..a3cfa88 100644[m
+[1m--- a/templates/base.html[m
+[1m+++ b/templates/base.html[m
+[36m@@ -8,14 +8,12 @@[m
+     <meta name="keywords" content="{% block meta_keywords %}{% trans 'Cameroonian community, Rome, Lazio, Italy, Cameroonian students, African diaspora' %}{% endblock %}">[m
+     <title>{% block title %}{% trans 'ASCAI Lazio' %}{% endblock %}</title>[m
+     [m
+[31m-    <!-- Favicon -->[m
+[32m+[m[32m    <!-- Favicon - ASCAI Lazio Logo -->[m
+     <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">[m
+     <link rel="icon" type="image/png" sizes="96x96" href="{% static 'images/favicon-96x96.png' %}">[m
+[31m-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">[m
+[31m-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">[m
+     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">[m
+[31m-    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/android-chrome-192x192.png' %}">[m
+[31m-    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/android-chrome-512x512.png' %}">[m
+[32m+[m[32m    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/web-app-manifest-192x192.png' %}">[m
+[32m+[m[32m    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/web-app-manifest-512x512.png' %}">[m
+     <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">[m
+     <link rel="manifest" href="{% static 'images/site.webmanifest' %}">[m
+     <meta name="theme-color" content="#007A5E">[m

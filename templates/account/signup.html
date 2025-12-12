@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load socialaccount %}
+{% load static %}
 
 {% block title %}{% trans 'Sign Up' %} - ASCAI Lazio{% endblock %}
 
@@ -9,6 +10,9 @@
     <div class="w-full max-w-md">
         <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
             <div class="bg-gradient-to-r from-cameroon-green to-cameroon-green/80 px-8 py-6 text-center">
+                <div class="flex justify-center mb-4">
+                    <img src="{% static 'images/apple-touch-icon.png' %}" alt="ASCAI Lazio Logo" class="h-16 w-16 object-contain drop-shadow-lg" />
+                </div>
                 <h1 class="text-3xl font-bold text-white mb-2">{% trans 'Create Account' %}</h1>
                 <p class="text-cameroon-green/90 text-sm">{% trans 'Join ASCAI Lazio community' %}</p>
             </div>
