@@ -86,7 +86,15 @@
         </div>
         {% empty %}
         <div class="col-span-3 bg-white rounded-lg shadow-md p-8 text-center">
-            <p class="text-gray-500">{% trans 'No mentors found.' %}</p>
+            <div class="max-w-md mx-auto">
+                <p class="text-gray-500 text-lg mb-4">{% trans 'No mentors found.' %}</p>
+                {% if request.GET.search %}
+                <p class="text-gray-400 text-sm mb-4">{% trans 'Try adjusting your search terms.' %}</p>
+                <a href="{% url 'mentorship:mentor_list' %}" class="text-cameroon-green hover:underline">{% trans 'View all mentors' %}</a>
+                {% else %}
+                <p class="text-gray-400 text-sm">{% trans 'Mentors will appear here once they are approved by administrators.' %}</p>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>

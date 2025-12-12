@@ -10,16 +10,57 @@ from .models import MentorProfile, MentorshipRequest, MentorshipMessage, MentorR
 @admin.register(MentorProfile)
 class MentorProfileAdmin(BaseAdmin):
     """Admin interface for MentorProfile."""
-    list_display = ['user', 'specialization', 'is_approved', 'availability_status', 'rating', 'students_helped']
-    list_filter = ['is_approved', 'availability_status']
-    search_fields = ['user__username', 'specialization', 'bio']
+    list_display = ['user', 'specialization', 'approval_status_badge', 'is_approved', 'availability_status', 'rating', 'students_helped', 'created_at']
+    list_filter = ['is_approved', 'availability_status', 'created_at']
+    search_fields = ['user__username', 'user__email', 'specialization', 'bio']
     raw_id_fields = ['user']
-    actions = ['approve_mentors']
+    actions = ['approve_mentors', 'reject_mentors']
+    list_editable = ['is_approved']  # Allow quick approval from list view
+    list_display_links = ['user', 'specialization']  # Make these clickable
+    ordering = ['-created_at']  # Show newest first (unapproved will be at top)
+    date_hierarchy = 'created_at'
+    
+    def approval_status_badge(self, obj):
+        """Display approval status with a badge indicator."""
+        from django.utils.html import format_html
+        if obj.is_approved:
+            return format_html(
+                '<span style="background-color: #28a745; color: white; padding: 3px 8px; '
+                'border-radius: 12px; font-size: 11px; font-weight: bold;">✓ APPROVED</span>'
+            )
+        else:
+            return format_html(
+                '<span style="background-color: #dc3545; color: white; padding: 3px 8px; '
+                'border-radius: 12px; font-size: 11px; font-weight: bold;">⚠ PENDING</span>'
+            )
+    approval_status_badge.short_description = _('Approval Status')
+    approval_status_badge.admin_order_field = 'is_approved'
     
     def approve_mentors(self, request, queryset):
+        """Approve selected mentors."""
         updated = queryset.update(is_approved=True)
-        self.message_user(request, f'{updated} mentor(s) approved.')
+        self.message_user(request, f'{updated} mentor(s) approved successfully.')
     approve_mentors.short_description = _('Approve selected mentors')
+    
+    def reject_mentors(self, request, queryset):
+        """Reject (unapprove) selected mentors."""
+        updated = queryset.update(is_approved=False)
+        self.message_user(request, f'{updated} mentor(s) rejected.')
+    reject_mentors.short_description = _('Reject selected mentors')
+    
+    def changelist_view(self, request, extra_context=None):
+        """Add notification count for pending mentors."""
+        extra_context = extra_context or {}
+        pending_count = MentorProfile.objects.filter(is_approved=False).count()
+        if pending_count > 0:
+            extra_context['notification_count'] = pending_count
+            extra_context['notification_message'] = _('⚠ {} mentor profile(s) pending approval').format(pending_count)
+        return super().changelist_view(request, extra_context)
+    
+    def get_queryset(self, request):
+        """Optimize queryset with select_related."""
+        qs = super().get_queryset(request)
+        return qs.select_related('user')
 
 
 @admin.register(MentorshipRequest)
