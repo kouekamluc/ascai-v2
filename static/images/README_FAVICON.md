@@ -1,36 +1,56 @@
-# Favicon Setup Instructions
+# ASCAI Lazio Logo Favicon Setup
 
-## Logo File Placement
+## Quick Setup (Easiest Method)
 
-Place your ASCAI Lazio logo files in this directory (`static/images/`) with the following names:
+### Step 1: Save Your Logo
+1. Save your ASCAI Lazio logo image (the one with Colosseum, flags, etc.) as:
+   - **File name:** `ascai-logo.png` (or `.jpg` if you only have JPG)
+   - **Location:** `static/images/ascai-logo.png`
 
-1. **favicon.ico** - Main favicon file (16x16, 32x32, 48x48 sizes recommended)
-2. **favicon-16x16.png** - 16x16 PNG version
-3. **favicon-32x32.png** - 32x32 PNG version
-4. **apple-touch-icon.png** - 180x180 PNG for iOS devices
-5. **android-chrome-192x192.png** - 192x192 PNG for Android
-6. **android-chrome-512x512.png** - 512x512 PNG for Android
+### Step 2: Generate Favicon Files (Choose One Method)
 
-## Recommended Sizes
+#### Option A: Using Python Script (Recommended)
+```bash
+# Install Pillow if not already installed
+pip install Pillow
 
-- favicon.ico: Multi-size (16x16, 32x32, 48x48)
-- PNG files: Use the exact sizes mentioned above
+# Run the generation script
+python scripts/generate_favicon.py
+```
 
-## Quick Setup (Using Your Logo)
+This will automatically create all required favicon sizes from your logo.
 
-If you have the ASCAI Lazio logo image:
+#### Option B: Using Online Tool
+1. Go to: https://realfavicongenerator.net/
+2. Upload your `ascai-logo.png` file
+3. Configure settings (optional)
+4. Download the generated package
+5. Extract and copy all files to `static/images/`
 
-1. Convert it to the required sizes using an online tool like:
-   - https://realfavicongenerator.net/
-   - https://favicon.io/
+### Step 3: Commit and Deploy
+```bash
+git add static/images/
+git commit -m "Add ASCAI Lazio logo favicon files"
+git push
+```
 
-2. Save all generated files to `static/images/`
+After deployment, your logo will appear as the favicon in browser tabs!
 
-3. Run `python manage.py collectstatic` to copy files to `staticfiles/`
+## Generated Files
 
-4. The favicon will appear in browser tabs automatically!
+The favicon setup will create/use these files:
 
-## Note
+1. **favicon.ico** - Main favicon (multi-size: 16x16, 32x32, 48x48)
+2. **favicon.svg** - SVG version (for modern browsers)
+3. **favicon-16x16.png** - 16x16 PNG
+4. **favicon-32x32.png** - 32x32 PNG
+5. **apple-touch-icon.png** - 180x180 PNG (iOS devices)
+6. **android-chrome-192x192.png** - 192x192 PNG (Android)
+7. **android-chrome-512x512.png** - 512x512 PNG (Android)
 
-The favicon links are already configured in `templates/base.html`. Once you place the image files here, the favicon will work automatically.
+## Notes
+
+- The favicon links are already configured in `templates/base.html`
+- Files will be automatically uploaded to S3 (if USE_S3=True) on deployment
+- The detailed logo may be simplified at small sizes (16x16, 32x32) - this is normal
 
