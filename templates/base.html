@@ -144,11 +144,35 @@
             }
             
             /* Increase container widths on tablets for better screen utilization */
-            /* Target common container patterns used throughout the site */
+            /* Target common container patterns used throughout the site, but exclude navbar */
             section > div.mx-auto,
-            main > div.mx-auto,
-            .mx-auto[class*="px-"] {
+            main > div.mx-auto {
                 max-width: 98% !important;
+            }
+            
+            /* Ensure navbar container maintains proper width */
+            nav .mx-auto {
+                max-width: 100% !important;
+            }
+            
+            /* Prevent navbar item overlap on tablets */
+            .site-navbar {
+                overflow-x: visible;
+            }
+            
+            .site-navbar > div > div {
+                flex-wrap: nowrap;
+                overflow: visible;
+            }
+            
+            /* Navbar responsive optimizations */
+            .site-navbar .nav-link {
+                white-space: nowrap;
+            }
+            
+            /* Ensure navbar items don't shrink on tablets */
+            .site-navbar > div > div > div {
+                flex-shrink: 0;
             }
         }
         

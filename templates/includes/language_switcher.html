@@ -2,11 +2,11 @@
 {% get_current_language as CURRENT_LANGUAGE %}
 {% get_available_languages as LANGUAGES %}
 
-<div class="relative" x-data="{ open: false }">
-    <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-cameroon-green bg-gray-50 hover:bg-cameroon-green/5 rounded-lg transition-all duration-200 border border-gray-200 hover:border-cameroon-green/30">
-        <span class="text-lg">{% if CURRENT_LANGUAGE == 'en' %}🇬🇧{% elif CURRENT_LANGUAGE == 'fr' %}🇫🇷{% elif CURRENT_LANGUAGE == 'it' %}🇮🇹{% else %}🌐{% endif %}</span>
-        <span class="uppercase font-semibold">{{ CURRENT_LANGUAGE }}</span>
-        <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div class="relative flex-shrink-0" x-data="{ open: false }">
+    <button @click="open = !open" class="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 text-xs md:text-sm font-medium text-gray-700 hover:text-cameroon-green bg-gray-50 hover:bg-cameroon-green/5 rounded-lg transition-all duration-200 border border-gray-200 hover:border-cameroon-green/30">
+        <span class="text-base md:text-lg">{% if CURRENT_LANGUAGE == 'en' %}🇬🇧{% elif CURRENT_LANGUAGE == 'fr' %}🇫🇷{% elif CURRENT_LANGUAGE == 'it' %}🇮🇹{% else %}🌐{% endif %}</span>
+        <span class="uppercase font-semibold hidden sm:inline">{{ CURRENT_LANGUAGE }}</span>
+        <svg class="w-3 h-3 md:w-4 md:h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
     </button>
