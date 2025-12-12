@@ -3,7 +3,7 @@
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="description" content="{% block meta_description %}{% trans 'ASCAI Lazio - Cameroonian Community in Rome & Lazio. Connect with Cameroonian students, academics, and professionals in Italy.' %}{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}{% trans 'Cameroonian community, Rome, Lazio, Italy, Cameroonian students, African diaspora' %}{% endblock %}">
     <title>{% block title %}{% trans 'ASCAI Lazio' %}{% endblock %}</title>
@@ -110,6 +110,45 @@
         @media (min-width: 1280px) {
             .container-responsive {
                 max-width: 80rem; /* 1280px - max-w-7xl for desktop */
+            }
+        }
+        
+        /* Ensure full width on tablets */
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        main {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* Tablet-specific optimizations (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            html, body {
+                width: 100vw;
+                max-width: 100vw;
+            }
+            
+            main {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            /* Ensure sections use full available width on tablets */
+            section {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            /* Increase container widths on tablets for better screen utilization */
+            /* Target common container patterns used throughout the site */
+            section > div.mx-auto,
+            main > div.mx-auto,
+            .mx-auto[class*="px-"] {
+                max-width: 98% !important;
             }
         }
         
