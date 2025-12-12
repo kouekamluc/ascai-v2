@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{% trans 'Universities' %} - ASCAI Lazio{% endblock %}
+{% block title %}Universities in Lazio, Italy | Guide for Cameroonian Students - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}Find the best universities in Lazio, Italy for Cameroonian students. Discover programs, tuition fees, admission requirements, and student life at universities in Rome and Lazio region.{% endblock %}
+
+{% block meta_keywords %}universities Lazio, Italy universities, Rome universities, study in Italy, Cameroonian students, university guide, Lazio universities, study programs Italy{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/universities/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/universities/">
+<meta property="og:title" content="Universities in Lazio, Italy | Guide for Cameroonian Students - ASCAI Lazio">
+<meta property="og:description" content="Find the best universities in Lazio, Italy for Cameroonian students. Discover programs, tuition fees, and admission requirements.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Universities in Lazio, Italy - ASCAI Lazio">
+<meta name="twitter:description" content="Find the best universities in Lazio, Italy for Cameroonian students.">
+{% endblock %}
 
 {% block extra_css %}
 <style>

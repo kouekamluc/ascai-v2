@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{{ scholarship.title }} - ASCAI Lazio{% endblock %}
+{% block title %}{{ scholarship.title }} | Scholarship Opportunity - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}{{ scholarship.description|striptags|truncatewords:30|default:"Apply for this scholarship opportunity" }} for students in Lazio, Italy. {% if scholarship.amount %}Amount: {{ scholarship.amount }} {{ scholarship.currency }}.{% endif %} {% if scholarship.application_deadline %}Deadline: {{ scholarship.application_deadline|date:"F d, Y" }}.{% endif %}{% endblock %}
+
+{% block meta_keywords %}scholarship, {{ scholarship.title }}, student funding, Lazio, Italy, Cameroonian students, financial aid{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/scholarships/{{ scholarship.slug }}/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/scholarships/{{ scholarship.slug }}/">
+<meta property="og:title" content="{{ scholarship.title }} | ASCAI Lazio">
+<meta property="og:description" content="{{ scholarship.description|striptags|truncatewords:30 }}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ scholarship.title }}">
+<meta name="twitter:description" content="{{ scholarship.description|striptags|truncatewords:30 }}">
+{% endblock %}
 
 {% block extra_css %}
 <style>

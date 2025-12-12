@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{% trans 'Scholarships' %} - ASCAI Lazio{% endblock %}
+{% block title %}Scholarships for Students in Lazio, Italy | Funding Opportunities - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}Find scholarships for students in Lazio, Italy. Discover funding opportunities, DISCO Lazio scholarships, and financial aid for Cameroonian students studying in Rome and Lazio region.{% endblock %}
+
+{% block meta_keywords %}scholarships Italy, Lazio scholarships, student funding, DISCO Lazio, study grants, financial aid Italy, Cameroonian students scholarships, university scholarships{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/scholarships/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/scholarships/">
+<meta property="og:title" content="Scholarships for Students in Lazio, Italy | Funding Opportunities - ASCAI Lazio">
+<meta property="og:description" content="Find scholarships for students in Lazio, Italy. Discover funding opportunities and financial aid for students.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scholarships for Students in Lazio - ASCAI Lazio">
+<meta name="twitter:description" content="Find scholarships for students in Lazio, Italy. Discover funding opportunities.">
+{% endblock %}
 
 {% block extra_css %}
 <style>

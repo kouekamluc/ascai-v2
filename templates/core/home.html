@@ -1,7 +1,28 @@
 {% extends 'base.html' %}
 {% load i18n static %}
 
-{% block title %}{% trans 'Home' %} - ASCAI Lazio{% endblock %}
+{% block title %}ASCAI Lazio | Cameroonian Community in Rome & Lazio{% endblock %}
+
+{% block meta_description %}ASCAI Lazio - Cameroonian Community in Rome & Lazio. Connect with Cameroonian students, academics, and professionals in Italy. Find scholarships, universities, events, and support.{% endblock %}
+
+{% block meta_keywords %}Cameroonian community, Rome, Lazio, Italy, Cameroonian students, African diaspora, university scholarships, Cameroonian academics{% endblock %}
+
+{% block extra_head %}
+<!-- Canonical URL -->
+<link rel="canonical" href="https://ascai.org/">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/">
+<meta property="og:title" content="ASCAI Lazio | Cameroonian Community in Rome & Lazio">
+<meta property="og:description" content="Connect with Cameroonian students, academics, and professionals in Rome and Lazio, Italy. Find scholarships, universities, events, and community support.">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://ascai.org/">
+<meta name="twitter:title" content="ASCAI Lazio | Cameroonian Community in Rome & Lazio">
+<meta name="twitter:description" content="Connect with Cameroonian students, academics, and professionals in Rome and Lazio, Italy.">
+{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->

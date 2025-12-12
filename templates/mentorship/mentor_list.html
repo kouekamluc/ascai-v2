@@ -1,5 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
+
+{% block title %}Mentorship Program | Find Mentors for Cameroonian Students - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}Find mentors and get guidance from experienced Cameroonian students and academics in Lazio, Italy. Connect with mentors who can help with academics, career, and life in Italy.{% endblock %}
+
+{% block meta_keywords %}mentorship, mentors, Cameroonian students, academic guidance, career advice, Lazio, Italy, student support, mentorship program{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/mentorship/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/mentorship/">
+<meta property="og:title" content="Mentorship Program | Find Mentors for Cameroonian Students - ASCAI Lazio">
+<meta property="og:description" content="Find mentors and get guidance from experienced Cameroonian students and academics in Lazio, Italy.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mentorship Program - ASCAI Lazio">
+<meta name="twitter:description" content="Find mentors and get guidance for academic and career success.">
+{% endblock %}
 
 {% block title %}{% trans 'Mentors' %} - ASCAI Lazio{% endblock %}
 

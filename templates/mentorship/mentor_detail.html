@@ -1,7 +1,24 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{{ mentor.user.get_full_name|default:mentor.user.username }} - ASCAI Lazio{% endblock %}
+{% block title %}{{ mentor.user.get_full_name|default:mentor.user.username }} - Mentor Profile | ASCAI Lazio{% endblock %}
+
+{% block meta_description %}{{ mentor.bio|striptags|truncatewords:30|default:"Mentor profile" }} - {{ mentor.specialization }}. Get mentorship from experienced professionals in Lazio, Italy.{% endblock %}
+
+{% block meta_keywords %}mentor, mentorship, {{ mentor.specialization }}, Cameroonian mentor, academic guidance, Lazio{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/mentorship/mentors/{{ mentor.pk }}/">
+<meta property="og:type" content="profile">
+<meta property="og:url" content="https://ascai.org/mentorship/mentors/{{ mentor.pk }}/">
+<meta property="og:title" content="{{ mentor.user.get_full_name|default:mentor.user.username }} - Mentor | ASCAI Lazio">
+<meta property="og:description" content="{{ mentor.bio|striptags|truncatewords:30|default:mentor.specialization }}">
+{% if mentor.user.avatar %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ mentor.user.avatar.url }}">{% endif %}
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ mentor.user.get_full_name|default:mentor.user.username }} - Mentor">
+<meta name="twitter:description" content="{{ mentor.bio|striptags|truncatewords:30|default:mentor.specialization }}">
+{% if mentor.user.avatar %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ mentor.user.avatar.url }}">{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

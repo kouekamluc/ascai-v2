@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{% trans 'Diaspora' %} - ASCAI Lazio{% endblock %}
+{% block title %}Cameroonian Diaspora in Lazio | News, Events & Community - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}Connect with Cameroonians in Lazio, Italy. Discover news, events, success stories, testimonials, and learn about life in Italy. Join the Cameroonian community in Rome and Lazio region.{% endblock %}
+
+{% block meta_keywords %}Cameroonian diaspora, Lazio, Rome, Italy, Cameroonian community, Cameroonian students, African diaspora, life in Italy, success stories, Cameroonian events{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/diaspora/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/diaspora/">
+<meta property="og:title" content="Cameroonian Diaspora in Lazio | News, Events & Community - ASCAI Lazio">
+<meta property="og:description" content="Connect with Cameroonians in Lazio, Italy. Discover news, events, success stories, and learn about life in Italy.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Cameroonian Diaspora in Lazio | News, Events & Community">
+<meta name="twitter:description" content="Connect with Cameroonians in Lazio, Italy. Discover news, events, success stories, and learn about life in Italy.">
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

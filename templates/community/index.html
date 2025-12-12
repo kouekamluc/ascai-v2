@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{% trans 'Community Forum' %} - ASCAI Lazio{% endblock %}
+{% block title %}Community Forum | Cameroonian Students & Academics - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}Join the ASCAI Lazio community forum. Connect, share, and learn with Cameroonian students, academics, and professionals in Lazio, Italy. Discuss topics, ask questions, and build connections.{% endblock %}
+
+{% block meta_keywords %}Cameroonian forum, community forum, Lazio, Rome, Italy, Cameroonian students, discussion forum, academic community{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/community/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/community/">
+<meta property="og:title" content="Community Forum | Cameroonian Students & Academics - ASCAI Lazio">
+<meta property="og:description" content="Join the ASCAI Lazio community forum. Connect, share, and learn with Cameroonian students and academics.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Community Forum | ASCAI Lazio">
+<meta name="twitter:description" content="Join the ASCAI Lazio community forum. Connect with Cameroonian students and academics.">
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

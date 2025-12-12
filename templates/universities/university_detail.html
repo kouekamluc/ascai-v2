@@ -1,7 +1,24 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{{ university.name }} - ASCAI Lazio{% endblock %}
+{% block title %}{{ university.name }} in {{ university.get_city_display }} | University Guide - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}{{ university.description|striptags|truncatewords:30|default:"Complete guide to" }} {{ university.name }} in {{ university.get_city_display }}, Lazio, Italy. Programs, tuition fees, admission requirements for Cameroonian students.{% endblock %}
+
+{% block meta_keywords %}{{ university.name }}, {{ university.get_city_display }}, Lazio, Italy, university guide, Cameroonian students, study in Italy, {{ university.name }} programs{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/universities/{{ university.slug }}/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/universities/{{ university.slug }}/">
+<meta property="og:title" content="{{ university.name }} in {{ university.get_city_display }} - ASCAI Lazio">
+<meta property="og:description" content="{{ university.description|striptags|truncatewords:30 }}">
+{% if university.logo %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ university.logo.url }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ university.name }} - ASCAI Lazio">
+<meta name="twitter:description" content="{{ university.description|striptags|truncatewords:30 }}">
+{% if university.logo %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ university.logo.url }}">{% endif %}
+{% endblock %}
 
 {% block extra_css %}
 <style>

@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{% trans 'Gallery' %} - ASCAI Lazio{% endblock %}
+{% block title %}Photo & Video Gallery | Cameroonian Community Events - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}Explore our photo and video gallery showcasing Cameroonian community events, activities, and gatherings in Lazio, Italy. See photos from cultural events, academic workshops, and community celebrations.{% endblock %}
+
+{% block meta_keywords %}gallery, photos, videos, Cameroonian community, Lazio events, community photos, cultural events, ASCAI gallery{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/gallery/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/gallery/">
+<meta property="og:title" content="Photo & Video Gallery | Cameroonian Community Events - ASCAI Lazio">
+<meta property="og:description" content="Explore our photo and video gallery showcasing Cameroonian community events in Lazio, Italy.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Photo & Video Gallery - ASCAI Lazio">
+<meta name="twitter:description" content="Explore our gallery showcasing Cameroonian community events.">
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

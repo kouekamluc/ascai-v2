@@ -1,7 +1,27 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{{ event.title }} - ASCAI Lazio{% endblock %}
+{% block title %}{{ event.title }} | Cameroonian Community Events - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}{{ event.description|striptags|truncatewords:30|default:"Join us for this Cameroonian community event in Lazio, Italy." }} Event location: {{ event.location }}. Date: {{ event.start_datetime|date:"F d, Y" }}.{% endblock %}
+
+{% block meta_keywords %}Cameroonian events, Lazio, Rome, Italy, community events, Cameroonian community, diaspora events, {{ event.location }}{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/diaspora/events/{{ event.slug }}/">
+<meta property="og:type" content="event">
+<meta property="og:url" content="https://ascai.org/diaspora/events/{{ event.slug }}/">
+<meta property="og:title" content="{{ event.title }} | ASCAI Lazio">
+<meta property="og:description" content="{{ event.description|striptags|truncatewords:30 }}">
+{% if event.image %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ event.image.url }}">{% endif %}
+<meta property="event:start_time" content="{{ event.start_datetime|date:'c' }}">
+<meta property="event:end_time" content="{{ event.end_datetime|date:'c' }}">
+<meta property="event:location" content="{{ event.location }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ event.title }}">
+<meta name="twitter:description" content="{{ event.description|striptags|truncatewords:30 }}">
+{% if event.image %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ event.image.url }}">{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

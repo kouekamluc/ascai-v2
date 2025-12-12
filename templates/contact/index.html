@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{% trans 'Contact Us' %} - ASCAI Lazio{% endblock %}
+{% block title %}Contact Us | ASCAI Lazio - Cameroonian Community in Rome & Lazio{% endblock %}
+
+{% block meta_description %}Contact ASCAI Lazio - Cameroonian community association in Rome and Lazio, Italy. Get in touch for questions, support, or to join our community of students and academics.{% endblock %}
+
+{% block meta_keywords %}contact ASCAI, Cameroonian community contact, Lazio, Rome, Italy, get in touch, community support{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/contact/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/contact/">
+<meta property="og:title" content="Contact Us | ASCAI Lazio - Cameroonian Community">
+<meta property="og:description" content="Contact ASCAI Lazio for questions, support, or to join our community of Cameroonian students and academics.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Contact Us - ASCAI Lazio">
+<meta name="twitter:description" content="Get in touch with ASCAI Lazio - Cameroonian community in Rome and Lazio.">
+{% endblock %}
 
 {% block extra_css %}
 {{ form.media.css }}

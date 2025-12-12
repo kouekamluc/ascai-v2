@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{% trans 'Downloads' %} - ASCAI Lazio{% endblock %}
+{% block title %}Downloads | Forms & Documents - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}Download forms, applications, and documents from ASCAI Lazio. Access enrollment documents, visa forms, Reddìto forms, and ASCAI Lazio guidelines for Cameroonian students in Italy.{% endblock %}
+
+{% block meta_keywords %}downloads, forms, documents, ASCAI Lazio, enrollment documents, visa forms, Reddìto forms, student documents{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/downloads/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/downloads/">
+<meta property="og:title" content="Downloads | Forms & Documents - ASCAI Lazio">
+<meta property="og:description" content="Download forms, applications, and documents from ASCAI Lazio for Cameroonian students.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Downloads - ASCAI Lazio">
+<meta name="twitter:description" content="Download forms and documents from ASCAI Lazio.">
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

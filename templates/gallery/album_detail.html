@@ -1,7 +1,24 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}{{ album.title }} - ASCAI Lazio{% endblock %}
+{% block title %}{{ album.title }} | Photo Gallery - ASCAI Lazio{% endblock %}
+
+{% block meta_description %}{{ album.description|striptags|truncatewords:30|default:"View photos from" }} {{ album.title }}. Cameroonian community gallery showcasing events and activities in Lazio, Italy.{% endblock %}
+
+{% block meta_keywords %}gallery, photos, {{ album.title }}, Cameroonian community, Lazio events, community photos{% endblock %}
+
+{% block extra_head %}
+<link rel="canonical" href="https://ascai.org/gallery/{{ album.pk }}/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ascai.org/gallery/{{ album.pk }}/">
+<meta property="og:title" content="{{ album.title }} | ASCAI Lazio Gallery">
+<meta property="og:description" content="{{ album.description|striptags|truncatewords:30|default:album.title }}">
+{% if album.cover_image %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ album.cover_image.url }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ album.title }}">
+<meta name="twitter:description" content="{{ album.description|striptags|truncatewords:30|default:album.title }}">
+{% if album.cover_image %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ album.cover_image.url }}">{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
