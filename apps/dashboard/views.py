@@ -939,8 +939,8 @@ class DashboardMentorProfileCreateView(DashboardRequiredMixin, CreateView):
     """Create mentor profile within dashboard."""
     from apps.mentorship.models import MentorProfile
     from apps.mentorship.forms import MentorProfileForm
-    model = MentorProfile
-    form_class = MentorProfileForm
+    model = MentorProfile  # This works because import is in class scope
+    form_class = MentorProfileForm  # This works because import is in class scope
     template_name = 'dashboard/mentorship/profile_create.html'
     
     def dispatch(self, request, *args, **kwargs):
@@ -969,8 +969,8 @@ class DashboardMentorProfileUpdateView(DashboardRequiredMixin, UpdateView):
     """Update mentor profile within dashboard."""
     from apps.mentorship.models import MentorProfile
     from apps.mentorship.forms import MentorProfileUpdateForm
-    model = MentorProfile
-    form_class = MentorProfileUpdateForm
+    model = MentorProfile  # This works because import is in class scope
+    form_class = MentorProfileUpdateForm  # This works because import is in class scope
     template_name = 'dashboard/mentorship/profile_update.html'
     
     def dispatch(self, request, *args, **kwargs):
@@ -1295,7 +1295,7 @@ def dashboard_update_availability(request):
 class DashboardMentorListView(DashboardRequiredMixin, ListView):
     """Browse mentors from dashboard."""
     from apps.mentorship.models import MentorProfile
-    model = MentorProfile
+    model = MentorProfile  # This works because import is in class scope
     template_name = 'dashboard/mentorship/mentor_list.html'
     context_object_name = 'mentors'
     paginate_by = 12
@@ -1345,7 +1345,7 @@ class DashboardMentorListView(DashboardRequiredMixin, ListView):
 class DashboardMentorDetailView(DashboardRequiredMixin, DetailView):
     """View mentor detail from dashboard."""
     from apps.mentorship.models import MentorProfile
-    model = MentorProfile
+    model = MentorProfile  # This works because import is in class scope
     template_name = 'dashboard/mentorship/mentor_detail.html'
     context_object_name = 'mentor'
     
@@ -1380,8 +1380,8 @@ class DashboardMentorshipRequestCreateView(DashboardRequiredMixin, CreateView):
     """Create mentorship request from dashboard."""
     from apps.mentorship.models import MentorshipRequest
     from apps.mentorship.forms import MentorshipRequestForm
-    model = MentorshipRequest
-    form_class = MentorshipRequestForm
+    model = MentorshipRequest  # This works because import is in class scope
+    form_class = MentorshipRequestForm  # This works because import is in class scope
     template_name = 'dashboard/mentorship/request_create.html'
     
     def dispatch(self, request, *args, **kwargs):
