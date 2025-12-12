@@ -126,6 +126,12 @@ class UniversityDetailView(DetailView):
                 university=self.object
             ).exists()
         
+        # Add absolute logo URL for meta tags
+        if self.object.logo:
+            context['logo_url'] = self.request.build_absolute_uri(self.object.logo.url)
+        else:
+            context['logo_url'] = None
+        
         return context
 
 

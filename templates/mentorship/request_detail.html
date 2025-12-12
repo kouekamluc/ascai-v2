@@ -108,9 +108,11 @@
             <h2 class="text-xl font-bold mb-2">{% trans 'Thank You!' %}</h2>
             <p class="text-gray-700">{% trans 'You have already rated this mentor.' %}</p>
             <div class="mt-4">
+                {% if request.rating %}
                 <p class="text-sm text-gray-600">{% trans 'Your Rating' %}: <span class="font-bold">{{ request.rating.rating }}/5</span></p>
                 {% if request.rating.comment %}
                 <p class="text-sm text-gray-600 mt-2">{{ request.rating.comment }}</p>
+                {% endif %}
                 {% endif %}
             </div>
         </div>

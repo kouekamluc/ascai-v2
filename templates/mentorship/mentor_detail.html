@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://ascai.org/mentorship/mentors/{{ mentor.pk }}/">
 <meta property="og:title" content="{{ mentor.user.get_full_name|default:mentor.user.username }} - Mentor | ASCAI Lazio">
 <meta property="og:description" content="{{ mentor.bio|striptags|truncatewords:30|default:mentor.specialization }}">
-{% if mentor.user.avatar %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ mentor.user.avatar.url }}">{% endif %}
+{% if avatar_url %}<meta property="og:image" content="{{ avatar_url }}">{% endif %}
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="{{ mentor.user.get_full_name|default:mentor.user.username }} - Mentor">
 <meta name="twitter:description" content="{{ mentor.bio|striptags|truncatewords:30|default:mentor.specialization }}">
-{% if mentor.user.avatar %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ mentor.user.avatar.url }}">{% endif %}
+{% if avatar_url %}<meta name="twitter:image" content="{{ avatar_url }}">{% endif %}
 {% endblock %}
 
 {% block content %}

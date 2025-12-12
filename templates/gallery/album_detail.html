@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://ascai.org/gallery/{{ album.pk }}/">
 <meta property="og:title" content="{{ album.title }} | ASCAI Lazio Gallery">
 <meta property="og:description" content="{{ album.description|striptags|truncatewords:30|default:album.title }}">
-{% if album.cover_image %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ album.cover_image.url }}">{% endif %}
+{% if cover_image_url %}<meta property="og:image" content="{{ cover_image_url }}">{% endif %}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ album.title }}">
 <meta name="twitter:description" content="{{ album.description|striptags|truncatewords:30|default:album.title }}">
-{% if album.cover_image %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ album.cover_image.url }}">{% endif %}
+{% if cover_image_url %}<meta name="twitter:image" content="{{ cover_image_url }}">{% endif %}
 {% endblock %}
 
 {% block content %}

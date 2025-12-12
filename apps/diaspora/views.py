@@ -78,6 +78,13 @@ class NewsDetailView(DetailView):
             category=self.object.category,
             is_published=True
         ).exclude(pk=self.object.pk)[:3]
+        
+        # Add absolute image URL for meta tags
+        if self.object.image:
+            context['image_url'] = self.request.build_absolute_uri(self.object.image.url)
+        else:
+            context['image_url'] = None
+        
         return context
 
 
@@ -127,6 +134,13 @@ class EventDetailView(DetailView):
         context['related_events'] = Event.objects.filter(
             is_published=True
         ).exclude(pk=self.object.pk)[:3]
+        
+        # Add absolute image URL for meta tags
+        if self.object.image:
+            context['image_url'] = self.request.build_absolute_uri(self.object.image.url)
+        else:
+            context['image_url'] = None
+        
         return context
 
 

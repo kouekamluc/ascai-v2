@@ -1366,6 +1366,12 @@ class DashboardMentorDetailView(DashboardRequiredMixin, DetailView):
             context['has_request'] = existing_requests.exists()
             context['existing_request'] = existing_requests.first()
         
+        # Add absolute avatar URL for meta tags
+        if self.object.user.avatar:
+            context['avatar_url'] = self.request.build_absolute_uri(self.object.user.avatar.url)
+        else:
+            context['avatar_url'] = None
+        
         return context
 
 

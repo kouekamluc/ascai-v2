@@ -29,6 +29,13 @@ class AlbumDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['images'] = self.object.images.all()
+        
+        # Add absolute cover image URL for meta tags
+        if self.object.cover_image:
+            context['cover_image_url'] = self.request.build_absolute_uri(self.object.cover_image.url)
+        else:
+            context['cover_image_url'] = None
+        
         return context
 
 

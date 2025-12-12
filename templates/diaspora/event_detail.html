@@ -13,14 +13,14 @@
 <meta property="og:url" content="https://ascai.org/diaspora/events/{{ event.slug }}/">
 <meta property="og:title" content="{{ event.title }} | ASCAI Lazio">
 <meta property="og:description" content="{{ event.description|striptags|truncatewords:30 }}">
-{% if event.image %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ event.image.url }}">{% endif %}
+{% if image_url %}<meta property="og:image" content="{{ image_url }}">{% endif %}
 <meta property="event:start_time" content="{{ event.start_datetime|date:'c' }}">
 <meta property="event:end_time" content="{{ event.end_datetime|date:'c' }}">
 <meta property="event:location" content="{{ event.location }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ event.title }}">
 <meta name="twitter:description" content="{{ event.description|striptags|truncatewords:30 }}">
-{% if event.image %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ event.image.url }}">{% endif %}
+{% if image_url %}<meta name="twitter:image" content="{{ image_url }}">{% endif %}
 {% endblock %}
 
 {% block content %}

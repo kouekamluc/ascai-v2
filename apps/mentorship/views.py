@@ -60,6 +60,13 @@ class MentorDetailView(DetailView):
             )
             context['has_request'] = existing_requests.exists()
             context['existing_request'] = existing_requests.first()
+        
+        # Add absolute avatar URL for meta tags
+        if self.object.user.avatar:
+            context['avatar_url'] = self.request.build_absolute_uri(self.object.user.avatar.url)
+        else:
+            context['avatar_url'] = None
+        
         return context
 
 
@@ -83,13 +90,26 @@ class MentorshipRequestCreateView(LoginRequiredMixin, CreateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        mentor = get_object_or_404(MentorProfile, id=self.kwargs['mentor_id'])
+        mentor = get_object_or_404(
+            MentorProfile, 
+            id=self.kwargs['mentor_id'],
+            is_approved=True  # Only allow requests to approved mentors
+        )
         context['mentor'] = mentor
         context['mentor_id'] = self.kwargs['mentor_id']
         return context
     
     def form_valid(self, form):
-        mentor = get_object_or_404(MentorProfile, id=self.kwargs['mentor_id'])
+        mentor = get_object_or_404(
+            MentorProfile, 
+            id=self.kwargs['mentor_id'],
+            is_approved=True  # Only allow requests to approved mentors
+        )
+        
+        # Prevent students from requesting their own mentor profile (if they're a mentor)
+        if hasattr(self.request.user, 'mentor_profile') and self.request.user.mentor_profile == mentor:
+            messages.error(self.request, _('You cannot request mentorship from yourself.'))
+            return redirect('mentorship:mentor_detail', pk=mentor.pk)
         
         # Prevent duplicate requests
         existing_request = MentorshipRequest.objects.filter(
@@ -162,7 +182,18 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
         
         context['messages'] = self.object.messages.all().order_by('created_at')
         context['form'] = MentorshipMessageForm()
-        context['rating_form'] = MentorRatingForm() if self.object.status == 'accepted' and not self.object.has_rating() and self.object.student == user else None
+        
+        # Safely check for rating form
+        try:
+            can_rate = (
+                self.object.status == 'accepted' and 
+                not self.object.has_rating() and 
+                self.object.student == user
+            )
+            context['rating_form'] = MentorRatingForm() if can_rate else None
+        except Exception:
+            context['rating_form'] = None
+        
         context['can_complete'] = self.object.can_be_completed()
         context['is_student'] = self.object.student == user
         context['is_mentor'] = self.object.mentor.user == user

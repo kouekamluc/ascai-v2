@@ -116,7 +116,11 @@ class MentorshipRequest(models.Model):
     
     def has_rating(self):
         """Check if this request has been rated."""
-        return hasattr(self, 'rating')
+        try:
+            # Check if related rating object exists
+            return hasattr(self, 'rating') and self.rating is not None
+        except Exception:
+            return False
 
 
 class MentorshipMessage(models.Model):
