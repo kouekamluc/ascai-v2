@@ -1350,6 +1350,7 @@ class DashboardMentorDetailView(DashboardRequiredMixin, DetailView):
     context_object_name = 'mentor'
     
     def get_queryset(self):
+        from apps.mentorship.models import MentorProfile
         return MentorProfile.objects.filter(is_approved=True).select_related('user')
     
     def get_context_data(self, **kwargs):
