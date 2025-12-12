@@ -3,6 +3,7 @@ URL configuration for ASCAI Lazio project.
 """
 from pathlib import Path
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -10,6 +11,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import set_language
 from apps.core.views import HealthCheckView
 from apps.accounts.views import CustomConfirmEmailView, CustomEmailVerificationSentView, email_verification_required_view
+from config.sitemaps import sitemaps
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -17,6 +19,8 @@ urlpatterns = [
     path('ckeditor5/', include('django_ckeditor_5.urls')),
     # Healthcheck endpoint (outside i18n_patterns for reliability)
     path('health/', HealthCheckView.as_view(), name='health'),
+    # Sitemap URLs (outside i18n_patterns for SEO)
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     # Email confirmation URL (outside i18n_patterns so it works from email links without language prefix)
     # This is critical because email links don't have language prefixes
     path('accounts/confirm-email/<str:key>/', CustomConfirmEmailView.as_view(), name='account_confirm_email'),
