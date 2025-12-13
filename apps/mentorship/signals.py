@@ -34,6 +34,8 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
     if created:
         # New request - notify mentor
         try:
+            if not instance.mentor:
+                return  # Skip if mentor doesn't exist
             site_url = get_site_url()
             mentor = instance.mentor.user
             student = instance.student
@@ -67,6 +69,8 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
     else:
         # Status changed - notify student
         try:
+            if not instance.mentor:
+                return  # Skip if mentor doesn't exist
             site_url = get_site_url()
             mentor = instance.mentor.user
             student = instance.student
@@ -137,6 +141,8 @@ def notify_new_message(sender, instance, created, **kwargs):
             request = instance.request
             
             # Determine recipient (the other person in the conversation)
+            if not request.mentor:
+                return  # Skip if mentor doesn't exist
             if instance.sender == request.student:
                 recipient = request.mentor.user
                 sender_name = request.student.get_full_name() or request.student.username

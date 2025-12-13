@@ -1072,12 +1072,13 @@ class DashboardStudentRequestsView(DashboardRequiredMixin, TemplateView):
         
         search_query = self.request.GET.get('search')
         if search_query:
-            requests = requests.filter(
-                Q(subject__icontains=search_query) |
-                Q(message__icontains=search_query) |
-                Q(mentor__user__username__icontains=search_query) |
-                Q(mentor__specialization__icontains=search_query)
-            )
+            # Use safe filtering that handles None mentors
+            from django.db.models import Q
+            search_q = Q(subject__icontains=search_query) | Q(message__icontains=search_query)
+            # Only add mentor-related filters if mentor exists
+            search_q |= Q(mentor__user__username__icontains=search_query)
+            search_q |= Q(mentor__specialization__icontains=search_query)
+            requests = requests.filter(search_q)
         
         context['requests'] = requests
         context['pending_count'] = MentorshipRequest.objects.filter(
@@ -1112,9 +1113,14 @@ class DashboardRequestDetailView(DashboardRequiredMixin, DetailView):
     def get_queryset(self):
         from apps.mentorship.models import MentorshipRequest
         user = self.request.user
-        return MentorshipRequest.objects.filter(
-            Q(student=user) | Q(mentor__user=user)
-        )
+        try:
+            queryset = MentorshipRequest.objects.filter(
+                Q(student=user) | Q(mentor__user=user)
+            ).select_related('mentor', 'mentor__user', 'student')
+            return queryset
+        except Exception:
+            # Fallback: only filter by student if mentor query fails
+            return MentorshipRequest.objects.filter(student=user).select_related('mentor', 'mentor__user', 'student')
     
     def get_context_data(self, **kwargs):
         from apps.mentorship.forms import MentorshipMessageForm, MentorRatingForm
@@ -1130,7 +1136,11 @@ class DashboardRequestDetailView(DashboardRequiredMixin, DetailView):
         context['rating_form'] = MentorRatingForm() if self.object.status == 'accepted' and not self.object.has_rating() and self.object.student == user else None
         context['can_complete'] = self.object.can_be_completed()
         context['is_student'] = self.object.student == user
-        context['is_mentor'] = self.object.mentor.user == user
+        # Fix: Check if mentor exists before accessing mentor.user
+        try:
+            context['is_mentor'] = hasattr(self.object, 'mentor') and self.object.mentor and self.object.mentor.user == user
+        except (AttributeError, TypeError):
+            context['is_mentor'] = False
         return context
     
     def post(self, request, *args, **kwargs):
@@ -1176,7 +1186,7 @@ def dashboard_accept_request(request, request_id):
     )
     
     # Additional check: ensure user is the mentor
-    if mentorship_request.mentor.user != request.user:
+    if not mentorship_request.mentor or mentorship_request.mentor.user != request.user:
         messages.error(request, _('You do not have permission to accept this request.'))
         return JsonResponse({'error': _('Access denied.')}, status=403)
     
@@ -1211,7 +1221,7 @@ def dashboard_reject_request(request, request_id):
     )
     
     # Additional check: ensure user is the mentor
-    if mentorship_request.mentor.user != request.user:
+    if not mentorship_request.mentor or mentorship_request.mentor.user != request.user:
         messages.error(request, _('You do not have permission to reject this request.'))
         return JsonResponse({'error': _('Access denied.')}, status=403)
     
@@ -1243,7 +1253,7 @@ def dashboard_complete_request(request, request_id):
     )
     
     # Only student or mentor can complete
-    if mentorship_request.student != request.user and mentorship_request.mentor.user != request.user:
+    if mentorship_request.student != request.user and (not mentorship_request.mentor or mentorship_request.mentor.user != request.user):
         messages.error(request, _('Access denied.'))
         return JsonResponse({'error': _('Access denied.')}, status=403)
     
@@ -1256,7 +1266,7 @@ def dashboard_complete_request(request, request_id):
     mentorship_request.save()
     
     # Increment students helped if mentor completed it
-    if mentorship_request.mentor.user == request.user:
+    if mentorship_request.mentor and mentorship_request.mentor.user == request.user:
         mentorship_request.mentor.increment_students_helped()
     
     messages.success(request, _('Mentorship request marked as completed.'))

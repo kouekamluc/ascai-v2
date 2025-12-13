@@ -12,11 +12,37 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from django.utils import timezone
+import json
+import os
+from pathlib import Path
 from .models import MentorProfile, MentorshipRequest, MentorshipMessage, MentorRating
 from .forms import (
     MentorProfileForm, MentorProfileUpdateForm, MentorshipRequestForm, 
     MentorshipMessageForm, MentorRatingForm
 )
+
+# Debug logging helper
+LOG_PATH = Path(__file__).resolve().parent.parent.parent / '.cursor' / 'debug.log'
+def _debug_log(location, message, data, hypothesis_id='A'):
+    try:
+        # Ensure directory exists
+        LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        log_entry = {
+            'location': location,
+            'message': message,
+            'data': data,
+            'timestamp': int(timezone.now().timestamp() * 1000),
+            'sessionId': 'debug-session',
+            'runId': 'run1',
+            'hypothesisId': hypothesis_id
+        }
+        with open(LOG_PATH, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(log_entry) + '\n')
+    except Exception as e:
+        # Log to Django logger as fallback
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Debug log failed: {e}")
 
 
 class MentorListView(ListView):
@@ -168,13 +194,50 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
     
     def get_queryset(self):
         user = self.request.user
-        return MentorshipRequest.objects.filter(
-            Q(student=user) | Q(mentor__user=user)
-        )
+        # #region agent log
+        _debug_log('apps/mentorship/views.py:195', 'RequestDetailView.get_queryset entry', {
+            'user_id': getattr(user, 'id', None),
+            'user_is_authenticated': user.is_authenticated
+        }, 'C')
+        # #endregion
+        try:
+            queryset = MentorshipRequest.objects.filter(
+                Q(student=user) | Q(mentor__user=user)
+            ).select_related('mentor', 'mentor__user', 'student')
+            # #region agent log
+            _debug_log('apps/mentorship/views.py:200', 'RequestDetailView.get_queryset success', {
+                'queryset_count': queryset.count()
+            }, 'C')
+            # #endregion
+            return queryset
+        except Exception as e:
+            # #region agent log
+            _debug_log('apps/mentorship/views.py:203', 'RequestDetailView.get_queryset error', {
+                'error': str(e),
+                'error_type': type(e).__name__
+            }, 'C')
+            # #endregion
+            # Fallback: only filter by student if mentor query fails
+            return MentorshipRequest.objects.filter(student=user).select_related('mentor', 'mentor__user', 'student')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        
+        # #region agent log
+        _debug_log('apps/mentorship/views.py:175', 'RequestDetailView.get_context_data entry', {
+            'request_id': getattr(self.object, 'id', None),
+            'user_id': getattr(self.request.user, 'id', None)
+        }, 'A')
+        # #endregion
+        
+        # #region agent log
+        _debug_log('apps/mentorship/views.py:178', 'Before accessing mentor', {
+            'has_object': hasattr(self, 'object'),
+            'has_mentor': hasattr(self.object, 'mentor') if hasattr(self, 'object') else False,
+            'mentor_id': getattr(self.object.mentor, 'id', None) if hasattr(self, 'object') and hasattr(self.object, 'mentor') else None
+        }, 'A')
+        # #endregion
         
         # Mark messages as read when viewing
         unread_messages = self.object.messages.exclude(sender=user).filter(is_read=False)
@@ -196,7 +259,33 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
         
         context['can_complete'] = self.object.can_be_completed()
         context['is_student'] = self.object.student == user
-        context['is_mentor'] = self.object.mentor.user == user
+        
+        # #region agent log
+        _debug_log('apps/mentorship/views.py:199', 'Before accessing mentor.user', {
+            'has_mentor': hasattr(self.object, 'mentor'),
+            'mentor_is_none': self.object.mentor is None if hasattr(self.object, 'mentor') else 'N/A',
+            'has_user': hasattr(self.object.mentor, 'user') if hasattr(self.object, 'mentor') and self.object.mentor is not None else False
+        }, 'A')
+        # #endregion
+        
+        # Fix: Check if mentor exists before accessing mentor.user
+        try:
+            context['is_mentor'] = self.object.mentor and self.object.mentor.user == user
+        except (AttributeError, TypeError) as e:
+            # #region agent log
+            _debug_log('apps/mentorship/views.py:201', 'Error accessing mentor.user', {
+                'error': str(e),
+                'error_type': type(e).__name__
+            }, 'A')
+            # #endregion
+            context['is_mentor'] = False
+        
+        # #region agent log
+        _debug_log('apps/mentorship/views.py:204', 'RequestDetailView.get_context_data exit', {
+            'is_mentor': context.get('is_mentor', None),
+            'is_student': context.get('is_student', None)
+        }, 'A')
+        # #endregion
         return context
     
     def post(self, request, *args, **kwargs):
@@ -281,7 +370,13 @@ def get_messages(request, request_id):
     )
     
     # Verify user has access
-    if mentorship_request.student != request.user and mentorship_request.mentor.user != request.user:
+    # #region agent log
+    _debug_log('apps/mentorship/views.py:345', 'Before accessing mentor.user in get_messages', {
+        'has_mentor': hasattr(mentorship_request, 'mentor'),
+        'mentor_is_none': mentorship_request.mentor is None if hasattr(mentorship_request, 'mentor') else 'N/A'
+    }, 'B')
+    # #endregion
+    if mentorship_request.student != request.user and (not mentorship_request.mentor or mentorship_request.mentor.user != request.user):
         return JsonResponse({'error': _('Access denied.')}, status=403)
     
     # Mark messages as read when polling
@@ -320,7 +415,13 @@ def complete_request(request, request_id):
     )
     
     # Only student or mentor can complete
-    if mentorship_request.student != request.user and mentorship_request.mentor.user != request.user:
+    # #region agent log
+    _debug_log('apps/mentorship/views.py:384', 'Before accessing mentor.user in complete_request', {
+        'has_mentor': hasattr(mentorship_request, 'mentor'),
+        'mentor_is_none': mentorship_request.mentor is None if hasattr(mentorship_request, 'mentor') else 'N/A'
+    }, 'B')
+    # #endregion
+    if mentorship_request.student != request.user and (not mentorship_request.mentor or mentorship_request.mentor.user != request.user):
         return JsonResponse({'error': _('Access denied.')}, status=403)
     
     if not mentorship_request.can_be_completed():
@@ -331,7 +432,7 @@ def complete_request(request, request_id):
     mentorship_request.save()
     
     # Increment students helped if mentor completed it
-    if mentorship_request.mentor.user == request.user:
+    if mentorship_request.mentor and mentorship_request.mentor.user == request.user:
         mentorship_request.mentor.increment_students_helped()
     
     messages.success(request, _('Mentorship request marked as completed.'))
