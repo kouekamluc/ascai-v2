@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n static static_utils %}
 
 {% block title %}ASCAI Lazio | Cameroonian Community in Rome & Lazio{% endblock %}
 
@@ -9,19 +9,24 @@
 
 {% block extra_head %}
 <!-- Canonical URL -->
-<link rel="canonical" href="https://ascai.org/">
+<link rel="canonical" href="{{ site_url }}/">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://ascai.org/">
+<meta property="og:url" content="{{ site_url }}/">
 <meta property="og:title" content="ASCAI Lazio | Cameroonian Community in Rome & Lazio">
 <meta property="og:description" content="Connect with Cameroonian students, academics, and professionals in Rome and Lazio, Italy. Find scholarships, universities, events, and community support.">
+<meta property="og:image" content="{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="ASCAI Lazio Logo">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://ascai.org/">
+<meta name="twitter:url" content="{{ site_url }}/">
 <meta name="twitter:title" content="ASCAI Lazio | Cameroonian Community in Rome & Lazio">
 <meta name="twitter:description" content="Connect with Cameroonian students, academics, and professionals in Rome and Lazio, Italy.">
+<meta name="twitter:image" content="{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}">
 {% endblock %}
 
 {% block content %}

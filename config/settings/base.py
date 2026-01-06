@@ -98,6 +98,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'apps.core.context_processors.language_preference',
+                'apps.core.context_processors.site_url',
             ],
         },
     },

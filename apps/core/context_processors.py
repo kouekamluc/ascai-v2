@@ -1,6 +1,8 @@
 """
 Context processors for core app.
 """
+from django.conf import settings
+from django.contrib.sites.models import Site
 
 
 def language_preference(request):
@@ -8,4 +10,33 @@ def language_preference(request):
     if hasattr(request, 'user') and request.user.is_authenticated:
         return {'user_language': request.user.language_preference}
     return {'user_language': 'en'}
+
+
+def site_url(request):
+    """Add site URL to context for absolute URLs in templates."""
+    try:
+        site = Site.objects.get_current()
+        site_domain = site.domain
+        # Use https in production, http in development
+        protocol = 'https' if not settings.DEBUG else 'http'
+        site_url = f"{protocol}://{site_domain}" if not site_domain.startswith('http') else site_domain
+    except Exception:
+        # Fallback: try to get from request if available
+        if request and hasattr(request, 'build_absolute_uri'):
+            try:
+                site_url = request.build_absolute_uri('/').rstrip('/')
+            except Exception:
+                # Final fallback
+                if settings.DEBUG:
+                    site_url = 'http://localhost:8000'
+                else:
+                    site_url = 'https://ascai.org'
+        else:
+            # Fallback to production URL or localhost
+            if settings.DEBUG:
+                site_url = 'http://localhost:8000'
+            else:
+                site_url = 'https://ascai.org'
+    
+    return {'site_url': site_url}
 

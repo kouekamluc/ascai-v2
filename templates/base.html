@@ -1,4 +1,4 @@
-{% load i18n static %}
+{% load i18n static static_utils %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -8,15 +8,29 @@
     <meta name="keywords" content="{% block meta_keywords %}{% trans 'Cameroonian community, Rome, Lazio, Italy, Cameroonian students, African diaspora' %}{% endblock %}">
     <title>{% block title %}{% trans 'ASCAI Lazio' %}{% endblock %}</title>
     
-    <!-- Favicon - ASCAI Lazio Logo -->
-    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
-    <link rel="icon" type="image/png" sizes="96x96" href="{% static 'images/favicon-96x96.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/web-app-manifest-192x192.png' %}">
-    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/web-app-manifest-512x512.png' %}">
-    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
-    <link rel="manifest" href="{% static 'images/site.webmanifest' %}">
+    <!-- Favicon - ASCAI Lazio Logo (Absolute URLs for better compatibility) -->
+    <link rel="icon" type="image/svg+xml" href="{% absolute_static 'images/favicon.svg' site_url %}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{% absolute_static 'images/favicon-96x96.png' site_url %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% absolute_static 'images/apple-touch-icon.png' site_url %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% absolute_static 'images/web-app-manifest-192x192.png' site_url %}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}">
+    <link rel="shortcut icon" href="{% absolute_static 'images/favicon.ico' site_url %}">
+    <link rel="manifest" href="{% absolute_static 'images/site.webmanifest' site_url %}">
     <meta name="theme-color" content="#007A5E">
+    
+    <!-- Open Graph / Facebook (Default - can be overridden in child templates) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_url }}{{ request.path }}">
+    <meta property="og:title" content="{% block og_title %}{% trans 'ASCAI Lazio - Cameroonian Community in Rome & Lazio' %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% block meta_description %}{% trans 'ASCAI Lazio - Cameroonian Community in Rome & Lazio. Connect with Cameroonian students, academics, and professionals in Italy.' %}{% endblock %}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}{% endblock %}">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="{% trans 'ASCAI Lazio Logo' %}">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{% block twitter_image %}{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}{% endblock %}">
     
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZ6JZRE35X"></script>
