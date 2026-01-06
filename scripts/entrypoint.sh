@@ -108,19 +108,17 @@ python manage.py create_admin --update || echo "⚠ Warning: Could not create/up
 echo "Updating Site domain for email confirmation URLs..."
 python manage.py update_site_domain || echo "⚠ Warning: Could not update Site domain, but continuing..."
 
-# Populate universities and scholarships data
+# Populate initial data (universities, scholarships, forum categories, news, events)
 # Set POPULATE_DATA=true to enable automatic population on container startup
 # Set POPULATE_DATA_CLEAR=true to clear existing data before populating
 if [ "${POPULATE_DATA:-false}" = "true" ]; then
-    echo "Populating universities and scholarships data..."
+    echo "Populating initial data..."
     
     if [ "${POPULATE_DATA_CLEAR:-false}" = "true" ]; then
         echo "Clearing existing data before populating..."
-        python manage.py populate_universities --clear || echo "⚠ Warning: Could not populate universities, but continuing..."
-        python manage.py populate_scholarships --clear || echo "⚠ Warning: Could not populate scholarships, but continuing..."
+        python manage.py populate_all_initial_data --clear || echo "⚠ Warning: Could not populate data, but continuing..."
     else
-        python manage.py populate_universities || echo "⚠ Warning: Could not populate universities, but continuing..."
-        python manage.py populate_scholarships || echo "⚠ Warning: Could not populate scholarships, but continuing..."
+        python manage.py populate_all_initial_data || echo "⚠ Warning: Could not populate data, but continuing..."
     fi
     echo "✓ Data population complete"
 else

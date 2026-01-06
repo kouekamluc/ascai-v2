@@ -59,3 +59,8 @@ if __name__ == '__main__':
     print("\n💡 Note: Other templates may still use max-w-7xl.")
     print("   The navbar, footer, and home page have been updated manually.")
 
+
+
+
+
+

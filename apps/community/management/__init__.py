@@ -1,0 +1,2 @@
+# Management commands for community app
+

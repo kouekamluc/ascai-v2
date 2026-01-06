@@ -31,3 +31,8 @@ class UniversitiesConfig(AppConfig):
 
 
 
+
+
+
+
+
