@@ -32,6 +32,24 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="{% block twitter_image %}{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}{% endblock %}">
     
+    <!-- Structured Data (JSON-LD) for Google Search Logo -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ASCAI Lazio",
+      "url": "{{ site_url }}",
+      "logo": "{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}",
+      "description": "{% trans 'ASCAI Lazio - Cameroonian Community in Rome & Lazio. Connect with Cameroonian students, academics, and professionals in Italy.' %}",
+      "alternateName": "Association des Camerounais de Lazio",
+      "address": {
+        "@type": "PostalAddress",
+        "addressRegion": "Lazio",
+        "addressCountry": "IT"
+      }
+    }
+    </script>
+    
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZ6JZRE35X"></script>
     <script>
