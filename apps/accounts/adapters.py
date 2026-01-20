@@ -107,9 +107,9 @@ class CustomSignupForm(SignupForm):
         user.role = self.cleaned_data.get('role', 'student')
         user.language_preference = self.cleaned_data.get('language_preference', 'en')
         
-        # Set approval status - require admin approval
-        user.is_approved = False
-        user.is_active = False  # Inactive until approved
+        # Set approval status - auto-approve new users so they can login immediately
+        user.is_approved = True
+        user.is_active = True  # Active so they can login
         
         user.save()
         return user
@@ -771,9 +771,9 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         # Google emails are already verified
         user.email_verified = True
         
-        # Set approval status - require admin approval (same as regular signup)
-        user.is_approved = False
-        user.is_active = True  # Active so email confirmation can be sent if needed
+        # Set approval status - auto-approve new users so they can login immediately
+        user.is_approved = True
+        user.is_active = True  # Active so they can login
         
         return user
     
