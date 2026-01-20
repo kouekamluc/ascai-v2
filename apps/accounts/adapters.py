@@ -147,8 +147,8 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             user.role = form.cleaned_data.get('role', 'student')
             user.language_preference = form.cleaned_data.get('language_preference', 'en')
         
-        # Set approval status - require admin approval
-        user.is_approved = False
+        # Set approval status - auto-approve new users so they can login immediately
+        user.is_approved = True
         # Keep user active initially so email confirmation can be sent
         # The backend will check is_approved for login, not just is_active
         # We'll handle inactive status after email confirmation if needed
@@ -157,8 +157,8 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if commit:
             user.save()
             logger.info(
-                f"User {user.username} ({user.email}) created with is_approved=False, is_active=True "
-                f"(will be checked by backend for login)"
+                f"User {user.username} ({user.email}) created with is_approved=True, is_active=True "
+                f"(auto-approved for immediate login)"
             )
             
             # NOTE: Do NOT create EmailAddress here - allauth's setup_user_email will handle it
@@ -879,14 +879,14 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             user.email_verified = True
         
         if is_new_user:
-            # New user signup - set defaults and require approval
+            # New user signup - set defaults and auto-approve
             if not user.role:
                 user.role = 'student'
             if not user.language_preference:
                 user.language_preference = 'en'
             
-            # Set approval status for new users
-            user.is_approved = False
+            # Set approval status for new users - auto-approve so they can login immediately
+            user.is_approved = True
             user.is_active = True
         
         # Save user with all updates (including email_verified=True)

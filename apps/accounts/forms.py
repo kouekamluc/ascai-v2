@@ -85,8 +85,8 @@ class CustomUserCreationForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
-        user.is_approved = False  # Require admin approval
-        user.is_active = False  # Inactive until approved
+        user.is_approved = True  # Auto-approve new users so they can login immediately
+        user.is_active = True  # Active so they can login
         if commit:
             user.save()
         return user
