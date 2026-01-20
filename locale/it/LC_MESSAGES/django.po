@@ -2133,4 +2133,3 @@ msgstr "Storico quote"
 
 msgid "No dues records"
 msgstr "Nessun record di quote"
-

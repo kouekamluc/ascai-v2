@@ -90,10 +90,13 @@ class LoginView(FormView):
         
         # Redirect to dashboard if approved, otherwise home
         if user.is_approved or user.is_superuser:
-            redirect_url = '/dashboard/'
-            current_language = get_language()
-            if current_language != settings.LANGUAGE_CODE:
-                redirect_url = f'/{current_language}/dashboard/'
+            # Use reverse to get the correct URL
+            try:
+                from django.urls import reverse
+                redirect_url = reverse('dashboard:home')
+            except Exception:
+                # Fallback to hardcoded path if reverse fails
+                redirect_url = '/dashboard/'
         else:
             # Get the redirect URL with proper language prefix
             redirect_url = self.get_success_url()

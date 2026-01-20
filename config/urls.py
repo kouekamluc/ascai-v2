@@ -44,6 +44,7 @@ urlpatterns += i18n_patterns(
     path('gallery/', include('apps.gallery.urls')),
     path('downloads/', include('apps.downloads.urls')),
     path('contact/', include('apps.contact.urls')),
+    path('students/', include('apps.students.urls')),
     path('governance/', include('apps.governance.urls')),
     prefix_default_language=False,
 )

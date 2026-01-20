@@ -1,18 +1,1 @@
 # Management commands
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
