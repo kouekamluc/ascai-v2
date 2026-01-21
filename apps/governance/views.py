@@ -204,15 +204,25 @@ class MyDuesView(LoginRequiredMixin, TemplateView):
     """User's dues management page."""
     template_name = 'governance/member_portal/my_dues.html'
     
+    def dispatch(self, request, *args, **kwargs):
+        """Check if user has a member profile before rendering."""
+        user = request.user
+        
+        try:
+            # Try to access member_profile to check if it exists
+            user.member_profile
+        except Member.DoesNotExist:
+            messages.warning(request, _('Please register as a member first.'))
+            return redirect('governance:member_register')
+        
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        try:
-            member = user.member_profile
-        except Member.DoesNotExist:
-            messages.warning(self.request, _('Please register as a member first.'))
-            return redirect('governance:member_register')
+        # Get member profile (we know it exists from dispatch check)
+        member = user.member_profile
         
         current_year = timezone.now().year
         dues = MembershipDues.objects.filter(member=member).order_by('-year')
