@@ -415,16 +415,18 @@ class CustomAccountAdapter(DefaultAccountAdapter):
     
     def is_email_verified(self, request, email_address):
         """
-        Override to skip email verification for social account users.
-        Google OAuth users have pre-verified emails, so we can skip verification.
+        Override to allow login for approved users even if email is not verified.
+        Since ACCOUNT_EMAIL_VERIFICATION = 'optional', approved users can login immediately.
+        Also handles Google OAuth users with pre-verified emails.
         
         Note: email_address can be either an EmailAddress object or a string (email).
         """
         from allauth.account.models import EmailAddress
         
-        # Handle both EmailAddress object and string (email)
+        # Get user object from email_address (handle both string and EmailAddress object)
+        user = None
         if isinstance(email_address, str):
-            # If it's a string, try to find the EmailAddress object
+            # If it's a string, try to find the EmailAddress object or user
             try:
                 email_address_obj = EmailAddress.objects.get(email=email_address)
                 user = email_address_obj.user
@@ -438,6 +440,14 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         else:
             # It's an EmailAddress object
             user = email_address.user if hasattr(email_address, 'user') else None
+        
+        # If user is approved or superuser, allow login even without email verification
+        # This ensures new users can login immediately after registration
+        if user and (user.is_approved or user.is_superuser):
+            # With ACCOUNT_EMAIL_VERIFICATION = 'optional', approved users can login
+            # We still check for actual verification, but don't block login
+            logger.info(f"Allowing login for approved user {user.username} (email_verified={user.email_verified})")
+            return True
         
         # Check if user has a social account (Google OAuth)
         if user:
@@ -467,7 +477,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 # Return True to skip email verification
                 return True
         
-        # For regular users, use default behavior
+        # For regular users, use default behavior (but with optional verification, this should allow login)
         return super().is_email_verified(request, email_address)
     
     def is_open_for_signup(self, request):
