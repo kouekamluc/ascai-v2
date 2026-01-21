@@ -554,7 +554,36 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             else:
                 return redirect('/')
         
-        # For regular users, use default behavior (show email verification page)
+        # For regular users with optional verification, ensure EmailAddress exists and send verification email
+        # This ensures verification emails are sent even though verification is optional
+        if user.email:
+            try:
+                email_address, created = EmailAddress.objects.get_or_create(
+                    user=user,
+                    email=user.email,
+                    defaults={'verified': False, 'primary': True}
+                )
+                
+                # If email is not verified, create and send verification email
+                if not email_address.verified:
+                    from allauth.account.models import EmailConfirmation
+                    # Delete any old confirmations first
+                    EmailConfirmation.objects.filter(email_address=email_address).delete()
+                    # Create new confirmation
+                    email_confirmation = EmailConfirmation.create(email_address)
+                    email_confirmation.save()
+                    logger.info(f"Created EmailConfirmation for {user.email} with key: {email_confirmation.key[:20]}...")
+                    # Send the email
+                    try:
+                        self.send_confirmation_mail(request, email_confirmation, signup=True)
+                        logger.info(f"Sent verification email to {user.email} (optional verification)")
+                    except Exception as e:
+                        logger.error(f"Failed to send verification email to {user.email}: {str(e)}", exc_info=True)
+                        # Don't break signup if email fails
+            except Exception as e:
+                logger.error(f"Error handling email verification for {user.email}: {str(e)}", exc_info=True)
+        
+        # Use default behavior which will show email verification sent page or redirect
         return super().respond_email_verification_sent(request, user)
     
     
