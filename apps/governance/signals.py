@@ -59,6 +59,7 @@ def check_assembly_notice_period(sender, instance, created, **kwargs):
 def update_membership_status_on_payment(sender, instance, **kwargs):
     """
     Update membership status when dues are paid.
+    Automatically set validity period from January to December when 10 EUR is paid.
     """
     if instance.status == 'paid' and instance.payment_date:
         # Update last payment date in membership status
@@ -66,6 +67,27 @@ def update_membership_status_on_payment(sender, instance, **kwargs):
         if latest_status:
             latest_status.last_payment_date = instance.payment_date
             latest_status.save(update_fields=['last_payment_date'])
+        
+        # Automatically set validity period for 10 EUR payments (members)
+        # Valid from January 1st to December 31st of the year
+        if float(instance.amount) == 10.0:
+            from datetime import date
+            year = instance.year
+            valid_from = date(year, 1, 1)  # January 1st
+            valid_until = date(year, 12, 31)  # December 31st
+            
+            # Update validity dates if not already set
+            if not instance.valid_from or not instance.valid_until:
+                instance.valid_from = valid_from
+                instance.valid_until = valid_until
+                instance.save(update_fields=['valid_from', 'valid_until'])
+            
+            # Update member's membership dates
+            if not instance.member.membership_start_date or instance.member.membership_start_date > valid_from:
+                instance.member.membership_start_date = valid_from
+            if not instance.member.membership_end_date or instance.member.membership_end_date < valid_until:
+                instance.member.membership_end_date = valid_until
+            instance.member.save(update_fields=['membership_start_date', 'membership_end_date'])
         
         # Mark member as active if they pay dues
         if not instance.member.is_active_member:
@@ -77,10 +99,29 @@ def update_membership_status_on_payment(sender, instance, **kwargs):
 def check_membership_expiration(sender, instance, **kwargs):
     """
     Check if membership should expire (3 months after due date without payment).
+    Also check if membership validity period has ended (valid_until date passed).
     """
+    today = timezone.now().date()
+    
+    # Check if validity period has ended (for 10 EUR payments)
+    if instance.status == 'paid' and instance.valid_until and today > instance.valid_until:
+        # Membership validity has expired
+        if instance.member.is_active_member:
+            instance.member.is_active_member = False
+            instance.member.save(update_fields=['is_active_member'])
+            
+            # Create status change
+            MembershipStatus.objects.create(
+                member=instance.member,
+                status='inactive',
+                effective_date=instance.valid_until,
+                reason=f'Membership validity expired on {instance.valid_until}'
+            )
+    
+    # Check for non-payment (3 months after due date without payment)
     if instance.status != 'paid' and instance.due_date:
         three_months_later = instance.due_date + timedelta(days=90)
-        if timezone.now().date() > three_months_later:
+        if today > three_months_later:
             # Membership should be lost (Article 29)
             if instance.member.is_active_member:
                 instance.member.is_active_member = False

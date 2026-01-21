@@ -180,10 +180,11 @@ class FinancialTransactionAdmin(BaseAdmin):
 
 @admin.register(MembershipDues)
 class MembershipDuesAdmin(ModelAdmin):
-    list_display = ['member', 'year', 'amount', 'due_date', 'payment_date', 'status']
+    list_display = ['member', 'year', 'amount', 'due_date', 'payment_date', 'status', 'valid_from', 'valid_until']
     list_filter = ['status', 'year', 'payment_method']
     search_fields = ['member__user__username', 'member__user__email']
     date_hierarchy = 'due_date'
+    readonly_fields = ['valid_from', 'valid_until']
 
 
 @admin.register(Contribution)

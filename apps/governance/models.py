@@ -1056,6 +1056,20 @@ class MembershipDues(models.Model):
         verbose_name=_('Notes')
     )
     
+    valid_from = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name=_('Valid From'),
+        help_text=_('Membership validity start date (automatically set to January 1st when 10 EUR is paid)')
+    )
+    
+    valid_until = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name=_('Valid Until'),
+        help_text=_('Membership validity end date (automatically set to December 31st when 10 EUR is paid)')
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

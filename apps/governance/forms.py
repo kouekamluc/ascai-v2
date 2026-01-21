@@ -228,7 +228,7 @@ class MembershipDuesForm(forms.ModelForm):
     class Meta:
         model = MembershipDues
         fields = ['member', 'year', 'amount', 'due_date', 'payment_date', 
-                  'payment_method', 'status', 'notes']
+                  'payment_method', 'status', 'notes', 'valid_from', 'valid_until']
         widgets = {
             'member': forms.Select(attrs={'class': 'form-input'}),
             'year': forms.NumberInput(attrs={'class': 'form-input'}),
@@ -238,7 +238,16 @@ class MembershipDuesForm(forms.ModelForm):
             'payment_method': forms.Select(attrs={'class': 'form-input'}),
             'status': forms.Select(attrs={'class': 'form-input'}),
             'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-textarea'}),
+            'valid_from': forms.DateInput(attrs={'type': 'date', 'class': 'form-input', 'readonly': True}),
+            'valid_until': forms.DateInput(attrs={'type': 'date', 'class': 'form-input', 'readonly': True}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make validity fields read-only (automatically set when 10 EUR is paid)
+        if self.instance and self.instance.pk:
+            self.fields['valid_from'].widget.attrs['readonly'] = True
+            self.fields['valid_until'].widget.attrs['readonly'] = True
 
 
 class ContributionForm(forms.ModelForm):
