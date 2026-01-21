@@ -1048,4 +1048,3 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             # Method doesn't exist in parent, use settings default
             from django.conf import settings
             return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
-
