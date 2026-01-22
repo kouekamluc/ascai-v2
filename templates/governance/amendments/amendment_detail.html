@@ -1,0 +1,105 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ amendment.title }} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{{ amendment.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl space-y-6">
+    <!-- Status and Metadata -->
+    <div class="governance-card">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">{% trans "Status" %}</h3>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                    {% if amendment.status == 'proposed' %}bg-blue-100 text-blue-800
+                    {% elif amendment.status == 'approved' %}bg-green-100 text-green-800
+                    {% elif amendment.status == 'rejected' %}bg-red-100 text-red-800
+                    {% elif amendment.status == 'discussed' %}bg-yellow-100 text-yellow-800
+                    {% elif amendment.status == 'adopted' %}bg-purple-100 text-purple-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {{ amendment.get_status_display }}
+                </span>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">{% trans "Deadline Compliance" %}</h3>
+                {% if amendment.meets_deadline %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    ✓ {% trans "Meets 30-Day Deadline" %}
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                    ✗ {% trans "Does Not Meet Deadline" %}
+                </span>
+                {% endif %}
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">{% trans "Proposed By" %}</h3>
+                <p class="text-sm text-gray-900">{{ amendment.proposed_by.get_full_name|default:amendment.proposed_by.username }}</p>
+                <p class="text-xs text-gray-500">{{ amendment.proposed_by.email }}</p>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">{% trans "Proposal Date" %}</h3>
+                <p class="text-sm text-gray-900">{{ amendment.proposal_date|date:"F d, Y" }}</p>
+            </div>
+            {% if amendment.proposed_article %}
+            <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">{% trans "Article Number" %}</h3>
+                <p class="text-sm text-gray-900">{{ amendment.proposed_article }}</p>
+            </div>
+            {% endif %}
+            <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">{% trans "Target Assembly" %}</h3>
+                <p class="text-sm text-gray-900">{{ amendment.target_assembly.title }}</p>
+                <p class="text-xs text-gray-500">{{ amendment.target_assembly.date|date:"F d, Y" }}</p>
+                <a href="{% url 'governance:assembly_detail' amendment.target_assembly.pk %}" class="text-xs text-indigo-600 hover:text-indigo-900">
+                    {% trans "View Assembly" %} →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="governance-card">
+        <h3 class="text-lg font-semibold mb-4">{% trans "Amendment Description" %}</h3>
+        <div class="prose max-w-none">
+            <p class="text-gray-700 whitespace-pre-wrap">{{ amendment.description }}</p>
+        </div>
+    </div>
+
+    <!-- Discussion Notes (if available) -->
+    {% if amendment.discussion_notes %}
+    <div class="governance-card">
+        <h3 class="text-lg font-semibold mb-4">{% trans "Discussion Notes" %}</h3>
+        <div class="prose max-w-none">
+            <p class="text-gray-700 whitespace-pre-wrap">{{ amendment.discussion_notes }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Timestamps -->
+    <div class="governance-card">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500">
+            <div>
+                <span class="font-medium">{% trans "Created:" %}</span> {{ amendment.created_at|date:"F d, Y, g:i A" }}
+            </div>
+            <div>
+                <span class="font-medium">{% trans "Last Updated:" %}</span> {{ amendment.updated_at|date:"F d, Y, g:i A" }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between pt-4 border-t">
+        <a href="{% url 'governance:amendment_list' %}" class="text-sm text-gray-600 hover:text-gray-900">
+            ← {% trans "Back to Amendments" %}
+        </a>
+        {% if perms.governance.change_rulesofprocedureamendment %}
+        <a href="{% url 'governance:amendment_edit' amendment.pk %}" class="btn-secondary">
+            {% trans "Edit" %}
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

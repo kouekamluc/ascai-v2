@@ -1,0 +1,122 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Rules of Procedure Amendments" %} - {{ block.super }}{% endblock %}
+
+{% block page_heading %}{% trans "Rules of Procedure Amendments" %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <p class="text-gray-600">{% trans "All proposed amendments to the Rules of Procedure (Article 47)" %}</p>
+        {% if user.is_authenticated and user.member_profile %}
+        <a href="{% url 'governance:amendment_propose' %}" class="btn-primary">
+            {% trans "Propose Amendment" %}
+        </a>
+        {% endif %}
+    </div>
+
+    {% if amendments %}
+    <div class="governance-card">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {% trans "Title" %}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {% trans "Proposed By" %}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {% trans "Target Assembly" %}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {% trans "Proposal Date" %}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {% trans "Status" %}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {% trans "Actions" %}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for amendment in amendments %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ amendment.title }}</div>
+                            {% if amendment.proposed_article %}
+                            <div class="text-xs text-gray-500">{% trans "Article" %} {{ amendment.proposed_article }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ amendment.proposed_by.get_full_name|default:amendment.proposed_by.username }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ amendment.target_assembly.title }}</div>
+                            <div class="text-xs text-gray-500">{{ amendment.target_assembly.date|date:"M d, Y" }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ amendment.proposal_date|date:"M d, Y" }}</div>
+                            {% if amendment.meets_deadline %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                {% trans "Meets Deadline" %}
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                {% trans "Late" %}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if amendment.status == 'proposed' %}bg-blue-100 text-blue-800
+                                {% elif amendment.status == 'approved' %}bg-green-100 text-green-800
+                                {% elif amendment.status == 'rejected' %}bg-red-100 text-red-800
+                                {% elif amendment.status == 'discussed' %}bg-yellow-100 text-yellow-800
+                                {% elif amendment.status == 'adopted' %}bg-purple-100 text-purple-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ amendment.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{% url 'governance:amendment_detail' amendment.pk %}" class="text-indigo-600 hover:text-indigo-900">
+                                {% trans "View" %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+                {% trans "Showing" %} {{ page_obj.start_index }} {% trans "to" %} {{ page_obj.end_index }} {% trans "of" %} {{ page_obj.paginator.count }} {% trans "amendments" %}
+            </div>
+            <div class="flex space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn-secondary">{% trans "Previous" %}</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn-secondary">{% trans "Next" %}</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="governance-card text-center py-12">
+        <p class="text-gray-500 mb-4">{% trans "No amendment proposals yet." %}</p>
+        {% if user.is_authenticated and user.member_profile %}
+        <a href="{% url 'governance:amendment_propose' %}" class="btn-primary">
+            {% trans "Propose First Amendment" %}
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -422,13 +422,36 @@ class RulesOfProcedureAmendmentForm(forms.ModelForm):
             'proposal_date': _('Must be at least 30 days before the target assembly (Article 47)'),
         }
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only show assemblies that have a date set and are in the future
+        from django.utils import timezone
+        from .models import GeneralAssembly
+        self.fields['target_assembly'].queryset = GeneralAssembly.objects.filter(
+            date__isnull=False,
+            date__gte=timezone.now()
+        ).order_by('date')
+        
+        # Set default proposal date to today
+        if not self.instance.pk and 'proposal_date' not in self.initial:
+            from datetime import date
+            self.fields['proposal_date'].initial = date.today()
+    
     def clean(self):
         cleaned_data = super().clean()
         target_assembly = cleaned_data.get('target_assembly')
         proposal_date = cleaned_data.get('proposal_date')
         
-        if target_assembly and proposal_date and target_assembly.date:
-            days_before = (target_assembly.date.date() - proposal_date).days
+        if target_assembly and proposal_date:
+            if not target_assembly.date:
+                raise forms.ValidationError(
+                    _('The target assembly must have a date set.')
+                )
+            
+            # Convert DateTimeField to date for comparison
+            assembly_date = target_assembly.date.date() if hasattr(target_assembly.date, 'date') else target_assembly.date
+            days_before = (assembly_date - proposal_date).days
+            
             if days_before < 30:
                 raise forms.ValidationError(
                     _('Amendment proposals must be submitted at least 30 days before the assembly (Article 47). '
