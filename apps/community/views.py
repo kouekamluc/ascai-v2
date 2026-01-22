@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from .models import ForumCategory, ForumThread, ForumPost, ThreadUpvote, PostUpvote
 from .forms import ThreadForm, PostForm
+from apps.dashboard.models import CommunityGroup, GroupDiscussion
 
 
 class ForumIndexView(ListView):
@@ -372,4 +373,159 @@ def toggle_post_solution(request, post_id):
         })
     
     return JsonResponse({'is_solution': post.is_solution})
+
+
+# Public Community Groups Views
+
+class PublicGroupListView(ListView):
+    """Public groups directory."""
+    model = CommunityGroup
+    template_name = 'community/groups/list.html'
+    context_object_name = 'groups'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        queryset = CommunityGroup.objects.filter(is_public=True).annotate(
+            member_count_annotated=Count('members')
+        )
+        
+        category = self.request.GET.get('category')
+        search = self.request.GET.get('search')
+        featured = self.request.GET.get('featured')
+        
+        if category:
+            queryset = queryset.filter(category=category)
+        
+        if featured == 'true':
+            queryset = queryset.filter(featured=True)
+        
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) |
+                Q(description__icontains=search) |
+                Q(tags__icontains=search)
+            )
+        
+        return queryset.order_by('-featured', '-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter_category'] = self.request.GET.get('category', '')
+        context['search_query'] = self.request.GET.get('search', '')
+        context['featured_groups'] = CommunityGroup.objects.filter(
+            is_public=True,
+            featured=True
+        ).annotate(
+            member_count_annotated=Count('members')
+        )[:6]
+        
+        # Get user's group memberships if logged in
+        if self.request.user.is_authenticated:
+            context['user_group_ids'] = list(
+                self.request.user.community_groups.values_list('id', flat=True)
+            )
+        else:
+            context['user_group_ids'] = []
+        
+        return context
+
+
+class PublicGroupDetailView(DetailView):
+    """Public group detail page."""
+    model = CommunityGroup
+    template_name = 'community/groups/detail.html'
+    context_object_name = 'group'
+    slug_url_kwarg = 'slug'
+    
+    def get_queryset(self):
+        return CommunityGroup.objects.filter(is_public=True)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get recent discussions
+        context['recent_discussions'] = self.object.discussions.select_related(
+            'author'
+        ).order_by('-created_at')[:10]
+        
+        # Get announcements
+        context['announcements'] = self.object.announcements.filter(
+            is_pinned=False
+        ).order_by('-created_at')[:5]
+        
+        # Get pinned announcements
+        context['pinned_announcements'] = self.object.announcements.filter(
+            is_pinned=True
+        ).order_by('-created_at')
+        
+        # Check if user is a member
+        if self.request.user.is_authenticated:
+            context['is_member'] = self.object.members.filter(pk=self.request.user.pk).exists()
+        else:
+            context['is_member'] = False
+        
+        # Get member count
+        context['member_count'] = self.object.member_count
+        context['activity_count'] = self.object.activity_count
+        context['last_activity'] = self.object.last_activity
+        
+        return context
+
+
+@login_required
+@require_http_methods(["POST"])
+def group_join(request, slug):
+    """Join or leave a community group."""
+    group = get_object_or_404(CommunityGroup, slug=slug, is_public=True)
+    
+    if group.members.filter(pk=request.user.pk).exists():
+        # Leave group
+        group.members.remove(request.user)
+        action = 'left'
+        messages.success(request, _('You have left the group.'))
+    else:
+        # Join group
+        group.members.add(request.user)
+        action = 'joined'
+        messages.success(request, _('You have joined the group.'))
+    
+    if request.headers.get('HX-Request'):
+        return render(request, 'community/partials/group_join_button.html', {
+            'group': group,
+            'is_member': action == 'joined'
+        })
+    
+    return redirect('community:group_detail', slug=slug)
+
+
+class GroupDiscussionListView(ListView):
+    """List discussions within a group."""
+    model = GroupDiscussion
+    template_name = 'community/groups/discussion.html'
+    context_object_name = 'discussions'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        group = get_object_or_404(CommunityGroup, slug=self.kwargs['slug'], is_public=True)
+        return GroupDiscussion.objects.filter(group=group).select_related(
+            'author', 'group'
+        ).order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group'] = get_object_or_404(
+            CommunityGroup,
+            slug=self.kwargs['slug'],
+            is_public=True
+        )
+        
+        # Check if user is a member
+        if self.request.user.is_authenticated:
+            context['is_member'] = context['group'].members.filter(
+                pk=self.request.user.pk
+            ).exists()
+        else:
+            context['is_member'] = False
+        
+        return context
 

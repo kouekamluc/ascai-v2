@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{{ document.title }} - {% trans 'Downloads' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{% url 'downloads:index' %}" class="hover:text-cameroon-green">{% trans 'Downloads' %}</a></li>
+            <li>/</li>
+            <li class="text-gray-900">{{ document.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Document Header -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div class="flex items-start justify-between mb-6">
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold mb-4">{{ document.title }}</h1>
+                {% if document.description %}
+                <div class="prose max-w-none mb-6">
+                    {{ document.description|safe }}
+                </div>
+                {% endif %}
+            </div>
+            {% if document.thumbnail %}
+            <img src="{{ document.thumbnail.url }}" alt="{{ document.title }}" class="w-32 h-32 object-cover rounded-lg ml-6">
+            {% endif %}
+        </div>
+
+        <!-- Document Info -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 border-t pt-6">
+            <div>
+                <div class="text-sm text-gray-600">{% trans 'Category' %}</div>
+                <div class="font-semibold">{{ document.get_category_display }}</div>
+            </div>
+            {% if document.file_type %}
+            <div>
+                <div class="text-sm text-gray-600">{% trans 'File Type' %}</div>
+                <div class="font-semibold uppercase">{{ document.file_type }}</div>
+            </div>
+            {% endif %}
+            {% if document.file_size %}
+            <div>
+                <div class="text-sm text-gray-600">{% trans 'File Size' %}</div>
+                <div class="font-semibold">{{ document.get_file_size_display }}</div>
+            </div>
+            {% endif %}
+            <div>
+                <div class="text-sm text-gray-600">{% trans 'Downloads' %}</div>
+                <div class="font-semibold">{{ document.download_count }}</div>
+            </div>
+        </div>
+
+        <!-- Tags -->
+        {% if document.tags %}
+        <div class="mb-6">
+            <div class="text-sm text-gray-600 mb-2">{% trans 'Tags' %}</div>
+            <div class="flex flex-wrap gap-2">
+                {% for tag in document.tags.split:"," %}
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">{{ tag.strip }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Download Button -->
+        {% if can_download %}
+        <div class="flex gap-4">
+            <a href="{% url 'downloads:document_download' document.pk %}" class="inline-flex items-center px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition font-semibold">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                {% trans 'Download Document' %}
+            </a>
+            {% if document.preview_url %}
+            <a href="{{ document.preview_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 border-2 border-cameroon-green text-cameroon-green rounded-lg hover:bg-cameroon-green/10 transition font-semibold">
+                {% trans 'Preview' %}
+            </a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p class="text-yellow-800">
+                {% if is_expired %}
+                    {% trans 'This document has expired and is no longer available for download.' %}
+                {% elif not document.is_active %}
+                    {% trans 'This document is currently unavailable.' %}
+                {% else %}
+                    {% trans 'This document has reached its download limit.' %}
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Related Documents -->
+    {% if related_documents %}
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Related Documents' %}</h2>
+        <div class="space-y-4">
+            {% for doc in related_documents %}
+            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-md transition">
+                <div>
+                    <h3 class="font-semibold">{{ doc.title }}</h3>
+                    <p class="text-sm text-gray-600">{{ doc.get_category_display }}</p>
+                </div>
+                <a href="{% url 'downloads:document_detail' doc.pk %}" class="text-cameroon-green hover:underline">
+                    {% trans 'View' %} →
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="mt-8">
+        <a href="{% url 'downloads:index' %}" class="inline-flex items-center text-cameroon-green hover:underline">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            {% trans 'Back to Downloads' %}
+        </a>
+    </div>
+</div>
+{% endblock %}

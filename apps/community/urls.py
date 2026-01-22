@@ -15,7 +15,11 @@ from .views import (
     toggle_thread_lock,
     toggle_post_solution,
     delete_thread,
-    delete_post
+    delete_post,
+    PublicGroupListView,
+    PublicGroupDetailView,
+    group_join,
+    GroupDiscussionListView
 )
 
 app_name = 'community'
@@ -34,5 +38,10 @@ urlpatterns = [
     path('posts/<int:post_id>/upvote/', upvote_post, name='upvote_post'),
     path('posts/<int:post_id>/solution/', toggle_post_solution, name='toggle_post_solution'),
     path('posts/<int:post_id>/delete/', delete_post, name='delete_post'),
+    # Public Community Groups
+    path('groups/', PublicGroupListView.as_view(), name='group_list'),
+    path('groups/<slug:slug>/', PublicGroupDetailView.as_view(), name='group_detail'),
+    path('groups/<slug:slug>/join/', group_join, name='group_join'),
+    path('groups/<slug:slug>/discussions/', GroupDiscussionListView.as_view(), name='group_discussions'),
 ]
 

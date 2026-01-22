@@ -4,21 +4,52 @@ Admin configuration for mentorship app.
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from config.admin import BaseAdmin, ModelAdmin
-from .models import MentorProfile, MentorshipRequest, MentorshipMessage, MentorRating
+from .models import (
+    MentorSpecialization, MentorProfile, MentorshipRequest,
+    MentorshipMessage, MentorRating, MentorshipSession
+)
+
+
+@admin.register(MentorSpecialization)
+class MentorSpecializationAdmin(ModelAdmin):
+    """Admin interface for MentorSpecialization."""
+    list_display = ['name', 'icon', 'order', 'mentor_count']
+    list_filter = ['order']
+    search_fields = ['name', 'description']
+    ordering = ['order', 'name']
+    
+    def mentor_count(self, obj):
+        return obj.mentors.count()
+    mentor_count.short_description = _('Mentors')
 
 
 @admin.register(MentorProfile)
 class MentorProfileAdmin(BaseAdmin):
     """Admin interface for MentorProfile."""
-    list_display = ['user', 'specialization', 'approval_status_badge', 'is_approved', 'availability_status', 'rating', 'students_helped', 'created_at']
-    list_filter = ['is_approved', 'availability_status', 'created_at']
+    list_display = ['user', 'specialization', 'approval_status_badge', 'is_approved', 'availability_status', 'rating', 'students_helped', 'success_rate', 'created_at']
+    list_filter = ['is_approved', 'availability_status', 'created_at', 'specializations']
     search_fields = ['user__username', 'user__email', 'specialization', 'bio']
     raw_id_fields = ['user']
+    filter_horizontal = ['specializations']
     actions = ['approve_mentors', 'reject_mentors']
     list_editable = ['is_approved']  # Allow quick approval from list view
     list_display_links = ['user', 'specialization']  # Make these clickable
     ordering = ['-created_at']  # Show newest first (unapproved will be at top)
     date_hierarchy = 'created_at'
+    fieldsets = (
+        (_('Basic Information'), {
+            'fields': ('user', 'specialization', 'specializations', 'years_experience', 'bio', 'profile_image')
+        }),
+        (_('Availability'), {
+            'fields': ('availability_status', 'availability_calendar', 'response_time')
+        }),
+        (_('Statistics'), {
+            'fields': ('rating', 'students_helped', 'success_rate')
+        }),
+        (_('Approval'), {
+            'fields': ('is_approved',)
+        }),
+    )
     
     def approval_status_badge(self, obj):
         """Display approval status with a badge indicator."""
@@ -119,6 +150,17 @@ class MentorRatingAdmin(BaseAdmin):
     list_filter = ['rating', 'created_at']
     search_fields = ['mentor__user__username', 'student__username', 'comment']
     raw_id_fields = ['request', 'student', 'mentor']
+
+
+@admin.register(MentorshipSession)
+class MentorshipSessionAdmin(ModelAdmin):
+    """Admin interface for MentorshipSession."""
+    list_display = ['request', 'scheduled_at', 'duration', 'location', 'is_completed', 'rating', 'created_at']
+    list_filter = ['is_completed', 'scheduled_at', 'created_at']
+    search_fields = ['request__student__username', 'request__mentor__user__username', 'location', 'notes']
+    raw_id_fields = ['request']
+    date_hierarchy = 'scheduled_at'
+    ordering = ['-scheduled_at']
 
 
 

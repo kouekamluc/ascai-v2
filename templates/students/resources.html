@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% trans 'Resources & Downloads' %} - ASCAI Lazio{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/resources.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -11,6 +15,39 @@
             {% trans 'Access PDF documents, forms, guidelines, and useful links for students studying in Lazio.' %}
         </p>
     </div>
+
+    <!-- Featured Resources Banner -->
+    {% if featured_documents %}
+    <div class="featured-resource-banner mb-8">
+        <h2 class="text-2xl font-bold mb-4">{% trans 'Featured Resources' %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% for doc in featured_documents|slice:":3" %}
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                <h3 class="font-semibold mb-2">{{ doc.title }}</h3>
+                <p class="text-sm text-white/90 mb-3">{{ doc.description|striptags|truncatewords:15 }}</p>
+                <a href="{% url 'students:resource_detail' doc.pk %}" class="text-white underline hover:no-underline">
+                    {% trans 'View Details' %} →
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Resource Categories -->
+    {% if resource_categories %}
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">{% trans 'Browse by Category' %}</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {% for category in resource_categories %}
+            <a href="{% url 'students:resources' %}?category={{ category.slug }}" class="resource-category-icon text-center p-4 rounded-lg hover:scale-105 transition">
+                <div class="text-2xl mb-2">{{ category.icon|default:"📁" }}</div>
+                <div class="text-sm font-medium">{{ category.name }}</div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
     <!-- HTMX Filters -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -35,9 +72,24 @@
         </form>
     </div>
 
+    <!-- Popular Resources -->
+    {% if popular_documents %}
+    <div class="mb-6">
+        <h2 class="text-xl font-bold mb-4">{% trans 'Popular Resources' %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for doc in popular_documents|slice:":6" %}
+            {% include 'students/partials/resource_card.html' with document=doc %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Resources List -->
-    <div id="resources-list" class="space-y-4">
-        {% include 'students/partials/resources_list_partial.html' %}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold mb-4">{% trans 'All Resources' %}</h2>
+        <div id="resources-list" class="space-y-4">
+            {% include 'students/partials/resources_list_partial.html' %}
+        </div>
     </div>
 
     <div id="loading" class="htmx-indicator text-center py-4">
@@ -45,36 +97,23 @@
         <p class="mt-2 text-gray-600">{% trans 'Loading...' %}</p>
     </div>
 
-    <!-- Useful Links Section -->
+    <!-- External Resource Links -->
+    {% if resource_links %}
     <div class="bg-white rounded-lg shadow-md p-8 mt-8">
-        <h2 class="text-2xl font-bold mb-6">{% trans 'Useful Links' %}</h2>
+        <h2 class="text-2xl font-bold mb-6">{% trans 'External Resources & Links' %}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="https://www.miur.gov.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Ministry of Education (MIUR)' %}</div>
-                <div class="text-sm text-gray-600">{% trans 'Official Italian education ministry website' %}</div>
+            {% for link in resource_links %}
+            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="resource-link-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold text-cameroon-green mb-1">{{ link.title }}</div>
+                {% if link.description %}
+                <div class="text-sm text-gray-600">{{ link.description|truncatewords:15 }}</div>
+                {% endif %}
+                <div class="text-xs text-gray-500 mt-2">{{ link.category.name }}</div>
             </a>
-            <a href="https://www.study-in-italy.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Study in Italy' %}</div>
-                <div class="text-sm text-gray-600">{% trans 'Information for international students' %}</div>
-            </a>
-            <a href="https://www.esteri.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Italian Ministry of Foreign Affairs' %}</div>
-                <div class="text-sm text-gray-600">{% trans 'Visa and consular information' %}</div>
-            </a>
-            <a href="https://www.poliziadistato.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Italian Police' %}</div>
-                <div class="text-sm text-gray-600">{% trans 'Residence permit information' %}</div>
-            </a>
-            <a href="https://www.sanita.regione.lazio.it/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Lazio Regional Health Service' %}</div>
-                <div class="text-sm text-gray-600">{% trans 'Healthcare information for students' %}</div>
-            </a>
-            <a href="https://erasmus-plus.ec.europa.eu/" target="_blank" rel="noopener noreferrer" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green mb-1">{% trans 'Erasmus+ Program' %}</div>
-                <div class="text-sm text-gray-600">{% trans 'European exchange program information' %}</div>
-            </a>
+            {% endfor %}
         </div>
     </div>
+    {% endif %}
 
     <!-- Back to Guide -->
     <div class="mt-8 text-center">

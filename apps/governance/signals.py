@@ -70,16 +70,24 @@ def update_membership_status_on_payment(sender, instance, **kwargs):
         
         # Automatically set validity period for 10 EUR payments (members)
         # Valid from January 1st to December 31st of the year
+        # Always set these values to ensure data consistency and prevent tampering
         if float(instance.amount) == 10.0:
             from datetime import date
             year = instance.year
             valid_from = date(year, 1, 1)  # January 1st
             valid_until = date(year, 12, 31)  # December 31st
             
-            # Update validity dates if not already set
-            if not instance.valid_from or not instance.valid_until:
+            # Always update validity dates to ensure they match the year
+            # This prevents any tampered values from persisting
+            needs_update = False
+            if instance.valid_from != valid_from:
                 instance.valid_from = valid_from
+                needs_update = True
+            if instance.valid_until != valid_until:
                 instance.valid_until = valid_until
+                needs_update = True
+            
+            if needs_update:
                 instance.save(update_fields=['valid_from', 'valid_until'])
             
             # Update member's membership dates

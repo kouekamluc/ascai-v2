@@ -45,29 +45,40 @@ class EventAdmin(BaseAdmin):
     Uses BaseAdmin which automatically provides WYSIWYG editor (Trix)
     for the 'description' TextField, allowing rich text formatting.
     """
-    list_display = ['title', 'location', 'start_datetime', 'end_datetime', 'organizer', 'is_published', 'registration_required']
-    list_filter = ['is_published', 'registration_required', 'language', 'start_datetime']
+    list_display = ['title', 'event_type', 'location', 'start_datetime', 'end_datetime', 'organizer', 'is_published', 'registration_required', 'registered_count']
+    list_filter = ['event_type', 'is_published', 'registration_required', 'language', 'start_datetime']
     search_fields = ['title', 'description', 'location', 'organizer__username']
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'start_datetime'
+    filter_horizontal = ['related_resources']
     
     fieldsets = (
         (_('Event Details'), {
-            'fields': ('title', 'slug', 'description', 'location', 'image', 'language')
+            'fields': ('title', 'slug', 'description', 'event_type', 'image', 'language')
         }),
         (_('Schedule'), {
             'fields': ('start_datetime', 'end_datetime')
         }),
-        (_('Organization'), {
-            'fields': ('organizer', 'is_published', 'registration_required', 'max_participants')
+        (_('Location'), {
+            'fields': ('location', 'location_map')
         }),
-        (_('Date'), {
-            'fields': ('created_at',),
+        (_('Registration'), {
+            'fields': ('registration_required', 'registration_deadline', 'max_participants', 'capacity', 'waitlist_enabled')
+        }),
+        (_('Organization'), {
+            'fields': ('organizer', 'is_published', 'related_resources')
+        }),
+        (_('Dates'), {
+            'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
     
-    readonly_fields = ['created_at']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    def registered_count(self, obj):
+        return obj.get_registered_count()
+    registered_count.short_description = _('Registered')
 
 
 @admin.register(Testimonial)

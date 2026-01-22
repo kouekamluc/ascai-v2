@@ -1,0 +1,78 @@
+{% load i18n %}
+<div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+    <div class="flex items-center gap-4 mb-4">
+        {% if mentor.profile_image %}
+        <img src="{{ mentor.profile_image.url }}" alt="{{ mentor.user.username }}" class="w-16 h-16 rounded-full object-cover">
+        {% elif mentor.user.avatar %}
+        <img src="{{ mentor.user.avatar.url }}" alt="{{ mentor.user.username }}" class="w-16 h-16 rounded-full object-cover">
+        {% else %}
+        <div class="w-16 h-16 bg-cameroon-green/10 rounded-full flex items-center justify-center">
+            <span class="text-2xl text-cameroon-green">{{ mentor.user.username|first|upper }}</span>
+        </div>
+        {% endif %}
+        <div class="flex-1">
+            <h3 class="text-xl font-semibold">
+                <a href="{% url 'mentorship:mentor_detail' mentor.pk %}" class="hover:text-cameroon-green">
+                    {{ mentor.user.get_full_name|default:mentor.user.username }}
+                </a>
+            </h3>
+            <div class="flex items-center gap-2 mt-1">
+                {% if mentor.rating %}
+                <div class="flex items-center">
+                    {% for i in "12345"|make_list %}
+                    <svg class="w-4 h-4 {% if forloop.counter <= mentor.rating|floatformat:0|add:0 %}text-yellow-400{% else %}text-gray-300{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                    </svg>
+                    {% endfor %}
+                </div>
+                <span class="text-sm text-gray-600">{{ mentor.rating|floatformat:1 }}/5.0</span>
+                {% if total_ratings %}
+                <span class="text-xs text-gray-500">({{ total_ratings }})</span>
+                {% endif %}
+                {% else %}
+                <span class="text-sm text-gray-500">{% trans 'No ratings yet' %}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <p class="text-cameroon-green font-semibold mb-2">{{ mentor.specialization }}</p>
+    
+    {% if mentor.specializations.all %}
+    <div class="flex flex-wrap gap-2 mb-3">
+        {% for spec in mentor.specializations.all|slice:":3" %}
+        <span class="px-2 py-1 bg-cameroon-green/10 text-cameroon-green rounded text-xs">{{ spec.name }}</span>
+        {% endfor %}
+        {% if mentor.specializations.count > 3 %}
+        <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">+{{ mentor.specializations.count|add:"-3" }}</span>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ mentor.bio|truncatewords:25 }}</p>
+    
+    <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+        <span>💼 {{ mentor.years_experience }} {% trans 'years' %}</span>
+        <span>👥 {{ mentor.students_helped }} {% trans 'helped' %}</span>
+        {% if mentor.success_rate %}
+        <span>📈 {{ mentor.success_rate }}% {% trans 'success' %}</span>
+        {% endif %}
+    </div>
+    
+    <div class="mb-4">
+        {% if mentor.availability_status == 'available' %}
+        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">✅ {% trans 'Available' %}</span>
+        {% elif mentor.availability_status == 'busy' %}
+        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">⏳ {% trans 'Busy' %}</span>
+        {% else %}
+        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">❌ {% trans 'Unavailable' %}</span>
+        {% endif %}
+        {% if mentor.response_time %}
+        <span class="ml-2 text-xs text-gray-500">{{ mentor.response_time }}</span>
+        {% endif %}
+    </div>
+    
+    <a href="{% url 'mentorship:mentor_detail' mentor.pk %}" class="block w-full text-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition font-semibold">
+        {% trans 'View Profile' %}
+    </a>
+</div>

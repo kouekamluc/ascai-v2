@@ -97,12 +97,35 @@ class Event(models.Model):
         ('it', _('Italiano')),
     ]
     
+    EVENT_TYPE_CHOICES = [
+        ('cultural', _('Cultural')),
+        ('educational', _('Educational')),
+        ('social', _('Social')),
+        ('networking', _('Networking')),
+        ('sports', _('Sports')),
+        ('workshop', _('Workshop')),
+        ('seminar', _('Seminar')),
+        ('other', _('Other')),
+    ]
+    
     title = models.CharField(max_length=200, verbose_name=_('Title'))
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     description = models.TextField(verbose_name=_('Description'))
     location = models.CharField(max_length=200, verbose_name=_('Location'))
+    location_map = models.URLField(
+        blank=True,
+        null=True,
+        verbose_name=_('Location Map URL'),
+        help_text=_('Google Maps or other map service URL')
+    )
     start_datetime = models.DateTimeField(verbose_name=_('Start Date & Time'))
     end_datetime = models.DateTimeField(verbose_name=_('End Date & Time'))
+    event_type = models.CharField(
+        max_length=20,
+        choices=EVENT_TYPE_CHOICES,
+        default='other',
+        verbose_name=_('Event Type')
+    )
     image = models.ImageField(
         upload_to='events/',
         blank=True,
@@ -124,10 +147,27 @@ class Event(models.Model):
         default=False,
         verbose_name=_('Registration Required')
     )
+    registration_deadline = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Registration Deadline'),
+        help_text=_('Deadline for event registration')
+    )
     max_participants = models.PositiveIntegerField(
         null=True,
         blank=True,
         verbose_name=_('Max Participants')
+    )
+    capacity = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_('Capacity'),
+        help_text=_('Total capacity for the event (same as max_participants if not specified)')
+    )
+    waitlist_enabled = models.BooleanField(
+        default=False,
+        verbose_name=_('Enable Waitlist'),
+        help_text=_('Allow users to join waitlist when event is full')
     )
     language = models.CharField(
         max_length=2,
@@ -135,7 +175,15 @@ class Event(models.Model):
         default='en',
         verbose_name=_('Language')
     )
+    related_resources = models.ManyToManyField(
+        'downloads.Document',
+        blank=True,
+        related_name='events',
+        verbose_name=_('Related Resources'),
+        help_text=_('Documents related to this event')
+    )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = _('Event')
@@ -148,10 +196,30 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
+        # Set capacity to max_participants if not specified
+        if not self.capacity and self.max_participants:
+            self.capacity = self.max_participants
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
         return reverse('diaspora:event_detail', kwargs={'slug': self.slug})
+    
+    def get_registered_count(self):
+        """Get the number of registered participants."""
+        return self.registrations.count()
+    
+    def is_full(self):
+        """Check if event is at capacity."""
+        if not self.capacity:
+            return False
+        return self.get_registered_count() >= self.capacity
+    
+    def spots_remaining(self):
+        """Get number of spots remaining."""
+        if not self.capacity:
+            return None
+        remaining = self.capacity - self.get_registered_count()
+        return max(0, remaining)
 
 
 class Testimonial(models.Model):

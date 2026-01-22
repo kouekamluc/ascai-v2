@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Event Calendar' %} - ASCAI Lazio{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/events.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-4xl font-bold mb-4">{% trans 'Event Calendar' %}</h1>
+            <p class="text-lg text-gray-600">{% trans 'View all events in calendar format' %}</p>
+        </div>
+        <div class="flex gap-4">
+            <a href="{% url 'diaspora:event_list' %}" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                {% trans 'List View' %}
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'diaspora:my_events' %}" class="px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                {% trans 'My Events' %}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Calendar View -->
+    <div class="bg-white rounded-lg shadow-md p-6 calendar-view">
+        <div id="calendar-container" class="min-h-[600px]">
+            <!-- Simple Calendar Grid -->
+            <div class="grid grid-cols-7 gap-2 mb-4">
+                <div class="text-center font-semibold text-gray-700 py-2">{% trans 'Mon' %}</div>
+                <div class="text-center font-semibold text-gray-700 py-2">{% trans 'Tue' %}</div>
+                <div class="text-center font-semibold text-gray-700 py-2">{% trans 'Wed' %}</div>
+                <div class="text-center font-semibold text-gray-700 py-2">{% trans 'Thu' %}</div>
+                <div class="text-center font-semibold text-gray-700 py-2">{% trans 'Fri' %}</div>
+                <div class="text-center font-semibold text-gray-700 py-2">{% trans 'Sat' %}</div>
+                <div class="text-center font-semibold text-gray-700 py-2">{% trans 'Sun' %}</div>
+            </div>
+            
+            <!-- Events List (Simplified calendar view) -->
+            <div class="space-y-4">
+                {% regroup events by start_datetime|date:"F Y" as events_by_month %}
+                {% for month_group in events_by_month %}
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-cameroon-green">{{ month_group.grouper }}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {% for event in month_group.list %}
+                        <div class="event-card bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex-1">
+                                    <div class="text-sm font-semibold text-cameroon-green mb-1">
+                                        {{ event.start_datetime|date:"d" }}
+                                    </div>
+                                    <h3 class="font-semibold mb-2">
+                                        <a href="{% url 'diaspora:event_detail' event.slug %}" class="hover:text-cameroon-green">
+                                            {{ event.title }}
+                                        </a>
+                                    </h3>
+                                    <div class="text-xs text-gray-600 mb-2">
+                                        <span class="event-type-badge {{ event.event_type }}">{{ event.get_event_type_display }}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 line-clamp-2">{{ event.description|striptags|truncatewords:15 }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-gray-500 mt-3">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                </svg>
+                                <span>{{ event.location }}</span>
+                            </div>
+                            {% if event.registration_required %}
+                            <div class="mt-2">
+                                <span class="text-xs px-2 py-1 bg-cameroon-green/10 text-cameroon-green rounded">
+                                    {% trans 'Registration Required' %}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-12">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <p class="text-gray-500 text-lg">{% trans 'No events scheduled.' %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

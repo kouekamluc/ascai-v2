@@ -25,21 +25,59 @@
         <p class="text-gray-600">{% trans 'Access forms, applications, and ASCAI Lazio documents' %}</p>
     </div>
     
-    <!-- Filters -->
+    <!-- Enhanced Filters -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <form hx-get="{% url 'downloads:index' %}" hx-target="#document-list" hx-trigger="change, keyup delay:500ms">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <select name="category" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
                     <option value="">{% trans 'All Categories' %}</option>
-                    <option value="reddito">{% trans 'Reddìto Forms' %}</option>
-                    <option value="enrollment">{% trans 'Enrollment Documents' %}</option>
-                    <option value="visa">{% trans 'Visa-Related Documents' %}</option>
-                    <option value="guidelines">{% trans 'ASCAI Lazio Guidelines' %}</option>
+                    <option value="reddito" {% if filter_category == 'reddito' %}selected{% endif %}>{% trans 'Reddìto Forms' %}</option>
+                    <option value="enrollment" {% if filter_category == 'enrollment' %}selected{% endif %}>{% trans 'Enrollment Documents' %}</option>
+                    <option value="visa" {% if filter_category == 'visa' %}selected{% endif %}>{% trans 'Visa-Related Documents' %}</option>
+                    <option value="guidelines" {% if filter_category == 'guidelines' %}selected{% endif %}>{% trans 'ASCAI Lazio Guidelines' %}</option>
                 </select>
-                <input type="text" name="search" placeholder="{% trans 'Search documents...' %}" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                <input type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search documents...' %}" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                <input type="text" name="tags" value="{{ request.GET.tags }}" placeholder="{% trans 'Tags (comma-separated)' %}" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                <select name="sort" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
+                    <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>{% trans 'Most Recent' %}</option>
+                    <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>{% trans 'Most Popular' %}</option>
+                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>{% trans 'Name (A-Z)' %}</option>
+                </select>
             </div>
         </form>
     </div>
+    
+    <!-- Popular & Recent Downloads -->
+    {% if popular_documents or recent_documents %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {% if popular_documents %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4">{% trans 'Popular Downloads' %}</h2>
+            <div class="space-y-3">
+                {% for doc in popular_documents|slice:":5" %}
+                <a href="{% url 'downloads:document_detail' doc.pk %}" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:shadow-md transition">
+                    <span class="font-medium text-sm">{{ doc.title }}</span>
+                    <span class="text-xs text-gray-500">{{ doc.download_count }} {% trans 'downloads' %}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% if recent_documents %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4">{% trans 'Recent Downloads' %}</h2>
+            <div class="space-y-3">
+                {% for doc in recent_documents|slice:":5" %}
+                <a href="{% url 'downloads:document_detail' doc.pk %}" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:shadow-md transition">
+                    <span class="font-medium text-sm">{{ doc.title }}</span>
+                    <span class="text-xs text-gray-500">{{ doc.uploaded_at|timesince }} {% trans 'ago' %}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
     
     <!-- Document List Grouped by Category -->
     <div id="document-list">

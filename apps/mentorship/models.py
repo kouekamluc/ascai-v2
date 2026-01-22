@@ -9,6 +9,37 @@ from django.urls import reverse
 User = get_user_model()
 
 
+class MentorSpecialization(models.Model):
+    """Mentor specialization categories."""
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name=_('Name')
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name=_('Description')
+    )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text=_('Icon class name'),
+        verbose_name=_('Icon')
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_('Order')
+    )
+    
+    class Meta:
+        verbose_name = _('Mentor Specialization')
+        verbose_name_plural = _('Mentor Specializations')
+        ordering = ['order', 'name']
+    
+    def __str__(self):
+        return self.name
+
+
 class MentorProfile(models.Model):
     """Mentor profile model."""
     AVAILABILITY_CHOICES = [
@@ -24,13 +55,45 @@ class MentorProfile(models.Model):
         verbose_name=_('User')
     )
     specialization = models.CharField(max_length=200, verbose_name=_('Specialization'))
+    specializations = models.ManyToManyField(
+        MentorSpecialization,
+        blank=True,
+        related_name='mentors',
+        verbose_name=_('Specializations'),
+        help_text=_('Select one or more specializations.')
+    )
     years_experience = models.PositiveIntegerField(verbose_name=_('Years of Experience'))
     bio = models.TextField(verbose_name=_('Bio'))
+    profile_image = models.ImageField(
+        upload_to='mentors/profiles/',
+        blank=True,
+        null=True,
+        verbose_name=_('Profile Image')
+    )
     availability_status = models.CharField(
         max_length=20,
         choices=AVAILABILITY_CHOICES,
         default='available',
         verbose_name=_('Availability Status')
+    )
+    availability_calendar = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_('Availability Calendar'),
+        help_text=_('JSON structure for availability schedule (e.g., {"monday": ["09:00-12:00"], "tuesday": ["14:00-17:00"]})')
+    )
+    response_time = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name=_('Average Response Time'),
+        help_text=_('e.g., "Within 24 hours", "Within 2-3 days"')
+    )
+    success_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0.00,
+        verbose_name=_('Success Rate (%)'),
+        help_text=_('Percentage of successful mentorship sessions')
     )
     is_approved = models.BooleanField(
         default=False,
@@ -45,6 +108,7 @@ class MentorProfile(models.Model):
     )
     students_helped = models.PositiveIntegerField(default=0, verbose_name=_('Students Helped'))
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = _('Mentor Profile')
@@ -68,6 +132,16 @@ class MentorProfile(models.Model):
         """Increment students helped count."""
         self.students_helped += 1
         self.save(update_fields=['students_helped'])
+    
+    def calculate_success_rate(self):
+        """Calculate success rate from completed requests."""
+        total_completed = self.requests.filter(status='completed').count()
+        total_accepted = self.requests.filter(status__in=['accepted', 'completed']).count()
+        if total_accepted > 0:
+            self.success_rate = round((total_completed / total_accepted) * 100, 2)
+        else:
+            self.success_rate = 0.00
+        self.save(update_fields=['success_rate'])
 
 
 class MentorshipRequest(models.Model):
@@ -187,9 +261,64 @@ class MentorRating(models.Model):
         return f"Rating {self.rating}/5 for {self.mentor.user.username} by {self.student.username}"
 
 
-
-
-
+class MentorshipSession(models.Model):
+    """Scheduled mentorship session model."""
+    request = models.ForeignKey(
+        MentorshipRequest,
+        on_delete=models.CASCADE,
+        related_name='sessions',
+        verbose_name=_('Request')
+    )
+    scheduled_at = models.DateTimeField(
+        verbose_name=_('Scheduled At')
+    )
+    duration = models.DurationField(
+        verbose_name=_('Duration'),
+        help_text=_('Session duration (e.g., 1:00:00 for 1 hour)')
+    )
+    location = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_('Location'),
+        help_text=_('Physical location or video call link')
+    )
+    notes = models.TextField(
+        blank=True,
+        verbose_name=_('Notes'),
+        help_text=_('Session notes or agenda')
+    )
+    is_completed = models.BooleanField(
+        default=False,
+        verbose_name=_('Completed')
+    )
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Completed At')
+    )
+    rating = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        choices=[(i, i) for i in range(1, 6)],
+        verbose_name=_('Session Rating'),
+        help_text=_('Rating given after session completion')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created At')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated At')
+    )
+    
+    class Meta:
+        verbose_name = _('Mentorship Session')
+        verbose_name_plural = _('Mentorship Sessions')
+        ordering = ['-scheduled_at']
+    
+    def __str__(self):
+        return f"Session for {self.request.student.username} with {self.request.mentor.user.username} on {self.scheduled_at}"
 
 
 

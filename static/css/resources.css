@@ -1,0 +1,58 @@
+/* Resources Page Styles */
+
+.resource-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resource-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.resource-category-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #007A3D 0%, #00994D 100%);
+    color: white;
+    font-size: 24px;
+}
+
+.featured-resource-banner {
+    background: linear-gradient(135deg, #007A3D 0%, #00994D 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+}
+
+.resource-link-card {
+    border-left: 4px solid #007A3D;
+    transition: all 0.2s ease;
+}
+
+.resource-link-card:hover {
+    border-left-width: 6px;
+    background-color: #f9fafb;
+}
+
+.download-progress {
+    height: 4px;
+    background-color: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.download-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #007A3D 0%, #00994D 100%);
+    transition: width 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .resource-grid {
+        grid-template-columns: 1fr;
+    }
+}

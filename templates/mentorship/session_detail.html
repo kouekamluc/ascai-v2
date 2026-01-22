@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Session Details' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{% url 'mentorship:index' %}" class="hover:text-cameroon-green">{% trans 'Mentorship' %}</a></li>
+            <li>/</li>
+            <li><a href="{% url 'mentorship:request_detail' session.request.pk %}" class="hover:text-cameroon-green">{% trans 'Request' %}</a></li>
+            <li>/</li>
+            <li class="text-gray-900">{% trans 'Session' %}</li>
+        </ol>
+    </nav>
+
+    <!-- Session Header -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div class="flex items-start justify-between mb-6">
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold mb-4">{% trans 'Mentorship Session' %}</h1>
+                <div class="flex items-center gap-3 mb-4">
+                    {% if session.is_completed %}
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded">
+                        ✓ {% trans 'Completed' %}
+                    </span>
+                    {% else %}
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded">
+                        {% trans 'Scheduled' %}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Session Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-t pt-6">
+            <div>
+                <div class="text-sm text-gray-600 mb-1">{% trans 'Scheduled Date & Time' %}</div>
+                <div class="font-semibold text-lg">{{ session.scheduled_at|date:"d M Y, H:i" }}</div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-600 mb-1">{% trans 'Duration' %}</div>
+                <div class="font-semibold">{{ session.duration }}</div>
+            </div>
+            {% if session.location %}
+            <div>
+                <div class="text-sm text-gray-600 mb-1">{% trans 'Location' %}</div>
+                <div class="font-semibold">
+                    {% if session.location|slice:":4" == 'http' %}
+                    <a href="{{ session.location }}" target="_blank" rel="noopener noreferrer" class="text-cameroon-green hover:underline">
+                        {{ session.location }}
+                    </a>
+                    {% else %}
+                    {{ session.location }}
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% if session.completed_at %}
+            <div>
+                <div class="text-sm text-gray-600 mb-1">{% trans 'Completed At' %}</div>
+                <div class="font-semibold">{{ session.completed_at|date:"d M Y, H:i" }}</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Participants -->
+        <div class="mb-6 border-t pt-6">
+            <h3 class="font-semibold mb-4">{% trans 'Participants' %}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <div class="text-sm text-gray-600">{% trans 'Student' %}</div>
+                    <div class="font-semibold">{{ session.request.student.get_full_name|default:session.request.student.username }}</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">{% trans 'Mentor' %}</div>
+                    <div class="font-semibold">{{ session.request.mentor.user.get_full_name|default:session.request.mentor.user.username }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notes -->
+        {% if session.notes %}
+        <div class="mb-6 border-t pt-6">
+            <h3 class="font-semibold mb-2">{% trans 'Session Notes' %}</h3>
+            <div class="prose max-w-none">
+                {{ session.notes|safe }}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Rating -->
+        {% if session.is_completed and session.rating %}
+        <div class="border-t pt-6">
+            <h3 class="font-semibold mb-2">{% trans 'Session Rating' %}</h3>
+            <div class="flex items-center gap-2">
+                {% for i in "12345"|make_list %}
+                <svg class="w-6 h-6 {% if forloop.counter <= session.rating %}text-yellow-400{% else %}text-gray-300{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                {% endfor %}
+                <span class="ml-2 text-gray-600">{{ session.rating }}/5</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Actions -->
+    <div class="flex justify-between">
+        <a href="{% url 'mentorship:request_detail' session.request.pk %}" class="inline-flex items-center text-cameroon-green hover:underline">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            {% trans 'Back to Request' %}
+        </a>
+        {% if not session.is_completed and is_student %}
+        <form method="post" action="{% url 'mentorship:complete_request' session.request.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold">
+                {% trans 'Mark as Completed' %}
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

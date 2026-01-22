@@ -1,0 +1,91 @@
+/* Events Calendar Styles */
+
+.calendar-view {
+    min-height: 600px;
+}
+
+.event-card {
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.event-card:hover {
+    border-left-color: #007A3D;
+    transform: translateX(4px);
+}
+
+.event-card.featured {
+    border-left-color: #f59e0b;
+    background: linear-gradient(to right, #fef3c7 0%, white 10%);
+}
+
+.event-type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.event-type-badge.cultural {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.event-type-badge.educational {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.event-type-badge.social {
+    background-color: #fce7f3;
+    color: #9f1239;
+}
+
+.event-type-badge.networking {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+
+.capacity-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.capacity-bar {
+    flex: 1;
+    height: 8px;
+    background-color: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.capacity-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #007A3D 0%, #00994D 100%);
+    transition: width 0.3s ease;
+}
+
+.capacity-fill.warning {
+    background: linear-gradient(90deg, #f59e0b 0%, #f97316 100%);
+}
+
+.capacity-fill.full {
+    background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+.qr-code-container {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .calendar-view {
+        min-height: 400px;
+    }
+}

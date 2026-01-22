@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Submit Your Story' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-4">{% trans 'Share Your Story' %}</h1>
+        <p class="text-lg text-gray-600">
+            {% trans 'Share your journey, experiences, or success story with the Cameroonian community in Lazio.' %}
+        </p>
+    </div>
+
+    <!-- Multi-step Form -->
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <!-- Progress Steps -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-cameroon-green text-white flex items-center justify-center font-semibold">1</div>
+                    <span class="ml-2 font-medium">{% trans 'Basic Info' %}</span>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-semibold">2</div>
+                    <span class="ml-2 text-gray-600">{% trans 'Story Content' %}</span>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-semibold">3</div>
+                    <span class="ml-2 text-gray-600">{% trans 'Review & Submit' %}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Step 1: Basic Information -->
+            <div id="step-1" class="step-content">
+                <h2 class="text-2xl font-bold mb-6">{% trans 'Basic Information' %}</h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.title.label }} *
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.submission_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.submission_type.label }} *
+                        </label>
+                        {{ form.submission_type }}
+                        {% if form.submission_type.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.submission_type.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.cover_image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.cover_image.label }}
+                        </label>
+                        {{ form.cover_image }}
+                        {% if form.cover_image.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.cover_image.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">{% trans 'Upload a cover image for your story (optional)' %}</p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.location.label }}
+                        </label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.location.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.tags.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.tags.label }}
+                        </label>
+                        {{ form.tags }}
+                        {% if form.tags.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.tags.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">{% trans 'Separate tags with commas (e.g., student, rome, success)' %}</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-end">
+                    <button type="button" onclick="showStep(2)" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 font-semibold">
+                        {% trans 'Next: Story Content' %} →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Story Content -->
+            <div id="step-2" class="step-content hidden">
+                <h2 class="text-2xl font-bold mb-6">{% trans 'Your Story' %}</h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label for="{{ form.story.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.story.label }} *
+                        </label>
+                        {{ form.story }}
+                        {% if form.story.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.story.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">{% trans 'Share your story, experiences, or journey. Be as detailed as you like!' %}</p>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        {{ form.is_anonymous }}
+                        <label for="{{ form.is_anonymous.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.is_anonymous.label }}
+                        </label>
+                    </div>
+                    {% if form.is_anonymous.errors %}
+                    <p class="text-sm text-red-600">{{ form.is_anonymous.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-8 flex justify-between">
+                    <button type="button" onclick="showStep(1)" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-semibold">
+                        ← {% trans 'Back' %}
+                    </button>
+                    <button type="button" onclick="showStep(3)" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 font-semibold">
+                        {% trans 'Next: Review' %} →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Review & Submit -->
+            <div id="step-3" class="step-content hidden">
+                <h2 class="text-2xl font-bold mb-6">{% trans 'Review & Submit' %}</h2>
+                
+                <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                    <h3 class="font-semibold mb-4">{% trans 'Please review your submission:' %}</h3>
+                    <div id="review-content" class="space-y-3 text-sm">
+                        <!-- Review content will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-blue-800">
+                        <strong>{% trans 'Note:' %}</strong> {% trans 'Your story will be reviewed by our team before being published. You will be notified once it has been reviewed.' %}
+                    </p>
+                </div>
+                
+                <div class="mt-8 flex justify-between">
+                    <button type="button" onclick="showStep(2)" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-semibold">
+                        ← {% trans 'Back' %}
+                    </button>
+                    <button type="submit" class="px-8 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 font-semibold">
+                        {% trans 'Submit Story' %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let currentStep = 1;
+
+function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+    
+    // Show selected step
+    document.getElementById(`step-${step}`).classList.remove('hidden');
+    
+    // Update progress indicators
+    for (let i = 1; i <= 3; i++) {
+        const indicator = document.querySelector(`.flex.items-center:nth-child(${i * 2 - 1})`);
+        if (i <= step) {
+            indicator.querySelector('div').classList.remove('bg-gray-200', 'text-gray-600');
+            indicator.querySelector('div').classList.add('bg-cameroon-green', 'text-white');
+            indicator.querySelector('span').classList.remove('text-gray-600');
+            indicator.querySelector('span').classList.add('font-medium');
+        } else {
+            indicator.querySelector('div').classList.add('bg-gray-200', 'text-gray-600');
+            indicator.querySelector('div').classList.remove('bg-cameroon-green', 'text-white');
+            indicator.querySelector('span').classList.add('text-gray-600');
+            indicator.querySelector('span').classList.remove('font-medium');
+        }
+    }
+    
+    // Update review content on step 3
+    if (step === 3) {
+        updateReview();
+    }
+    
+    currentStep = step;
+}
+
+function updateReview() {
+    const reviewContent = document.getElementById('review-content');
+    const title = document.getElementById('id_title').value;
+    const submissionType = document.getElementById('id_submission_type').options[document.getElementById('id_submission_type').selectedIndex].text;
+    const location = document.getElementById('id_location').value;
+    const tags = document.getElementById('id_tags').value;
+    const story = document.getElementById('id_story').value.substring(0, 200) + '...';
+    const isAnonymous = document.getElementById('id_is_anonymous').checked;
+    
+    reviewContent.innerHTML = `
+        <div><strong>{% trans 'Title:' %}</strong> ${title}</div>
+        <div><strong>{% trans 'Type:' %}</strong> ${submissionType}</div>
+        ${location ? `<div><strong>{% trans 'Location:' %}</strong> ${location}</div>` : ''}
+        ${tags ? `<div><strong>{% trans 'Tags:' %}</strong> ${tags}</div>` : ''}
+        <div><strong>{% trans 'Story Preview:' %}</strong> ${story}</div>
+        <div><strong>{% trans 'Anonymous:' %}</strong> ${isAnonymous ? '{% trans "Yes" %}' : '{% trans "No" %}'}</div>
+    `;
+}
+</script>
+{% endblock %}

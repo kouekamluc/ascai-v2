@@ -1,0 +1,106 @@
+/* New Student Guide Styles */
+
+.guide-progress-tracker {
+    position: sticky;
+    top: 20px;
+}
+
+.progress-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.progress-circle.completed {
+    background-color: #10b981;
+    color: white;
+}
+
+.progress-circle.in-progress {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.progress-circle.not-started {
+    background-color: #e5e7eb;
+    color: #6b7280;
+}
+
+.guide-section-card {
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.guide-section-card:hover {
+    border-left-color: #007A3D;
+    transform: translateX(4px);
+}
+
+.guide-step-item {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.guide-step-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e5e7eb;
+}
+
+.guide-step-item:last-child::before {
+    display: none;
+}
+
+.guide-step-number {
+    position: absolute;
+    left: -12px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: white;
+    border: 2px solid #007A3D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #007A3D;
+}
+
+.guide-step-item.completed .guide-step-number {
+    background-color: #007A3D;
+    color: white;
+}
+
+.checklist-item {
+    transition: all 0.2s ease;
+}
+
+.checklist-item:hover {
+    background-color: #f9fafb;
+}
+
+.checklist-item.completed {
+    opacity: 0.7;
+}
+
+.checklist-item.completed .checklist-text {
+    text-decoration: line-through;
+}
+
+@media (max-width: 768px) {
+    .guide-progress-tracker {
+        position: relative;
+        top: 0;
+    }
+}

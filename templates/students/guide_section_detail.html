@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{{ section.title }} - {% trans 'New Student Guide' %} - ASCAI Lazio{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/guide.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{% url 'students:index' %}" class="hover:text-cameroon-green">{% trans 'Students' %}</a></li>
+            <li>/</li>
+            <li><a href="{% url 'students:new_student_guide' %}" class="hover:text-cameroon-green">{% trans 'New Student Guide' %}</a></li>
+            <li>/</li>
+            <li class="text-gray-900">{{ section.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Section Header -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div class="flex items-start mb-6">
+            <div class="resource-category-icon mr-4">
+                <span class="text-2xl">{{ section.icon|default:"📚" }}</span>
+            </div>
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold mb-4">{{ section.title }}</h1>
+                <div class="prose max-w-none">
+                    {{ section.content|safe }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress (if logged in) -->
+        {% if user.is_authenticated and user_progress %}
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700">{% trans 'Your Progress' %}</span>
+                <span class="text-sm font-bold text-cameroon-green">{{ completion_percentage }}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-cameroon-green h-2 rounded-full transition-all duration-300" style="width: {{ completion_percentage }}%"></div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Steps -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Step-by-Step Guide' %}</h2>
+        <div class="space-y-6">
+            {% for step in steps %}
+            <div class="guide-step-item {% if user.is_authenticated and step.id in completed_step_ids %}completed{% endif %} bg-white rounded-lg shadow-md p-6">
+                <div class="guide-step-number">{{ forloop.counter }}</div>
+                <div class="pl-8">
+                    <h3 class="text-xl font-bold mb-3">{{ step.title }}</h3>
+                    <div class="prose max-w-none mb-4">
+                        {{ step.content|safe }}
+                    </div>
+                    
+                    {% if step.image %}
+                    <img src="{{ step.image.url }}" alt="{{ step.title }}" class="rounded-lg mb-4 max-w-full">
+                    {% endif %}
+                    
+                    {% if step.video_url %}
+                    <div class="mb-4">
+                        <a href="{{ step.video_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                            </svg>
+                            {% trans 'Watch Video' %}
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if step.related_resources.all %}
+                    <div class="mt-4">
+                        <h4 class="font-semibold mb-2">{% trans 'Related Resources' %}</h4>
+                        <div class="flex flex-wrap gap-2">
+                            {% for resource in step.related_resources.all %}
+                            <a href="{% url 'students:resource_detail' resource.pk %}" class="px-3 py-1 bg-cameroon-green/10 text-cameroon-green rounded text-sm hover:bg-cameroon-green/20">
+                                {{ resource.title }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                    <div class="mt-4">
+                        {% if step.id in completed_step_ids %}
+                        <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded text-sm">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            {% trans 'Completed' %}
+                        </span>
+                        {% else %}
+                        <button 
+                            hx-post="{% url 'students:save_guide_progress' step.id %}"
+                            hx-swap="outerHTML"
+                            class="inline-flex items-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            {% trans 'Mark as Complete' %}
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between items-center bg-white rounded-lg shadow-md p-6">
+        {% if previous_section %}
+        <a href="{% url 'students:guide_section_detail' previous_section.slug %}" class="inline-flex items-center text-cameroon-green hover:underline">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            {{ previous_section.title }}
+        </a>
+        {% else %}
+        <span></span>
+        {% endif %}
+        
+        <a href="{% url 'students:new_student_guide' %}" class="text-gray-600 hover:text-cameroon-green">
+            {% trans 'Back to Guide' %}
+        </a>
+        
+        {% if next_section %}
+        <a href="{% url 'students:guide_section_detail' next_section.slug %}" class="inline-flex items-center text-cameroon-green hover:underline">
+            {{ next_section.title }}
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+        </a>
+        {% else %}
+        <span></span>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

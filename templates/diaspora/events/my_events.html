@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'My Events' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-4">{% trans 'My Events' %}</h1>
+        <p class="text-lg text-gray-600">{% trans 'View and manage your event registrations' %}</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-6 border-b border-gray-200">
+        <nav class="flex space-x-8">
+            <a href="#upcoming" class="py-4 px-1 border-b-2 border-cameroon-green font-medium text-cameroon-green">
+                {% trans 'Upcoming Events' %}
+            </a>
+            <a href="#past" class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                {% trans 'Past Events' %}
+            </a>
+        </nav>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div id="upcoming" class="mb-12">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Upcoming Events' %}</h2>
+        {% if upcoming_registrations %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for registration in upcoming_registrations %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                {% if registration.event.image %}
+                <img src="{{ registration.event.image.url }}" alt="{{ registration.event.title }}" class="w-full h-48 object-cover">
+                {% else %}
+                <div class="w-full h-48 bg-gradient-to-br from-cameroon-green to-green-600"></div>
+                {% endif %}
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="event-type-badge {{ registration.event.event_type }}">{{ registration.event.get_event_type_display }}</span>
+                        {% if registration.event.is_full %}
+                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs">{% trans 'Full' %}</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">
+                        <a href="{% url 'diaspora:event_detail' registration.event.slug %}" class="hover:text-cameroon-green">
+                            {{ registration.event.title }}
+                        </a>
+                    </h3>
+                    <div class="space-y-2 text-sm text-gray-600 mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>{{ registration.event.start_datetime|date:"d M Y, H:i" }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                            <span>{{ registration.event.location }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">
+                            {% trans 'Registered' %} {{ registration.registered_at|date:"d M Y" }}
+                        </span>
+                        <a href="{% url 'diaspora:event_detail' registration.event.slug %}" class="text-cameroon-green hover:underline text-sm font-medium">
+                            {% trans 'View Details' %} →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="text-gray-500 text-lg mb-4">{% trans 'You have no upcoming event registrations.' %}</p>
+            <a href="{% url 'diaspora:event_list' %}" class="inline-block px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
+                {% trans 'Browse Events' %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Past Events -->
+    <div id="past">
+        <h2 class="text-2xl font-bold mb-6">{% trans 'Past Events' %}</h2>
+        {% if past_registrations %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for registration in past_registrations %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden opacity-75">
+                {% if registration.event.image %}
+                <img src="{{ registration.event.image.url }}" alt="{{ registration.event.title }}" class="w-full h-48 object-cover">
+                {% else %}
+                <div class="w-full h-48 bg-gradient-to-br from-gray-400 to-gray-600"></div>
+                {% endif %}
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2">
+                        <a href="{% url 'diaspora:event_detail' registration.event.slug %}" class="hover:text-cameroon-green">
+                            {{ registration.event.title }}
+                        </a>
+                    </h3>
+                    <div class="space-y-2 text-sm text-gray-600 mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>{{ registration.event.start_datetime|date:"d M Y, H:i" }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                            <span>{{ registration.event.location }}</span>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-500">
+                        {% trans 'Attended' %} {{ registration.event.end_datetime|date:"d M Y" }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <p class="text-gray-500">{% trans 'No past event registrations.' %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

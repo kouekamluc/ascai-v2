@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ submission.title }} - {% trans 'My Stories' %} - ASCAI Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{% url 'diaspora:index' %}" class="hover:text-cameroon-green">{% trans 'Diaspora' %}</a></li>
+            <li>/</li>
+            <li><a href="{% url 'diaspora:my_stories' %}" class="hover:text-cameroon-green">{% trans 'My Stories' %}</a></li>
+            <li>/</li>
+            <li class="text-gray-900">{{ submission.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Submission Header -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div class="flex items-start justify-between mb-6">
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="px-3 py-1 bg-cameroon-green/10 text-cameroon-green rounded">
+                        {{ submission.get_submission_type_display }}
+                    </span>
+                    <span class="px-3 py-1 rounded {% if submission.status == 'published' %}bg-green-100 text-green-800{% elif submission.status == 'pending' %}bg-yellow-100 text-yellow-800{% elif submission.status == 'declined' %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ submission.get_status_display }}
+                    </span>
+                    {% if submission.featured %}
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded">
+                        ⭐ {% trans 'Featured' %}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <h1 class="text-3xl font-bold mb-4">{{ submission.title }}</h1>
+                
+                {% if submission.cover_image %}
+                <img src="{{ submission.cover_image.url }}" alt="{{ submission.title }}" class="w-full h-64 object-cover rounded-lg mb-6">
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Submission Info -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 border-t pt-6">
+            <div>
+                <div class="text-sm text-gray-600">{% trans 'Submitted' %}</div>
+                <div class="font-semibold">{{ submission.submitted_at|date:"d M Y" }}</div>
+            </div>
+            {% if submission.location %}
+            <div>
+                <div class="text-sm text-gray-600">{% trans 'Location' %}</div>
+                <div class="font-semibold">{{ submission.location }}</div>
+            </div>
+            {% endif %}
+            {% if submission.published_date %}
+            <div>
+                <div class="text-sm text-gray-600">{% trans 'Published' %}</div>
+                <div class="font-semibold">{{ submission.published_date|date:"d M Y" }}</div>
+            </div>
+            {% endif %}
+            {% if submission.is_anonymous %}
+            <div>
+                <div class="text-sm text-gray-600">{% trans 'Visibility' %}</div>
+                <div class="font-semibold">{% trans 'Anonymous' %}</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Tags -->
+        {% if submission.tags %}
+        <div class="mb-6">
+            <div class="text-sm text-gray-600 mb-2">{% trans 'Tags' %}</div>
+            <div class="flex flex-wrap gap-2">
+                {% for tag in submission.tags.split:"," %}
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">{{ tag.strip }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Story Content -->
+        <div class="prose max-w-none mb-6">
+            {{ submission.story|safe }}
+        </div>
+        
+        <!-- Admin Notes (if declined) -->
+        {% if submission.status == 'declined' and submission.admin_notes %}
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <h3 class="font-semibold text-red-800 mb-2">{% trans 'Review Notes' %}</h3>
+            <p class="text-red-700 text-sm">{{ submission.admin_notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Back Button -->
+    <div class="flex justify-between">
+        <a href="{% url 'diaspora:my_stories' %}" class="inline-flex items-center text-cameroon-green hover:underline">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            {% trans 'Back to My Stories' %}
+        </a>
+        {% if submission.status == 'pending' %}
+        <span class="text-sm text-gray-600">{% trans 'Your story is being reviewed' %}</span>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -164,6 +164,33 @@ class CommunityGroup(models.Model):
         help_text=_('Public groups are visible to all authenticated users.')
     )
     
+    cover_image = models.ImageField(
+        upload_to='groups/covers/',
+        blank=True,
+        null=True,
+        verbose_name=_('Cover Image'),
+        help_text=_('Cover image for the group (recommended size: 1200x400px)')
+    )
+    
+    rules = models.TextField(
+        blank=True,
+        verbose_name=_('Group Rules'),
+        help_text=_('Rules and guidelines for group members.')
+    )
+    
+    tags = models.CharField(
+        max_length=500,
+        blank=True,
+        verbose_name=_('Tags'),
+        help_text=_('Comma-separated tags for the group (e.g., "students, rome, support")')
+    )
+    
+    featured = models.BooleanField(
+        default=False,
+        verbose_name=_('Featured'),
+        help_text=_('Featured groups appear prominently on the groups directory.')
+    )
+    
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -175,6 +202,11 @@ class CommunityGroup(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_('Created At')
+    )
+    
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated At')
     )
     
     class Meta:
@@ -192,6 +224,34 @@ class CommunityGroup(models.Model):
     
     def get_absolute_url(self):
         return reverse('dashboard:group_detail', kwargs={'slug': self.slug})
+    
+    def get_public_url(self):
+        """Get public-facing URL for the group."""
+        return reverse('community:group_detail', kwargs={'slug': self.slug})
+    
+    @property
+    def member_count(self):
+        """Get the number of members in the group."""
+        return self.members.count()
+    
+    @property
+    def activity_count(self):
+        """Get the total activity count (discussions + announcements)."""
+        return self.discussions.count() + self.announcements.count()
+    
+    @property
+    def last_activity(self):
+        """Get the last activity timestamp."""
+        last_discussion = self.discussions.order_by('-created_at').first()
+        last_announcement = self.announcements.order_by('-created_at').first()
+        
+        timestamps = []
+        if last_discussion:
+            timestamps.append(last_discussion.created_at)
+        if last_announcement:
+            timestamps.append(last_announcement.created_at)
+        
+        return max(timestamps) if timestamps else self.created_at
 
 
 class GroupDiscussion(models.Model):
@@ -375,6 +435,14 @@ class UserStorySubmission(models.Model):
         ('declined', _('Declined')),
     ]
     
+    SUBMISSION_TYPE_CHOICES = [
+        ('success', _('Success Story')),
+        ('journey', _('Journey Story')),
+        ('advice', _('Advice & Tips')),
+        ('experience', _('Personal Experience')),
+        ('other', _('Other')),
+    ]
+    
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -391,6 +459,14 @@ class UserStorySubmission(models.Model):
         verbose_name=_('Story')
     )
     
+    cover_image = models.ImageField(
+        upload_to='story_covers/%Y/%m/',
+        blank=True,
+        null=True,
+        verbose_name=_('Cover Image'),
+        help_text=_('Main cover image for the story')
+    )
+    
     images = models.ManyToManyField(
         StoryImage,
         blank=True,
@@ -405,10 +481,37 @@ class UserStorySubmission(models.Model):
         verbose_name=_('Supporting Documents')
     )
     
+    tags = models.CharField(
+        max_length=500,
+        blank=True,
+        verbose_name=_('Tags'),
+        help_text=_('Comma-separated tags (e.g., "student, rome, success")')
+    )
+    
+    location = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_('Location'),
+        help_text=_('Location related to the story (e.g., "Rome, Italy")')
+    )
+    
+    submission_type = models.CharField(
+        max_length=20,
+        choices=SUBMISSION_TYPE_CHOICES,
+        default='other',
+        verbose_name=_('Submission Type')
+    )
+    
     is_anonymous = models.BooleanField(
         default=False,
         verbose_name=_('Anonymous'),
         help_text=_('If checked, the story will be published without your name.')
+    )
+    
+    featured = models.BooleanField(
+        default=False,
+        verbose_name=_('Featured'),
+        help_text=_('Featured stories appear prominently on the diaspora page.')
     )
     
     status = models.CharField(
@@ -435,6 +538,13 @@ class UserStorySubmission(models.Model):
         verbose_name=_('Reviewed At')
     )
     
+    published_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Published Date'),
+        help_text=_('Date when story was published (set automatically when status changes to published)')
+    )
+    
     class Meta:
         verbose_name = _('Story Submission')
         verbose_name_plural = _('Story Submissions')
@@ -442,6 +552,13 @@ class UserStorySubmission(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.title}"
+    
+    def save(self, *args, **kwargs):
+        # Set published_date when status changes to published
+        if self.status == 'published' and not self.published_date:
+            from django.utils import timezone
+            self.published_date = timezone.now()
+        super().save(*args, **kwargs)
 
 
 class EventRegistration(models.Model):

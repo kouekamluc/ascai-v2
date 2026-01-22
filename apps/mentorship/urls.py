@@ -12,6 +12,8 @@ from .views import (
     StudentDashboardView,
     RequestDetailView,
     RateMentorView,
+    SessionScheduleView,
+    SessionDetailView,
     accept_request,
     reject_request,
     complete_request,
@@ -36,6 +38,8 @@ urlpatterns = [
     path('requests/<int:request_id>/complete/', complete_request, name='complete_request'),
     path('requests/<int:request_id>/rate/', RateMentorView.as_view(), name='rate_mentor'),
     path('requests/<int:request_id>/messages/', get_messages, name='get_messages'),
+    path('requests/<int:request_id>/schedule/', SessionScheduleView.as_view(), name='session_schedule'),
+    path('sessions/<int:pk>/', SessionDetailView.as_view(), name='session_detail'),
     path('availability/update/', update_availability, name='update_availability'),
 ]
 

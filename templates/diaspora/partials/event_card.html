@@ -1,0 +1,58 @@
+{% load i18n %}
+<div class="event-card {% if event.featured %}featured{% endif %} bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+    {% if event.image %}
+    <div class="relative h-48 overflow-hidden">
+        <img src="{{ event.image.url }}" alt="{{ event.title }}" class="w-full h-full object-cover">
+        {% if event.featured %}
+        <div class="absolute top-2 right-2 px-2 py-1 bg-yellow-400 text-yellow-900 rounded text-xs font-semibold">
+            ⭐ {% trans 'Featured' %}
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="h-48 bg-gradient-to-br from-cameroon-red/20 to-cameroon-red/5 flex items-center justify-center">
+        <svg class="w-16 h-16 text-cameroon-red/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+    </div>
+    {% endif %}
+    <div class="p-6">
+        <div class="flex items-center gap-2 mb-3">
+            <span class="event-type-badge {{ event.event_type }}">{{ event.get_event_type_display }}</span>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <svg class="w-4 h-4 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>{{ event.start_datetime|date:"d M Y, H:i" }}</span>
+            </div>
+        </div>
+        <h3 class="text-xl font-semibold mb-3 line-clamp-2">
+            <a href="{% url 'diaspora:event_detail' event.slug %}" class="text-gray-900 hover:text-cameroon-green transition-colors">
+                {{ event.title }}
+            </a>
+        </h3>
+        <p class="text-gray-600 mb-3 line-clamp-2">{{ event.description|truncatewords:20|striptags }}</p>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span>{{ event.location }}</span>
+        </div>
+        {% if event.registration_required %}
+        <div class="flex items-center justify-between mb-3">
+            <span class="inline-block px-3 py-1 bg-cameroon-green/10 text-cameroon-green text-xs rounded-full font-medium">
+                {% trans 'Registration Required' %}
+            </span>
+            {% if event.capacity %}
+            <div class="capacity-indicator">
+                <div class="capacity-bar">
+                    <div class="capacity-fill {% if event.is_full %}full{% elif event.spots_remaining and event.spots_remaining < 10 %}warning{% endif %}" style="width: {% widthratio event.get_registered_count event.capacity 100 %}%"></div>
+                </div>
+                <span class="text-xs text-gray-600">{{ event.get_registered_count }}/{{ event.capacity }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>

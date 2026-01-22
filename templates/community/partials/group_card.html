@@ -1,0 +1,59 @@
+{% load i18n %}
+<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+    {% if group.cover_image %}
+    <img src="{{ group.cover_image.url }}" alt="{{ group.name }}" class="w-full h-48 object-cover">
+    {% else %}
+    <div class="w-full h-48 bg-gradient-to-br from-cameroon-green to-green-600"></div>
+    {% endif %}
+    
+    <div class="p-6">
+        <div class="flex items-start justify-between mb-3">
+            <h3 class="text-xl font-bold">
+                <a href="{% url 'community:group_detail' group.slug %}" class="hover:text-cameroon-green">
+                    {{ group.name }}
+                </a>
+            </h3>
+            {% if group.featured %}
+            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-semibold">
+                ⭐ {% trans 'Featured' %}
+            </span>
+            {% endif %}
+        </div>
+        
+        <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ group.description|striptags|truncatewords:20 }}</p>
+        
+        <div class="flex items-center gap-4 text-sm text-gray-600 mb-4">
+            <span class="flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                {{ group.member_count }} {% trans 'members' %}
+            </span>
+            <span class="flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                {{ group.activity_count }} {% trans 'activities' %}
+            </span>
+        </div>
+        
+        <div class="flex items-center justify-between">
+            <span class="px-2 py-1 bg-cameroon-green/10 text-cameroon-green rounded text-xs">
+                {{ group.get_category_display }}
+            </span>
+            {% if user.is_authenticated %}
+                {% if group.id in user_group_ids %}
+                <span class="text-sm text-green-600 font-medium">✓ {% trans 'Member' %}</span>
+                {% else %}
+                <a href="{% url 'community:group_detail' group.slug %}" class="text-sm text-cameroon-green hover:underline font-medium">
+                    {% trans 'View Group' %} →
+                </a>
+                {% endif %}
+            {% else %}
+            <a href="{% url 'community:group_detail' group.slug %}" class="text-sm text-cameroon-green hover:underline font-medium">
+                {% trans 'View Group' %} →
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans 'New Student Guide' %} - ASCAI Lazio{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/guide.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">{% trans 'Welcome to ASCAI Lazio' %}</h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            {% trans 'Your complete guide to studying and living in Lazio, Italy. Everything you need to know as a new student from Cameroon.' %}
+        </p>
+    </div>
+
+    <!-- Progress Tracker (if logged in) -->
+    {% if user.is_authenticated %}
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold">{% trans 'Your Progress' %}</h2>
+            <div class="text-2xl font-bold text-cameroon-green">{{ overall_progress }}%</div>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+            <div class="bg-cameroon-green h-4 rounded-full transition-all duration-300" style="width: {{ overall_progress }}%"></div>
+        </div>
+        <p class="text-sm text-gray-600 mt-2">
+            {% trans 'Complete all sections to unlock your full student guide!' %}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Guide Sections -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {% for section in sections %}
+        <a href="{% url 'students:guide_section_detail' section.slug %}" class="guide-section-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition block">
+            <div class="flex items-start mb-4">
+                <div class="resource-category-icon mr-4">
+                    <span class="text-2xl">{{ section.icon|default:"📚" }}</span>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold mb-2">{{ section.title }}</h3>
+                    <p class="text-gray-600 text-sm mb-4">{{ section.content|striptags|truncatewords:20 }}</p>
+                </div>
+            </div>
+            
+            {% if user.is_authenticated and user_progress %}
+                {% for section_id, progress_data in user_progress.items %}
+                    {% if section_id == section.id|stringformat:"s" %}
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                {% if progress_data.is_completed %}
+                                <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="text-sm text-green-600 font-medium">{% trans 'Completed' %}</span>
+                                {% else %}
+                                <div class="w-5 h-5 border-2 border-cameroon-green rounded-full"></div>
+                                <span class="text-sm text-gray-600">{{ progress_data.completion_percentage }}% {% trans 'Complete' %}</span>
+                                {% endif %}
+                            </div>
+                            <span class="text-sm text-cameroon-green font-semibold">{% trans 'Continue' %} →</span>
+                        </div>
+                    {% endif %}
+                {% empty %}
+                <span class="text-sm text-gray-500">{% trans 'Not started' %}</span>
+                {% endfor %}
+            {% else %}
+            <span class="text-sm text-cameroon-green font-semibold">{% trans 'Get Started' %} →</span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-cameroon-green text-white rounded-lg p-8 text-center">
+        <h2 class="text-2xl font-bold mb-4">{% trans 'Need Help?' %}</h2>
+        <p class="mb-6">{% trans 'Have questions? Our community is here to help you every step of the way.' %}</p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="{% url 'contact:index' %}" class="px-6 py-3 bg-white text-cameroon-green rounded-lg hover:bg-gray-100 font-semibold">
+                {% trans 'Contact Us' %}
+            </a>
+            <a href="{% url 'community:index' %}" class="px-6 py-3 border-2 border-white text-white rounded-lg hover:bg-white/10 font-semibold">
+                {% trans 'Visit Forum' %}
+            </a>
+            <a href="{% url 'mentorship:index' %}" class="px-6 py-3 border-2 border-white text-white rounded-lg hover:bg-white/10 font-semibold">
+                {% trans 'Find a Mentor' %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

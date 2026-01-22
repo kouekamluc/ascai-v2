@@ -436,4 +436,3 @@ class RulesOfProcedureAmendmentForm(forms.ModelForm):
                 )
         
         return cleaned_data
-

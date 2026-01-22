@@ -117,17 +117,38 @@ class TicketReplyAdmin(BaseAdmin):
 
 
 @admin.register(CommunityGroup)
-class CommunityGroupAdmin(ModelAdmin):
-    list_display = ['name', 'category', 'is_public', 'created_by', 'created_at', 'member_count']
-    list_filter = ['category', 'is_public', 'created_at']
-    search_fields = ['name', 'description']
+class CommunityGroupAdmin(BaseAdmin):
+    list_display = ['name', 'category', 'is_public', 'featured', 'created_by', 'created_at', 'member_count', 'activity_count']
+    list_filter = ['category', 'is_public', 'featured', 'created_at']
+    search_fields = ['name', 'description', 'tags']
     prepopulated_fields = {'slug': ('name',)}
     filter_horizontal = ['members']
-    readonly_fields = ['created_at']
+    readonly_fields = ['created_at', 'updated_at', 'member_count', 'activity_count', 'last_activity']
+    fieldsets = (
+        (_('Basic Information'), {
+            'fields': ('name', 'slug', 'category', 'description', 'cover_image')
+        }),
+        (_('Settings'), {
+            'fields': ('is_public', 'featured', 'tags', 'rules')
+        }),
+        (_('Members'), {
+            'fields': ('members', 'created_by')
+        }),
+        (_('Statistics'), {
+            'fields': ('member_count', 'activity_count', 'last_activity')
+        }),
+        (_('Timestamps'), {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
     
     def member_count(self, obj):
-        return obj.members.count()
+        return obj.member_count
     member_count.short_description = _('Members')
+    
+    def activity_count(self, obj):
+        return obj.activity_count
+    activity_count.short_description = _('Activity')
 
 
 @admin.register(GroupDiscussion)
@@ -163,17 +184,20 @@ class StoryImageAdmin(ModelAdmin):
 
 @admin.register(UserStorySubmission)
 class UserStorySubmissionAdmin(BaseAdmin):
-    list_display = ['title', 'user', 'status', 'is_anonymous', 'submitted_at', 'reviewed_at']
-    list_filter = ['status', 'is_anonymous', 'submitted_at']
-    search_fields = ['title', 'story', 'user__username']
-    readonly_fields = ['user', 'submitted_at', 'reviewed_at']
+    list_display = ['title', 'user', 'submission_type', 'status', 'featured', 'is_anonymous', 'submitted_at', 'published_date']
+    list_filter = ['status', 'submission_type', 'featured', 'is_anonymous', 'submitted_at']
+    search_fields = ['title', 'story', 'user__username', 'tags', 'location']
+    readonly_fields = ['user', 'submitted_at', 'reviewed_at', 'published_date']
     filter_horizontal = ['images']
     fieldsets = (
         (_('Story Information'), {
-            'fields': ('user', 'title', 'story', 'is_anonymous', 'images', 'documents')
+            'fields': ('user', 'title', 'story', 'submission_type', 'cover_image', 'is_anonymous', 'tags', 'location')
         }),
-        (_('Review'), {
-            'fields': ('status', 'admin_notes', 'reviewed_at')
+        (_('Media'), {
+            'fields': ('images', 'documents')
+        }),
+        (_('Review & Publication'), {
+            'fields': ('status', 'featured', 'admin_notes', 'reviewed_at', 'published_date')
         }),
         (_('Timestamps'), {
             'fields': ('submitted_at',),

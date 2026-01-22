@@ -11,7 +11,12 @@ from .views import (
     ScholarshipsListView,
     EnrollmentProcessView,
     OrientationView,
-    ResourcesView
+    ResourcesView,
+    ResourceDetailView,
+    NewStudentGuideView,
+    GuideSectionDetailView,
+    GuideStepDetailView,
+    save_guide_progress
 )
 
 app_name = 'students'
@@ -26,5 +31,10 @@ urlpatterns = [
     path('enrollment/', EnrollmentProcessView.as_view(), name='enrollment_process'),
     path('orientation/', OrientationView.as_view(), name='orientation'),
     path('resources/', ResourcesView.as_view(), name='resources'),
+    path('resources/<int:pk>/', ResourceDetailView.as_view(), name='resource_detail'),
+    path('new-student-guide/', NewStudentGuideView.as_view(), name='new_student_guide'),
+    path('new-student-guide/<slug:slug>/', GuideSectionDetailView.as_view(), name='guide_section_detail'),
+    path('new-student-guide/step/<int:pk>/', GuideStepDetailView.as_view(), name='guide_step_detail'),
+    path('new-student-guide/progress/<int:step_id>/save/', save_guide_progress, name='save_guide_progress'),
 ]
 

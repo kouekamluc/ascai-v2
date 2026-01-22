@@ -15,10 +15,13 @@ from django.utils import timezone
 import json
 import os
 from pathlib import Path
-from .models import MentorProfile, MentorshipRequest, MentorshipMessage, MentorRating
+from .models import (
+    MentorSpecialization, MentorProfile, MentorshipRequest,
+    MentorshipMessage, MentorRating, MentorshipSession
+)
 from .forms import (
     MentorProfileForm, MentorProfileUpdateForm, MentorshipRequestForm, 
-    MentorshipMessageForm, MentorRatingForm
+    MentorshipMessageForm, MentorRatingForm, MentorshipSessionForm
 )
 
 # Debug logging helper
@@ -46,24 +49,74 @@ def _debug_log(location, message, data, hypothesis_id='A'):
 
 
 class MentorListView(ListView):
-    """List view for approved mentors."""
+    """Enhanced list view for approved mentors with advanced filters."""
     model = MentorProfile
     template_name = 'mentorship/mentor_list.html'
     context_object_name = 'mentors'
     paginate_by = 12
     
     def get_queryset(self):
-        queryset = MentorProfile.objects.filter(is_approved=True).select_related('user')
+        queryset = MentorProfile.objects.filter(is_approved=True).select_related('user').prefetch_related('specializations')
         
+        # Filter by specialization
+        specialization = self.request.GET.get('specialization')
+        if specialization:
+            queryset = queryset.filter(specializations__id=specialization)
+        
+        # Filter by availability
+        availability = self.request.GET.get('availability')
+        if availability:
+            queryset = queryset.filter(availability_status=availability)
+        
+        # Filter by rating (minimum)
+        min_rating = self.request.GET.get('min_rating')
+        if min_rating:
+            try:
+                queryset = queryset.filter(rating__gte=float(min_rating))
+            except ValueError:
+                pass
+        
+        # Filter by experience (minimum years)
+        min_experience = self.request.GET.get('min_experience')
+        if min_experience:
+            try:
+                queryset = queryset.filter(years_experience__gte=int(min_experience))
+            except ValueError:
+                pass
+        
+        # Search
         search = self.request.GET.get('search')
         if search:
             queryset = queryset.filter(
                 Q(user__username__icontains=search) |
                 Q(specialization__icontains=search) |
-                Q(bio__icontains=search)
+                Q(bio__icontains=search) |
+                Q(specializations__name__icontains=search)
             )
         
-        return queryset.order_by('-rating', '-students_helped')
+        # Sorting
+        sort_by = self.request.GET.get('sort', 'rating')
+        if sort_by == 'experience':
+            queryset = queryset.order_by('-years_experience', '-rating')
+        elif sort_by == 'students':
+            queryset = queryset.order_by('-students_helped', '-rating')
+        elif sort_by == 'success':
+            queryset = queryset.order_by('-success_rate', '-rating')
+        else:  # rating (default)
+            queryset = queryset.order_by('-rating', '-students_helped')
+        
+        return queryset.distinct()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['specializations'] = MentorSpecialization.objects.all().order_by('order', 'name')
+        context['filter_specialization'] = self.request.GET.get('specialization', '')
+        context['filter_availability'] = self.request.GET.get('availability', '')
+        context['filter_min_rating'] = self.request.GET.get('min_rating', '')
+        context['filter_min_experience'] = self.request.GET.get('min_experience', '')
+        context['search_query'] = self.request.GET.get('search', '')
+        context['sort_by'] = self.request.GET.get('sort', 'rating')
+        return context
 
 
 class MentorDetailView(DetailView):
@@ -92,6 +145,14 @@ class MentorDetailView(DetailView):
             context['avatar_url'] = self.request.build_absolute_uri(self.object.user.avatar.url)
         else:
             context['avatar_url'] = None
+        
+        # Get mentor's specializations
+        context['specializations'] = self.object.specializations.all()
+        
+        # Get testimonials/ratings
+        context['ratings'] = self.object.ratings.select_related('student').order_by('-created_at')[:5]
+        context['average_rating'] = self.object.rating
+        context['total_ratings'] = self.object.ratings.count()
         
         return context
 
@@ -510,4 +571,65 @@ class RateMentorView(LoginRequiredMixin, CreateView):
     
     def get_success_url(self):
         return reverse_lazy('mentorship:request_detail', kwargs={'pk': self.get_mentorship_request().pk})
+
+
+class SessionScheduleView(LoginRequiredMixin, CreateView):
+    """Schedule a mentorship session."""
+    model = MentorshipSession
+    form_class = MentorshipSessionForm
+    template_name = 'mentorship/session_schedule.html'
+    
+    def get_mentorship_request(self):
+        """Get the mentorship request."""
+        return get_object_or_404(
+            MentorshipRequest,
+            id=self.kwargs['request_id'],
+            status='accepted'
+        )
+    
+    def dispatch(self, request, *args, **kwargs):
+        """Check if user has access to schedule session."""
+        mentorship_request = self.get_mentorship_request()
+        if not (request.user == mentorship_request.student or 
+                (mentorship_request.mentor and request.user == mentorship_request.mentor.user)):
+            messages.error(request, _('You do not have permission to schedule sessions for this request.'))
+            return redirect('mentorship:request_detail', pk=mentorship_request.pk)
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        mentorship_request = self.get_mentorship_request()
+        form.instance.request = mentorship_request
+        messages.success(self.request, _('Session scheduled successfully!'))
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('mentorship:session_detail', kwargs={'pk': self.object.pk})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request'] = self.get_mentorship_request()
+        return context
+
+
+class SessionDetailView(LoginRequiredMixin, DetailView):
+    """View session details."""
+    model = MentorshipSession
+    template_name = 'mentorship/session_detail.html'
+    context_object_name = 'session'
+    
+    def get_queryset(self):
+        """Only show sessions for requests the user is involved in."""
+        if self.request.user.is_authenticated:
+            return MentorshipSession.objects.filter(
+                Q(request__student=self.request.user) |
+                Q(request__mentor__user=self.request.user)
+            ).select_related('request', 'request__student', 'request__mentor__user')
+        return MentorshipSession.objects.none()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_student'] = self.object.request.student == self.request.user
+        context['is_mentor'] = (self.object.request.mentor and 
+                                self.object.request.mentor.user == self.request.user)
+        return context
 
