@@ -190,12 +190,14 @@ echo "USE_S3 environment variable: '${USE_S3:-False}'"
 (
     echo "Running collectstatic in background..."
     if command -v timeout >/dev/null 2>&1; then
-        timeout 300 python manage.py collectstatic --noinput --verbosity 1 && \
+        # Suppress duplicate file warnings (they're harmless - Django uses first file found)
+        # Use sed to filter out duplicate file warnings while preserving other output
+        timeout 300 python manage.py collectstatic --noinput --verbosity 1 2>&1 | sed '/Found another file with the destination path/d' && \
         echo "✓ collectstatic completed successfully" || \
         echo "⚠ WARNING: collectstatic failed or timed out - static files may not be fully uploaded"
     else
         # Fallback if timeout command is not available
-        python manage.py collectstatic --noinput --verbosity 1 && \
+        python manage.py collectstatic --noinput --verbosity 1 2>&1 | sed '/Found another file with the destination path/d' && \
         echo "✓ collectstatic completed successfully" || \
         echo "⚠ WARNING: collectstatic failed - static files may not be fully uploaded"
     fi

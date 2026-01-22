@@ -37,7 +37,7 @@ RUN echo "Collecting static files during build (local storage for WhiteNoise)...
     ALLOWED_HOSTS=localhost \
     DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy \
     USE_S3=False \
-    python manage.py collectstatic --noinput --clear && \
+    python manage.py collectstatic --noinput --clear 2>&1 | sed '/Found another file with the destination path/d' && \
     echo "Verifying static files collection..." && \
     test -d staticfiles/admin && echo "✓ Admin static files collected locally" || (echo "ERROR: Admin static files not found!" && exit 1)
 
