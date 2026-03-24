@@ -63,12 +63,40 @@ class Command(BaseCommand):
         # Add the site to the social app
         social_app.sites.add(site)
         
+        # Determine protocol (https in production, http in development)
+        protocol = 'https' if not settings.DEBUG else 'http'
+        redirect_uri = f"{protocol}://{site.domain}/accounts/google/login/callback/"
+        
         self.stdout.write(
             self.style.SUCCESS(
                 f'✅ Google OAuth SocialApplication created successfully!\n'
                 f'   Client ID: {client_id[:20]}...\n'
                 f'   Site: {site.domain}\n'
                 f'   Total Google apps after cleanup: 1'
+            )
+        )
+        
+        self.stdout.write(
+            self.style.WARNING(
+                '\n' + '='*70 + '\n'
+                '⚠️  IMPORTANT: Google OAuth Redirect URI Configuration\n'
+                '='*70 + '\n'
+                f'\nThe redirect URI for this application is:\n'
+                f'   {redirect_uri}\n'
+                f'\nYou MUST add this exact URI to your Google Cloud Console:\n'
+                f'   1. Go to: https://console.cloud.google.com/\n'
+                f'   2. Select your project\n'
+                f'   3. Navigate to: APIs & Services → Credentials\n'
+                f'   4. Click on your OAuth 2.0 Client ID\n'
+                f'   5. Under "Authorized redirect URIs", click "ADD URI"\n'
+                f'   6. Add this exact URI: {redirect_uri}\n'
+                f'   7. Click "SAVE"\n'
+                f'\nIf you see "Error 400: redirect_uri_mismatch", it means:\n'
+                f'   - The redirect URI above is NOT in your Google Cloud Console, OR\n'
+                f'   - The Site domain ({site.domain}) doesn\'t match your production domain\n'
+                f'\nTo fix the Site domain, run:\n'
+                f'   python manage.py update_site_domain --domain your-production-domain.com\n'
+                '='*70 + '\n'
             )
         )
         

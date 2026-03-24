@@ -96,7 +96,7 @@ class Command(BaseCommand):
         # Test 5: Governance (if accessible)
         self.stdout.write('5. Testing Governance Access...')
         try:
-            response = self.client.get(reverse('governance:index'))
+            response = self.client.get(reverse('governance:dashboard'))
             if response.status_code in [200, 302, 403]:
                 results['passed'].append('Governance section accessible (may require auth)')
                 self.stdout.write(self.style.SUCCESS('  ✓ Governance section accessible'))

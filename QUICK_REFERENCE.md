@@ -47,6 +47,9 @@ python manage.py update_site_domain
 # Setup Google OAuth
 python manage.py setup_google_oauth
 
+# Verify Google OAuth configuration (shows redirect URI)
+python manage.py verify_google_oauth
+
 # Test email
 python manage.py test_email
 ```

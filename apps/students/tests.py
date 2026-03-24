@@ -17,7 +17,7 @@ class StudentsViewsTest(TestCase):
         # Assuming there's a students home URL
         # Adjust based on actual URL pattern
         try:
-            url = reverse('students:home')
+            url = reverse('students:index')
             response = self.client.get(url)
             self.assertIn(response.status_code, [200, 404])
         except:

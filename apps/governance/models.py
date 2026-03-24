@@ -1669,21 +1669,21 @@ class BoardOfAuditors(models.Model):
                 )
             
             # Auto-add former presidents (from ExecutivePosition history)
-            former_presidents = ExecutivePosition.objects.filter(
+            former_president_user_ids = ExecutivePosition.objects.filter(
                 position='president',
                 status__in=['resigned', 'replaced'],
-                end_date__isnull=False
-            ).select_related('user').distinct('user')
-            
-            for position in former_presidents:
-                if position.user:
-                    AuditorMember.objects.get_or_create(
-                        board=self,
-                        user=position.user,
-                        defaults={
-                            'is_former_president': True,
-                        }
-                    )
+                end_date__isnull=False,
+                user__isnull=False,
+            ).values_list('user_id', flat=True).distinct()
+
+            for user_id in former_president_user_ids:
+                AuditorMember.objects.get_or_create(
+                    board=self,
+                    user_id=user_id,
+                    defaults={
+                        'is_former_president': True,
+                    }
+                )
 
 
 class AuditorMember(models.Model):
@@ -2051,7 +2051,7 @@ class AssociationEvent(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('governance:event_detail', kwargs={'pk': self.pk})
+        return reverse('governance:association_event_detail', kwargs={'pk': self.pk})
 
 
 class EventOrganizingCommittee(models.Model):

@@ -7,7 +7,15 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import date
 from decimal import Decimal
-from .models import Member, MembershipStatus, ExecutiveBoard, ExecutivePosition
+from .models import (
+    Member,
+    MembershipStatus,
+    ExecutiveBoard,
+    ExecutivePosition,
+    BoardOfAuditors,
+    AuditorMember,
+    AssociationEvent,
+)
 
 User = get_user_model()
 
@@ -201,4 +209,63 @@ class GovernanceViewsTest(TestCase):
         except:
             # If URL doesn't exist, that's okay
             pass
+
+
+class GovernanceRuntimeRegressionTest(TestCase):
+    """Regression tests for recent runtime fixes."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='formerpresident',
+            email='former-president@example.com',
+            password='testpass123'
+        )
+
+    def test_association_event_absolute_url_uses_existing_route(self):
+        event = AssociationEvent.objects.create(
+            title='Governance Event',
+            event_type='other',
+            description='Regression test event',
+            start_date=timezone.now(),
+            location='Rome'
+        )
+        expected_url = reverse('governance:association_event_detail', kwargs={'pk': event.pk})
+        self.assertEqual(event.get_absolute_url(), expected_url)
+
+    def test_board_creation_deduplicates_former_president_members(self):
+        # Two historical presidency rows for one user should produce one auditor membership.
+        executive_board_one = ExecutiveBoard.objects.create(
+            term_start_date=date(2020, 1, 1),
+            term_end_date=date(2021, 12, 31)
+        )
+        executive_board_two = ExecutiveBoard.objects.create(
+            term_start_date=date(2022, 1, 1),
+            term_end_date=date(2023, 12, 31)
+        )
+        ExecutivePosition.objects.create(
+            board=executive_board_one,
+            user=self.user,
+            position='president',
+            start_date=date(2020, 1, 1),
+            end_date=date(2020, 6, 1),
+            status='resigned',
+        )
+        ExecutivePosition.objects.create(
+            board=executive_board_two,
+            user=self.user,
+            position='president',
+            start_date=date(2020, 6, 2),
+            end_date=date(2021, 1, 1),
+            status='replaced',
+        )
+
+        board = BoardOfAuditors.objects.create(
+            name='2026-2028 Board of Auditors',
+            term_start=date(2026, 1, 1),
+            term_end=date(2027, 12, 31),
+        )
+
+        memberships = AuditorMember.objects.filter(board=board, user=self.user)
+        self.assertEqual(memberships.count(), 1)
+        self.assertTrue(memberships.first().is_former_president)
 
