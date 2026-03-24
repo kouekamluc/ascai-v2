@@ -17,10 +17,11 @@ def create_initial_membership_status(sender, instance, created, **kwargs):
     """
     Create initial membership status when member is created.
     """
-    if created:
+    if created and not instance.status_history.exists():
+        initial_status = 'active' if instance.is_active_member else 'pending'
         MembershipStatus.objects.create(
             member=instance,
-            status='active',
+            status=initial_status,
             effective_date=timezone.now().date()
         )
 

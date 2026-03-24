@@ -140,6 +140,7 @@ class MembershipStatus(models.Model):
     Track membership lifecycle and status changes.
     """
     STATUS_CHOICES = [
+        ('pending', _('Pending')),
         ('active', _('Active')),
         ('inactive', _('Inactive')),
         ('suspended', _('Suspended')),

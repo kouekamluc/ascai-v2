@@ -172,13 +172,6 @@ class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
         
         member.save()
         
-        # Create initial membership status record
-        MembershipStatus.objects.create(
-            member=member,
-            status='pending',
-            reason=_('Initial registration - pending admin verification')
-        )
-        
         if member.member_type == 'sympathizer':
             messages.success(
                 self.request,
@@ -228,8 +221,8 @@ class MyDuesView(LoginRequiredMixin, TemplateView):
         dues = MembershipDues.objects.filter(member=member).order_by('-year')
         current_dues = dues.filter(year=current_year).first()
         
-        # Create current year dues if it doesn't exist
-        if not current_dues:
+        # Create current year dues if it doesn't exist and member is active
+        if not current_dues and member.is_active_member:
             current_dues = MembershipDues.objects.create(
                 member=member,
                 year=current_year,
@@ -237,6 +230,7 @@ class MyDuesView(LoginRequiredMixin, TemplateView):
                 due_date=timezone.datetime(current_year, 3, 31).date(),
                 status='pending'
             )
+            dues = MembershipDues.objects.filter(member=member).order_by('-year')
         
         context.update({
             'member': member,
@@ -249,6 +243,10 @@ class MyDuesView(LoginRequiredMixin, TemplateView):
 @login_required
 def request_dues_payment(request, dues_id):
     """User requests to pay their dues (admin will mark as paid)."""
+    if request.method != 'POST':
+        messages.error(request, _('Invalid request method.'))
+        return redirect('governance:my_dues')
+
     dues = get_object_or_404(MembershipDues, pk=dues_id, member__user=request.user)
     
     if dues.status == 'paid':
@@ -609,7 +607,11 @@ def verify_member(request, member_id):
         member.save(update_fields=['cameroonian_origin_verified'])
         messages.success(request, _('Cameroonian origin verified.'))
     elif action == 'activate':
-        if member.lazio_residence_verified and member.cameroonian_origin_verified:
+        verification_complete = (
+            member.lazio_residence_verified and
+            (member.member_type == 'sympathizer' or member.cameroonian_origin_verified)
+        )
+        if verification_complete:
             member.is_active_member = True
             member.save(update_fields=['is_active_member'])
             MembershipStatus.objects.create(
@@ -620,7 +622,10 @@ def verify_member(request, member_id):
             )
             messages.success(request, _('Member activated successfully.'))
         else:
-            messages.error(request, _('Cannot activate member. Please verify residence and origin first.'))
+            if member.member_type == 'sympathizer':
+                messages.error(request, _('Cannot activate sympathizer. Please verify residence first.'))
+            else:
+                messages.error(request, _('Cannot activate member. Please verify residence and origin first.'))
     elif action == 'deactivate':
         member.is_active_member = False
         member.save(update_fields=['is_active_member'])
