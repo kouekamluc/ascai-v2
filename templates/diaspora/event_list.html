@@ -1,134 +1,101 @@
 {% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n %}
 
-{% block title %}{% trans 'Events' %} - ASCAI Lazio{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/events.css' %}">
-{% endblock %}
+{% block title %}{% trans 'Events' %} | ASCAI Lazio{% endblock %}
+{% block meta_description %}{% trans 'Discover upcoming and past ASCAI Lazio community events, cultural moments, and networking opportunities across Lazio.' %}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="mb-8 flex items-center justify-between">
-        <div>
-            <h1 class="text-4xl font-bold mb-4 text-cameroon-green">{% trans 'Events' %}</h1>
-            <p class="text-lg text-gray-600">{% trans 'Discover upcoming and past events organized by the Cameroonian community in Lazio.' %}</p>
-        </div>
-        <div class="flex gap-4">
-            <a href="{% url 'diaspora:event_list' %}?view=list" class="px-4 py-2 {% if view_type == 'list' or not view_type %}bg-cameroon-green text-white{% else %}border border-gray-300{% endif %} rounded-lg">
-                {% trans 'List' %}
-            </a>
-            <a href="{% url 'diaspora:event_calendar' %}" class="px-4 py-2 {% if view_type == 'calendar' %}bg-cameroon-green text-white{% else %}border border-gray-300{% endif %} rounded-lg">
-                {% trans 'Calendar' %}
-            </a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'diaspora:my_events' %}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                {% trans 'My Events' %}
-            </a>
-            {% endif %}
-        </div>
-    </div>
-    
-    <!-- Enhanced Filters -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="page-shell space-y-10">
+    <section class="page-hero">
+        <div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">{% trans 'Event Type' %}</label>
-                <select name="event_type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
-                    <option value="">{% trans 'All Types' %}</option>
-                    <option value="cultural" {% if filter_event_type == 'cultural' %}selected{% endif %}>{% trans 'Cultural' %}</option>
-                    <option value="educational" {% if filter_event_type == 'educational' %}selected{% endif %}>{% trans 'Educational' %}</option>
-                    <option value="social" {% if filter_event_type == 'social' %}selected{% endif %}>{% trans 'Social' %}</option>
-                    <option value="networking" {% if filter_event_type == 'networking' %}selected{% endif %}>{% trans 'Networking' %}</option>
-                    <option value="sports" {% if filter_event_type == 'sports' %}selected{% endif %}>{% trans 'Sports' %}</option>
-                    <option value="workshop" {% if filter_event_type == 'workshop' %}selected{% endif %}>{% trans 'Workshop' %}</option>
-                    <option value="seminar" {% if filter_event_type == 'seminar' %}selected{% endif %}>{% trans 'Seminar' %}</option>
-                </select>
+                <span class="eyebrow">{% trans 'Events' %}</span>
+                <h1 class="mt-6 text-5xl md:text-6xl font-bold">{% trans 'A stronger calendar for community moments that matter.' %}</h1>
+                <p class="mt-5 text-lg leading-8 text-white/82">
+                    {% trans 'Follow cultural, educational, and networking events across Lazio and make it easier to show up for the conversations, celebrations, and opportunities around you.' %}
+                </p>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">{% trans 'Date Filter' %}</label>
-                <select name="date_filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
-                    <option value="upcoming" {% if filter_date == 'upcoming' %}selected{% endif %}>{% trans 'Upcoming' %}</option>
-                    <option value="past" {% if filter_date == 'past' %}selected{% endif %}>{% trans 'Past Events' %}</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">{% trans 'Location' %}</label>
-                <input type="text" name="location" value="{{ filter_location }}" placeholder="{% trans 'Search location...' %}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">{% trans 'Search' %}</label>
-                <input type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search events...' %}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green">
-            </div>
-            <div class="md:col-span-4 flex gap-4">
-                <button type="submit" class="px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition-colors font-medium">
-                    {% trans 'Filter' %}
-                </button>
-                <a href="{% url 'diaspora:event_list' %}" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                    {% trans 'Clear' %}
+            <div class="flex flex-wrap gap-3 lg:justify-end">
+                <a href="{% url 'diaspora:event_list' %}?view=list" class="rounded-full px-5 py-3 text-sm font-semibold {% if view_type == 'list' or not view_type %}bg-white text-ascai-ink{% else %}border border-white/20 bg-white/8 text-white{% endif %}">
+                    {% trans 'List view' %}
                 </a>
+                <a href="{% url 'diaspora:event_calendar' %}" class="rounded-full px-5 py-3 text-sm font-semibold {% if view_type == 'calendar' %}bg-white text-ascai-ink{% else %}border border-white/20 bg-white/8 text-white{% endif %}">
+                    {% trans 'Calendar' %}
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'diaspora:my_events' %}" class="rounded-full border border-white/20 bg-white/8 px-5 py-3 text-sm font-semibold text-white hover:bg-white/14">
+                    {% trans 'My events' %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section-card p-7 md:p-10">
+        <form method="get" class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <select name="event_type" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                <option value="">{% trans 'All event types' %}</option>
+                <option value="cultural" {% if filter_event_type == 'cultural' %}selected{% endif %}>{% trans 'Cultural' %}</option>
+                <option value="educational" {% if filter_event_type == 'educational' %}selected{% endif %}>{% trans 'Educational' %}</option>
+                <option value="social" {% if filter_event_type == 'social' %}selected{% endif %}>{% trans 'Social' %}</option>
+                <option value="networking" {% if filter_event_type == 'networking' %}selected{% endif %}>{% trans 'Networking' %}</option>
+                <option value="sports" {% if filter_event_type == 'sports' %}selected{% endif %}>{% trans 'Sports' %}</option>
+                <option value="workshop" {% if filter_event_type == 'workshop' %}selected{% endif %}>{% trans 'Workshop' %}</option>
+                <option value="seminar" {% if filter_event_type == 'seminar' %}selected{% endif %}>{% trans 'Seminar' %}</option>
+            </select>
+            <select name="date_filter" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                <option value="upcoming" {% if filter_date == 'upcoming' %}selected{% endif %}>{% trans 'Upcoming' %}</option>
+                <option value="past" {% if filter_date == 'past' %}selected{% endif %}>{% trans 'Past events' %}</option>
+            </select>
+            <input type="text" name="location" value="{{ filter_location }}" placeholder="{% trans 'Search location' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search events' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            <div class="md:col-span-2 xl:col-span-4 flex flex-wrap gap-3">
+                <button type="submit" class="rounded-full bg-cameroon-green px-6 py-3 text-sm font-semibold text-white hover:bg-cameroon-green/90">{% trans 'Apply filters' %}</button>
+                <a href="{% url 'diaspora:event_list' %}" class="rounded-full bg-stone-100 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-stone-200">{% trans 'Clear' %}</a>
             </div>
         </form>
-    </div>
-    
-    <!-- Featured Events -->
+    </section>
+
     {% if featured_events %}
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-4">{% trans 'Featured Events' %}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'Featured events' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Highlighted gatherings and flagship moments' %}</h2>
+            </div>
+        </div>
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {% for event in featured_events %}
             {% include 'diaspora/partials/event_card.html' with event=event %}
             {% endfor %}
         </div>
-    </div>
+    </section>
     {% endif %}
-    
-    <!-- Event List with HTMX Infinite Scroll -->
-    <div id="event-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {% for event in events %}
-        {% include 'diaspora/partials/event_card.html' with event=event %}
-        {% empty %}
-        <div class="col-span-3 bg-white rounded-lg shadow-md p-12 text-center">
-            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            <p class="text-gray-500 text-lg">{% trans 'No events found.' %}</p>
+
+    <section>
+        <div id="event-list" class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {% for event in events %}
+            {% include 'diaspora/partials/event_card.html' with event=event %}
+            {% empty %}
+            <div class="col-span-full section-card p-10 text-center">
+                <h3 class="text-2xl font-bold text-ascai-ink">{% trans 'No events found' %}</h3>
+                <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Try another filter combination.' %}</p>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    
-    <!-- HTMX Infinite Scroll Pagination -->
+    </section>
+
     {% if page_obj.has_next %}
-    <div 
-        hx-get="{% url 'diaspora:event_list' %}?page={{ page_obj.next_page_number }}{% if request.GET.date_filter %}&date_filter={{ request.GET.date_filter }}{% endif %}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}"
-        hx-trigger="revealed"
-        hx-swap="beforeend"
-        hx-target="#event-list"
-        class="col-span-3 mt-8"
-    >
-        <div class="text-center py-4">
-            <div class="htmx-indicator inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cameroon-green"></div>
-            <p class="mt-2 text-gray-600">{% trans 'Loading more events...' %}</p>
+    <div hx-get="{% url 'diaspora:event_list' %}?page={{ page_obj.next_page_number }}{% if request.GET.date_filter %}&date_filter={{ request.GET.date_filter }}{% endif %}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}"
+         hx-trigger="revealed"
+         hx-swap="beforeend"
+         hx-target="#event-list"
+         class="mt-2">
+        <div class="text-center py-6">
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-cameroon-green"></div>
+            <p class="mt-3 text-sm text-gray-600">{% trans 'Loading more events...' %}</p>
         </div>
-    </div>
-    {% endif %}
-    
-    <!-- Fallback Pagination (if HTMX not available) -->
-    {% if is_paginated and not page_obj.has_next %}
-    <div class="mt-8 flex justify-center items-center gap-4">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.date_filter %}&date_filter={{ request.GET.date_filter }}{% endif %}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}" class="px-6 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-            {% trans 'Previous' %}
-        </a>
-        {% endif %}
-        <span class="px-4 py-2 text-gray-700">{% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.date_filter %}&date_filter={{ request.GET.date_filter }}{% endif %}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}" class="px-6 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-            {% trans 'Next' %}
-        </a>
-        {% endif %}
     </div>
     {% endif %}
 </div>
 {% endblock %}
-

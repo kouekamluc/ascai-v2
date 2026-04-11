@@ -2,35 +2,46 @@
 {% load i18n %}
 
 {% block title %}{% trans 'Executive Board' %} | ASCAI Lazio{% endblock %}
-
-{% block meta_description %}{% trans 'Meet the executive board of ASCAI Lazio — the Cameroonian community association serving students and academics in Rome and Lazio, Italy.' %}{% endblock %}
-
-{% block meta_keywords %}ASCAI Lazio, executive board, leadership, Cameroonian association, Rome, Lazio{% endblock %}
+{% block meta_description %}{% trans 'Meet the executive board of ASCAI Lazio, the leadership team serving the Cameroonian community in Rome and Lazio.' %}{% endblock %}
 
 {% block content %}
-<div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">{% trans 'Executive Board' %}</h1>
-        <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-            {% trans 'The elected leadership serving our community for the current mandate.' %}
-        </p>
-    </div>
+<div class="page-shell space-y-10">
+    <section class="page-hero">
+        <div class="max-w-3xl">
+            <span class="eyebrow">{% trans 'Leadership' %}</span>
+            <h1 class="mt-6 text-5xl md:text-6xl font-bold">{% trans 'Meet the executive board guiding ASCAI Lazio.' %}</h1>
+            <p class="mt-5 text-lg text-white/82 leading-8">
+                {% trans 'The association is shaped by leaders who coordinate community support, representation, events, and strategic direction for the current term.' %}
+            </p>
+            {% if executive_board %}
+            <div class="mt-8 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white/92">
+                {% trans 'Current term:' %} {{ executive_board.term_start_date|date:"d M Y" }} - {{ executive_board.term_end_date|date:"d M Y" }}
+            </div>
+            {% endif %}
+        </div>
+    </section>
 
     {% if executive_board and executive_positions %}
-    <div class="mb-10 text-center">
-        <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">{% trans 'Current term' %}</p>
-        <p class="text-lg text-gray-800 mt-1">
-            {{ executive_board.term_start_date|date:"d M Y" }} — {{ executive_board.term_end_date|date:"d M Y" }}
-        </p>
-    </div>
-    {% include 'core/partials/executive_board_grid.html' %}
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Current mandate' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Board members and responsibilities' %}</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-gray-600">
+                    {% trans 'This leadership team represents the association publicly and helps coordinate governance, communication, finances, and community life.' %}
+                </p>
+            </div>
+        </div>
+        {% include 'core/partials/executive_board_grid.html' %}
+    </section>
     {% else %}
-    <div class="text-center py-16 bg-gray-50 rounded-xl border border-gray-200">
-        <p class="text-gray-600 text-lg">{% trans 'Executive board information will be published here when available.' %}</p>
-        <a href="{% url 'core:home' %}" class="inline-block mt-6 text-cameroon-green font-semibold hover:text-cameroon-red">
-            ← {% trans 'Back to Home' %}
-        </a>
-    </div>
+    <section class="section-card p-10 text-center">
+        <h2 class="text-4xl font-bold text-ascai-ink">{% trans 'Leadership details are coming soon' %}</h2>
+        <p class="mt-4 max-w-2xl mx-auto text-sm leading-7 text-gray-600">
+            {% trans 'Executive board information will be published here once the current team details are available for public display.' %}
+        </p>
+        <a href="{% url 'core:home' %}" class="mt-8 inline-flex rounded-full bg-cameroon-green px-5 py-3 text-sm font-semibold text-white">{% trans 'Back to Home' %}</a>
+    </section>
     {% endif %}
-</div>
+    </div>
 {% endblock %}

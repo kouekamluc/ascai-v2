@@ -1,312 +1,179 @@
 {% extends 'base.html' %}
 {% load i18n static %}
 
-{% block title %}{{ university.name }} in {{ university.get_city_display }} | University Guide - ASCAI Lazio{% endblock %}
-
-{% block meta_description %}{{ university.description|striptags|truncatewords:30|default:"Complete guide to" }} {{ university.name }} in {{ university.get_city_display }}, Lazio, Italy. Programs, tuition fees, admission requirements for Cameroonian students.{% endblock %}
-
-{% block meta_keywords %}{{ university.name }}, {{ university.get_city_display }}, Lazio, Italy, university guide, Cameroonian students, study in Italy, {{ university.name }} programs{% endblock %}
+{% block title %}{{ university.name }} | ASCAI Lazio{% endblock %}
+{% block meta_description %}{{ university.description|striptags|truncatewords:30|default:"University guide for students in Lazio." }}{% endblock %}
 
 {% block extra_head %}
 <link rel="canonical" href="https://ascai.org/universities/{{ university.slug }}/">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://ascai.org/universities/{{ university.slug }}/">
-<meta property="og:title" content="{{ university.name }} in {{ university.get_city_display }} - ASCAI Lazio">
-<meta property="og:description" content="{{ university.description|striptags|truncatewords:30 }}">
-{% if logo_url %}<meta property="og:image" content="{{ logo_url }}">{% endif %}
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ university.name }} - ASCAI Lazio">
-<meta name="twitter:description" content="{{ university.description|striptags|truncatewords:30 }}">
-{% if logo_url %}<meta name="twitter:image" content="{{ logo_url }}">{% endif %}
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .university-hero-detail {
-        background: linear-gradient(135deg, #007A5E 0%, #005a45 100%);
-    }
-    .info-card {
-        transition: all 0.3s ease;
-    }
-    .info-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-</style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="university-hero-detail text-white py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div class="flex items-center gap-6 flex-1">
+<div class="page-shell space-y-10">
+    <section class="page-hero">
+        <div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div class="flex items-start gap-6">
                 {% if university.logo %}
-                <div class="w-32 h-32 bg-white rounded-2xl p-4 shadow-2xl flex items-center justify-center">
-                    <img src="{{ university.logo.url }}" alt="{{ university.name }}" class="max-w-full max-h-full object-contain">
+                <div class="flex h-28 w-28 shrink-0 items-center justify-center rounded-[1.75rem] bg-white p-5 shadow-xl">
+                    <img src="{{ university.logo.url }}" alt="{{ university.name }}" class="max-h-full max-w-full object-contain">
                 </div>
                 {% else %}
-                <div class="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-2xl">
-                    <span class="text-6xl font-bold text-white">{{ university.name|first }}</span>
+                <div class="flex h-28 w-28 shrink-0 items-center justify-center rounded-[1.75rem] bg-white/14 text-5xl font-bold text-white shadow-xl">
+                    {{ university.name|first }}
                 </div>
                 {% endif %}
                 <div>
-                    <h1 class="text-4xl md:text-5xl font-bold mb-3">{{ university.name }}</h1>
-                    <div class="flex items-center gap-2 text-xl text-white/90">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        <span>{{ university.get_city_display }}</span>
+                    <span class="eyebrow">{{ university.get_city_display }}</span>
+                    <h1 class="mt-5 text-5xl md:text-6xl font-bold">{{ university.name }}</h1>
+                    <p class="mt-4 max-w-2xl text-lg leading-8 text-white/82">{{ university.description|striptags|truncatewords:32 }}</p>
+                </div>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                {% if user.is_authenticated and can_save %}
+                <form hx-post="{% url 'universities:toggle_save' university.slug %}" hx-target="#save-button" hx-swap="outerHTML">
+                    {% csrf_token %}
+                    <div id="save-button">
+                        {% if is_saved %}
+                        <button type="submit" class="w-full rounded-[1.5rem] border border-white/20 bg-white/12 px-6 py-4 text-left text-white backdrop-blur hover:bg-white/18">
+                            <span class="block text-xs font-extrabold uppercase tracking-[0.18em] text-white/68">{% trans 'Saved' %}</span>
+                            <span class="mt-2 block text-lg font-semibold">{% trans 'Remove from your shortlist' %}</span>
+                        </button>
+                        {% else %}
+                        <button type="submit" class="w-full rounded-[1.5rem] bg-white px-6 py-4 text-left text-ascai-ink shadow-lg hover:bg-white/92">
+                            <span class="block text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{% trans 'Shortlist' %}</span>
+                            <span class="mt-2 block text-lg font-semibold">{% trans 'Save this university' %}</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </form>
+                {% endif %}
+                <div class="rounded-[1.5rem] border border-white/18 bg-[#0f2b23]/78 p-6 text-white shadow-glow">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-yellow">{% trans 'Quick view' %}</p>
+                    <div class="mt-4 space-y-3 text-sm text-white/78">
+                        {% if university.website %}<p>{% trans 'Official website available' %}</p>{% endif %}
+                        {% if university.languages %}<p>{% trans 'Languages of instruction listed below' %}</p>{% endif %}
+                        {% if university.degree_types %}<p>{% trans 'Degree types and programs included' %}</p>{% endif %}
                     </div>
                 </div>
             </div>
-            {% if user.is_authenticated and can_save %}
-            <form hx-post="{% url 'universities:toggle_save' university.slug %}" hx-target="#save-button" hx-swap="outerHTML">
-                {% csrf_token %}
-                <div id="save-button">
-                    {% if is_saved %}
-                    <button type="submit" class="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all font-semibold flex items-center gap-2 border border-white/30 shadow-lg">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                        </svg>
-                        {% trans 'Saved' %}
-                    </button>
-                    {% else %}
-                    <button type="submit" class="px-6 py-3 bg-white text-cameroon-green rounded-xl hover:bg-white/90 transition-all font-semibold flex items-center gap-2 shadow-lg">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                        </svg>
-                        {% trans 'Save' %}
-                    </button>
-                    {% endif %}
-                </div>
-            </form>
-            {% endif %}
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 -mt-8">
-    <!-- Main Info Card -->
-    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 mb-8 border border-gray-100">
-        
-        <!-- Contact Information -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {% if university.address %}
-            <div class="info-card bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-100">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 bg-cameroon-green/10 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-gray-900">{% trans 'Address' %}</h3>
+    <section class="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+        <div class="section-card p-7 md:p-8">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Overview' %}</p>
+            <div class="mt-5 space-y-5 text-sm leading-7 text-gray-600">
+                {% if university.address %}
+                <div>
+                    <h2 class="text-lg font-bold text-ascai-ink">{% trans 'Address' %}</h2>
+                    <div class="mt-2">{{ university.address|safe }}</div>
                 </div>
-                <div class="text-gray-700 leading-relaxed prose prose-sm max-w-none">{{ university.address|safe }}</div>
-            </div>
-            {% endif %}
-            {% if university.website %}
-            <div class="info-card bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-100">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 bg-cameroon-green/10 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-gray-900">{% trans 'Website' %}</h3>
+                {% endif %}
+                {% if university.website %}
+                <div>
+                    <h2 class="text-lg font-bold text-ascai-ink">{% trans 'Website' %}</h2>
+                    <a href="{{ university.website }}" target="_blank" class="mt-2 inline-block font-semibold text-cameroon-green">{{ university.website }}</a>
                 </div>
-                <a href="{{ university.website }}" target="_blank" class="text-cameroon-green hover:text-cameroon-green/80 font-medium flex items-center gap-2">
-                    <span class="truncate">{{ university.website }}</span>
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
-                </a>
-            </div>
-            {% endif %}
-            {% if university.email %}
-            <div class="info-card bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-100">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 bg-cameroon-green/10 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-gray-900">{% trans 'Email' %}</h3>
+                {% endif %}
+                {% if university.email %}
+                <div>
+                    <h2 class="text-lg font-bold text-ascai-ink">{% trans 'Email' %}</h2>
+                    <a href="mailto:{{ university.email }}" class="mt-2 inline-block font-semibold text-cameroon-green">{{ university.email }}</a>
                 </div>
-                <a href="mailto:{{ university.email }}" class="text-cameroon-green hover:text-cameroon-green/80 font-medium">{{ university.email }}</a>
-            </div>
-            {% endif %}
-            {% if university.phone %}
-            <div class="info-card bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-100">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 bg-cameroon-green/10 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-gray-900">{% trans 'Phone' %}</h3>
-                </div>
-                <p class="text-gray-700 font-medium">{{ university.phone }}</p>
-            </div>
-            {% endif %}
-        </div>
-        
-        <!-- Description -->
-        <div class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                <div class="w-1 h-8 bg-gradient-to-b from-cameroon-green to-cameroon-green/50 rounded-full"></div>
-                {% trans 'About' %}
-            </h2>
-            <div class="prose prose-lg max-w-none">
-                <div class="text-gray-700 leading-relaxed text-lg">{{ university.description|safe }}</div>
-            </div>
-        </div>
-        
-        <!-- Key Information Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {% if university.tuition_range_min or university.tuition_range_max %}
-            <div class="bg-gradient-to-br from-cameroon-green/5 to-cameroon-green/10 p-6 rounded-xl border border-cameroon-green/20">
-                <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    {% trans 'Tuition Range' %}
-                </h3>
-                <p class="text-2xl font-bold text-cameroon-green">
-                    {% if university.tuition_range_min and university.tuition_range_max %}
-                    €{{ university.tuition_range_min }} - €{{ university.tuition_range_max }}
-                    {% elif university.tuition_range_min %}
-                    {% trans 'From' %} €{{ university.tuition_range_min }}
-                    {% elif university.tuition_range_max %}
-                    {% trans 'Up to' %} €{{ university.tuition_range_max }}
-                    {% endif %}
-                </p>
-            </div>
-            {% endif %}
-            
-            {% if university.languages %}
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 p-6 rounded-xl border border-blue-200">
-                <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
-                    </svg>
-                    {% trans 'Languages of Instruction' %}
-                </h3>
-                <div class="flex flex-wrap gap-2">
-                    {% for language in university.languages %}
-                    <span class="px-4 py-2 bg-white text-blue-700 rounded-lg text-sm font-semibold shadow-sm border border-blue-200">{{ language }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-            
-            {% if university.degree_types %}
-            <div class="bg-gradient-to-br from-green-50 to-green-100/50 p-6 rounded-xl border border-green-200">
-                <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
-                    {% trans 'Degree Types' %}
-                </h3>
-                <div class="flex flex-wrap gap-2">
-                    {% for degree in university.degree_types %}
-                    <span class="px-4 py-2 bg-white text-green-700 rounded-lg text-sm font-semibold shadow-sm border border-green-200">{{ degree }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-            
-            {% if university.fields_of_study %}
-            <div class="bg-gradient-to-br from-purple-50 to-purple-100/50 p-6 rounded-xl border border-purple-200">
-                <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    {% trans 'Fields of Study' %}
-                </h3>
-                <div class="flex flex-wrap gap-2">
-                    {% for field in university.fields_of_study %}
-                    <span class="px-4 py-2 bg-white text-purple-700 rounded-lg text-sm font-semibold shadow-sm border border-purple-200">{{ field }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    
-    <!-- Programs -->
-    {% if programs %}
-    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-gray-100">
-        <div class="mb-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 flex items-center gap-3">
-                <div class="w-1 h-10 bg-gradient-to-b from-cameroon-green to-cameroon-green/50 rounded-full"></div>
-                {% trans 'Academic Programs' %}
-            </h2>
-            <p class="text-gray-600 text-lg">{% trans 'Explore the diverse range of programs offered by this institution' %}</p>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {% for program in programs %}
-            <div class="group bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl p-6 hover:border-cameroon-green transition-all hover:shadow-lg">
-                <div class="flex items-start justify-between mb-4">
-                    <h3 class="text-xl font-bold text-gray-900 group-hover:text-cameroon-green transition-colors">{{ program.name }}</h3>
-                    <span class="px-3 py-1 bg-cameroon-green/10 text-cameroon-green rounded-lg text-xs font-bold">
-                        {{ program.get_degree_type_display }}
-                    </span>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                        <div>
-                            <p class="text-xs text-gray-500">{% trans 'Field' %}</p>
-                            <p class="text-sm font-semibold text-gray-900">{{ program.field }}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <div>
-                            <p class="text-xs text-gray-500">{% trans 'Duration' %}</p>
-                            <p class="text-sm font-semibold text-gray-900">{{ program.duration_years }} {% trans 'years' %}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
-                        </svg>
-                        <div>
-                            <p class="text-xs text-gray-500">{% trans 'Language' %}</p>
-                            <p class="text-sm font-semibold text-gray-900">{{ program.get_language_display }}</p>
-                        </div>
-                    </div>
-                    {% if program.tuition %}
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <div>
-                            <p class="text-xs text-gray-500">{% trans 'Tuition' %}</p>
-                            <p class="text-sm font-semibold text-gray-900">€{{ program.tuition }}</p>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                {% if program.description %}
-                <div class="pt-4 border-t border-gray-200">
-                    <div class="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none">{{ program.description|safe }}</div>
+                {% endif %}
+                {% if university.phone %}
+                <div>
+                    <h2 class="text-lg font-bold text-ascai-ink">{% trans 'Phone' %}</h2>
+                    <p class="mt-2 font-semibold text-gray-700">{{ university.phone }}</p>
                 </div>
                 {% endif %}
             </div>
+        </div>
+
+        <div class="section-card p-7 md:p-8">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Why it matters' %}</p>
+            <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'A clearer look at fit, cost, and study direction' %}</h2>
+            <div class="mt-6 text-sm leading-8 text-gray-600">
+                {{ university.description|safe }}
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {% if university.tuition_range_min or university.tuition_range_max %}
+        <div class="content-card p-6">
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{% trans 'Tuition' %}</p>
+            <p class="mt-3 text-3xl font-bold text-ascai-ink">
+                {% if university.tuition_range_min and university.tuition_range_max %}
+                EUR {{ university.tuition_range_min }} - EUR {{ university.tuition_range_max }}
+                {% elif university.tuition_range_min %}
+                {% trans 'From' %} EUR {{ university.tuition_range_min }}
+                {% elif university.tuition_range_max %}
+                {% trans 'Up to' %} EUR {{ university.tuition_range_max }}
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+        {% if university.languages %}
+        <div class="content-card p-6">
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-red">{% trans 'Languages' %}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+                {% for language in university.languages %}
+                <span class="rounded-full bg-blue-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-blue-700">{{ language }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% if university.degree_types %}
+        <div class="content-card p-6">
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-yellow">{% trans 'Degree types' %}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+                {% for degree in university.degree_types %}
+                <span class="rounded-full bg-cameroon-green/10 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-cameroon-green">{{ degree }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% if university.fields_of_study %}
+        <div class="content-card p-6">
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{% trans 'Fields' %}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+                {% for field in university.fields_of_study %}
+                <span class="rounded-full bg-stone-100 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-600">{{ field }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </section>
+
+    {% if programs %}
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Programs' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Academic options offered by this institution' %}</h2>
+            </div>
+        </div>
+        <div class="grid gap-5 lg:grid-cols-2">
+            {% for program in programs %}
+            <article class="content-card p-6">
+                <div class="flex items-start justify-between gap-4">
+                    <h3 class="text-2xl font-bold text-ascai-ink">{{ program.name }}</h3>
+                    <span class="rounded-full bg-cameroon-green/10 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-cameroon-green">{{ program.get_degree_type_display }}</span>
+                </div>
+                <div class="mt-5 grid gap-3 sm:grid-cols-2 text-sm text-gray-600">
+                    <div><span class="font-semibold text-ascai-ink">{% trans 'Field' %}:</span> {{ program.field }}</div>
+                    <div><span class="font-semibold text-ascai-ink">{% trans 'Duration' %}:</span> {{ program.duration_years }} {% trans 'years' %}</div>
+                    <div><span class="font-semibold text-ascai-ink">{% trans 'Language' %}:</span> {{ program.get_language_display }}</div>
+                    {% if program.tuition %}<div><span class="font-semibold text-ascai-ink">{% trans 'Tuition' %}:</span> EUR {{ program.tuition }}</div>{% endif %}
+                </div>
+                {% if program.description %}
+                <div class="mt-5 border-t border-black/5 pt-5 text-sm leading-7 text-gray-600">{{ program.description|safe }}</div>
+                {% endif %}
+            </article>
             {% endfor %}
         </div>
-    </div>
+    </section>
     {% endif %}
 </div>
 {% endblock %}
-

@@ -2,345 +2,227 @@
 {% load i18n static static_utils %}
 
 {% block title %}ASCAI Lazio | Cameroonian Community in Rome & Lazio{% endblock %}
-
-{% block meta_description %}ASCAI Lazio - Cameroonian Community in Rome & Lazio. Connect with Cameroonian students, academics, and professionals in Italy. Find scholarships, universities, events, and support.{% endblock %}
-
-{% block meta_keywords %}Cameroonian community, Rome, Lazio, Italy, Cameroonian students, African diaspora, university scholarships, Cameroonian academics{% endblock %}
+{% block meta_description %}ASCAI Lazio connects Cameroonian students, academics, and professionals in Rome and Lazio through mentorship, opportunities, events, and community support.{% endblock %}
+{% block meta_keywords %}ASCAI Lazio, Cameroonian community, Rome, Lazio, scholarships, universities, mentorship, events{% endblock %}
 
 {% block extra_head %}
-<!-- Canonical URL -->
 <link rel="canonical" href="{{ site_url }}/">
-
-<!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ site_url }}/">
 <meta property="og:title" content="ASCAI Lazio | Cameroonian Community in Rome & Lazio">
-<meta property="og:description" content="Connect with Cameroonian students, academics, and professionals in Rome and Lazio, Italy. Find scholarships, universities, events, and community support.">
+<meta property="og:description" content="A stronger digital home for Cameroonian students, academics, and professionals in Lazio.">
 <meta property="og:image" content="{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}">
-<meta property="og:image:width" content="512">
-<meta property="og:image:height" content="512">
-<meta property="og:image:alt" content="ASCAI Lazio Logo">
-
-<!-- Twitter -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="{{ site_url }}/">
-<meta name="twitter:title" content="ASCAI Lazio | Cameroonian Community in Rome & Lazio">
-<meta name="twitter:description" content="Connect with Cameroonian students, academics, and professionals in Rome and Lazio, Italy.">
-<meta name="twitter:image" content="{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}">
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section text-white py-24 md:py-32 relative overflow-hidden">
-    <div class="hero-overlay" aria-hidden="true"></div>
-    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="max-w-3xl mx-auto text-center rounded-2xl bg-white/10 backdrop-blur-md px-6 py-10 md:px-12 md:py-12 border border-white/20 shadow-2xl ring-1 ring-white/10">
-            <div class="flex justify-center mb-6">
-                <img src="{% static 'images/web-app-manifest-512x512.png' %}" alt="ASCAI Lazio Logo" class="h-28 w-28 md:h-36 md:w-36 object-contain drop-shadow-2xl" />
-            </div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 tracking-tight text-white drop-shadow-sm">ASCAI Lazio</h1>
-            <p class="text-lg md:text-xl mb-10 text-white/95 font-medium">
-                {% trans 'Cameroonian Community in Rome & Lazio, Italy' %}
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard:home' %}" class="px-8 py-3.5 bg-cameroon-red text-white rounded-xl font-semibold shadow-lg shadow-black/20 hover:bg-[#a00e1e] transition duration-200">
+<div class="page-shell space-y-10">
+    <section class="page-hero">
+        <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div>
+                <span class="eyebrow">{% trans 'Community. Opportunity. Belonging.' %}</span>
+                <h1 class="mt-6 text-5xl md:text-6xl lg:text-7xl font-bold leading-[0.95]">
+                    {% trans 'A bold home for Cameroonians building their future in Lazio.' %}
+                </h1>
+                <p class="mt-6 max-w-2xl text-lg md:text-xl text-white/82 leading-8">
+                    {% trans 'Discover scholarships, universities, mentorship, events, and a strong support network designed for students, academics, and professionals across Rome and the wider Lazio region.' %}
+                </p>
+                <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard:home' %}" class="surface-link justify-center sm:justify-start">
                         {% trans 'Go to Dashboard' %}
                     </a>
-                    <a href="{% url 'dashboard:profile_view' %}" class="px-8 py-3.5 border-2 border-white/90 text-white rounded-xl font-semibold hover:bg-white hover:text-cameroon-green transition duration-200 backdrop-blur-sm">
-                        {% trans 'View Profile' %}
+                    <a href="{% url 'community:index' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/8 px-6 py-3.5 font-semibold text-white hover:bg-white/14 transition">
+                        {% trans 'Explore Community' %}
                     </a>
-                {% else %}
-                    <a href="{% url 'account_signup' %}" class="px-8 py-3.5 bg-cameroon-red text-white rounded-xl font-semibold shadow-lg shadow-black/20 hover:bg-[#a00e1e] transition duration-200">
-                        {% trans 'Join Community' %}
+                    {% else %}
+                    <a href="{% url 'account_signup' %}" class="surface-link justify-center sm:justify-start">
+                        {% trans 'Join ASCAI Lazio' %}
                     </a>
-                    <a href="{% url 'account_signup' %}" class="px-8 py-3.5 border-2 border-white/90 text-white rounded-xl font-semibold hover:bg-white hover:text-cameroon-green transition duration-200 backdrop-blur-sm">
-                        {% trans 'Register' %}
+                    <a href="{% url 'students:index' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/8 px-6 py-3.5 font-semibold text-white hover:bg-white/14 transition">
+                        {% trans 'Start With the Student Guide' %}
                     </a>
-                {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                <div class="rounded-[1.75rem] border border-white/16 bg-white/12 p-6 backdrop-blur-md">
+                    <p class="text-sm uppercase tracking-[0.18em] text-white/64">{% trans 'Built for impact' %}</p>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-3xl font-bold">01</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Find opportunities faster' %}</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">02</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Connect with mentors and peers' %}</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">03</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Stay visible in the community' %}</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">04</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Access practical student resources' %}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-[1.75rem] border border-white/16 bg-[#0f2b23]/78 p-6 shadow-glow">
+                    <p class="text-sm uppercase tracking-[0.18em] text-cameroon-yellow">{% trans 'What ASCAI does' %}</p>
+                    <ul class="mt-4 space-y-3 text-sm text-white/78">
+                        <li>{% trans 'Mentorship and orientation for new arrivals' %}</li>
+                        <li>{% trans 'Scholarship and university discovery' %}</li>
+                        <li>{% trans 'News, events, and diaspora storytelling' %}</li>
+                        <li>{% trans 'Community support and leadership visibility' %}</li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Introduction to Cameroonians in Lazio -->
-<section class="py-20 md:py-24 section-surface-soft">
-    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+    <section class="grid gap-5 md:grid-cols-3">
+        <div class="section-card p-7">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Study' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Navigate universities and scholarships with clarity' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Compare universities, spot funding opportunities, and understand the steps that matter most for studying in Lazio.' %}</p>
+            <div class="mt-6 flex gap-3 flex-wrap">
+                <a href="{% url 'universities:index' %}" class="rounded-full bg-cameroon-green px-4 py-2.5 text-sm font-semibold text-white">{% trans 'Browse Universities' %}</a>
+                <a href="{% url 'scholarships:index' %}" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700">{% trans 'See Scholarships' %}</a>
+            </div>
+        </div>
+        <div class="section-card p-7">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Connect' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Grow through peers, mentors, and shared experience' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Ask questions, meet mentors, and join the conversations shaping the Cameroonian community in Lazio today.' %}</p>
+            <div class="mt-6 flex gap-3 flex-wrap">
+                <a href="{% url 'mentorship:index' %}" class="rounded-full bg-cameroon-red px-4 py-2.5 text-sm font-semibold text-white">{% trans 'Find a Mentor' %}</a>
+                <a href="{% url 'community:index' %}" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700">{% trans 'Enter Community' %}</a>
+            </div>
+        </div>
+        <div class="section-card p-7">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'Belong' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Stay close to events, stories, and leadership' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Follow upcoming events, celebrate success stories, and see the people leading the association forward.' %}</p>
+            <div class="mt-6 flex gap-3 flex-wrap">
+                <a href="{% url 'diaspora:index' %}" class="rounded-full bg-ascai-ink px-4 py-2.5 text-sm font-semibold text-white">{% trans 'Explore Diaspora' %}</a>
+                <a href="{% url 'core:leadership' %}" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700">{% trans 'Meet Leadership' %}</a>
+            </div>
+        </div>
+    </section>
+
+    {% if executive_board and executive_positions %}
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-widest text-cameroon-green mb-3">{% trans 'Who we are' %}</p>
-                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-ascai-ink tracking-tight">
-                    {% trans 'Cameroonians in Lazio' %}
-                </h2>
-                <div class="w-12 h-1 rounded-full bg-gradient-to-r from-cameroon-green to-cameroon-yellow mb-8"></div>
-                <p class="text-lg text-gray-700 mb-4 leading-relaxed">
-                    {% trans 'The Cameroonian community in Lazio, Italy, represents a vibrant and growing diaspora of students, academics, and professionals. Our community is dedicated to supporting one another through academic excellence, cultural preservation, and mutual assistance.' %}
-                </p>
-                <p class="text-lg text-gray-700 mb-4 leading-relaxed">
-                    {% trans 'ASCAI Lazio serves as a bridge connecting Cameroonian students and academics across universities in Rome and the wider Lazio region. We provide essential resources, mentorship opportunities, and a supportive network to help our members thrive in their academic and professional journeys.' %}
-                </p>
-                <p class="text-lg text-gray-700 leading-relaxed">
-                    {% trans 'Through cultural events, academic workshops, and community initiatives, we celebrate our heritage while embracing our role in the Italian academic and social landscape.' %}
-                </p>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Leadership' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'The current executive board' %}</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-gray-600">{% trans 'Meet the leadership team serving the community during the current mandate.' %}</p>
             </div>
-            <div class="rounded-2xl p-8 md:p-10 bg-white/90 ring-1 ring-cameroon-green/15 border border-cameroon-green/10 shadow-lg shadow-cameroon-green/5">
-                <h3 class="text-xl font-semibold mb-6 text-cameroon-green tracking-tight">{% trans 'Our Community' %}</h3>
-                <ul class="space-y-4 text-gray-700">
-                    <li class="flex items-start gap-3">
-                        <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cameroon-green/15 text-cameroon-green text-sm font-bold">✓</span>
-                        <span class="leading-relaxed">{% trans 'Students across major universities in Lazio' %}</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cameroon-green/15 text-cameroon-green text-sm font-bold">✓</span>
-                        <span class="leading-relaxed">{% trans 'Academics and researchers in various fields' %}</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cameroon-green/15 text-cameroon-green text-sm font-bold">✓</span>
-                        <span class="leading-relaxed">{% trans 'Professionals contributing to Italian society' %}</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cameroon-green/15 text-cameroon-green text-sm font-bold">✓</span>
-                        <span class="leading-relaxed">{% trans 'Cultural ambassadors promoting diversity' %}</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Mission & Objectives -->
-<section class="py-20 md:py-24 bg-stone-50">
-    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto mb-14">
-            <p class="text-xs font-semibold uppercase tracking-widest text-cameroon-green mb-3">{% trans 'What drives us' %}</p>
-            <h2 class="text-3xl md:text-4xl font-bold text-ascai-ink tracking-tight">{% trans 'Our Mission' %}</h2>
-            <div class="mx-auto mt-4 w-12 h-1 rounded-full bg-gradient-to-r from-cameroon-green to-cameroon-yellow"></div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            <div class="text-center p-8 rounded-2xl bg-white ring-1 ring-black/5 border border-cameroon-green/10 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition duration-300">
-                <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-cameroon-green/10 text-cameroon-green ring-1 ring-cameroon-green/15">
-                    <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.011 50.011 0 0 1 12 2.25c2.407 0 4.742.18 7.035.509 1.025.124 2.029.3 3.01.54m-15.482 0A50.497 50.497 0 0 0 12 12.75a50.497 50.497 0 0 0 8.437-5.06" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-semibold mb-3 text-cameroon-green tracking-tight">{% trans 'Academic Support' %}</h3>
-                <p class="text-gray-600 leading-relaxed">{% trans 'Supporting Cameroonian students in Lazio with information, guidance, and resources.' %}</p>
-            </div>
-            <div class="text-center p-8 rounded-2xl bg-white ring-1 ring-black/5 border border-cameroon-green/10 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition duration-300">
-                <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-cameroon-green/10 text-cameroon-green ring-1 ring-cameroon-green/15">
-                    <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.09 9.09 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-semibold mb-3 text-cameroon-green tracking-tight">{% trans 'Community Unity' %}</h3>
-                <p class="text-gray-600 leading-relaxed">{% trans 'Promoting diaspora unity, cultural exchange, and integration.' %}</p>
-            </div>
-            <div class="text-center p-8 rounded-2xl bg-white ring-1 ring-black/5 border border-cameroon-green/10 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition duration-300">
-                <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-cameroon-green/10 text-cameroon-green ring-1 ring-cameroon-green/15">
-                    <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2-1.75 2H5.5c-.964 0-1.75-.906-1.75-2v-4.25m16.5 0c0 1.094-.787 2-1.75 2H5.5c-.964 0-1.75-.906-1.75-2m16.5 0V8.65c0-1.094-.787-2-1.75-2H5.5c-.964 0-1.75.906-1.75 2v5.5m16.5 0v-1.25a2.25 2.25 0 00-2.25-2.25h-1.5a2.25 2.25 0 00-2.25 2.25v1.25m12 0v-1.25a2.25 2.25 0 00-2.25-2.25h-1.5a2.25 2.25 0 00-2.25 2.25v1.25M9 12h6" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-semibold mb-3 text-cameroon-green tracking-tight">{% trans 'Opportunities' %}</h3>
-                <p class="text-gray-600 leading-relaxed">{% trans 'Providing mentorship, orientation, and scholarship opportunities.' %}</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-{% if executive_board and executive_positions %}
-<section class="py-20 md:py-24 bg-ascai-green-soft">
-    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-widest text-cameroon-green mb-2">{% trans 'Leadership' %}</p>
-                <h2 class="text-3xl md:text-4xl font-bold text-ascai-ink tracking-tight">{% trans 'Executive Board' %}</h2>
-                <p class="text-gray-600 mt-3 max-w-xl leading-relaxed">
-                    {% trans 'Meet the members leading ASCAI Lazio for the current term.' %}
-                </p>
-            </div>
-            <a href="{% url 'core:leadership' %}" class="inline-flex items-center text-cameroon-green hover:text-cameroon-red font-semibold whitespace-nowrap transition-colors">
-                {% trans 'Learn more' %}
-                <span class="ml-1" aria-hidden="true">→</span>
-            </a>
+            <a href="{% url 'core:leadership' %}" class="hidden sm:inline-flex rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-stone-200">{% trans 'View Full Board' %}</a>
         </div>
         {% include 'core/partials/executive_board_grid.html' %}
-    </div>
-</section>
-{% endif %}
+    </section>
+    {% endif %}
 
-<!-- Latest News -->
-{% if latest_news %}
-<section class="py-20 md:py-24 bg-stone-50">
-    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+    {% if latest_news %}
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-widest text-cameroon-green mb-2">{% trans 'Stay informed' %}</p>
-                <h2 class="text-3xl md:text-4xl font-bold text-ascai-ink tracking-tight">{% trans 'Latest News' %}</h2>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Newsroom' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'What the community is talking about now' %}</h2>
             </div>
-            <a href="{% url 'diaspora:news_list' %}" class="inline-flex items-center text-cameroon-green hover:text-cameroon-red font-semibold transition-colors">
-                {% trans 'View All' %}
-                <span class="ml-1" aria-hidden="true">→</span>
-            </a>
+            <a href="{% url 'diaspora:news_list' %}" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-stone-200">{% trans 'All News' %}</a>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8" id="news-container">
+        <div class="grid gap-5 md:grid-cols-3">
             {% for news in latest_news %}
-            <article class="group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 shadow-sm hover:shadow-xl transition duration-300">
-                <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-cameroon-green/15 via-cameroon-green/5 to-stone-100">
+            <article class="content-card overflow-hidden">
+                <div class="aspect-[16/10] bg-gradient-to-br from-cameroon-green/15 via-cameroon-green/5 to-stone-100">
                     {% if news.image %}
-                    <img src="{{ news.image.url }}" alt="{{ news.title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]">
-                    {% else %}
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <svg class="h-14 w-14 text-cameroon-green/25" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h12m-12 3h12m-8.5 3h1.5M6 3v18a.75.75 0 0 0 .75.75h10.5A.75.75 0 0 0 18 21V3a.75.75 0 0 0-.75-.75H6.75A.75.75 0 0 0 6 3Z" />
-                        </svg>
-                    </div>
+                    <img src="{{ news.image.url }}" alt="{{ news.title }}" class="h-full w-full object-cover">
                     {% endif %}
                 </div>
-                <div class="flex flex-1 flex-col p-6">
-                    <time class="text-sm font-medium text-cameroon-green/80" datetime="{{ news.published_at|date:'c' }}">{{ news.published_at|date:"d M Y" }}</time>
-                    <h3 class="text-xl font-semibold mt-2 mb-2 tracking-tight text-ascai-ink group-hover:text-cameroon-green transition-colors">
-                        <a href="{% url 'diaspora:news_detail' news.slug %}">{{ news.title }}</a>
+                <div class="p-6">
+                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cameroon-green">{{ news.published_at|date:"d M Y" }}</p>
+                    <h3 class="mt-3 text-2xl font-bold text-ascai-ink leading-tight">
+                        <a href="{% url 'diaspora:news_detail' news.slug %}" class="hover:text-cameroon-green">{{ news.title }}</a>
                     </h3>
-                    <p class="text-gray-600 text-sm leading-relaxed flex-1">{{ news.content|truncatewords:20|striptags }}</p>
+                    <p class="mt-3 text-sm leading-7 text-gray-600">{{ news.content|truncatewords:22|striptags }}</p>
                 </div>
             </article>
             {% endfor %}
         </div>
-        <div class="htmx-indicator text-center py-4">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-cameroon-green border-t-transparent"></div>
-            <p class="mt-2 text-gray-600">{% trans 'Loading news...' %}</p>
-        </div>
-    </div>
-</section>
-{% endif %}
+    </section>
+    {% endif %}
 
-<!-- Upcoming Events -->
-{% if upcoming_events %}
-<section class="py-20 md:py-24 bg-white">
-    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+    {% if upcoming_events %}
+    <section class="section-card p-7 md:p-10 pattern-grid">
+        <div class="section-heading">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-widest text-cameroon-yellow mb-2">{% trans 'Calendar' %}</p>
-                <h2 class="text-3xl md:text-4xl font-bold text-ascai-ink tracking-tight">{% trans 'Upcoming Events' %}</h2>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Calendar' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Upcoming moments to show up for' %}</h2>
             </div>
-            <a href="{% url 'diaspora:event_list' %}" class="inline-flex items-center text-cameroon-green hover:text-cameroon-red font-semibold transition-colors">
-                {% trans 'View All' %}
-                <span class="ml-1" aria-hidden="true">→</span>
-            </a>
+            <a href="{% url 'diaspora:event_list' %}" class="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 border border-black/5 hover:bg-stone-50">{% trans 'All Events' %}</a>
         </div>
-        <div id="events-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div id="events-container" class="grid gap-5 md:grid-cols-3">
             {% for event in upcoming_events %}
-            <article class="group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 border border-gray-100/80 shadow-sm hover:shadow-xl transition duration-300">
-                <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-stone-100 to-cameroon-green/10">
+            <article class="content-card overflow-hidden">
+                <div class="aspect-[16/10] bg-gradient-to-br from-cameroon-red/15 via-cameroon-yellow/15 to-white">
                     {% if event.image %}
-                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]">
-                    {% else %}
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <svg class="h-14 w-14 text-cameroon-green/25" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5" />
-                        </svg>
-                    </div>
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="h-full w-full object-cover">
                     {% endif %}
                 </div>
-                <div class="flex flex-1 flex-col p-6">
-                    <div class="text-sm font-medium text-cameroon-green/90 mb-2 flex items-center gap-2">
-                        <svg class="h-4 w-4 shrink-0 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {{ event.start_datetime|date:"d M Y, H:i" }}
+                <div class="p-6">
+                    <div class="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-cameroon-green">
+                        <span>{{ event.start_datetime|date:"d M Y" }}</span>
+                        {% if event.registration_required %}<span class="rounded-full bg-cameroon-green/10 px-3 py-1 text-[11px]">{% trans 'Registration required' %}</span>{% endif %}
                     </div>
-                    <h3 class="text-xl font-semibold mb-2 tracking-tight text-ascai-ink group-hover:text-cameroon-green transition-colors">
-                        <a href="{% url 'diaspora:event_detail' event.slug %}">{{ event.title }}</a>
+                    <h3 class="mt-3 text-2xl font-bold text-ascai-ink leading-tight">
+                        <a href="{% url 'diaspora:event_detail' event.slug %}" class="hover:text-cameroon-green">{{ event.title }}</a>
                     </h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-4 flex-1">{{ event.description|truncatewords:15|striptags }}</p>
-                    {% if event.registration_required %}
-                    <span class="inline-flex w-fit items-center px-3 py-1 rounded-full text-xs font-semibold bg-cameroon-yellow/15 text-amber-900/90 ring-1 ring-cameroon-yellow/35">
-                        {% trans 'Registration Required' %}
-                    </span>
-                    {% endif %}
+                    <p class="mt-3 text-sm leading-7 text-gray-600">{{ event.description|truncatewords:18|striptags }}</p>
+                    <p class="mt-4 text-sm font-medium text-gray-500">{{ event.location }}</p>
                 </div>
             </article>
             {% endfor %}
         </div>
-        <div class="htmx-indicator text-center py-4">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-cameroon-green border-t-transparent"></div>
-            <p class="mt-2 text-gray-600">{% trans 'Loading events...' %}</p>
+    </section>
+    {% endif %}
+
+    {% if success_stories %}
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'Inspiration' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Success stories from the community' %}</h2>
+            </div>
+            <a href="{% url 'diaspora:success_story_list' %}" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-stone-200">{% trans 'Read More' %}</a>
         </div>
-        {% if upcoming_events|length >= 6 %}
-        <div class="text-center mt-8" id="load-more-events">
-            <div
-                hx-get="{% url 'core:events_load_more' %}?offset=6"
-                hx-trigger="revealed"
-                hx-swap="afterend"
-                hx-indicator=".htmx-indicator"
-            >
+        <div class="grid gap-5 md:grid-cols-3">
+            {% for story in success_stories %}
+            <article class="content-card p-6">
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'Community voice' %}</p>
+                <h3 class="mt-3 text-2xl font-bold text-ascai-ink leading-tight">
+                    <a href="{% url 'diaspora:news_detail' story.slug %}" class="hover:text-cameroon-green">{{ story.title }}</a>
+                </h3>
+                <p class="mt-3 text-sm leading-7 text-gray-600">{{ story.content|truncatewords:26|striptags }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="page-hero">
+        <div class="max-w-3xl">
+            <span class="eyebrow">{% trans 'Ready to be part of it?' %}</span>
+            <h2 class="mt-6 text-4xl md:text-5xl font-bold">{% trans 'Join a stronger, more connected ASCAI Lazio.' %}</h2>
+            <p class="mt-5 text-lg text-white/82 leading-8">
+                {% trans 'Whether you are just arriving, already studying, mentoring others, or building your career in Italy, this platform is here to help you move with more confidence.' %}
+            </p>
+            <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                <a href="{% url 'account_signup' %}" class="surface-link justify-center sm:justify-start">{% trans 'Create Your Account' %}</a>
+                <a href="{% url 'contact:index' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/8 px-6 py-3.5 font-semibold text-white hover:bg-white/14 transition">{% trans 'Contact ASCAI Lazio' %}</a>
             </div>
         </div>
-        {% endif %}
-    </div>
-</section>
-{% endif %}
-
-<!-- Success Stories -->
-{% if success_stories %}
-<section class="py-20 md:py-24 bg-stone-50">
-    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto mb-14">
-            <p class="text-xs font-semibold uppercase tracking-widest text-cameroon-green mb-3">{% trans 'Inspiration' %}</p>
-            <h2 class="text-3xl md:text-4xl font-bold text-ascai-ink tracking-tight">{% trans 'Success Stories' %}</h2>
-            <div class="mx-auto mt-4 w-12 h-1 rounded-full bg-gradient-to-r from-cameroon-green to-cameroon-yellow"></div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8" id="stories-container">
-            {% for story in success_stories %}
-            <article class="group flex flex-col rounded-2xl bg-white p-6 ring-1 ring-black/5 shadow-sm hover:shadow-xl transition duration-300">
-                {% if story.image %}
-                <div class="relative mb-5 aspect-video overflow-hidden rounded-xl">
-                    <img src="{{ story.image.url }}" alt="{{ story.title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]">
-                </div>
-                {% endif %}
-                <h3 class="text-xl font-semibold mb-2 tracking-tight text-ascai-ink">{{ story.title }}</h3>
-                <p class="text-gray-600 text-sm leading-relaxed flex-1">{{ story.content|truncatewords:25|striptags }}</p>
-                <a href="{% url 'diaspora:news_detail' story.slug %}" class="mt-5 inline-flex items-center text-cameroon-green hover:text-cameroon-red font-semibold text-sm transition-colors">
-                    {% trans 'Read More' %}
-                    <span class="ml-1" aria-hidden="true">→</span>
-                </a>
-            </article>
-            {% endfor %}
-        </div>
-        <div class="htmx-indicator text-center py-4">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-cameroon-green border-t-transparent"></div>
-            <p class="mt-2 text-gray-600">{% trans 'Loading stories...' %}</p>
-        </div>
-    </div>
-</section>
-{% endif %}
-
-<!-- CTA Section -->
-<section class="relative py-20 md:py-24 bg-cameroon-green text-white overflow-hidden">
-    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-cameroon-yellow/10 blur-3xl"></div>
-        <div class="absolute -left-20 bottom-0 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
-        <div class="absolute inset-0 bg-gradient-to-tr from-black/10 via-transparent to-cameroon-yellow/5"></div>
-    </div>
-    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        {% if user.is_authenticated %}
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 tracking-tight">{% trans 'Welcome Back!' %}</h2>
-            <p class="text-lg md:text-xl mb-10 text-white/95 max-w-2xl mx-auto leading-relaxed">
-                {% trans 'Continue exploring our community resources and events' %}
-            </p>
-            <a href="{% url 'dashboard:home' %}" class="inline-block px-10 py-3.5 bg-cameroon-red text-white rounded-xl font-semibold shadow-lg shadow-black/25 hover:bg-[#a00e1e] transition duration-200">
-                {% trans 'Go to Dashboard' %}
-            </a>
-        {% else %}
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 tracking-tight">{% trans 'Join Our Community' %}</h2>
-            <p class="text-lg md:text-xl mb-10 text-white/95 max-w-2xl mx-auto leading-relaxed">
-                {% trans 'Connect with fellow Cameroonian students and academics in Lazio' %}
-            </p>
-            <a href="{% url 'account_signup' %}" class="inline-block px-10 py-3.5 bg-cameroon-red text-white rounded-xl font-semibold shadow-lg shadow-black/25 hover:bg-[#a00e1e] transition duration-200">
-                {% trans 'Register Now' %}
-            </a>
-        {% endif %}
-    </div>
-</section>
+    </section>
+</div>
 {% endblock %}

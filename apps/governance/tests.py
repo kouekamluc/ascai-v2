@@ -179,6 +179,28 @@ class ExecutivePositionModelTest(TestCase):
         )
         self.assertIsNotNone(str(position))
 
+    def test_standard_role_label_is_normalized_to_internal_code(self):
+        """Human-readable built-in roles should still work with internal logic."""
+        position = ExecutivePosition.objects.create(
+            board=self.board,
+            user=self.user,
+            position='President',
+            start_date=date.today()
+        )
+        self.assertEqual(position.position, 'president')
+        self.assertEqual(position.get_position_display(), 'President')
+
+    def test_custom_role_is_preserved(self):
+        """Custom roles should remain custom while displaying cleanly."""
+        position = ExecutivePosition.objects.create(
+            board=self.board,
+            user=self.user,
+            position='Welfare Officer',
+            start_date=date.today()
+        )
+        self.assertEqual(position.position, 'Welfare Officer')
+        self.assertEqual(position.get_position_display(), 'Welfare Officer')
+
 
 class GovernanceViewsTest(TestCase):
     """Test governance views."""

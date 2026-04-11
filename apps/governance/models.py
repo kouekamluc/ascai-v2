@@ -5,8 +5,10 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import slugify
 from datetime import timedelta
 import uuid
 
@@ -23,6 +25,42 @@ EXECUTIVE_POSITION_CHOICES = [
     ('communication_culture_manager', _('Communication and Culture Manager')),
 ]
 EXECUTIVE_POSITION_LABELS = dict(EXECUTIVE_POSITION_CHOICES)
+
+
+def _executive_position_alias_map():
+    alias_map = {}
+    for code, label in EXECUTIVE_POSITION_CHOICES:
+        label_text = str(label)
+        variants = {
+            code,
+            code.replace('_', ' '),
+            code.replace('_', '-'),
+            label_text,
+            label_text.lower(),
+            label_text.replace('-', ' '),
+            label_text.replace('-', '_'),
+        }
+        for variant in variants:
+            normalized = slugify(str(variant)).replace('-', '_')
+            if normalized:
+                alias_map[normalized] = code
+    return alias_map
+
+
+EXECUTIVE_POSITION_ALIAS_MAP = _executive_position_alias_map()
+
+
+def normalize_executive_position(value):
+    """
+    Normalize built-in roles to their canonical internal code while
+    preserving custom roles as readable free text.
+    """
+    cleaned = ' '.join(str(value or '').strip().split())
+    if not cleaned:
+        return ''
+
+    alias_key = slugify(cleaned).replace('-', '_')
+    return EXECUTIVE_POSITION_ALIAS_MAP.get(alias_key, cleaned)
 
 
 # ============================================================================
@@ -332,7 +370,31 @@ class ExecutivePosition(models.Model):
         if self.position in EXECUTIVE_POSITION_LABELS:
             return str(EXECUTIVE_POSITION_LABELS[self.position])
 
-        return self.position.replace('_', ' ').strip().title()
+        return self.position.strip()
+
+    def clean(self):
+        super().clean()
+        self.position = normalize_executive_position(self.position)
+
+    def validate_unique(self, exclude=None):
+        super().validate_unique(exclude=exclude)
+
+        if self.board_id and self.position:
+            existing = ExecutivePosition.objects.filter(
+                board=self.board,
+                position__iexact=self.position,
+            )
+            if self.pk:
+                existing = existing.exclude(pk=self.pk)
+
+            if existing.exists():
+                raise ValidationError({
+                    'position': _('This board already has that executive position.')
+                })
+
+    def save(self, *args, **kwargs):
+        self.position = normalize_executive_position(self.position)
+        super().save(*args, **kwargs)
 
 
 class BoardMeeting(models.Model):

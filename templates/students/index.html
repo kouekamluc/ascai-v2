@@ -1,168 +1,103 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans 'Studying in Lazio – Complete Guide' %} - ASCAI Lazio{% endblock %}
+{% block title %}{% trans 'Studying in Lazio - Complete Guide' %} | ASCAI Lazio{% endblock %}
+{% block meta_description %}{% trans 'A practical and inspiring guide for Cameroonian students preparing to study, settle, and thrive in Lazio.' %}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <!-- Hero Section -->
-    <div class="text-center mb-12">
-        <h1 class="text-5xl font-bold mb-4 text-cameroon-green">{% trans 'Studying in Lazio' %}</h1>
-        <p class="text-2xl text-gray-700 mb-2">{% trans 'Complete Guide' %}</p>
-        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
-            {% trans 'Your comprehensive resource for studying, living, and thriving in the Lazio region of Italy. Find universities, scholarships, programs, and essential information for Cameroonian students.' %}
-        </p>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div class="bg-white rounded-lg shadow-md p-6 text-center">
-            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ universities_count }}</div>
-            <div class="text-gray-600">{% trans 'Universities' %}</div>
+<div class="page-shell space-y-10">
+    <section class="page-hero">
+        <div class="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+            <div>
+                <span class="eyebrow">{% trans 'Student Guide' %}</span>
+                <h1 class="mt-6 text-5xl md:text-6xl font-bold leading-[0.96]">
+                    {% trans 'A sharper path for studying and living well in Lazio.' %}
+                </h1>
+                <p class="mt-5 max-w-2xl text-lg leading-8 text-white/82">
+                    {% trans 'Use this guide to move from uncertainty to clarity with universities, scholarships, documents, orientation, and practical support designed around the real student journey.' %}
+                </p>
+                <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+                    <a href="{% url 'students:new_student_guide' %}" class="surface-link justify-center sm:justify-start">{% trans 'Open the step-by-step guide' %}</a>
+                    <a href="{% url 'students:resources' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/8 px-6 py-3.5 font-semibold text-white hover:bg-white/14 transition">{% trans 'See resources' %}</a>
+                </div>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                <div class="rounded-[1.75rem] border border-white/16 bg-white/12 p-6 backdrop-blur-md">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-white/65">{% trans 'At a glance' %}</p>
+                    <div class="mt-5 grid grid-cols-3 gap-4 lg:grid-cols-1">
+                        <div>
+                            <div class="text-4xl font-bold">{{ universities_count }}</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Universities' %}</p>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold">{{ scholarships_count }}</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Scholarships' %}</p>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold">{{ documents_count }}</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Resources' %}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-[1.75rem] border border-white/16 bg-[#0f2b23]/78 p-6 shadow-glow">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'What this section covers' %}</p>
+                    <ul class="mt-4 space-y-3 text-sm text-white/78">
+                        <li>{% trans 'Choosing a university and degree path' %}</li>
+                        <li>{% trans 'Funding and scholarship preparation' %}</li>
+                        <li>{% trans 'Enrollment, arrival, and orientation' %}</li>
+                        <li>{% trans 'Living advice for Rome and Lazio' %}</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-lg shadow-md p-6 text-center">
-            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ scholarships_count }}</div>
-            <div class="text-gray-600">{% trans 'Active Scholarships' %}</div>
+    </section>
+
+    <section class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <a href="{% url 'students:universities_list' %}" class="content-card p-7 hover:-translate-y-1 transition">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Universities' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Compare where to study' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Explore universities across Lazio with a cleaner view of location, program fit, and tuition range.' %}</p>
+        </a>
+        <a href="{% url 'students:scholarships_list' %}" class="content-card p-7 hover:-translate-y-1 transition">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Funding' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Track the right scholarships' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Find DISCO Lazio and other scholarship opportunities without digging through scattered information.' %}</p>
+        </a>
+        <a href="{% url 'students:enrollment_process' %}" class="content-card p-7 hover:-translate-y-1 transition">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'Enrollment' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Understand the process early' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Follow a clearer route through applications, documents, visa steps, and arrival planning.' %}</p>
+        </a>
+        <a href="{% url 'students:orientation' %}" class="content-card p-7 hover:-translate-y-1 transition">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Orientation' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Arrive with more confidence' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Get support around settling in, academic rhythm, and adapting to life in Italy.' %}</p>
+        </a>
+        <a href="{% url 'students:living_guide' %}" class="content-card p-7 hover:-translate-y-1 transition">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Living Guide' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Handle everyday life better' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Accommodation, transport, healthcare, and practical city life tips for Lazio.' %}</p>
+        </a>
+        <a href="{% url 'students:resources' %}" class="content-card p-7 hover:-translate-y-1 transition">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'Resources' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Keep the useful documents close' %}</h2>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Access forms, guides, and resource files that matter during your student journey.' %}</p>
+        </a>
+    </section>
+
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Quick routes' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Start from where you are right now' %}</h2>
+            </div>
         </div>
-        <div class="bg-white rounded-lg shadow-md p-6 text-center">
-            <div class="text-4xl font-bold text-cameroon-green mb-2">{{ documents_count }}</div>
-            <div class="text-gray-600">{% trans 'Resources & Documents' %}</div>
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <a href="{% url 'universities:index' %}" class="rounded-[1.5rem] bg-white px-5 py-5 text-sm font-semibold text-gray-700 border border-black/5 hover:border-cameroon-green/20">{% trans 'Full university directory' %}</a>
+            <a href="{% url 'scholarships:index' %}" class="rounded-[1.5rem] bg-white px-5 py-5 text-sm font-semibold text-gray-700 border border-black/5 hover:border-cameroon-green/20">{% trans 'All scholarships' %}</a>
+            <a href="{% url 'community:index' %}" class="rounded-[1.5rem] bg-white px-5 py-5 text-sm font-semibold text-gray-700 border border-black/5 hover:border-cameroon-green/20">{% trans 'Community forum' %}</a>
+            <a href="{% url 'mentorship:index' %}" class="rounded-[1.5rem] bg-white px-5 py-5 text-sm font-semibold text-gray-700 border border-black/5 hover:border-cameroon-green/20">{% trans 'Find a mentor' %}</a>
         </div>
-    </div>
-
-    <!-- Main Sections Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        <!-- Universities -->
-        <a href="{% url 'students:universities_list' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                </div>
-                <h2 class="text-xl font-semibold">{% trans 'Universities in Lazio' %}</h2>
-            </div>
-            <p class="text-gray-600 mb-4">{% trans 'Explore universities in Rome, Viterbo, Cassino, and other cities. Filter by city, program, tuition, and language.' %}</p>
-            <span class="text-cameroon-green font-semibold">{% trans 'Browse Universities →' %}</span>
-        </a>
-
-        <!-- Study Programs -->
-        <a href="{% url 'students:study_programs' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-                <h2 class="text-xl font-semibold">{% trans 'Study Programs Overview' %}</h2>
-            </div>
-            <p class="text-gray-600 mb-4">{% trans 'Discover Bachelor, Master, and PhD programs available across Lazio universities.' %}</p>
-            <span class="text-cameroon-green font-semibold">{% trans 'View Programs →' %}</span>
-        </a>
-
-        <!-- Erasmus & Exchange -->
-        <a href="{% url 'students:erasmus_exchange' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h2 class="text-xl font-semibold">{% trans 'Erasmus & Exchange' %}</h2>
-            </div>
-            <p class="text-gray-600 mb-4">{% trans 'Information about Erasmus+ and international exchange programs in Lazio.' %}</p>
-            <span class="text-cameroon-green font-semibold">{% trans 'Learn More →' %}</span>
-        </a>
-
-        <!-- Scholarships -->
-        <a href="{% url 'students:scholarships_list' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h2 class="text-xl font-semibold">{% trans 'Scholarships' %}</h2>
-            </div>
-            <p class="text-gray-600 mb-4">{% trans 'Find funding opportunities including DISCO Lazio and other scholarships available to students.' %}</p>
-            <span class="text-cameroon-green font-semibold">{% trans 'Browse Scholarships →' %}</span>
-        </a>
-
-        <!-- Enrollment Process -->
-        <a href="{% url 'students:enrollment_process' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                    </svg>
-                </div>
-                <h2 class="text-xl font-semibold">{% trans 'Enrollment Process' %}</h2>
-            </div>
-            <p class="text-gray-600 mb-4">{% trans 'Step-by-step guide to university enrollment in Lazio, including visa and residence permit information.' %}</p>
-            <span class="text-cameroon-green font-semibold">{% trans 'View Guide →' %}</span>
-        </a>
-
-        <!-- Orientation & Advice -->
-        <a href="{% url 'students:orientation' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                    </svg>
-                </div>
-                <h2 class="text-xl font-semibold">{% trans 'Orientation & Advice' %}</h2>
-            </div>
-            <p class="text-gray-600 mb-4">{% trans 'Essential advice for new students arriving in Lazio, including academic success tips and cultural integration.' %}</p>
-            <span class="text-cameroon-green font-semibold">{% trans 'Get Advice →' %}</span>
-        </a>
-
-        <!-- Living Guide -->
-        <a href="{% url 'students:living_guide' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                    </svg>
-                </div>
-                <h2 class="text-xl font-semibold">{% trans 'Living in Lazio' %}</h2>
-            </div>
-            <p class="text-gray-600 mb-4">{% trans 'Comprehensive guide covering accommodation, cost of living, transportation, healthcare, and cultural integration.' %}</p>
-            <span class="text-cameroon-green font-semibold">{% trans 'Read Guide →' %}</span>
-        </a>
-
-        <!-- Resources & Downloads -->
-        <a href="{% url 'students:resources' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition transform hover:-translate-y-1">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-cameroon-green/10 rounded-lg flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                </div>
-                <h2 class="text-xl font-semibold">{% trans 'Resources & Downloads' %}</h2>
-            </div>
-            <p class="text-gray-600 mb-4">{% trans 'Access PDF documents, forms, guidelines, and useful links for students.' %}</p>
-            <span class="text-cameroon-green font-semibold">{% trans 'View Resources →' %}</span>
-        </a>
-    </div>
-
-    <!-- Quick Links Section -->
-    <div class="bg-cameroon-green/10 border border-cameroon-green/20 rounded-lg p-8 mb-12">
-        <h2 class="text-2xl font-bold mb-6 text-center">{% trans 'Quick Links' %}</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{% url 'universities:index' %}" class="text-center p-4 bg-white rounded-lg hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green">{% trans 'Full University Directory' %}</div>
-            </a>
-            <a href="{% url 'scholarships:index' %}" class="text-center p-4 bg-white rounded-lg hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green">{% trans 'All Scholarships' %}</div>
-            </a>
-            <a href="{% url 'community:index' %}" class="text-center p-4 bg-white rounded-lg hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green">{% trans 'Community Forum' %}</div>
-            </a>
-            <a href="{% url 'mentorship:index' %}" class="text-center p-4 bg-white rounded-lg hover:shadow-md transition">
-                <div class="font-semibold text-cameroon-green">{% trans 'Find a Mentor' %}</div>
-            </a>
-        </div>
-    </div>
+    </section>
 </div>
 {% endblock %}
-

@@ -1,188 +1,118 @@
 {% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n %}
 
-{% block title %}Contact Us | ASCAI Lazio - Cameroonian Community in Rome & Lazio{% endblock %}
+{% block title %}Contact ASCAI Lazio{% endblock %}
+{% block meta_description %}Contact ASCAI Lazio for questions, support, partnerships, or community enquiries in Rome and the Lazio region.{% endblock %}
 
-{% block meta_description %}Contact ASCAI Lazio - Cameroonian community association in Rome and Lazio, Italy. Get in touch for questions, support, or to join our community of students and academics.{% endblock %}
-
-{% block meta_keywords %}contact ASCAI, Cameroonian community contact, Lazio, Rome, Italy, get in touch, community support{% endblock %}
-
-{% block extra_head %}
-<link rel="canonical" href="https://ascai.org/contact/">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://ascai.org/contact/">
-<meta property="og:title" content="Contact Us | ASCAI Lazio - Cameroonian Community">
-<meta property="og:description" content="Contact ASCAI Lazio for questions, support, or to join our community of Cameroonian students and academics.">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Contact Us - ASCAI Lazio">
-<meta name="twitter:description" content="Get in touch with ASCAI Lazio - Cameroonian community in Rome and Lazio.">
-{% endblock %}
-
-{% block extra_css %}
-{{ form.media.css }}
-{% endblock %}
+{% block extra_css %}{{ form.media.css }}{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">{% trans 'Contact Us' %}</h1>
-        <p class="text-gray-600 text-lg">{% trans 'We would love to hear from you. Send us a message and we will respond as soon as possible.' %}</p>
-    </div>
-    
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Contact Form -->
-        <div class="bg-white rounded-lg shadow-md p-8 border border-gray-100">
-            <h2 class="text-2xl font-semibold mb-6 text-gray-900">{% trans 'Send us a Message' %}</h2>
-            
-            <form method="post" 
-                  hx-post="{% url 'contact:index' %}" 
-                  hx-target="#contact-form-container" 
+<div class="page-shell space-y-10">
+    <section class="page-hero">
+        <div class="max-w-3xl">
+            <span class="eyebrow">{% trans 'Contact' %}</span>
+            <h1 class="mt-6 text-5xl md:text-6xl font-bold">{% trans 'Reach out to ASCAI Lazio with confidence.' %}</h1>
+            <p class="mt-5 text-lg text-white/82 leading-8">
+                {% trans 'Whether you need guidance, partnership support, or a direct connection to the community, send a message and we will respond as soon as we can.' %}
+            </p>
+        </div>
+    </section>
+
+    <section class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+        <div class="section-card p-7 md:p-10">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Send a message' %}</p>
+            <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Tell us how we can help' %}</h2>
+            <form method="post"
+                  hx-post="{% url 'contact:index' %}"
+                  hx-target="#contact-form-container"
                   hx-swap="innerHTML"
                   hx-indicator="#htmx-indicator"
-                  id="contact-form">
+                  id="contact-form"
+                  class="mt-8">
                 {% csrf_token %}
                 <div id="contact-form-container">
                     {% include 'contact/partials/contact_form.html' with form=form %}
                 </div>
             </form>
         </div>
-        
-        <!-- Contact Information -->
-        <div class="space-y-6">
-            <div class="bg-white rounded-lg shadow-md p-8 border border-gray-100">
-                <h2 class="text-2xl font-semibold mb-6 text-gray-900">{% trans 'Contact Information' %}</h2>
-                
-                <div class="space-y-6">
-                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <h3 class="font-semibold text-lg mb-3 flex items-center text-gray-900">
-                            <svg class="w-5 h-5 mr-2 text-cameroon-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            {% trans 'Office Address' %}
-                        </h3>
-                        <p class="text-gray-700 leading-relaxed">
-                            <strong class="text-gray-900">{% trans 'ASCAI Lazio' %}</strong><br>
-                            {% trans 'Lazio Region' %}<br>
-                            {% trans 'Rome, Italy' %}
-                        </p>
+
+        <div class="space-y-5">
+            <div class="section-card p-7">
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Direct contact' %}</p>
+                <div class="mt-5 space-y-5 text-sm text-gray-600">
+                    <div>
+                        <h3 class="text-xl font-bold text-ascai-ink">{% trans 'Email' %}</h3>
+                        <a href="mailto:info@ascai.org" class="mt-2 inline-block font-semibold text-cameroon-green">info@ascai.org</a>
                     </div>
-                    
-                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <h3 class="font-semibold text-lg mb-3 flex items-center text-gray-900">
-                            <svg class="w-5 h-5 mr-2 text-cameroon-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            {% trans 'Email' %}
-                        </h3>
-                        <p class="text-gray-700">
-                            <a href="mailto:info@ascai.org" class="text-cameroon-green hover:text-cameroon-green/80 hover:underline font-medium transition-colors duration-200">info@ascai.org</a>
-                        </p>
+                    <div>
+                        <h3 class="text-xl font-bold text-ascai-ink">{% trans 'Location' %}</h3>
+                        <p class="mt-2">{% trans 'Rome and the Lazio region, Italy' %}</p>
                     </div>
-                    
-                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <h3 class="font-semibold text-lg mb-3 flex items-center text-gray-900">
-                            <svg class="w-5 h-5 mr-2 text-cameroon-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            {% trans 'Office Hours' %}
-                        </h3>
-                        <p class="text-gray-700 leading-relaxed">
-                            <span class="font-medium">{% trans 'Monday - Friday' %}:</span> 9:00 - 17:00<br>
-                            <span class="font-medium">{% trans 'Saturday' %}:</span> 9:00 - 13:00<br>
-                            <span class="font-medium">{% trans 'Sunday' %}:</span> {% trans 'Closed' %}
-                        </p>
+                    <div>
+                        <h3 class="text-xl font-bold text-ascai-ink">{% trans 'What to contact us about' %}</h3>
+                        <p class="mt-2 leading-7">{% trans 'Student support, community enquiries, partnerships, leadership questions, and platform-related guidance.' %}</p>
                     </div>
                 </div>
             </div>
-            
-            <!-- Google Maps Embed -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+
+            <div class="section-card overflow-hidden">
+                <div class="p-7 border-b border-black/5">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'Map' %}</p>
+                    <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Community based in Rome' %}</h2>
+                </div>
                 <div class="h-80 w-full">
-                    <iframe 
+                    <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2968.54820654506!2d12.482232315321117!3d41.90278397921861!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132f6196f9928ebb%3A0xb90f770693656e38!2sRome%2C%20Metropolitan%20City%20of%20Rome%20Capital%2C%20Italy!5e0!3m2!1sen!2sus!4v1648123456789!5m2!1sen!2sus"
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy" 
+                        width="100%"
+                        height="100%"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
                         title="{% trans 'ASCAI Lazio Location' %}">
                     </iframe>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>
 
-<!-- Success Popup Modal -->
-<div id="success-popup" 
-     class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center"
+<div id="success-popup"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4"
      x-data="{ show: false }"
      x-show="show"
      x-cloak
-     @keydown.escape.window="show = false"
-     style="display: none;">
-    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-8 text-center border border-gray-100"
-         @click.away="show = false">
-        <div class="mb-4">
-            <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center">
-                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
+     @keydown.escape.window="show = false">
+    <div class="max-w-md w-full rounded-[1.75rem] bg-white p-8 shadow-2xl text-center" @click.away="show = false">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cameroon-green/10">
+            <svg class="w-8 h-8 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
         </div>
-        <h3 class="text-2xl font-bold mb-3 text-gray-900">{% trans 'Message Sent!' %}</h3>
-        <p class="text-gray-600 mb-6 leading-relaxed">{% trans 'Thank you for contacting us. We will get back to you as soon as possible.' %}</p>
-        <button @click="show = false" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition-colors duration-200 font-medium shadow-md hover:shadow-lg">
-            {% trans 'Close' %}
-        </button>
+        <h3 class="mt-5 text-3xl font-bold text-ascai-ink">{% trans 'Message sent' %}</h3>
+        <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Thank you for getting in touch. We will respond as soon as possible.' %}</p>
+        <button @click="show = false" class="mt-6 rounded-full bg-cameroon-green px-5 py-3 text-sm font-semibold text-white">{% trans 'Close' %}</button>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 {{ form.media.js }}
 <script>
-    // Handle HTMX success response for contact form
-    document.body.addEventListener('htmx:afterSwap', function(event) {
-        if (event.detail.target && event.detail.target.id === 'contact-form-container') {
-            // Check if the response contains success message
-            const container = event.detail.target;
-            const successMessage = container.querySelector('.bg-green-100');
-            
-            if (successMessage) {
-                // Get Alpine component for popup
-                const popup = document.getElementById('success-popup');
-                if (popup) {
-                    // Use Alpine's reactive system to show popup
-                    const alpineData = Alpine.$data(popup);
-                    if (alpineData) {
-                        alpineData.show = true;
-                        
-                        // Auto-hide after 5 seconds
-                        setTimeout(function() {
-                            alpineData.show = false;
-                        }, 5000);
-                    } else {
-                        // Fallback: direct manipulation
-                        popup.style.display = 'flex';
-                        setTimeout(function() {
-                            popup.style.display = 'none';
-                        }, 5000);
-                    }
-                }
-                
-                // Reset form
-                setTimeout(function() {
-                    const form = document.getElementById('contact-form');
-                    if (form) {
-                        form.reset();
-                    }
-                }, 500);
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target && event.detail.target.id === 'contact-form-container') {
+        const successMessage = event.detail.target.querySelector('.bg-green-100');
+        if (successMessage) {
+            const popup = document.getElementById('success-popup');
+            const alpineData = popup ? Alpine.$data(popup) : null;
+            if (alpineData) {
+                alpineData.show = true;
+                setTimeout(function() { alpineData.show = false; }, 5000);
             }
+            const form = document.getElementById('contact-form');
+            if (form) form.reset();
         }
-    });
+    }
+});
 </script>
 {% endblock %}
-{% endblock %}
-

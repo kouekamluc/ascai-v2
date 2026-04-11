@@ -1,141 +1,120 @@
 {% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n %}
 
-{% block title %}Downloads | Forms & Documents - ASCAI Lazio{% endblock %}
-
-{% block meta_description %}Download forms, applications, and documents from ASCAI Lazio. Access enrollment documents, visa forms, Reddìto forms, and ASCAI Lazio guidelines for Cameroonian students in Italy.{% endblock %}
-
-{% block meta_keywords %}downloads, forms, documents, ASCAI Lazio, enrollment documents, visa forms, Reddìto forms, student documents{% endblock %}
-
-{% block extra_head %}
-<link rel="canonical" href="https://ascai.org/downloads/">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://ascai.org/downloads/">
-<meta property="og:title" content="Downloads | Forms & Documents - ASCAI Lazio">
-<meta property="og:description" content="Download forms, applications, and documents from ASCAI Lazio for Cameroonian students.">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Downloads - ASCAI Lazio">
-<meta name="twitter:description" content="Download forms and documents from ASCAI Lazio.">
-{% endblock %}
+{% block title %}Downloads | ASCAI Lazio{% endblock %}
+{% block meta_description %}Access forms, guides, and practical documents from ASCAI Lazio in a cleaner, easier-to-browse resource hub.{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-2">{% trans 'Downloads' %}</h1>
-        <p class="text-gray-600">{% trans 'Access forms, applications, and ASCAI Lazio documents' %}</p>
-    </div>
-    
-    <!-- Enhanced Filters -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <form hx-get="{% url 'downloads:index' %}" hx-target="#document-list" hx-trigger="change, keyup delay:500ms">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <select name="category" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
-                    <option value="">{% trans 'All Categories' %}</option>
-                    <option value="reddito" {% if filter_category == 'reddito' %}selected{% endif %}>{% trans 'Reddìto Forms' %}</option>
-                    <option value="enrollment" {% if filter_category == 'enrollment' %}selected{% endif %}>{% trans 'Enrollment Documents' %}</option>
-                    <option value="visa" {% if filter_category == 'visa' %}selected{% endif %}>{% trans 'Visa-Related Documents' %}</option>
-                    <option value="guidelines" {% if filter_category == 'guidelines' %}selected{% endif %}>{% trans 'ASCAI Lazio Guidelines' %}</option>
-                </select>
-                <input type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search documents...' %}" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
-                <input type="text" name="tags" value="{{ request.GET.tags }}" placeholder="{% trans 'Tags (comma-separated)' %}" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
-                <select name="sort" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-transparent">
-                    <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>{% trans 'Most Recent' %}</option>
-                    <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>{% trans 'Most Popular' %}</option>
-                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>{% trans 'Name (A-Z)' %}</option>
-                </select>
+<div class="page-shell space-y-10">
+    <section class="page-hero">
+        <div class="max-w-3xl">
+            <span class="eyebrow">{% trans 'Downloads' %}</span>
+            <h1 class="mt-6 text-5xl md:text-6xl font-bold">{% trans 'Essential forms and documents, organized for speed.' %}</h1>
+            <p class="mt-5 text-lg text-white/82 leading-8">
+                {% trans 'Search, sort, and download the resources students and community members need most, from enrollment forms to ASCAI guidance.' %}
+            </p>
+        </div>
+    </section>
+
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Find resources' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Filter by category, search, or popularity' %}</h2>
             </div>
+        </div>
+        <form hx-get="{% url 'downloads:index' %}" hx-target="#document-list" hx-trigger="change, keyup delay:400ms" class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <select name="category" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                <option value="">{% trans 'All categories' %}</option>
+                <option value="reddito" {% if filter_category == 'reddito' %}selected{% endif %}>{% trans 'Reddito Forms' %}</option>
+                <option value="enrollment" {% if filter_category == 'enrollment' %}selected{% endif %}>{% trans 'Enrollment Documents' %}</option>
+                <option value="visa" {% if filter_category == 'visa' %}selected{% endif %}>{% trans 'Visa-Related Documents' %}</option>
+                <option value="guidelines" {% if filter_category == 'guidelines' %}selected{% endif %}>{% trans 'ASCAI Guidelines' %}</option>
+            </select>
+            <input type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search documents' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            <input type="text" name="tags" value="{{ request.GET.tags }}" placeholder="{% trans 'Tags' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            <select name="sort" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>{% trans 'Most Recent' %}</option>
+                <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>{% trans 'Most Popular' %}</option>
+                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>{% trans 'Name A-Z' %}</option>
+            </select>
         </form>
-    </div>
-    
-    <!-- Popular & Recent Downloads -->
+    </section>
+
     {% if popular_documents or recent_documents %}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <section class="grid gap-5 lg:grid-cols-2">
         {% if popular_documents %}
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold mb-4">{% trans 'Popular Downloads' %}</h2>
-            <div class="space-y-3">
+        <div class="section-card p-7">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Popular now' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Most downloaded resources' %}</h2>
+            <div class="mt-5 space-y-3">
                 {% for doc in popular_documents|slice:":5" %}
-                <a href="{% url 'downloads:document_detail' doc.pk %}" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:shadow-md transition">
-                    <span class="font-medium text-sm">{{ doc.title }}</span>
-                    <span class="text-xs text-gray-500">{{ doc.download_count }} {% trans 'downloads' %}</span>
+                <a href="{% url 'downloads:document_detail' doc.pk %}" class="flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-black/5 hover:border-cameroon-green/20">
+                    <span class="font-semibold text-gray-800">{{ doc.title }}</span>
+                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-cameroon-green">{{ doc.download_count }} {% trans 'downloads' %}</span>
                 </a>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
         {% if recent_documents %}
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold mb-4">{% trans 'Recent Downloads' %}</h2>
-            <div class="space-y-3">
+        <div class="section-card p-7">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Recently added' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Latest uploads' %}</h2>
+            <div class="mt-5 space-y-3">
                 {% for doc in recent_documents|slice:":5" %}
-                <a href="{% url 'downloads:document_detail' doc.pk %}" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:shadow-md transition">
-                    <span class="font-medium text-sm">{{ doc.title }}</span>
-                    <span class="text-xs text-gray-500">{{ doc.uploaded_at|timesince }} {% trans 'ago' %}</span>
+                <a href="{% url 'downloads:document_detail' doc.pk %}" class="flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-black/5 hover:border-cameroon-green/20">
+                    <span class="font-semibold text-gray-800">{{ doc.title }}</span>
+                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-gray-500">{{ doc.uploaded_at|timesince }} {% trans 'ago' %}</span>
                 </a>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
-    </div>
+    </section>
     {% endif %}
-    
-    <!-- Document List Grouped by Category -->
+
     <div id="document-list">
         {% if grouped_documents %}
             {% for category_key, category_data in grouped_documents.items %}
-            <div class="mb-8">
-                <h2 class="text-2xl font-semibold mb-4 text-cameroon-green">{{ category_data.name }}</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {% for document in category_data.documents %}
-                    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-                        <div class="p-6">
-                            <div class="flex items-start justify-between mb-3">
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-semibold mb-2 text-gray-900">{{ document.title }}</h3>
-                                    {% if document.description %}
-                                    <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ document.description|striptags|truncatewords:15 }}</p>
-                                    {% endif %}
-                                </div>
-                                <div class="ml-2">
-                                    {% if document.file_type == 'pdf' %}
-                                    <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M4 18h12V6h-4V2H4v16zm-2 1V0h12l4 4v16H2v-1z"/>
-                                    </svg>
-                                    {% else %}
-                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                                <div id="download-count-{{ document.pk }}" class="text-sm text-gray-500">
-                                    {{ document.download_count }} {% trans 'downloads' %}
-                                </div>
-                                <form hx-post="{% url 'downloads:increment_count' document.pk %}" 
-                                      hx-target="#download-count-{{ document.pk }}"
-                                      hx-swap="outerHTML"
-                                      class="inline">
-                                    {% csrf_token %}
-                                    <button type="submit" 
-                                            onclick="window.open('{% url 'downloads:document_download' document.pk %}', '_blank'); return false;"
-                                            class="px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition-colors duration-200 text-sm font-medium">
-                                        {% trans 'Download' %}
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+            <section class="section-card p-7 md:p-10">
+                <div class="section-heading">
+                    <div>
+                        <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{{ category_key }}</p>
+                        <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{{ category_data.name }}</h2>
                     </div>
+                </div>
+                <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                    {% for document in category_data.documents %}
+                    <article class="content-card p-6">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-ascai-ink leading-tight">{{ document.title }}</h3>
+                                {% if document.description %}<p class="mt-3 text-sm leading-7 text-gray-600">{{ document.description|striptags|truncatewords:18 }}</p>{% endif %}
+                            </div>
+                            <div class="text-xs font-bold uppercase tracking-[0.16em] text-cameroon-green">{{ document.file_type|default:"file" }}</div>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between gap-3 border-t border-black/5 pt-5">
+                            <div id="download-count-{{ document.pk }}" class="text-sm font-medium text-gray-500">
+                                {{ document.download_count }} {% trans 'downloads' %}
+                            </div>
+                            <form hx-post="{% url 'downloads:increment_count' document.pk %}" hx-target="#download-count-{{ document.pk }}" hx-swap="outerHTML">
+                                {% csrf_token %}
+                                <button type="submit" onclick="window.open('{% url 'downloads:document_download' document.pk %}', '_blank'); return false;" class="rounded-full bg-cameroon-green px-4 py-2.5 text-sm font-semibold text-white">
+                                    {% trans 'Download' %}
+                                </button>
+                            </form>
+                        </div>
+                    </article>
                     {% endfor %}
                 </div>
-            </div>
+            </section>
             {% endfor %}
         {% else %}
-            <div class="bg-white rounded-lg shadow-md p-8 text-center">
-                <p class="text-gray-500 text-lg">{% trans 'No documents available.' %}</p>
-            </div>
+        <section class="section-card p-10 text-center">
+            <p class="text-gray-600">{% trans 'No documents are available right now.' %}</p>
+        </section>
         {% endif %}
     </div>
 </div>
 {% endblock %}
-

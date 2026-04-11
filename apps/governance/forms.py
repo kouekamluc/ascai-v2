@@ -16,7 +16,8 @@ from .models import (
     FinancialTransaction, MembershipDues, Contribution,
     ExecutiveBoard, ExecutivePosition, BoardMeeting,
     Election, Candidacy, Communication, AssociationEvent,
-    RulesOfProcedureAmendment,
+    RulesOfProcedureAmendment, EXECUTIVE_POSITION_CHOICES,
+    normalize_executive_position,
 )
 
 
@@ -304,6 +305,19 @@ class ExecutivePositionForm(forms.ModelForm):
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        built_in_roles = ', '.join(str(label) for _, label in EXECUTIVE_POSITION_CHOICES)
+        self.fields['position'].help_text = _(
+            'Use a standard role like %(roles)s, or type a new custom role.'
+        ) % {'roles': built_in_roles}
+
+    def clean_position(self):
+        position = normalize_executive_position(self.cleaned_data.get('position'))
+        if not position:
+            raise forms.ValidationError(_('Position is required.'))
+        return position
 
 
 class BoardMeetingForm(forms.ModelForm):

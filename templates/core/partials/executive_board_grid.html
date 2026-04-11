@@ -1,24 +1,34 @@
 {% load i18n %}
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
     {% for position in executive_positions %}
-    <div class="bg-white rounded-2xl ring-1 ring-black/5 border border-cameroon-green/10 p-6 shadow-sm hover:shadow-lg transition duration-300 text-center flex flex-col items-center">
-        {% if position.user and position.user.avatar %}
-        <img src="{{ position.user.avatar.url }}" alt="{{ position.user.get_display_name }}" class="w-20 h-20 rounded-full object-cover border-2 border-cameroon-green/20">
-        {% elif position.user %}
-        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cameroon-green to-cameroon-green/80 flex items-center justify-center text-white text-xl font-bold border-2 border-cameroon-green/20">
-            {{ position.user.get_display_name|slice:":1"|upper }}
+    <article class="content-card group overflow-hidden">
+        <div class="h-28 bg-gradient-to-r from-cameroon-green via-cameroon-green/85 to-ascai-ink"></div>
+        <div class="-mt-12 px-6 pb-6">
+            {% if position.user and position.user.avatar %}
+            <img src="{{ position.user.avatar.url }}" alt="{{ position.user.get_display_name }}" class="h-24 w-24 rounded-[1.5rem] border-4 border-white object-cover shadow-lg">
+            {% elif position.user %}
+            <div class="flex h-24 w-24 items-center justify-center rounded-[1.5rem] border-4 border-white bg-gradient-to-br from-cameroon-green to-ascai-ink text-3xl font-bold text-white shadow-lg">
+                {{ position.user.get_display_name|slice:":1"|upper }}
+            </div>
+            {% else %}
+            <div class="flex h-24 w-24 items-center justify-center rounded-[1.5rem] border-4 border-white bg-stone-100 text-sm font-semibold uppercase tracking-[0.18em] text-gray-400 shadow-lg">
+                {% trans 'Vacant' %}
+            </div>
+            {% endif %}
+
+            <p class="mt-5 text-xs font-extrabold uppercase tracking-[0.22em] text-cameroon-green">{{ position.get_position_display }}</p>
+            {% if position.user %}
+            <h3 class="mt-3 text-2xl font-bold text-ascai-ink">{{ position.user.get_display_name }}</h3>
+            <p class="mt-2 text-sm leading-7 text-gray-600">
+                {% trans 'Serving the association through the current executive mandate and helping guide community priorities across Lazio.' %}
+            </p>
+            {% else %}
+            <h3 class="mt-3 text-2xl font-bold text-ascai-ink">{% trans 'Open seat' %}</h3>
+            <p class="mt-2 text-sm leading-7 text-gray-600">
+                {% trans 'This position is currently vacant and will be filled as the board evolves.' %}
+            </p>
+            {% endif %}
         </div>
-        {% else %}
-        <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm font-medium border border-gray-200">
-            —
-        </div>
-        {% endif %}
-        <h3 class="text-lg font-semibold text-cameroon-green mt-4">{{ position.get_position_display }}</h3>
-        {% if position.user %}
-        <p class="text-gray-900 font-medium mt-1">{{ position.user.get_display_name }}</p>
-        {% else %}
-        <p class="text-gray-400 italic mt-1">{% trans 'Vacant' %}</p>
-        {% endif %}
-    </div>
+    </article>
     {% endfor %}
 </div>

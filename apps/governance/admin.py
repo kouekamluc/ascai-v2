@@ -4,6 +4,7 @@ Admin configuration for governance app.
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from config.admin import BaseAdmin, ModelAdmin, TabularInline
+from .forms import ExecutivePositionForm
 from .models import (
     Member, MembershipStatus,
     ExecutiveBoard, ExecutivePosition, BoardMeeting,
@@ -64,6 +65,7 @@ class MembershipStatusAdmin(ModelAdmin):
 
 class ExecutivePositionInline(TabularInline):
     model = ExecutivePosition
+    form = ExecutivePositionForm
     extra = 0
     fields = ['position', 'user', 'start_date', 'end_date', 'status']
 
@@ -80,10 +82,16 @@ class ExecutiveBoardAdmin(BaseAdmin):
 
 @admin.register(ExecutivePosition)
 class ExecutivePositionAdmin(ModelAdmin):
-    list_display = ['board', 'position', 'user', 'start_date', 'status']
-    list_filter = ['position', 'status', 'board']
-    search_fields = ['user__username', 'user__email', 'user__full_name']
+    form = ExecutivePositionForm
+    list_display = ['board', 'position_label', 'user', 'start_date', 'status']
+    list_filter = ['status', 'board']
+    search_fields = ['position', 'user__username', 'user__email', 'user__full_name']
     readonly_fields = ['created_at', 'updated_at']
+    autocomplete_fields = ['board', 'user']
+
+    def position_label(self, obj):
+        return obj.get_position_display()
+    position_label.short_description = _('Position')
 
 
 @admin.register(BoardMeeting)
