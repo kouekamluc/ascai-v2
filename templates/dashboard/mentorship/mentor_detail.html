@@ -2,87 +2,102 @@
 {% load i18n %}
 
 {% block page_heading %}{{ mentor.user.get_full_name|default:mentor.user.username }}{% endblock %}
+{% block page_description %}{{ mentor.specialization }}{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <div class="flex justify-between items-center mb-6">
-        <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="text-cameroon-green hover:underline">
-            ← {% trans 'Back to Mentors' %}
-        </a>
-    </div>
-    
-    <div class="dashboard-card">
-        <div class="flex items-start justify-between mb-6">
+<div class="space-y-8">
+    <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="link-primary inline-flex items-center gap-2">
+        <span aria-hidden="true">&larr;</span>
+        <span>{% trans 'Back to mentors' %}</span>
+    </a>
+
+    <section class="dashboard-card overflow-hidden">
+        <div class="grid gap-6 p-6 sm:p-8 xl:grid-cols-[1.15fr_.85fr]">
             <div>
-                <h1 class="text-3xl font-bold mb-2">{{ mentor.user.get_full_name|default:mentor.user.username }}</h1>
-                <p class="text-xl text-gray-600 mb-4">{{ mentor.specialization }}</p>
-                <div class="flex items-center gap-6">
+                <div class="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                        <p class="text-sm text-gray-500">{% trans 'Rating' %}</p>
-                        <p class="text-2xl font-bold text-yellow-600">{{ mentor.rating }}/5</p>
+                        <p class="dashboard-kicker text-cameroon-green">{{ mentor.specialization }}</p>
+                        <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{{ mentor.user.get_full_name|default:mentor.user.username }}</h2>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500">{% trans 'Students Helped' %}</p>
-                        <p class="text-2xl font-bold text-cameroon-green">{{ mentor.students_helped }}</p>
+                    <span class="badge {% if mentor.availability_status == 'available' %}badge-success{% elif mentor.availability_status == 'busy' %}badge-warning{% else %}badge-gray{% endif %}">
+                        {{ mentor.get_availability_status_display }}
+                    </span>
+                </div>
+
+                <div class="mt-6 grid gap-4 sm:grid-cols-3">
+                    <div class="rounded-[1.5rem] bg-ascai-mist/75 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{% trans 'Rating' %}</p>
+                        <p class="mt-2 text-3xl font-bold text-yellow-700">{{ mentor.rating }}/5</p>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500">{% trans 'Experience' %}</p>
-                        <p class="text-2xl font-bold text-blue-600">{{ mentor.years_experience }} {% trans 'years' %}</p>
+                    <div class="rounded-[1.5rem] bg-ascai-mist/75 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{% trans 'Students Helped' %}</p>
+                        <p class="mt-2 text-3xl font-bold text-cameroon-green">{{ mentor.students_helped }}</p>
+                    </div>
+                    <div class="rounded-[1.5rem] bg-ascai-mist/75 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{% trans 'Experience' %}</p>
+                        <p class="mt-2 text-3xl font-bold text-blue-700">{{ mentor.years_experience }} {% trans 'years' %}</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 rounded-[1.75rem] border border-gray-100 bg-white/80 p-6">
+                    <p class="dashboard-kicker text-cameroon-green">{% trans 'About This Mentor' %}</p>
+                    <div class="prose mt-4 max-w-none text-gray-700">
+                        {{ mentor.bio|safe }}
                     </div>
                 </div>
             </div>
-            <span class="px-4 py-2 rounded-full text-sm font-medium {% if mentor.availability_status == 'available' %}bg-green-100 text-green-700{% elif mentor.availability_status == 'busy' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-700{% endif %}">
-                {{ mentor.get_availability_status_display }}
-            </span>
+
+            <aside class="rounded-[1.9rem] bg-gradient-to-br from-ascai-ink via-cameroon-green to-cameroon-green/80 p-6 text-white shadow-glow">
+                <p class="dashboard-kicker text-white/65">{% trans 'Next Step' %}</p>
+                {% if not user.is_mentor or mentor.user != user %}
+                    {% if has_request %}
+                        {% if existing_request.status == 'pending' %}
+                        <h3 class="mt-3 text-2xl font-bold">{% trans 'Your request is pending.' %}</h3>
+                        <p class="mt-4 text-sm leading-7 text-white/80">{% trans 'This mentor has received your request and has not responded yet.' %}</p>
+                        <a href="{% url 'dashboard:mentorship_request_detail' existing_request.pk %}" class="btn-secondary mt-6 w-full">
+                            {% trans 'View request' %}
+                        </a>
+                        {% elif existing_request.status == 'accepted' %}
+                        <h3 class="mt-3 text-2xl font-bold">{% trans 'You already have an active mentorship here.' %}</h3>
+                        <p class="mt-4 text-sm leading-7 text-white/80">{% trans 'Continue from your mentorship request detail page and keep the conversation moving.' %}</p>
+                        <a href="{% url 'dashboard:mentorship_request_detail' existing_request.pk %}" class="btn-secondary mt-6 w-full">
+                            {% trans 'Open conversation' %}
+                        </a>
+                        {% elif existing_request.status == 'rejected' %}
+                        <h3 class="mt-3 text-2xl font-bold">{% trans 'This mentor declined your last request.' %}</h3>
+                        <p class="mt-4 text-sm leading-7 text-white/80">{% trans 'You can browse other mentors to find a better match for your needs.' %}</p>
+                        <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="btn-secondary mt-6 w-full">
+                            {% trans 'Browse other mentors' %}
+                        </a>
+                        {% else %}
+                        <h3 class="mt-3 text-2xl font-bold">{% trans 'This mentorship was completed.' %}</h3>
+                        <p class="mt-4 text-sm leading-7 text-white/80">{% trans 'You can review the completed request or start a new mentorship path with another mentor if needed.' %}</p>
+                        <a href="{% url 'dashboard:mentorship_request_detail' existing_request.pk %}" class="btn-secondary mt-6 w-full">
+                            {% trans 'View completed request' %}
+                        </a>
+                        {% endif %}
+                    {% elif user.is_student %}
+                    <h3 class="mt-3 text-2xl font-bold">{% trans 'Ready to ask for support?' %}</h3>
+                    <p class="mt-4 text-sm leading-7 text-white/80">{% trans 'Send a clear mentorship request describing the challenge you are facing and the kind of guidance you need.' %}</p>
+                    <a href="{% url 'dashboard:mentorship_create_request' mentor.pk %}" class="btn-secondary mt-6 w-full">
+                        {% trans 'Request mentorship' %}
+                    </a>
+                    {% else %}
+                    <h3 class="mt-3 text-2xl font-bold">{% trans 'Mentorship requests are reserved for student accounts.' %}</h3>
+                    <p class="mt-4 text-sm leading-7 text-white/80">{% trans 'You can still explore mentor profiles, but only student users can submit mentorship requests from the dashboard workflow.' %}</p>
+                    <a href="{% url 'dashboard:mentorship_dashboard' %}" class="btn-secondary mt-6 w-full">
+                        {% trans 'Back to mentorship dashboard' %}
+                    </a>
+                    {% endif %}
+                {% else %}
+                <h3 class="mt-3 text-2xl font-bold">{% trans 'This is your mentor profile.' %}</h3>
+                <p class="mt-4 text-sm leading-7 text-white/80">{% trans 'Keep your profile up to date so students can understand your strengths, availability, and the kind of support you provide.' %}</p>
+                <a href="{% url 'dashboard:mentorship_profile_update' %}" class="btn-secondary mt-6 w-full">
+                    {% trans 'Edit my profile' %}
+                </a>
+                {% endif %}
+            </aside>
         </div>
-        
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold mb-3">{% trans 'About' %}</h2>
-            <div class="prose max-w-none">
-                {{ mentor.bio|safe }}
-            </div>
-        </div>
-        
-        {% if not user.is_mentor or mentor.user != user %}
-        <div class="border-t pt-6">
-            {% if has_request %}
-            {% if existing_request.status == 'pending' %}
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                <p class="text-yellow-800 mb-2 font-semibold">{% trans 'You have a pending request with this mentor.' %}</p>
-                <a href="{% url 'dashboard:mentorship_request_detail' existing_request.pk %}" class="inline-block px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
-                    {% trans 'View Request' %} →
-                </a>
-            </div>
-            {% elif existing_request.status == 'accepted' %}
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                <p class="text-green-800 mb-2 font-semibold">{% trans 'You have an active mentorship with this mentor.' %}</p>
-                <a href="{% url 'dashboard:mentorship_request_detail' existing_request.pk %}" class="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    {% trans 'View Conversation' %} →
-                </a>
-            </div>
-            {% elif existing_request.status == 'rejected' %}
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <p class="text-red-800 mb-2 font-semibold">{% trans 'Your request was declined by this mentor.' %}</p>
-                <a href="{% url 'dashboard:mentorship_browse_mentors' %}" class="inline-block px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
-                    {% trans 'Find Another Mentor' %} →
-                </a>
-            </div>
-            {% endif %}
-            {% else %}
-            <div class="space-y-4">
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p class="text-blue-800 text-sm mb-2">
-                        <strong>{% trans 'Ready to get started?' %}</strong> {% trans 'Send a mentorship request to connect with this mentor.' %}
-                    </p>
-                </div>
-                <a href="{% url 'dashboard:mentorship_create_request' mentor.pk %}" class="block w-full text-center px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 font-semibold text-lg">
-                    {% trans 'Request Mentorship' %} →
-                </a>
-            </div>
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
+    </section>
 </div>
 {% endblock %}
-

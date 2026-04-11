@@ -482,6 +482,8 @@ class GroupListView(DashboardRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user_groups'] = CommunityGroup.objects.filter(members=self.request.user)
+        context['group_categories'] = CommunityGroup.CATEGORY_CHOICES
+        context['selected_category'] = self.request.GET.get('category', '')
         return context
 
 

@@ -2,85 +2,64 @@
 {% load i18n %}
 
 {% block page_heading %}{% trans 'Ask a Question' %}{% endblock %}
+{% block page_description %}{% trans 'Send a support question to the association team when you need clarification on procedures, documents, or settling-in issues.' %}{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow-md p-6 max-w-2xl">
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="space-y-4">
-            <div>
-                <label for="{{ form.subject.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ form.subject.label }}
-                </label>
-                {{ form.subject }}
-                {% if form.subject.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ form.subject.errors.0 }}</p>
-                {% endif %}
+<div class="space-y-8">
+    <section class="grid gap-6 xl:grid-cols-[.9fr_1.1fr]">
+        <aside class="dashboard-card p-6 sm:p-8">
+            <p class="dashboard-kicker text-cameroon-green">{% trans 'Student Support' %}</p>
+            <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Ask the team for practical help.' %}</h2>
+            <p class="mt-4 text-sm leading-7 text-gray-600">{% trans 'Questions can cover documents, student life, relocation steps, housing, healthcare, or association processes that are still unclear after reading the guide.' %}</p>
+
+            <div class="mt-6 rounded-[1.5rem] bg-gradient-to-br from-cameroon-green/8 to-cameroon-yellow/10 p-5">
+                <p class="text-sm leading-7 text-gray-700">{% trans 'A clear subject and a detailed explanation make it easier for the team to respond quickly and accurately.' %}</p>
             </div>
-            
-            <div>
-                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ form.category.label }} ({% trans 'Optional' %})
-                </label>
-                {{ form.category }}
-                {% if form.category.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</p>
-                {% endif %}
+        </aside>
+
+        <section class="dashboard-card p-6 sm:p-8">
+            <div class="dashboard-card-header">
+                <p class="dashboard-kicker text-cameroon-green">{% trans 'Question Form' %}</p>
+                <h3 class="mt-2 text-2xl font-bold text-ascai-ink">{% trans 'Describe the issue you need help with.' %}</h3>
             </div>
-            
-            <div>
-                <label for="{{ form.question.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ form.question.label }}
-                </label>
-                {{ form.question }}
-                {% if form.question.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ form.question.errors.0 }}</p>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="mt-6 flex justify-end space-x-4">
-            <a href="{% url 'dashboard:student_questions' %}" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                {% trans 'Cancel' %}
-            </a>
-            <button type="submit" class="px-6 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
-                {% trans 'Submit Question' %}
-            </button>
-        </div>
-    </form>
+
+            <form method="post" class="dashboard-form space-y-5">
+                {% csrf_token %}
+
+                <div>
+                    <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+                    {{ form.subject }}
+                    {% if form.subject.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.subject.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.category.id_for_label }}">{{ form.category.label }} ({% trans 'Optional' %})</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.category.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.question.id_for_label }}">{{ form.question.label }}</label>
+                    {{ form.question }}
+                    {% if form.question.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.question.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <button type="submit" class="btn-primary">
+                        {% trans 'Submit question' %}
+                    </button>
+                    <a href="{% url 'dashboard:student_questions' %}" class="btn-secondary">
+                        {% trans 'Cancel' %}
+                    </a>
+                </div>
+            </form>
+        </section>
+    </section>
 </div>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
