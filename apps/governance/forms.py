@@ -297,6 +297,10 @@ class ExecutivePositionForm(forms.ModelForm):
         model = ExecutivePosition
         fields = ['board', 'position', 'user', 'start_date', 'end_date', 'status']
         widgets = {
+            'position': forms.TextInput(attrs={
+                'placeholder': _('e.g. President, Welfare Officer, Events Coordinator'),
+                'list': 'executive-position-suggestions',
+            }),
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
         }

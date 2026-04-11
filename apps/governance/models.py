@@ -22,6 +22,7 @@ EXECUTIVE_POSITION_CHOICES = [
     ('statutory_auditor', _('Statutory Auditor')),
     ('communication_culture_manager', _('Communication and Culture Manager')),
 ]
+EXECUTIVE_POSITION_LABELS = dict(EXECUTIVE_POSITION_CHOICES)
 
 
 # ============================================================================
@@ -256,8 +257,6 @@ class ExecutivePosition(models.Model):
     """
     Executive Board positions (Article 13).
     """
-    POSITION_CHOICES = EXECUTIVE_POSITION_CHOICES
-    
     STATUS_CHOICES = [
         ('active', _('Active')),
         ('resigned', _('Resigned')),
@@ -272,9 +271,9 @@ class ExecutivePosition(models.Model):
     )
     
     position = models.CharField(
-        max_length=50,
-        choices=POSITION_CHOICES,
-        verbose_name=_('Position')
+        max_length=100,
+        verbose_name=_('Position'),
+        help_text=_('Enter an existing executive role or define a new one for this board.')
     )
     
     user = models.ForeignKey(
@@ -325,6 +324,15 @@ class ExecutivePosition(models.Model):
     
     def __str__(self):
         return f"{self.get_position_display()} - {self.user.get_display_name() if self.user else 'Vacant'}"
+
+    def get_position_display(self):
+        """
+        Return a readable label for built-in codes while preserving custom roles.
+        """
+        if self.position in EXECUTIVE_POSITION_LABELS:
+            return str(EXECUTIVE_POSITION_LABELS[self.position])
+
+        return self.position.replace('_', ' ').strip().title()
 
 
 class BoardMeeting(models.Model):
@@ -2283,4 +2291,3 @@ class Communication(models.Model):
     
     def get_absolute_url(self):
         return reverse('governance:communication_detail', kwargs={'pk': self.pk})
-
