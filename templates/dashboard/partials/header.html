@@ -1,47 +1,44 @@
 {% load i18n %}
-<!-- Header -->
-<header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center">
-        <!-- Mobile menu button -->
-        <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-        </button>
-        
-        <h2 class="ml-2 lg:ml-0 text-xl font-semibold text-gray-900">{% block header_title %}{% trans 'Dashboard' %}{% endblock %}</h2>
-    </div>
-    
-    <div class="flex items-center space-x-4">
-        <!-- Language Switcher -->
-        {% include 'includes/language_switcher.html' %}
-        
-        <!-- Notifications (placeholder) -->
-        <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-            </svg>
-        </button>
-        
-        <!-- User Menu -->
-        <div class="relative" x-data="{ open: false }">
-            <button @click="open = !open" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100">
-                {% if user.avatar %}
-                <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full">
-                {% else %}
-                <div class="w-8 h-8 bg-gradient-to-br from-cameroon-green to-cameroon-green/80 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                    {{ user.username|first|upper }}
-                </div>
-                {% endif %}
+<header class="sticky top-0 z-40 border-b border-white/30 bg-white/72 backdrop-blur-xl shadow-[0_12px_40px_rgba(17,35,29,0.06)]">
+    <div class="mx-auto flex h-20 max-w-[92rem] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div class="flex min-w-0 items-center gap-3">
+            <button @click="sidebarOpen = !sidebarOpen" class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-black/5 bg-white text-ascai-ink shadow-sm lg:hidden">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
             </button>
-            <div x-show="open" 
-                 @click.away="open = false"
-                 x-cloak
-                 class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200">
-                <a href="{% url 'dashboard:profile_view' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{% trans 'Profile' %}</a>
-                <a href="{% url 'account_logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">{% trans 'Logout' %}</a>
+            <div class="min-w-0">
+                <p class="dashboard-kicker text-cameroon-green">{% trans 'Reserved Area' %}</p>
+                <h2 class="truncate text-2xl font-bold text-ascai-ink">{% block header_title %}{% trans 'Dashboard' %}{% endblock %}</h2>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div class="hidden max-w-[8rem] overflow-hidden md:block">
+                {% include 'includes/language_switcher.html' %}
+            </div>
+            <a href="{% url 'core:home' %}" class="hidden rounded-full border border-black/8 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-cameroon-green/20 hover:text-cameroon-green md:inline-flex">
+                {% trans 'Back to Site' %}
+            </a>
+
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" class="flex items-center gap-2 rounded-full bg-ascai-ink py-2 pl-2 pr-3 text-white shadow-lg">
+                    {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="h-9 w-9 rounded-full object-cover">
+                    {% else %}
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cameroon-yellow font-bold text-ascai-ink">{{ user.username|first|upper }}</span>
+                    {% endif %}
+                    <span class="hidden max-w-28 truncate text-sm font-semibold lg:inline">{{ user.get_display_name|default:user.username }}</span>
+                </button>
+                <div x-show="open" x-cloak @click.away="open = false" class="absolute right-0 mt-3 w-56 overflow-hidden rounded-2xl border border-black/5 bg-white shadow-2xl">
+                    <div class="border-b border-black/5 bg-stone-50 px-4 py-3">
+                        <p class="text-sm font-semibold text-ascai-ink">{{ user.get_display_name|default:user.username }}</p>
+                        <p class="mt-1 text-xs text-gray-500">{{ user.email }}</p>
+                    </div>
+                    <a href="{% url 'dashboard:profile_view' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-stone-50 hover:text-cameroon-green">{% trans 'Profile' %}</a>
+                    <a href="{% url 'account_logout' %}" class="block px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50">{% trans 'Logout' %}</a>
+                </div>
             </div>
         </div>
     </div>
 </header>
-

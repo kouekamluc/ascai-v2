@@ -44,6 +44,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        today = timezone.now().date()
         
         # Statistics
         context['stats'] = {
@@ -61,6 +62,11 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                 Member, GeneralAssembly, MembershipDues, FinancialTransaction,
                 Election, AssemblyVote, AssemblyVoteRecord
             )
+            from apps.governance.utils import (
+                calculate_member_seniority,
+                check_assembly_notice_period,
+                check_general_report_requirement,
+            )
             
             # Check if user is a member
             is_member = hasattr(user, 'member_profile')
@@ -69,6 +75,11 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             if is_member:
                 member = user.member_profile
                 context['member'] = member
+                current_dues = MembershipDues.objects.filter(
+                    member=member,
+                    year=today.year
+                ).order_by('-due_date').first()
+                seniority = calculate_member_seniority(member)
                 
                 # Get upcoming assemblies for participation
                 upcoming_assemblies = GeneralAssembly.objects.filter(
@@ -102,6 +113,8 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                         })
                 
                 context['upcoming_assemblies'] = assemblies_with_voting
+                next_assembly = upcoming_assemblies.first()
+                notice_status = check_assembly_notice_period(next_assembly) if next_assembly else None
                 
                 # Get active elections user can vote in
                 active_elections = Election.objects.filter(
@@ -121,9 +134,25 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                     })
                 
                 context['active_elections'] = elections_with_eligibility
+                context['governance_health'] = {
+                    'member_type': member.get_member_type_display(),
+                    'is_active_member': member.is_active_member,
+                    'seniority': seniority,
+                    'current_dues': current_dues,
+                    'dues_due_date': current_dues.due_date if current_dues else None,
+                    'dues_amount': current_dues.amount if current_dues else None,
+                    'dues_status': current_dues.get_status_display() if current_dues else _('Not generated'),
+                    'last_assembly_attendance': member.last_assembly_attendance,
+                    'next_assembly': next_assembly,
+                    'next_assembly_notice_ok': notice_status['compliant'] if notice_status else None,
+                    'next_assembly_notice_days': notice_status['days'] if notice_status else None,
+                    'march_31_deadline': today.replace(month=3, day=31),
+                    'annual_dues_label': '10 EUR' if member.member_type != 'sympathizer' else '5 EUR',
+                }
             
             # Admin/staff governance stats
             if user.has_perm('governance.view_member') or user.is_staff:
+                report_requirement = check_general_report_requirement()
                 context['governance_stats'] = {
                     'total_members': Member.objects.count(),
                     'active_members': Member.objects.filter(is_active_member=True).count(),
@@ -136,6 +165,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                         transaction_type='expense',
                         status='pending'
                     ).count(),
+                    'report_requirement': report_requirement,
                 }
         except Exception as e:
             # Governance app might not be migrated yet
@@ -226,6 +256,27 @@ class ProfileView(DashboardRequiredMixin, DetailView):
         except Exception:
             # Governance app might not be migrated yet
             context['active_positions'] = []
+        
+        try:
+            from apps.governance.models import MembershipDues
+            from apps.governance.utils import calculate_member_seniority
+            if hasattr(profile_user, 'member_profile'):
+                member = profile_user.member_profile
+                current_year = timezone.now().year
+                current_dues = MembershipDues.objects.filter(
+                    member=member,
+                    year=current_year
+                ).order_by('-due_date').first()
+                context['membership_overview'] = {
+                    'member': member,
+                    'seniority': calculate_member_seniority(member),
+                    'current_dues': current_dues,
+                    'annual_dues_label': '10 EUR' if member.member_type != 'sympathizer' else '5 EUR',
+                }
+            else:
+                context['membership_overview'] = None
+        except Exception:
+            context['membership_overview'] = None
         
         return context
 

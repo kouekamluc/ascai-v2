@@ -3,197 +3,237 @@
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="description" content="{% trans 'ASCAI Lazio Reserved Area - Private Dashboard' %}">
     <title>{% block title %}{% trans 'Dashboard' %} - ASCAI Lazio{% endblock %}</title>
-    
-    <!-- Tailwind CSS CDN -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        serif: ['Source Serif 4', 'serif'],
+                    },
                     colors: {
                         cameroon: {
-                            green: '#007A5E',
-                            red: '#CE1126',
-                            yellow: '#FCD116',
-                        }
+                            green: '#0d6b52',
+                            red: '#c63d2b',
+                            yellow: '#f2c94c',
+                        },
+                        ascai: {
+                            ink: '#11231d',
+                            forest: '#10392f',
+                            mist: '#eef4f0',
+                            sand: '#f7f0e3',
+                            charcoal: '#25332f',
+                        },
+                    },
+                    boxShadow: {
+                        glow: '0 24px 80px rgba(13, 107, 82, 0.15)',
                     }
                 }
             }
         }
     </script>
-    
-    <!-- ASCAI Design System CSS -->
+
     <link rel="stylesheet" href="{% static 'css/ascai-design-system.css' %}">
-    
-    <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    
-    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
+
     <style>
+        :root {
+            --dash-surface: rgba(255, 255, 255, 0.76);
+            --dash-surface-strong: rgba(255, 255, 255, 0.92);
+            --dash-border: rgba(17, 35, 29, 0.08);
+            --dash-text: #11231d;
+            --dash-green: #0d6b52;
+            --dash-red: #c63d2b;
+            --dash-yellow: #f2c94c;
+        }
+
         [x-cloak] { display: none !important; }
-        .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
-        .htmx-request .htmx-indicator { opacity: 1; }
-        
-        /* Enhanced Dashboard Styles */
-        .dashboard-card {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            border: 1px solid #f3f4f6;
-            padding: 1.5rem;
-            transition: all 0.3s;
+        .htmx-indicator { opacity: 0; transition: opacity 180ms ease-in; }
+        .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            color: var(--dash-text);
+            background:
+                radial-gradient(circle at top left, rgba(13, 107, 82, 0.18), transparent 34%),
+                radial-gradient(circle at top right, rgba(242, 201, 76, 0.16), transparent 30%),
+                linear-gradient(180deg, #f4efe3 0%, #fbfaf7 18%, #f8f6f0 100%);
+            min-height: 100vh;
         }
-        .dashboard-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border-color: rgba(0, 122, 94, 0.2);
+
+        h1, h2, h3, h4 {
+            font-family: 'Source Serif 4', serif;
+            letter-spacing: -0.025em;
         }
-        
-        .dashboard-card-header {
-            border-bottom: 1px solid #f3f4f6;
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
+
+        .dashboard-shell {
+            position: relative;
+            overflow-x: clip;
         }
-        
-        .btn-primary {
-            padding: 0.625rem 1.5rem;
-            background: linear-gradient(to right, #007A5E, rgba(0, 122, 94, 0.9));
-            color: white;
-            font-weight: 500;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-        }
-        .btn-primary:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transform: scale(1.02);
-        }
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-secondary {
-            padding: 0.625rem 1.5rem;
-            background-color: white;
-            border: 2px solid #d1d5db;
-            color: #374151;
-            font-weight: 500;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-        }
-        .btn-secondary:hover {
-            background-color: #f9fafb;
-            border-color: #9ca3af;
-        }
-        
-        .btn-danger {
-            padding: 0.625rem 1.5rem;
-            background: linear-gradient(to right, #dc2626, #b91c1c);
-            color: white;
-            font-weight: 500;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-        }
-        .btn-danger:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transform: scale(1.02);
-        }
-        
-        .form-input, .form-textarea {
-            width: 100%;
-            padding: 0.625rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-            outline: none;
-        }
-        .form-textarea {
-            resize: none;
-        }
-        .form-input:focus, .form-textarea:focus {
-            box-shadow: 0 0 0 2px rgba(0, 122, 94, 0.2);
-            border-color: #007A5E;
-        }
-        
-        .stat-card {
-            background: linear-gradient(to bottom right, white, #f9fafb);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            border-left-width: 4px;
-            transition: all 0.3s;
-        }
-        .stat-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            transform: scale(1.02);
-        }
-        
-        .badge {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
+
+        .dashboard-shell::before,
+        .dashboard-shell::after {
+            content: "";
+            position: fixed;
+            width: 24rem;
+            height: 24rem;
             border-radius: 9999px;
-            display: inline-block;
+            filter: blur(90px);
+            opacity: 0.16;
+            pointer-events: none;
+            z-index: 0;
         }
-        .badge-success {
-            background-color: #d1fae5;
-            color: #065f46;
+
+        .dashboard-shell::before {
+            top: 6rem;
+            left: -7rem;
+            background: rgba(13, 107, 82, 0.4);
         }
-        .badge-warning {
-            background-color: #fef3c7;
-            color: #92400e;
+
+        .dashboard-shell::after {
+            top: 14rem;
+            right: -8rem;
+            background: rgba(242, 201, 76, 0.35);
         }
-        .badge-info {
-            background-color: #dbeafe;
-            color: #1e40af;
+
+        .dashboard-panel {
+            background: var(--dash-surface);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--dash-border);
+            border-radius: 1.75rem;
+            box-shadow: 0 16px 50px rgba(17, 35, 29, 0.06);
         }
-        .badge-danger {
-            background-color: #fee2e2;
-            color: #991b1b;
+
+        .dashboard-card {
+            background: var(--dash-surface-strong);
+            border: 1px solid var(--dash-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 14px 36px rgba(17, 35, 29, 0.05);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         }
-        .badge-gray {
-            background-color: #f3f4f6;
-            color: #1f2937;
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 24px 50px rgba(17, 35, 29, 0.09);
+            border-color: rgba(13, 107, 82, 0.16);
         }
-        
-        .link-primary {
-            color: #007A5E;
-            font-weight: 500;
-            transition: color 0.2s;
+
+        .dashboard-card-header {
+            border-bottom: 1px solid rgba(17, 35, 29, 0.08);
+            padding-bottom: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .dashboard-kicker {
+            font-size: .76rem;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+        }
+
+        .dashboard-hero {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 2rem;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(135deg, rgba(16, 57, 47, 0.96), rgba(13, 107, 82, 0.9) 58%, rgba(242, 201, 76, 0.86) 145%);
+            color: white;
+            box-shadow: 0 24px 80px rgba(16, 57, 47, 0.22);
+        }
+
+        .dashboard-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255,255,255,0.18), transparent 22%),
+                radial-gradient(circle at 88% 12%, rgba(255,255,255,0.12), transparent 18%);
+            pointer-events: none;
+        }
+
+        .dashboard-hero > * { position: relative; z-index: 1; }
+
+        .stat-card {
+            background: linear-gradient(140deg, rgba(255,255,255,0.92), rgba(255,255,255,0.78));
+            border-radius: 1.5rem;
+            box-shadow: 0 14px 36px rgba(17, 35, 29, 0.05);
+            padding: 1.5rem;
+            border: 1px solid rgba(17, 35, 29, 0.08);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+
+        .btn-primary, .btn-secondary, .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            border-radius: 9999px;
+            padding: .8rem 1.2rem;
+            font-size: .95rem;
+            font-weight: 700;
+            transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
             text-decoration: none;
         }
-        .link-primary:hover {
-            color: rgba(0, 122, 94, 0.8);
-            text-decoration: underline;
+
+        .btn-primary {
+            background: var(--dash-green);
+            color: white;
+            box-shadow: 0 12px 30px rgba(13, 107, 82, 0.18);
         }
-        
-        .section-divider {
-            border-top: 1px solid #e5e7eb;
-            margin: 1.5rem 0;
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.88);
+            border: 1px solid rgba(17, 35, 29, 0.1);
+            color: var(--dash-text);
         }
-        
+
+        .btn-danger {
+            background: var(--dash-red);
+            color: white;
+            box-shadow: 0 12px 30px rgba(198, 61, 43, 0.18);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            border-radius: 9999px;
+            padding: .35rem .75rem;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background: #dff8ef; color: #065f46; }
+        .badge-warning { background: #fff2cf; color: #92400e; }
+        .badge-info { background: #e1efff; color: #1e40af; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-gray { background: #f3f4f6; color: #374151; }
+
+        .link-primary {
+            color: var(--dash-green);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
         .empty-state {
             text-align: center;
             padding: 3rem 1.5rem;
         }
-        
+
         .empty-state-icon {
             width: 4rem;
             height: 4rem;
@@ -201,71 +241,53 @@
             color: #9ca3af;
         }
     </style>
-    
+
     {% block extra_css %}{% endblock %}
     {% if form %}{{ form.media.css }}{% endif %}
 </head>
-<body class="bg-gray-50 min-h-screen" x-data="{ sidebarOpen: false }">
-    <!-- Messages -->
+<body class="dashboard-shell" x-data="{ sidebarOpen: false }">
     {% include 'includes/messages.html' %}
-    
-    <div class="flex min-h-screen overflow-x-hidden">
-        <!-- Sidebar -->
+
+    <div class="relative z-10 flex min-h-screen overflow-x-hidden">
         {% include 'dashboard/partials/sidebar.html' %}
-        
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-h-0">
-            <!-- Header -->
+        <div class="flex min-w-0 flex-1 flex-col">
             {% include 'dashboard/partials/header.html' %}
-            
-            <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 via-white to-gray-50 p-4 sm:p-6 lg:p-8">
-                <!-- Breadcrumbs -->
+            <main class="relative z-10 flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
                 {% if breadcrumbs %}
                 <nav class="mb-6" aria-label="Breadcrumb">
-                    <ol class="flex items-center space-x-2 text-sm">
-                        <li>
-                            <a href="{% url 'dashboard:home' %}" class="text-gray-500 hover:text-cameroon-green transition-colors font-medium">
-                                {% trans 'Dashboard' %}
-                            </a>
-                        </li>
+                    <ol class="flex flex-wrap items-center gap-2 text-sm">
+                        <li><a href="{% url 'dashboard:home' %}" class="font-medium text-gray-500 hover:text-cameroon-green">{% trans 'Dashboard' %}</a></li>
                         {% for crumb in breadcrumbs %}
-                        <li class="flex items-center">
-                            <svg class="w-4 h-4 mx-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                            </svg>
+                        <li class="flex items-center gap-2">
+                            <span class="text-gray-400">/</span>
                             {% if crumb.url %}
-                            <a href="{{ crumb.url }}" class="text-gray-500 hover:text-cameroon-green transition-colors font-medium">{{ crumb.name }}</a>
+                            <a href="{{ crumb.url }}" class="font-medium text-gray-500 hover:text-cameroon-green">{{ crumb.name }}</a>
                             {% else %}
-                            <span class="text-gray-900 font-semibold">{{ crumb.name }}</span>
+                            <span class="font-semibold text-gray-900">{{ crumb.name }}</span>
                             {% endif %}
                         </li>
                         {% endfor %}
                     </ol>
                 </nav>
                 {% endif %}
-                
-                <!-- Page Title -->
+
                 {% block page_title %}
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{% block page_heading %}{% endblock %}</h1>
-                    <p class="text-gray-600">{% block page_description %}{% endblock %}</p>
+                    <h1 class="text-4xl font-bold text-ascai-ink">{% block page_heading %}{% endblock %}</h1>
+                    <p class="mt-2 max-w-3xl text-sm leading-7 text-gray-600">{% block page_description %}{% endblock %}</p>
                 </div>
                 {% endblock %}
-                
-                <!-- Content -->
+
                 {% block content %}{% endblock %}
             </main>
         </div>
     </div>
-    
-    <!-- HTMX Indicator -->
-    <div id="htmx-indicator" class="htmx-indicator fixed top-0 left-0 right-0 bg-cameroon-green text-white py-2 text-center z-50">
+
+    <div id="htmx-indicator" class="htmx-indicator fixed inset-x-0 top-0 z-50 bg-cameroon-green py-2 text-center text-sm font-semibold tracking-wide text-white">
         <span>{% trans 'Loading...' %}</span>
     </div>
-    
+
     {% block extra_js %}{% endblock %}
     {% if form %}{{ form.media.js }}{% endif %}
 </body>
 </html>
-
