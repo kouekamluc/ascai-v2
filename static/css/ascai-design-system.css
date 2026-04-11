@@ -3,6 +3,11 @@
   --ascai-green: #007A5E;
   --ascai-red: #CE1126;
   --ascai-yellow: #FCD116;
+  --ascai-green-soft: rgba(0, 122, 94, 0.06);
+  --ascai-green-muted: rgba(0, 122, 94, 0.12);
+  --ascai-ink: #0f2e28;
+  --ascai-footer: #0c2420;
+  --ascai-footer-accent: rgba(0, 122, 94, 0.4);
 }
 
 /* Utility Classes */
@@ -36,6 +41,47 @@
   background-color: #007A5E;
 }
 
+/* Branded hero overlay: readable text + green tint */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    165deg,
+    rgba(15, 46, 40, 0.5) 0%,
+    rgba(0, 90, 70, 0.45) 38%,
+    rgba(0, 48, 38, 0.88) 100%
+  );
+  pointer-events: none;
+}
+
+.hero-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 100%,
+    rgba(0, 122, 94, 0.35) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+/* Subtle section wash (optional class alongside Tailwind) */
+.section-surface-soft {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    rgba(250, 250, 249, 1) 50%,
+    var(--ascai-green-soft) 100%
+  );
+}
+
+/* Public site footer */
+.site-footer-ascai {
+  background-color: var(--ascai-footer);
+  border-top: 1px solid var(--ascai-footer-accent);
+}
+
 /* Navbar Styles */
 .nav-link {
   position: relative;
@@ -49,7 +95,7 @@
   transform: translateX(-50%) scaleX(0);
   width: 0;
   height: 2px;
-  background: linear-gradient(to right, var(--ascai-green), var(--ascai-green));
+  background: linear-gradient(to right, var(--ascai-green), var(--ascai-yellow));
   transition: all 0.3s ease;
 }
 
