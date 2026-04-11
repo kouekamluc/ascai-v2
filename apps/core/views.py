@@ -13,7 +13,28 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class HomeView(TemplateView):
+class ExecutiveBoardPublicContextMixin:
+    """Adds executive_board and executive_positions from governance data."""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            from apps.governance.utils import get_current_public_executive_board
+            board, positions = get_current_public_executive_board()
+            context['executive_board'] = board
+            context['executive_positions'] = positions
+        except Exception as e:
+            logger.error(
+                'Error fetching executive board for public page: %s',
+                str(e),
+                exc_info=True,
+            )
+            context['executive_board'] = None
+            context['executive_positions'] = []
+        return context
+
+
+class HomeView(ExecutiveBoardPublicContextMixin, TemplateView):
     """
     Home page view with latest news, events, and success stories.
     """
@@ -52,6 +73,11 @@ class HomeView(TemplateView):
             context['success_stories'] = []
         
         return context
+
+
+class LeadershipView(ExecutiveBoardPublicContextMixin, TemplateView):
+    """Public page listing current executive board members."""
+    template_name = 'core/leadership.html'
 
 
 class HealthCheckView(TemplateView):

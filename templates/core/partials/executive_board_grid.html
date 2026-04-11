@@ -1,0 +1,24 @@
+{% load i18n %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for position in executive_positions %}
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition text-center flex flex-col items-center">
+        {% if position.user and position.user.avatar %}
+        <img src="{{ position.user.avatar.url }}" alt="{{ position.user.get_display_name }}" class="w-20 h-20 rounded-full object-cover border-2 border-cameroon-green/20">
+        {% elif position.user %}
+        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cameroon-green to-cameroon-green/80 flex items-center justify-center text-white text-xl font-bold border-2 border-cameroon-green/20">
+            {{ position.user.get_display_name|slice:":1"|upper }}
+        </div>
+        {% else %}
+        <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm font-medium border border-gray-200">
+            —
+        </div>
+        {% endif %}
+        <h3 class="text-lg font-semibold text-cameroon-green mt-4">{{ position.get_position_display }}</h3>
+        {% if position.user %}
+        <p class="text-gray-900 font-medium mt-1">{{ position.user.get_display_name }}</p>
+        {% else %}
+        <p class="text-gray-400 italic mt-1">{% trans 'Vacant' %}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>

@@ -12,6 +12,29 @@ from .models import (
     EXECUTIVE_POSITION_CHOICES
 )
 
+_POSITION_ORDER = {code: i for i, (code, _) in enumerate(EXECUTIVE_POSITION_CHOICES)}
+
+
+def get_current_public_executive_board():
+    """
+    Current executive board for public display: active status and term dates
+    including today. Returns (board, positions) with positions sorted per
+    Article 13 order, or (None, []) if none qualifies.
+    """
+    today = timezone.now().date()
+    board = ExecutiveBoard.objects.filter(
+        status='active',
+        term_start_date__lte=today,
+        term_end_date__gte=today,
+    ).order_by('-term_start_date').first()
+    if not board:
+        return None, []
+    positions = list(
+        board.positions.filter(status='active').select_related('user')
+    )
+    positions.sort(key=lambda p: _POSITION_ORDER.get(p.position, 99))
+    return board, positions
+
 
 # ============================================================================
 # VOTE COUNTING ALGORITHMS

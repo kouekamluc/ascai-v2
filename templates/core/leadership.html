@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Executive Board' %} | ASCAI Lazio{% endblock %}
+
+{% block meta_description %}{% trans 'Meet the executive board of ASCAI Lazio — the Cameroonian community association serving students and academics in Rome and Lazio, Italy.' %}{% endblock %}
+
+{% block meta_keywords %}ASCAI Lazio, executive board, leadership, Cameroonian association, Rome, Lazio{% endblock %}
+
+{% block content %}
+<div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">{% trans 'Executive Board' %}</h1>
+        <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+            {% trans 'The elected leadership serving our community for the current mandate.' %}
+        </p>
+    </div>
+
+    {% if executive_board and executive_positions %}
+    <div class="mb-10 text-center">
+        <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">{% trans 'Current term' %}</p>
+        <p class="text-lg text-gray-800 mt-1">
+            {{ executive_board.term_start_date|date:"d M Y" }} — {{ executive_board.term_end_date|date:"d M Y" }}
+        </p>
+    </div>
+    {% include 'core/partials/executive_board_grid.html' %}
+    {% else %}
+    <div class="text-center py-16 bg-gray-50 rounded-xl border border-gray-200">
+        <p class="text-gray-600 text-lg">{% trans 'Executive board information will be published here when available.' %}</p>
+        <a href="{% url 'core:home' %}" class="inline-block mt-6 text-cameroon-green font-semibold hover:text-cameroon-red">
+            ← {% trans 'Back to Home' %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

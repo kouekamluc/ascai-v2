@@ -27,6 +27,7 @@ class StaticViewSitemap(Sitemap):
         """
         return [
             ('core:home', 1.0),  # Home page has highest priority
+            ('core:leadership', 0.72),
             ('diaspora:index', 0.8),
             ('community:index', 0.8),
             ('universities:index', 0.8),

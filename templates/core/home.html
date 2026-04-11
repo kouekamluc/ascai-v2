@@ -131,6 +131,25 @@
     </div>
 </section>
 
+{% if executive_board and executive_positions %}
+<section class="py-16 bg-gray-50">
+    <div class="max-w-full md:max-w-[95%] lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900">{% trans 'Executive Board' %}</h2>
+                <p class="text-gray-600 mt-2">
+                    {% trans 'Meet the members leading ASCAI Lazio for the current term.' %}
+                </p>
+            </div>
+            <a href="{% url 'core:leadership' %}" class="text-cameroon-green hover:text-cameroon-red font-semibold whitespace-nowrap">
+                {% trans 'Learn more' %} →
+            </a>
+        </div>
+        {% include 'core/partials/executive_board_grid.html' %}
+    </div>
+</section>
+{% endif %}
+
 <!-- Latest News -->
 {% if latest_news %}
 <section class="py-16 bg-gray-50">
