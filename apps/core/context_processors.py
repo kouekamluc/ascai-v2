@@ -40,3 +40,16 @@ def site_url(request):
     
     return {'site_url': site_url}
 
+
+def public_collaborators(request):
+    """Expose featured collaborators for public site sections."""
+    try:
+        from apps.core.models import Collaborator
+
+        collaborators = list(
+            Collaborator.objects.filter(is_active=True, is_featured=True).order_by("display_order", "name")[:12]
+        )
+    except Exception:
+        collaborators = []
+
+    return {"public_collaborators": collaborators}

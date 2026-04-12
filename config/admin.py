@@ -265,7 +265,7 @@ def get_notification_navigation(request):
     # Helper to format title with count badge
     def format_with_badge(title, count):
         if count > 0:
-            return f"{title} 🔴 {count}"
+            return f"{title} ({count})"
         return title
     
     # Return full navigation with notification counts
@@ -329,6 +329,11 @@ def get_notification_navigation(request):
                     "title": _("Testimonials"),
                     "icon": "rate_review",
                     "link": "/admin/diaspora/testimonial/",
+                },
+                {
+                    "title": _("Collaborators"),
+                    "icon": "handshake",
+                    "link": "/admin/core/collaborator/",
                 },
                 {
                     "title": _("Forum Categories"),
@@ -536,14 +541,22 @@ admin.site.site_header = _('ASCAI Lazio Administration')
 admin.site.site_title = _('ASCAI Lazio Admin')
 admin.site.index_title = _('Welcome to ASCAI Lazio Administration')
 
+# Hide django-allauth social auth models while social authentication is disabled.
+try:
+    from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
+
+    admin.site.unregister(SocialAccount)
+    admin.site.unregister(SocialApp)
+    admin.site.unregister(SocialToken)
+except Exception:
+    pass
+
 # Make admin_site available for direct imports (alias to admin.site for compatibility)
 admin_site = admin.site
 
 # Export Unfold admin classes for use in app admin.py files
 # This allows apps to use: from config.admin import BaseAdmin, ModelAdmin, TabularInline, StackedInline
 __all__ = ['admin_site', 'BaseAdmin', 'ModelAdmin', 'TabularInline', 'StackedInline', 'dashboard_callback']
-
-
 
 
 

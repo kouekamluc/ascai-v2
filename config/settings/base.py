@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
     
     # Local apps
     'apps.accounts',
@@ -99,6 +98,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'apps.core.context_processors.language_preference',
                 'apps.core.context_processors.site_url',
+                'apps.core.context_processors.public_collaborators',
             ],
         },
     },
@@ -131,8 +131,8 @@ USE_TZ = True
 
 LANGUAGES = [
     ('en', 'English'),
-    ('fr', 'Français'),
-    ('it', 'Italiano'),
+    ('fr', 'French'),
+    ('it', 'Italian'),
 ]
 
 LOCALE_PATHS = [
@@ -446,37 +446,8 @@ ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/5m',  # 5 attempts per 5 minutes
 }
 
-# Social Account Settings (Google OAuth)
-# NOTE: Google OAuth is configured via SocialApp database entries (created by setup_google_oauth command)
-# Do NOT configure 'APP' here to avoid MultipleObjectsReturned errors
-# The setup_google_oauth management command creates the SocialApp entry from environment variables
-SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomSocialAccountAdapter'
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'OAUTH_PKCE_ENABLED': True,
-        'VERIFIED_EMAIL': True,  # CRITICAL: Tell allauth that Google emails are already verified
-        # 'APP' configuration removed - using database SocialApp entries instead
-        # This prevents MultipleObjectsReturned errors when both are configured
-    }
-}
-# Auto-approve social accounts (users still need admin approval via is_approved field)
-SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Google already verifies emails
-SOCIALACCOUNT_QUERY_EMAIL = True
-SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens unless needed
-# Auto-connect social accounts to existing users with matching verified email
-# This prevents "account already exists" email errors and improves UX
-SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
-# Allow social login via GET request (prevents redirect loops)
-# This is safe because the actual OAuth flow still requires user consent
-SOCIALACCOUNT_LOGIN_ON_GET = True
+# Social authentication is intentionally disabled for now.
+# Keep django-allauth for email/password account flows only.
 
 # Session Configuration
 SESSION_COOKIE_AGE = 86400  # 24 hours
@@ -527,33 +498,32 @@ UNFOLD = {
     },
     "STYLES": [
         {
-            "source": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+            "source": "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:wght@500;600;700&display=swap",
         },
     ],
     "SCRIPTS": [],
     "COLORS": {
         "primary": {
-            "50": "250 250 252",
-            "100": "244 244 247",
-            "200": "228 228 234",
-            "300": "200 200 210",
-            "400": "156 156 171",
-            "500": "30 58 138",  # Navy Blue primary
-            "600": "30 64 175",
-            "700": "29 78 216",
-            "800": "30 58 138",
-            "900": "30 41 59",
-            "950": "15 23 42",
+            "50": "239 247 243",
+            "100": "219 240 230",
+            "200": "183 224 204",
+            "300": "139 202 173",
+            "400": "85 171 136",
+            "500": "13 107 82",
+            "600": "11 93 72",
+            "700": "16 57 47",
+            "800": "17 45 38",
+            "900": "15 35 30",
+            "950": "9 22 19",
         },
     },
     "EXTENSIONS": {
         "modeltranslation": {
             "flags": {
-                "en": "🇬🇧",
-                "fr": "🇫🇷",
-                "it": "🇮🇹",
+                "en": "EN",
+                "fr": "FR",
+                "it": "IT",
             },
         },
     },
 }
-

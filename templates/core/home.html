@@ -211,6 +211,43 @@
     </section>
     {% endif %}
 
+    {% if public_collaborators %}
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Collaborators' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Institutions and organisations working alongside ASCAI Lazio' %}</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-gray-600">{% trans 'Showcase the networks, schools, organisations, and community partners that help strengthen the association.' %}</p>
+            </div>
+        </div>
+        <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {% for collaborator in public_collaborators %}
+            <article class="content-card flex h-full flex-col items-center p-6 text-center">
+                {% if collaborator.logo %}
+                <div class="flex h-24 w-full items-center justify-center rounded-[1.5rem] bg-white p-4 shadow-sm">
+                    <img src="{{ collaborator.logo.url }}" alt="{{ collaborator.name }}" class="max-h-14 w-auto object-contain">
+                </div>
+                {% else %}
+                <div class="flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-cameroon-green/10 text-2xl font-bold text-cameroon-green">
+                    {{ collaborator.name|first|upper }}
+                </div>
+                {% endif %}
+                <p class="mt-5 text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ collaborator.get_category_display }}</p>
+                <h3 class="mt-2 text-2xl font-bold text-ascai-ink">{{ collaborator.name }}</h3>
+                {% if collaborator.description %}
+                <p class="mt-3 text-sm leading-7 text-gray-600">{{ collaborator.description|truncatewords:18 }}</p>
+                {% endif %}
+                {% if collaborator.website_url %}
+                <a href="{{ collaborator.website_url }}" target="_blank" rel="noopener noreferrer" class="mt-5 rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-stone-200">
+                    {% trans 'Visit website' %}
+                </a>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
     <section class="page-hero">
         <div class="max-w-3xl">
             <span class="eyebrow">{% trans 'Ready to be part of it?' %}</span>

@@ -61,6 +61,32 @@
             </div>
         </div>
 
+        {% if public_collaborators %}
+        <div class="mt-12 rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                    <p class="text-sm font-extrabold uppercase tracking-[0.2em] text-cameroon-yellow">{% trans 'Collaborators' %}</p>
+                    <p class="mt-2 max-w-2xl text-sm leading-7 text-white/70">{% trans 'Add your collaborator and partner logos from the admin area to showcase the network supporting ASCAI Lazio.' %}</p>
+                </div>
+            </div>
+            <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {% for collaborator in public_collaborators|slice:":8" %}
+                <div class="rounded-[1.4rem] bg-white/95 p-4 text-ascai-ink">
+                    <div class="flex h-16 items-center justify-center rounded-2xl bg-stone-50 p-3">
+                        {% if collaborator.logo %}
+                        <img src="{{ collaborator.logo.url }}" alt="{{ collaborator.name }}" class="max-h-10 w-auto object-contain">
+                        {% else %}
+                        <span class="text-lg font-bold text-cameroon-green">{{ collaborator.name|first|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="mt-4 truncate text-sm font-bold">{{ collaborator.name }}</p>
+                    <p class="mt-1 text-xs uppercase tracking-[0.16em] text-gray-500">{{ collaborator.get_category_display }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="mt-14 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/55 md:flex-row md:items-center md:justify-between">
             <p>&copy; {% now "Y" %} ASCAI Lazio. {% trans 'All rights reserved.' %}</p>
             <p>{% trans 'Built to support community, visibility, and opportunity across Lazio.' %}</p>
