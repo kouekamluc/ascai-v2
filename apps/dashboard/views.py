@@ -212,6 +212,8 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         # Quick actions
         context['quick_actions'] = [
             {'title': _('Update Profile'), 'url': reverse_lazy('dashboard:profile_edit'), 'icon': 'user'},
+            {'title': _('Book Orientation'), 'url': reverse_lazy('dashboard:orientation_booking'), 'icon': 'orientation'},
+            {'title': _('Ask Student Question'), 'url': reverse_lazy('dashboard:student_question_create'), 'icon': 'question'},
             {'title': _('Submit Story'), 'url': reverse_lazy('dashboard:stories_submit'), 'icon': 'edit'},
             {'title': _('Create Ticket'), 'url': reverse_lazy('dashboard:tickets_create'), 'icon': 'support'},
             {'title': _('Browse Groups'), 'url': reverse_lazy('dashboard:groups_list'), 'icon': 'users'},
