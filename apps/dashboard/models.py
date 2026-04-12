@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from django.utils.text import slugify
+from django.utils import timezone
 import uuid
 
 User = get_user_model()
@@ -756,3 +757,19 @@ class OrientationSession(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.preferred_date}"
+
+    @property
+    def status_label(self):
+        if self.is_confirmed and self.confirmed_date:
+            if self.confirmed_date < timezone.now():
+                return _('Completed')
+            return _('Confirmed')
+        if self.preferred_date < timezone.now().date():
+            return _('Needs Rescheduling')
+        return _('Pending Review')
+
+    @property
+    def is_active_request(self):
+        if self.is_confirmed and self.confirmed_date:
+            return self.confirmed_date >= timezone.now()
+        return self.preferred_date >= timezone.now().date()

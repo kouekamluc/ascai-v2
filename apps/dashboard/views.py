@@ -841,6 +841,16 @@ class NewStudentGuideView(DashboardRequiredMixin, TemplateView):
                 'content': _('Find accommodation and register your address with the local municipality (Comune). You will need a rental contract and your residence permit for registration.')
             },
         ]
+        context['latest_question'] = StudentQuestion.objects.filter(
+            user=self.request.user
+        ).order_by('-created_at').first()
+        orientation_sessions = OrientationSession.objects.filter(
+            user=self.request.user
+        ).order_by('-created_at')
+        context['latest_orientation_session'] = orientation_sessions.first()
+        context['has_active_orientation_request'] = any(
+            session.is_active_request for session in orientation_sessions[:5]
+        )
         return context
 
 
@@ -927,6 +937,13 @@ class StudentQuestionListView(DashboardRequiredMixin, ListView):
     def get_queryset(self):
         return StudentQuestion.objects.filter(user=self.request.user).order_by('-created_at')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['latest_orientation_session'] = OrientationSession.objects.filter(
+            user=self.request.user
+        ).order_by('-created_at').first()
+        return context
+
 
 class StudentQuestionCreateView(DashboardRequiredMixin, CreateView):
     """Create student question."""
@@ -947,8 +964,36 @@ class OrientationBookingCreateView(DashboardRequiredMixin, CreateView):
     form_class = OrientationBookingForm
     template_name = 'dashboard/new_student/orientation_booking.html'
     success_url = reverse_lazy('dashboard:new_student_guide')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sessions = OrientationSession.objects.filter(user=self.request.user).order_by('-created_at')
+        context['orientation_sessions'] = sessions
+        context['active_orientation_session'] = next(
+            (session for session in sessions if session.is_active_request),
+            None,
+        )
+        context['latest_question'] = StudentQuestion.objects.filter(
+            user=self.request.user
+        ).order_by('-created_at').first()
+        return context
     
     def form_valid(self, form):
+        existing_active = next(
+            (
+                session
+                for session in OrientationSession.objects.filter(user=self.request.user).order_by('-created_at')
+                if session.is_active_request
+            ),
+            None,
+        )
+        if existing_active:
+            messages.info(
+                self.request,
+                _('You already have an active orientation request. We updated your dashboard so you can track it below.'),
+            )
+            return redirect('dashboard:orientation_booking')
+
         form.instance.user = self.request.user
         messages.success(self.request, _('Orientation session requested. You will be contacted soon.'))
         return super().form_valid(form)

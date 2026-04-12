@@ -50,6 +50,19 @@
                 <p class="dashboard-kicker text-cameroon-green">{% trans 'Direct Support' %}</p>
                 <h3 class="mt-2 text-2xl font-bold text-ascai-ink">{% trans 'Need help with a specific problem?' %}</h3>
                 <p class="mt-4 text-sm leading-7 text-gray-600">{% trans 'Ask a question when you need clarification on a process, document, or immediate challenge.' %}</p>
+                {% if latest_question %}
+                <div class="mt-5 rounded-[1.4rem] border border-black/5 bg-ascai-mist/65 p-4 text-sm text-gray-600">
+                    <p class="font-semibold text-ascai-ink">{{ latest_question.subject }}</p>
+                    <p class="mt-1">
+                        {% if latest_question.is_resolved %}
+                            {% trans 'Latest question resolved' %}
+                        {% else %}
+                            {% trans 'Latest question still awaiting follow-up' %}
+                        {% endif %}
+                        . {{ latest_question.created_at|date:"M d, Y" }}
+                    </p>
+                </div>
+                {% endif %}
                 <a href="{% url 'dashboard:student_question_create' %}" class="btn-primary mt-6">
                     {% trans 'Ask a question' %}
                 </a>
@@ -59,8 +72,21 @@
                 <p class="dashboard-kicker text-cameroon-green">{% trans 'Orientation' %}</p>
                 <h3 class="mt-2 text-2xl font-bold text-ascai-ink">{% trans 'Book a one-to-one orientation session' %}</h3>
                 <p class="mt-4 text-sm leading-7 text-gray-600">{% trans 'Request a personal orientation if you want help understanding your next steps after arrival.' %}</p>
+                {% if latest_orientation_session %}
+                <div class="mt-5 rounded-[1.4rem] border border-black/5 bg-ascai-mist/65 p-4 text-sm text-gray-600">
+                    <p class="font-semibold text-ascai-ink">{% trans 'Latest session request' %}</p>
+                    <p class="mt-1">{{ latest_orientation_session.preferred_date|date:"M d, Y" }} {{ latest_orientation_session.preferred_time|time:"H:i" }}</p>
+                    <p class="mt-1">
+                        {% if has_active_orientation_request %}
+                            {% trans 'There is an active orientation request on your account.' %}
+                        {% else %}
+                            {{ latest_orientation_session.status_label }}
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
                 <a href="{% url 'dashboard:orientation_booking' %}" class="btn-secondary mt-6">
-                    {% trans 'Book session' %}
+                    {% if has_active_orientation_request %}{% trans 'View request' %}{% else %}{% trans 'Book session' %}{% endif %}
                 </a>
             </article>
 

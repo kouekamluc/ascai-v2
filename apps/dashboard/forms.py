@@ -202,6 +202,22 @@ class OrientationBookingForm(forms.ModelForm):
             }),
         }
 
+    def clean_preferred_date(self):
+        preferred_date = self.cleaned_data['preferred_date']
+        from django.utils import timezone
+
+        if preferred_date < timezone.now().date():
+            raise forms.ValidationError(_('Please choose today or a future date.'))
+        return preferred_date
+
+    def clean_topics(self):
+        topics = (self.cleaned_data.get('topics') or '').strip()
+        if len(topics) < 12:
+            raise forms.ValidationError(
+                _('Please provide a bit more detail so the team can prepare the session.')
+            )
+        return topics
+
 
 class TicketReplyForm(forms.ModelForm):
     """Form for replying to support tickets."""

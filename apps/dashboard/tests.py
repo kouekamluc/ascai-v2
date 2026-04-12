@@ -4,7 +4,9 @@ Tests for dashboard app.
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from .models import SupportTicket, TicketReply, CommunityGroup
+from datetime import date, timedelta, time
+
+from .models import SupportTicket, TicketReply, CommunityGroup, OrientationSession, StudentQuestion
 from .mixins import DashboardRequiredMixin
 
 User = get_user_model()
@@ -154,6 +156,56 @@ class DashboardViewsTest(TestCase):
         url = reverse('dashboard:profile_view')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_orientation_booking_flow_prevents_duplicate_active_requests(self):
+        self.client.login(username='testuser', password='testpass123')
+        OrientationSession.objects.create(
+            user=self.user,
+            preferred_date=date.today() + timedelta(days=2),
+            preferred_time=time(10, 0),
+            topics='Residence permit and university enrollment guidance',
+        )
+
+        response = self.client.post(
+            reverse('dashboard:orientation_booking'),
+            {
+                'preferred_date': date.today() + timedelta(days=4),
+                'preferred_time': '14:00',
+                'topics': 'I still need help with housing and health insurance.',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(OrientationSession.objects.filter(user=self.user).count(), 1)
+
+    def test_orientation_booking_page_shows_existing_request(self):
+        self.client.login(username='testuser', password='testpass123')
+        OrientationSession.objects.create(
+            user=self.user,
+            preferred_date=date.today() + timedelta(days=1),
+            preferred_time=time(9, 30),
+            topics='Need help understanding first administrative steps',
+        )
+        response = self.client.get(reverse('dashboard:orientation_booking'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Active request')
+
+    def test_student_questions_page_includes_orientation_context(self):
+        self.client.login(username='testuser', password='testpass123')
+        OrientationSession.objects.create(
+            user=self.user,
+            preferred_date=date.today() + timedelta(days=3),
+            preferred_time=time(11, 0),
+            topics='Questions about healthcare registration',
+        )
+        StudentQuestion.objects.create(
+            user=self.user,
+            subject='Need help with residence permit',
+            question='What documents should I prepare first?',
+            category='Residence Permit',
+        )
+        response = self.client.get(reverse('dashboard:student_questions'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Orientation follow-up')
 
 
 class DashboardMixinsTest(TestCase):

@@ -303,6 +303,7 @@ class OrientationSessionAdmin(ModelAdmin):
     list_filter = ['is_confirmed', 'created_at']
     search_fields = ['user__username', 'topics']
     readonly_fields = ['user', 'created_at']
+    autocomplete_fields = ['user']
     list_display_links = ['user', 'preferred_date']
     fieldsets = (
         (_('Session Request'), {
@@ -332,6 +333,15 @@ class OrientationSessionAdmin(ModelAdmin):
             )
     confirmation_badge.short_description = _('Status')
     confirmation_badge.admin_order_field = 'is_confirmed'
+
+    def save_model(self, request, obj, form, change):
+        from django.utils import timezone
+
+        if obj.is_confirmed and not obj.confirmed_date:
+            obj.confirmed_date = timezone.now()
+        elif not obj.is_confirmed:
+            obj.confirmed_date = None
+        super().save_model(request, obj, form, change)
     
     def changelist_view(self, request, extra_context=None):
         """Add notification count to changelist context."""

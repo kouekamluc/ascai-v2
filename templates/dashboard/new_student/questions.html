@@ -17,6 +17,19 @@
                 {% trans 'Ask a question' %}
             </a>
         </div>
+        {% if latest_orientation_session %}
+        <div class="mt-6 rounded-[1.5rem] border border-black/5 bg-ascai-mist/60 p-5">
+            <p class="dashboard-kicker text-cameroon-green">{% trans 'Orientation follow-up' %}</p>
+            <p class="mt-2 text-sm leading-7 text-gray-600">
+                {% blocktrans with date=latest_orientation_session.preferred_date|date:"M d, Y" time=latest_orientation_session.preferred_time|time:"H:i" status=latest_orientation_session.status_label %}
+                Your latest orientation request is for {{ date }} at {{ time }} and is currently marked {{ status }}.
+                {% endblocktrans %}
+            </p>
+            <a href="{% url 'dashboard:orientation_booking' %}" class="btn-secondary mt-4">
+                {% trans 'View orientation request' %}
+            </a>
+        </div>
+        {% endif %}
     </section>
 
     {% if questions %}
