@@ -56,6 +56,7 @@ class DownloadListView(ListView):
         context = super().get_context_data(**kwargs)
         context['filter_category'] = self.request.GET.get('category', '')
         context['search_query'] = self.request.GET.get('search', '')
+        context['tags_query'] = self.request.GET.get('tags', '')
         context['sort_by'] = self.request.GET.get('sort', 'recent')
         
         # Get popular downloads
@@ -67,11 +68,6 @@ class DownloadListView(ListView):
         context['recent_documents'] = Document.objects.filter(
             is_active=True
         ).order_by('-uploaded_at')[:10]
-        
-        return context
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
         
         # Group documents by category
         documents = context['documents']
@@ -179,6 +175,11 @@ class PopularDownloadsView(ListView):
             is_active=True
         ).order_by('-download_count', '-uploaded_at')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_variant'] = 'popular'
+        return context
+
 
 class RecentDownloadsView(ListView):
     """Recently uploaded documents."""
@@ -192,3 +193,7 @@ class RecentDownloadsView(ListView):
             is_active=True
         ).order_by('-uploaded_at')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_variant'] = 'recent'
+        return context

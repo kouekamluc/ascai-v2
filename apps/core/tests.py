@@ -4,7 +4,7 @@ Tests for core app.
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from apps.core.models import Collaborator
+from apps.core.models import AssociationSettings, Collaborator
 
 User = get_user_model()
 
@@ -76,4 +76,13 @@ class CoreContextProcessorsTest(TestCase):
 
         self.assertEqual(len(context['public_collaborators']), 1)
         self.assertEqual(context['public_collaborators'][0].name, 'Visible Partner')
+
+    def test_association_settings_processor(self):
+        """Association settings should always be available."""
+        from apps.core.context_processors import association_settings
+
+        context = association_settings(None)
+
+        self.assertIn('association_settings', context)
+        self.assertIsInstance(context['association_settings'], AssociationSettings)
 

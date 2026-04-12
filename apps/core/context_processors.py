@@ -53,3 +53,15 @@ def public_collaborators(request):
         collaborators = []
 
     return {"public_collaborators": collaborators}
+
+
+def association_settings(request):
+    """Expose singleton website settings for public templates and admin-aware pages."""
+    try:
+        from apps.core.models import AssociationSettings
+
+        settings_obj = AssociationSettings.load()
+    except Exception:
+        settings_obj = None
+
+    return {"association_settings": settings_obj}

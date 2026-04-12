@@ -59,3 +59,50 @@ class Collaborator(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class AssociationSettings(models.Model):
+    """Singleton-style site settings editable from Django admin."""
+
+    site_name = models.CharField(
+        max_length=200,
+        default="ASCAI Lazio",
+        verbose_name=_("Site Name"),
+    )
+    tagline = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("Tagline"),
+    )
+    public_email = models.EmailField(
+        blank=True,
+        verbose_name=_("Public Email"),
+    )
+    facebook_url = models.URLField(blank=True, verbose_name=_("Facebook URL"))
+    instagram_url = models.URLField(blank=True, verbose_name=_("Instagram URL"))
+    linkedin_url = models.URLField(blank=True, verbose_name=_("LinkedIn URL"))
+    tiktok_url = models.URLField(blank=True, verbose_name=_("TikTok URL"))
+    youtube_url = models.URLField(blank=True, verbose_name=_("YouTube URL"))
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Association Settings")
+        verbose_name_plural = _("Association Settings")
+
+    def __str__(self):
+        return self.site_name or _("Association Settings")
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, _created = cls.objects.get_or_create(
+            pk=1,
+            defaults={
+                "site_name": "ASCAI Lazio",
+                "tagline": _("Association of Cameroonian Students and Academics in Lazio"),
+            },
+        )
+        return obj

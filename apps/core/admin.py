@@ -2,12 +2,14 @@
 Admin configuration for site-wide core content.
 """
 from django.contrib import admin
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from config.admin import BaseAdmin
 
-from .models import Collaborator
+from .models import AssociationSettings, Collaborator
 
 
 @admin.register(Collaborator)
@@ -65,3 +67,35 @@ class CollaboratorAdmin(BaseAdmin):
         )
 
     logo_preview_large.short_description = _("Logo Preview")
+
+
+@admin.register(AssociationSettings)
+class AssociationSettingsAdmin(BaseAdmin):
+    fieldsets = (
+        (_("Brand"), {
+            "fields": ("site_name", "tagline", "public_email"),
+        }),
+        (_("Social Media Links"), {
+            "fields": (
+                "facebook_url",
+                "instagram_url",
+                "linkedin_url",
+                "tiktok_url",
+                "youtube_url",
+            ),
+            "description": _("Paste the full public URLs to your association social accounts."),
+        }),
+    )
+    readonly_fields = ["updated_at"]
+
+    def has_add_permission(self, request):
+        return not AssociationSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        obj = AssociationSettings.objects.first()
+        if obj:
+            return redirect(reverse("admin:core_associationsettings_change", args=[obj.pk]))
+        return redirect(reverse("admin:core_associationsettings_add"))

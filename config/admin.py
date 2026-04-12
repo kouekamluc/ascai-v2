@@ -271,7 +271,7 @@ def get_notification_navigation(request):
     # Return full navigation with notification counts
     return [
         {
-            "title": format_with_badge(_("Notifications & Enquiries"), counts['total']),
+            "title": format_with_badge(_("Inbox & Actions"), counts['total']),
             "icon": "notifications_active",
             "items": [
                 {
@@ -302,9 +302,14 @@ def get_notification_navigation(request):
             ],
         },
         {
-            "title": _("Content Management"),
+            "title": _("Website & Content"),
             "icon": "article",
             "items": [
+                {
+                    "title": _("Website Settings"),
+                    "icon": "language",
+                    "link": "/admin/core/associationsettings/",
+                },
                 {
                     "title": _("News & Announcements"),
                     "icon": "newspaper",
@@ -353,7 +358,7 @@ def get_notification_navigation(request):
             ],
         },
         {
-            "title": _("User Management"),
+            "title": _("Members & Mentorship"),
             "icon": "people",
             "items": [
                 {
@@ -389,7 +394,7 @@ def get_notification_navigation(request):
             ],
         },
         {
-            "title": _("Resources & Education"),
+            "title": _("Resources & Media"),
             "icon": "folder",
             "items": [
                 {
@@ -430,7 +435,7 @@ def get_notification_navigation(request):
             ],
         },
         {
-            "title": _("Support & Community"),
+            "title": _("Community & Support"),
             "icon": "support_agent",
             "items": [
                 {
@@ -557,8 +562,6 @@ admin_site = admin.site
 # Export Unfold admin classes for use in app admin.py files
 # This allows apps to use: from config.admin import BaseAdmin, ModelAdmin, TabularInline, StackedInline
 __all__ = ['admin_site', 'BaseAdmin', 'ModelAdmin', 'TabularInline', 'StackedInline', 'dashboard_callback']
-
-
 
 
 

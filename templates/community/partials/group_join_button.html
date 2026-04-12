@@ -1,0 +1,19 @@
+{% load i18n %}
+{% if user.is_authenticated %}
+<form method="post" action="{% url 'community:group_join' group.slug %}" hx-post="{% url 'community:group_join' group.slug %}" hx-target="this" hx-swap="outerHTML" class="inline-flex">
+    {% csrf_token %}
+    {% if is_member %}
+    <button type="submit" class="rounded-full border border-cameroon-green/20 bg-white px-5 py-3 text-sm font-semibold text-cameroon-green hover:bg-cameroon-green/5">
+        {% trans 'Leave group' %}
+    </button>
+    {% else %}
+    <button type="submit" class="rounded-full bg-cameroon-green px-5 py-3 text-sm font-semibold text-white hover:bg-cameroon-green/90">
+        {% trans 'Join group' %}
+    </button>
+    {% endif %}
+</form>
+{% else %}
+<a href="{% url 'account_login' %}" class="inline-flex rounded-full bg-cameroon-green px-5 py-3 text-sm font-semibold text-white hover:bg-cameroon-green/90">
+    {% trans 'Log in to join' %}
+</a>
+{% endif %}

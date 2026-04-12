@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Popular Downloads' %} | ASCAI Lazio{% endblock %}
+{% block meta_description %}{% trans 'Browse the most downloaded ASCAI Lazio documents and practical resources.' %}{% endblock %}
+
+{% block content %}
+<div class="page-shell space-y-10">
+    <section class="page-hero">
+        <div class="max-w-3xl">
+            <span class="eyebrow">{% trans 'Downloads' %}</span>
+            <h1 class="mt-6 text-5xl md:text-6xl font-bold">{% trans 'The most downloaded community resources.' %}</h1>
+            <p class="mt-5 text-lg text-white/82 leading-8">{% trans 'See which guides, forms, and practical documents members rely on the most.' %}</p>
+        </div>
+    </section>
+
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Popular Downloads' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Top documents by download count' %}</h2>
+            </div>
+            <a href="{% url 'downloads:index' %}" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-stone-200">{% trans 'Back to all downloads' %}</a>
+        </div>
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {% for document in documents %}
+            <article class="content-card p-6">
+                <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ document.get_category_display }}</p>
+                <h3 class="mt-3 text-2xl font-bold leading-tight text-ascai-ink">{{ document.title }}</h3>
+                {% if document.description %}
+                <p class="mt-3 text-sm leading-7 text-gray-600">{{ document.description|striptags|truncatewords:18 }}</p>
+                {% endif %}
+                <div class="mt-6 flex items-center justify-between gap-3 border-t border-black/5 pt-5">
+                    <span class="text-sm font-medium text-gray-500">{{ document.download_count }} {% trans 'downloads' %}</span>
+                    <a href="{% url 'downloads:document_detail' document.pk %}" class="rounded-full bg-cameroon-green px-4 py-2.5 text-sm font-semibold text-white">{% trans 'Open' %}</a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="md:col-span-2 xl:col-span-3 section-card p-10 text-center">
+                <p class="text-gray-600">{% trans 'No downloads are available yet.' %}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
