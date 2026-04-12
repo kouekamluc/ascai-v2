@@ -24,9 +24,9 @@ urlpatterns = [
     # Email confirmation URL (outside i18n_patterns so it works from email links without language prefix)
     # This is critical because email links don't have language prefixes
     path('accounts/confirm-email/<str:key>/', CustomConfirmEmailView.as_view(), name='account_confirm_email'),
-    # Intercept /accounts/confirm-email/ (without key) to bypass for Google OAuth users
+    # Friendly fallback for /accounts/confirm-email/ without a verification key
     path('accounts/confirm-email/', email_verification_required_view, name='account_email_verification_required'),
-    # Override email verification sent view to bypass for Google OAuth users
+    # Branded email verification sent page
     path('accounts/email-verification-sent/', CustomEmailVerificationSentView.as_view(), name='account_email_verification_sent'),
 ]
 
@@ -109,4 +109,3 @@ if settings.DEBUG or not USE_S3:
         ] + urlpatterns
     except ImportError:
         pass  # debug_toolbar not installed, skip it
-

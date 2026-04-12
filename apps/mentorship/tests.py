@@ -4,8 +4,10 @@ Tests for mentorship app.
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from decimal import Decimal
 from .models import MentorProfile, MentorshipRequest, MentorshipMessage, MentorRating
+from .services import create_request, accept_request, reject_request, complete_request
 
 User = get_user_model()
 
@@ -168,4 +170,119 @@ class MentorshipViewsTest(TestCase):
         url = reverse('mentorship:mentor_detail', kwargs={'pk': self.mentor_profile.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+
+class MentorshipWorkflowServiceTest(TestCase):
+    """Regression coverage for the shared mentorship workflow service."""
+
+    def setUp(self):
+        self.student = User.objects.create_user(
+            username='student_service',
+            email='student_service@example.com',
+            password='testpass123',
+            role='student',
+        )
+        self.mentor_user = User.objects.create_user(
+            username='mentor_service',
+            email='mentor_service@example.com',
+            password='testpass123',
+            role='mentor',
+        )
+        self.mentor_profile = MentorProfile.objects.create(
+            user=self.mentor_user,
+            specialization='Engineering',
+            years_experience=6,
+            bio='Experienced mentor',
+            is_approved=True,
+        )
+
+    def test_shared_service_runs_full_request_lifecycle(self):
+        mentorship_request = create_request(
+            student=self.student,
+            mentor=self.mentor_profile,
+            subject='Need guidance',
+            message='I would like help with settling in Rome.',
+        )
+        self.assertEqual(mentorship_request.status, 'pending')
+
+        accept_request(mentorship_request=mentorship_request, actor=self.mentor_user)
+        mentorship_request.refresh_from_db()
+        self.assertEqual(mentorship_request.status, 'accepted')
+
+        complete_request(mentorship_request=mentorship_request, actor=self.mentor_user)
+        mentorship_request.refresh_from_db()
+        self.mentor_profile.refresh_from_db()
+        self.assertEqual(mentorship_request.status, 'completed')
+        self.assertEqual(self.mentor_profile.students_helped, 1)
+
+    def test_duplicate_active_request_is_blocked(self):
+        create_request(
+            student=self.student,
+            mentor=self.mentor_profile,
+            subject='First request',
+            message='First message',
+        )
+
+        with self.assertRaisesMessage(ValidationError, 'active request'):
+            create_request(
+                student=self.student,
+                mentor=self.mentor_profile,
+                subject='Second request',
+                message='Second message',
+            )
+
+
+class DashboardMentorshipWorkflowTest(TestCase):
+    """Ensure dashboard actions use the same mentorship lifecycle rules."""
+
+    def setUp(self):
+        self.client = Client()
+        self.student = User.objects.create_user(
+            username='student_dash',
+            email='student_dash@example.com',
+            password='testpass123',
+            role='student',
+            is_approved=True,
+        )
+        self.mentor_user = User.objects.create_user(
+            username='mentor_dash',
+            email='mentor_dash@example.com',
+            password='testpass123',
+            role='mentor',
+            is_approved=True,
+        )
+        self.mentor_profile = MentorProfile.objects.create(
+            user=self.mentor_user,
+            specialization='Law',
+            years_experience=4,
+            bio='Mentor bio',
+            is_approved=True,
+        )
+        self.request = MentorshipRequest.objects.create(
+            student=self.student,
+            mentor=self.mentor_profile,
+            subject='Dashboard test',
+            message='Please help',
+        )
+
+    def test_dashboard_accept_and_complete_actions_update_request(self):
+        self.client.login(username='mentor_dash', password='testpass123')
+        accept_url = reverse(
+            'dashboard:mentorship_accept_request',
+            kwargs={'request_id': self.request.pk},
+        )
+        complete_url = reverse(
+            'dashboard:mentorship_complete_request',
+            kwargs={'request_id': self.request.pk},
+        )
+
+        accept_response = self.client.post(accept_url)
+        self.assertEqual(accept_response.status_code, 302)
+        self.request.refresh_from_db()
+        self.assertEqual(self.request.status, 'accepted')
+
+        complete_response = self.client.post(complete_url)
+        self.assertEqual(complete_response.status_code, 302)
+        self.request.refresh_from_db()
+        self.assertEqual(self.request.status, 'completed')
 

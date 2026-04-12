@@ -25,8 +25,10 @@ class CollaboratorAdmin(BaseAdmin):
     ]
     list_filter = ["category", "is_featured", "is_active"]
     search_fields = ["name", "description", "website_url"]
+    search_help_text = _("Search by collaborator name or website.")
     list_editable = ["is_featured", "is_active", "display_order"]
     readonly_fields = ["logo_preview_large", "created_at", "updated_at"]
+    list_per_page = 20
 
     fieldsets = (
         (_("Collaborator Details"), {
@@ -87,6 +89,7 @@ class AssociationSettingsAdmin(BaseAdmin):
         }),
     )
     readonly_fields = ["updated_at"]
+    list_per_page = 1
 
     def has_add_permission(self, request):
         return not AssociationSettings.objects.exists()

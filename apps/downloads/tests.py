@@ -92,11 +92,20 @@ class DownloadsViewsTest(TestCase):
         url = reverse('downloads:index')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-    
+        self.assertIn('popular_documents', response.context)
+        self.assertIn('recent_documents', response.context)
+        self.assertIn('sort_by', response.context)
+
     def test_document_download_view(self):
         """Test document download view."""
         url = reverse('downloads:document_download', kwargs={'pk': self.document.pk})
         response = self.client.get(url)
         # May redirect or return file, both are valid
         self.assertIn(response.status_code, [200, 302, 404])
+
+    def test_popular_and_recent_pages_render(self):
+        popular_response = self.client.get(reverse('downloads:popular'))
+        recent_response = self.client.get(reverse('downloads:recent'))
+        self.assertEqual(popular_response.status_code, 200)
+        self.assertEqual(recent_response.status_code, 200)
 

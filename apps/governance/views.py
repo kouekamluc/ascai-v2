@@ -44,6 +44,7 @@ from .utils import (
     check_general_report_requirement, check_assembly_frequency_compliance,
     calculate_dues_totals, calculate_dues_summary
 )
+from .services import can_publish_communication, user_has_governance_access
 from .forms import (
     MemberForm, MemberSelfRegistrationForm, GeneralAssemblyForm, AgendaItemForm, AssemblyAttendanceForm,
     AssemblyVoteForm, FinancialTransactionForm, MembershipDuesForm, ContributionForm,
@@ -1146,7 +1147,7 @@ def approve_expense(request, pk):
     transaction = get_object_or_404(FinancialTransaction, pk=pk)
     
     # Check if user has permission
-    if not (request.user.has_perm('governance.approve_expense') or request.user.is_staff):
+    if not user_has_governance_access(request.user, 'governance.approve_expense'):
         messages.error(request, _('You do not have permission to approve expenses.'))
         return redirect('governance:expense_approval', pk=pk)
     
@@ -1405,14 +1406,14 @@ class ElectionDetailView(LoginRequiredMixin, DetailView):
         context['candidacies'] = election.candidacies.all().select_related('candidate').order_by('position')
         
         # Only show votes to admins or if election is completed
-        if self.request.user.is_staff or self.request.user.has_perm('governance.manage_elections') or election.status == 'completed':
+        if user_has_governance_access(self.request.user, 'governance.manage_elections') or election.status == 'completed':
             context['votes'] = election.votes.all().select_related('voter', 'candidate')
         else:
             context['votes'] = ElectionVote.objects.none()  # Empty queryset for regular members
         
         # Calculate results - only show if election is completed or user is admin
         # For regular members, only show results after election completion
-        if election.status == 'completed' or self.request.user.is_staff or self.request.user.has_perm('governance.manage_elections'):
+        if election.status == 'completed' or user_has_governance_access(self.request.user, 'governance.manage_elections'):
             context['results'] = calculate_election_results(election)
             context['show_results'] = True
         else:
@@ -2084,6 +2085,13 @@ def approve_communication(request, communication_id):
 def publish_communication(request, communication_id):
     """Publish communication (Communication Manager)."""
     communication = get_object_or_404(Communication, pk=communication_id)
+
+    if not can_publish_communication(request.user):
+        messages.error(
+            request,
+            _('Only the communication team, executive leadership, or staff can publish communications.'),
+        )
+        return redirect('governance:communication_detail', pk=communication_id)
     
     # Check if requires approval and is approved
     if communication.requires_president_approval and not communication.president_approved:
@@ -2293,7 +2301,7 @@ def update_assembly_status(request, assembly_id):
     """Update assembly status."""
     assembly = get_object_or_404(GeneralAssembly, pk=assembly_id)
     
-    if not request.user.has_perm('governance.manage_assembly'):
+    if not user_has_governance_access(request.user, 'governance.manage_assembly'):
         messages.error(request, _('You do not have permission to update assembly status.'))
         return redirect('governance:assembly_detail', pk=assembly_id)
     
@@ -2313,7 +2321,7 @@ def update_election_status(request, election_id):
     """Update election status."""
     election = get_object_or_404(Election, pk=election_id)
     
-    if not request.user.has_perm('governance.manage_elections'):
+    if not user_has_governance_access(request.user, 'governance.manage_elections'):
         messages.error(request, _('You do not have permission to update election status.'))
         return redirect('governance:election_detail', pk=election_id)
     
@@ -2333,7 +2341,7 @@ def update_case_status(request, case_id):
     """Update disciplinary case status."""
     case = get_object_or_404(DisciplinaryCase, pk=case_id)
     
-    if not request.user.has_perm('governance.apply_sanctions'):
+    if not user_has_governance_access(request.user, 'governance.apply_sanctions'):
         messages.error(request, _('You do not have permission to update case status.'))
         return redirect('governance:disciplinary_case_detail', pk=case_id)
     
@@ -2421,7 +2429,7 @@ def publish_vote_results(request, vote_id):
     """Publish vote results within 30 days (Article 24)."""
     vote = get_object_or_404(AssemblyVote, pk=vote_id)
     
-    if not request.user.has_perm('governance.manage_assembly'):
+    if not user_has_governance_access(request.user, 'governance.manage_assembly'):
         messages.error(request, _('You do not have permission to publish vote results.'))
         return redirect('governance:assembly_detail', pk=vote.assembly.pk)
     

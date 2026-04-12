@@ -6,15 +6,13 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, T
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import JsonResponse
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from django.utils import timezone
-import json
-import os
-from pathlib import Path
 from .models import (
     MentorSpecialization, MentorProfile, MentorshipRequest,
     MentorshipMessage, MentorRating, MentorshipSession
@@ -23,29 +21,15 @@ from .forms import (
     MentorProfileForm, MentorProfileUpdateForm, MentorshipRequestForm, 
     MentorshipMessageForm, MentorRatingForm, MentorshipSessionForm
 )
-
-# Debug logging helper
-LOG_PATH = Path(__file__).resolve().parent.parent.parent / '.cursor' / 'debug.log'
-def _debug_log(location, message, data, hypothesis_id='A'):
-    try:
-        # Ensure directory exists
-        LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        log_entry = {
-            'location': location,
-            'message': message,
-            'data': data,
-            'timestamp': int(timezone.now().timestamp() * 1000),
-            'sessionId': 'debug-session',
-            'runId': 'run1',
-            'hypothesisId': hypothesis_id
-        }
-        with open(LOG_PATH, 'a', encoding='utf-8') as f:
-            f.write(json.dumps(log_entry) + '\n')
-    except Exception as e:
-        # Log to Django logger as fallback
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Debug log failed: {e}")
+from .services import (
+    accept_request as accept_mentorship_request,
+    complete_request as complete_mentorship_request,
+    create_request as create_mentorship_request,
+    get_request_queryset_for_user,
+    reject_request as reject_mentorship_request,
+    send_message as send_mentorship_message,
+    update_availability as update_mentor_availability,
+)
 
 
 class MentorListView(ListView):
@@ -192,28 +176,20 @@ class MentorshipRequestCreateView(LoginRequiredMixin, CreateView):
             id=self.kwargs['mentor_id'],
             is_approved=True  # Only allow requests to approved mentors
         )
-        
-        # Prevent students from requesting their own mentor profile (if they're a mentor)
-        if hasattr(self.request.user, 'mentor_profile') and self.request.user.mentor_profile == mentor:
-            messages.error(self.request, _('You cannot request mentorship from yourself.'))
+
+        try:
+            self.object = create_mentorship_request(
+                student=self.request.user,
+                mentor=mentor,
+                subject=form.cleaned_data["subject"],
+                message=form.cleaned_data["message"],
+            )
+        except (PermissionDenied, ValidationError) as exc:
+            messages.error(self.request, exc.messages[0] if hasattr(exc, "messages") else str(exc))
             return redirect('mentorship:mentor_detail', pk=mentor.pk)
-        
-        # Prevent duplicate requests
-        existing_request = MentorshipRequest.objects.filter(
-            student=self.request.user,
-            mentor=mentor,
-            status__in=['pending', 'accepted']
-        ).first()
-        
-        if existing_request:
-            messages.error(self.request, _('You already have an active request with this mentor.'))
-            return redirect('mentorship:mentor_detail', pk=mentor.pk)
-        
-        form.instance.student = self.request.user
-        form.instance.mentor = mentor
-        response = super().form_valid(form)
+
         messages.success(self.request, _('Mentorship request sent successfully!'))
-        return response
+        return redirect(self.get_success_url())
     
     def get_success_url(self):
         return reverse_lazy('mentorship:student_dashboard')
@@ -254,51 +230,11 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'request'
     
     def get_queryset(self):
-        user = self.request.user
-        # #region agent log
-        _debug_log('apps/mentorship/views.py:195', 'RequestDetailView.get_queryset entry', {
-            'user_id': getattr(user, 'id', None),
-            'user_is_authenticated': user.is_authenticated
-        }, 'C')
-        # #endregion
-        try:
-            queryset = MentorshipRequest.objects.filter(
-                Q(student=user) | Q(mentor__user=user)
-            ).select_related('mentor', 'mentor__user', 'student')
-            # #region agent log
-            _debug_log('apps/mentorship/views.py:200', 'RequestDetailView.get_queryset success', {
-                'queryset_count': queryset.count()
-            }, 'C')
-            # #endregion
-            return queryset
-        except Exception as e:
-            # #region agent log
-            _debug_log('apps/mentorship/views.py:203', 'RequestDetailView.get_queryset error', {
-                'error': str(e),
-                'error_type': type(e).__name__
-            }, 'C')
-            # #endregion
-            # Fallback: only filter by student if mentor query fails
-            return MentorshipRequest.objects.filter(student=user).select_related('mentor', 'mentor__user', 'student')
+        return get_request_queryset_for_user(self.request.user)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        
-        # #region agent log
-        _debug_log('apps/mentorship/views.py:175', 'RequestDetailView.get_context_data entry', {
-            'request_id': getattr(self.object, 'id', None),
-            'user_id': getattr(self.request.user, 'id', None)
-        }, 'A')
-        # #endregion
-        
-        # #region agent log
-        _debug_log('apps/mentorship/views.py:178', 'Before accessing mentor', {
-            'has_object': hasattr(self, 'object'),
-            'has_mentor': hasattr(self.object, 'mentor') if hasattr(self, 'object') else False,
-            'mentor_id': getattr(self.object.mentor, 'id', None) if hasattr(self, 'object') and hasattr(self.object, 'mentor') else None
-        }, 'A')
-        # #endregion
         
         # Mark messages as read when viewing
         unread_messages = self.object.messages.exclude(sender=user).filter(is_read=False)
@@ -310,7 +246,7 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
         # Safely check for rating form
         try:
             can_rate = (
-                self.object.status == 'accepted' and 
+                self.object.status == 'completed' and 
                 not self.object.has_rating() and 
                 self.object.student == user
             )
@@ -321,32 +257,10 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
         context['can_complete'] = self.object.can_be_completed()
         context['is_student'] = self.object.student == user
         
-        # #region agent log
-        _debug_log('apps/mentorship/views.py:199', 'Before accessing mentor.user', {
-            'has_mentor': hasattr(self.object, 'mentor'),
-            'mentor_is_none': self.object.mentor is None if hasattr(self.object, 'mentor') else 'N/A',
-            'has_user': hasattr(self.object.mentor, 'user') if hasattr(self.object, 'mentor') and self.object.mentor is not None else False
-        }, 'A')
-        # #endregion
-        
-        # Fix: Check if mentor exists before accessing mentor.user
         try:
             context['is_mentor'] = self.object.mentor and self.object.mentor.user == user
-        except (AttributeError, TypeError) as e:
-            # #region agent log
-            _debug_log('apps/mentorship/views.py:201', 'Error accessing mentor.user', {
-                'error': str(e),
-                'error_type': type(e).__name__
-            }, 'A')
-            # #endregion
+        except (AttributeError, TypeError):
             context['is_mentor'] = False
-        
-        # #region agent log
-        _debug_log('apps/mentorship/views.py:204', 'RequestDetailView.get_context_data exit', {
-            'is_mentor': context.get('is_mentor', None),
-            'is_student': context.get('is_student', None)
-        }, 'A')
-        # #endregion
         return context
     
     def post(self, request, *args, **kwargs):
@@ -359,10 +273,17 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
         
         form = MentorshipMessageForm(request.POST)
         if form.is_valid():
-            message = form.save(commit=False)
-            message.request = self.object
-            message.sender = request.user
-            message.save()
+            try:
+                message = send_mentorship_message(
+                    mentorship_request=self.object,
+                    sender=request.user,
+                    content=form.cleaned_data["content"],
+                )
+            except (PermissionDenied, ValidationError) as exc:
+                return JsonResponse(
+                    {"error": exc.messages[0] if hasattr(exc, "messages") else str(exc)},
+                    status=400,
+                )
             
             # Return message item for HTMX
             if request.headers.get('HX-Request'):
@@ -379,16 +300,16 @@ class RequestDetailView(LoginRequiredMixin, DetailView):
 @require_http_methods(["POST"])
 def accept_request(request, request_id):
     """Accept mentorship request (HTMX endpoint)."""
-    mentorship_request = get_object_or_404(
-        MentorshipRequest,
-        id=request_id,
-        mentor__user=request.user,
-        status='pending'
-    )
-    from django.utils import timezone
-    mentorship_request.status = 'accepted'
-    mentorship_request.responded_at = timezone.now()
-    mentorship_request.save()
+    mentorship_request = get_object_or_404(MentorshipRequest, id=request_id)
+    try:
+        mentorship_request = accept_mentorship_request(
+            mentorship_request=mentorship_request,
+            actor=request.user,
+        ).request
+    except PermissionDenied as exc:
+        return JsonResponse({'error': str(exc)}, status=403)
+    except ValidationError as exc:
+        return JsonResponse({'error': exc.messages[0]}, status=400)
     
     # Return HTMX-compatible HTML fragment
     if request.headers.get('HX-Request'):
@@ -402,16 +323,16 @@ def accept_request(request, request_id):
 @require_http_methods(["POST"])
 def reject_request(request, request_id):
     """Reject mentorship request (HTMX endpoint)."""
-    mentorship_request = get_object_or_404(
-        MentorshipRequest,
-        id=request_id,
-        mentor__user=request.user,
-        status='pending'
-    )
-    from django.utils import timezone
-    mentorship_request.status = 'rejected'
-    mentorship_request.responded_at = timezone.now()
-    mentorship_request.save()
+    mentorship_request = get_object_or_404(MentorshipRequest, id=request_id)
+    try:
+        mentorship_request = reject_mentorship_request(
+            mentorship_request=mentorship_request,
+            actor=request.user,
+        ).request
+    except PermissionDenied as exc:
+        return JsonResponse({'error': str(exc)}, status=403)
+    except ValidationError as exc:
+        return JsonResponse({'error': exc.messages[0]}, status=400)
     
     # Return HTMX-compatible HTML fragment
     if request.headers.get('HX-Request'):
@@ -430,13 +351,6 @@ def get_messages(request, request_id):
         id=request_id
     )
     
-    # Verify user has access
-    # #region agent log
-    _debug_log('apps/mentorship/views.py:345', 'Before accessing mentor.user in get_messages', {
-        'has_mentor': hasattr(mentorship_request, 'mentor'),
-        'mentor_is_none': mentorship_request.mentor is None if hasattr(mentorship_request, 'mentor') else 'N/A'
-    }, 'B')
-    # #endregion
     if mentorship_request.student != request.user and (not mentorship_request.mentor or mentorship_request.mentor.user != request.user):
         return JsonResponse({'error': _('Access denied.')}, status=403)
     
@@ -470,31 +384,16 @@ class MentorProfileUpdateView(LoginRequiredMixin, UpdateView):
 @require_http_methods(["POST"])
 def complete_request(request, request_id):
     """Mark mentorship request as completed (HTMX endpoint)."""
-    mentorship_request = get_object_or_404(
-        MentorshipRequest,
-        id=request_id
-    )
-    
-    # Only student or mentor can complete
-    # #region agent log
-    _debug_log('apps/mentorship/views.py:384', 'Before accessing mentor.user in complete_request', {
-        'has_mentor': hasattr(mentorship_request, 'mentor'),
-        'mentor_is_none': mentorship_request.mentor is None if hasattr(mentorship_request, 'mentor') else 'N/A'
-    }, 'B')
-    # #endregion
-    if mentorship_request.student != request.user and (not mentorship_request.mentor or mentorship_request.mentor.user != request.user):
-        return JsonResponse({'error': _('Access denied.')}, status=403)
-    
-    if not mentorship_request.can_be_completed():
-        return JsonResponse({'error': _('Only accepted requests can be completed.')}, status=400)
-    
-    mentorship_request.status = 'completed'
-    mentorship_request.responded_at = timezone.now()
-    mentorship_request.save()
-    
-    # Increment students helped if mentor completed it
-    if mentorship_request.mentor and mentorship_request.mentor.user == request.user:
-        mentorship_request.mentor.increment_students_helped()
+    mentorship_request = get_object_or_404(MentorshipRequest, id=request_id)
+    try:
+        mentorship_request = complete_mentorship_request(
+            mentorship_request=mentorship_request,
+            actor=request.user,
+        ).request
+    except PermissionDenied as exc:
+        return JsonResponse({'error': str(exc)}, status=403)
+    except ValidationError as exc:
+        return JsonResponse({'error': exc.messages[0]}, status=400)
     
     messages.success(request, _('Mentorship request marked as completed.'))
     
@@ -508,17 +407,18 @@ def complete_request(request, request_id):
 @require_http_methods(["POST"])
 def update_availability(request):
     """Update mentor availability status (HTMX endpoint)."""
-    mentor_profile = get_object_or_404(
-        MentorProfile,
-        user=request.user
-    )
-    
-    new_status = request.POST.get('availability_status')
-    if new_status not in dict(MentorProfile.AVAILABILITY_CHOICES).keys():
-        return JsonResponse({'error': _('Invalid availability status.')}, status=400)
-    
-    mentor_profile.availability_status = new_status
-    mentor_profile.save()
+    mentor_profile = get_object_or_404(MentorProfile, user=request.user)
+
+    try:
+        update_mentor_availability(
+            mentor_profile=mentor_profile,
+            actor=request.user,
+            new_status=request.POST.get('availability_status'),
+        )
+    except PermissionDenied as exc:
+        return JsonResponse({'error': str(exc)}, status=403)
+    except ValidationError as exc:
+        return JsonResponse({'error': exc.messages[0]}, status=400)
     
     return JsonResponse({'status': 'updated', 'availability_status': new_status})
 
@@ -632,4 +532,3 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
         context['is_mentor'] = (self.object.request.mentor and 
                                 self.object.request.mentor.user == self.request.user)
         return context
-

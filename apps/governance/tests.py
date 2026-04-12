@@ -5,7 +5,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from .models import (
     Member,
@@ -15,7 +15,9 @@ from .models import (
     BoardOfAuditors,
     AuditorMember,
     AssociationEvent,
+    MembershipDues,
 )
+from .services import user_has_governance_access
 
 User = get_user_model()
 
@@ -290,4 +292,76 @@ class GovernanceRuntimeRegressionTest(TestCase):
         memberships = AuditorMember.objects.filter(board=board, user=self.user)
         self.assertEqual(memberships.count(), 1)
         self.assertTrue(memberships.first().is_former_president)
+
+
+class GovernanceWorkflowServiceTest(TestCase):
+    """Workflow-oriented governance coverage."""
+
+    def setUp(self):
+        self.president = User.objects.create_user(
+            username='president_user',
+            email='president@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        self.member_user = User.objects.create_user(
+            username='member_user',
+            email='member@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        self.member = Member.objects.create(
+            user=self.member_user,
+            member_type='student',
+            is_active_member=False,
+        )
+        self.board = ExecutiveBoard.objects.create(
+            term_start_date=date.today(),
+            term_end_date=date.today() + timedelta(days=730),
+            status='active',
+        )
+        ExecutivePosition.objects.create(
+            board=self.board,
+            user=self.president,
+            position='president',
+            start_date=date.today(),
+            status='active',
+        )
+
+    def test_paid_dues_activate_member_and_create_status_history(self):
+        dues = MembershipDues.objects.create(
+            member=self.member,
+            year=date.today().year,
+            amount=Decimal('10.00'),
+            due_date=date(date.today().year, 3, 31),
+            payment_date=date.today(),
+            payment_method='cash',
+            status='paid',
+        )
+
+        self.member.refresh_from_db()
+        dues.refresh_from_db()
+        self.assertTrue(self.member.is_active_member)
+        self.assertEqual(dues.valid_from, date(date.today().year, 1, 1))
+        self.assertEqual(dues.valid_until, date(date.today().year, 12, 31))
+        self.assertTrue(
+            MembershipStatus.objects.filter(
+                member=self.member,
+                status='active',
+                reason__icontains='Dues paid',
+            ).exists()
+        )
+
+    def test_active_president_gets_governance_access_without_manual_permission(self):
+        self.assertTrue(
+            user_has_governance_access(self.president, 'governance.manage_assembly')
+        )
+        self.assertTrue(
+            user_has_governance_access(self.president, 'governance.approve_expense')
+        )
+
+    def test_non_executive_member_does_not_get_expense_approval_access(self):
+        self.assertFalse(
+            user_has_governance_access(self.member_user, 'governance.approve_expense')
+        )
 

@@ -29,7 +29,10 @@ class MemberAdmin(BaseAdmin):
     list_filter = ['member_type', 'is_active_member', 'lazio_residence_verified', 
                    'cameroonian_origin_verified', 'registration_date']
     search_fields = ['user__username', 'user__email', 'user__full_name']
+    search_help_text = _('Search members by username, email, or full name.')
     readonly_fields = ['registration_date', 'created_at', 'updated_at']
+    autocomplete_fields = ['user']
+    list_per_page = 25
     fieldsets = (
         (_('Member Information'), {
             'fields': ('user', 'member_type', 'is_active_member')
@@ -55,6 +58,8 @@ class MembershipStatusAdmin(ModelAdmin):
     list_display = ['member', 'status', 'effective_date', 'last_payment_date']
     list_filter = ['status', 'effective_date']
     search_fields = ['member__user__username', 'member__user__email']
+    autocomplete_fields = ['member']
+    list_per_page = 25
     readonly_fields = ['created_at']
     date_hierarchy = 'effective_date'
 
@@ -78,6 +83,7 @@ class ExecutiveBoardAdmin(BaseAdmin):
     readonly_fields = ['created_at', 'updated_at']
     inlines = [ExecutivePositionInline]
     date_hierarchy = 'term_start_date'
+    list_per_page = 20
 
 
 @admin.register(ExecutivePosition)
@@ -86,8 +92,10 @@ class ExecutivePositionAdmin(ModelAdmin):
     list_display = ['board', 'position_label', 'user', 'start_date', 'status']
     list_filter = ['status', 'board']
     search_fields = ['position', 'user__username', 'user__email', 'user__full_name']
+    search_help_text = _('Search by role title or board member name.')
     readonly_fields = ['created_at', 'updated_at']
     autocomplete_fields = ['board', 'user']
+    list_per_page = 25
 
     def position_label(self, obj):
         return obj.get_position_display()
@@ -121,6 +129,7 @@ class GeneralAssemblyAdmin(BaseAdmin):
     readonly_fields = ['created_at', 'updated_at']
     inlines = [AgendaItemInline]
     date_hierarchy = 'date'
+    list_per_page = 20
     fieldsets = (
         (_('Assembly Information'), {
             'fields': ('assembly_type', 'date', 'location', 'convocation_date', 'status')
@@ -193,6 +202,8 @@ class MembershipDuesAdmin(ModelAdmin):
     search_fields = ['member__user__username', 'member__user__email']
     date_hierarchy = 'due_date'
     readonly_fields = ['valid_from', 'valid_until']
+    autocomplete_fields = ['member']
+    list_per_page = 30
 
 
 @admin.register(Contribution)
@@ -211,6 +222,8 @@ class FinancialReportAdmin(BaseAdmin):
     search_fields = ['report_content']
     readonly_fields = ['created_at', 'updated_at']
     date_hierarchy = 'period_end'
+    autocomplete_fields = ['generated_by', 'verified_by']
+    list_per_page = 20
 
 
 @admin.register(ExpenseApproval)
@@ -245,6 +258,8 @@ class CommissionMemberAdmin(ModelAdmin):
     list_display = ['commission', 'user', 'role']
     list_filter = ['role', 'commission']
     search_fields = ['user__username', 'user__email']
+    autocomplete_fields = ['commission', 'user']
+    list_per_page = 25
 
 
 @admin.register(Election)
@@ -264,6 +279,8 @@ class CandidacyAdmin(BaseAdmin):
                    'lazio_residence_verified', 'cameroonian_origin_verified']
     search_fields = ['candidate__username', 'candidate__email', 'eligibility_notes']
     readonly_fields = ['created_at', 'updated_at']
+    autocomplete_fields = ['candidate', 'election']
+    list_per_page = 25
 
 
 @admin.register(ElectionVote)
@@ -300,6 +317,8 @@ class AuditorMemberAdmin(ModelAdmin):
     list_display = ['board', 'user', 'is_president', 'is_founding_member', 'is_former_president']
     list_filter = ['is_president', 'is_founding_member', 'is_former_president', 'board']
     search_fields = ['user__username', 'user__email']
+    autocomplete_fields = ['board', 'user']
+    list_per_page = 25
 
 
 @admin.register(AuditReport)
@@ -330,6 +349,8 @@ class DisciplinaryCaseAdmin(BaseAdmin):
     readonly_fields = ['created_at', 'updated_at']
     inlines = [DisciplinarySanctionInline]
     date_hierarchy = 'reported_date'
+    autocomplete_fields = ['member', 'reported_by']
+    list_per_page = 25
 
 
 @admin.register(DisciplinarySanction)
@@ -379,6 +400,7 @@ class AssociationDocumentAdmin(BaseAdmin):
     search_fields = ['title', 'description']
     readonly_fields = ['created_at', 'updated_at']
     date_hierarchy = 'publication_date'
+    list_per_page = 20
 
 
 @admin.register(Communication)
@@ -390,4 +412,6 @@ class CommunicationAdmin(BaseAdmin):
     search_fields = ['title', 'content']
     readonly_fields = ['created_at', 'updated_at']
     date_hierarchy = 'publication_date'
+    autocomplete_fields = ['published_by', 'president_approved_by']
+    list_per_page = 20
 

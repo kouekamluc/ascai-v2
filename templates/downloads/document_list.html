@@ -32,7 +32,7 @@
                 <option value="guidelines" {% if filter_category == 'guidelines' %}selected{% endif %}>{% trans 'ASCAI Guidelines' %}</option>
             </select>
             <input type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search documents' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
-            <input type="text" name="tags" value="{{ tags_query|default:request.GET.tags }}" placeholder="{% trans 'Tags' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            <input type="text" name="tags" value="{{ tags_query }}" placeholder="{% trans 'Tags' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
             <select name="sort" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
                 <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>{% trans 'Most Recent' %}</option>
                 <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>{% trans 'Most Popular' %}</option>

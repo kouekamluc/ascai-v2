@@ -140,8 +140,33 @@ class AccountsViewsTest(TestCase):
             is_approved=True
         )
     
-    # Note: Register and login views are handled by allauth
-    # These tests would need to test allauth URLs which are configured differently
+    def test_signup_flow_creates_approved_user(self):
+        """The public signup flow should create an immediately approved user."""
+        response = self.client.post(
+            reverse('account_signup'),
+            {
+                'username': 'newmember',
+                'email': 'newmember@example.com',
+                'password1': 'testpass12345',
+                'password2': 'testpass12345',
+                'phone': '+390000000',
+                'role': 'student',
+                'language_preference': 'en',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        created_user = User.objects.get(username='newmember')
+        self.assertTrue(created_user.is_approved)
+        self.assertTrue(created_user.is_active)
+
+    def test_login_flow_redirects_approved_user_to_dashboard(self):
+        """Approved users should enter through the dashboard route."""
+        response = self.client.post(
+            reverse('account_login'),
+            {'login': 'testuser', 'password': 'testpass123'},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/dashboard/', response.url)
     
     def test_profile_view_requires_login(self):
         """Test that profile view requires login."""
@@ -165,4 +190,7 @@ class AccountsURLsTest(TestCase):
         """Test profile URL resolves."""
         url = reverse('accounts:profile')
         self.assertEqual(url, '/accounts/profile/')
+
+    def test_allauth_login_url_resolves(self):
+        self.assertEqual(reverse('account_login'), '/accounts/login/')
 

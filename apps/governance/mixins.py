@@ -6,6 +6,8 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 
+from .services import user_has_governance_access
+
 
 class GovernanceRequiredMixin(LoginRequiredMixin):
     """
@@ -33,6 +35,9 @@ class ExecutiveBoardRequiredMixin(GovernanceRequiredMixin, PermissionRequiredMix
     permission_required = 'governance.manage_executive_board'
     raise_exception = True
 
+    def has_permission(self):
+        return user_has_governance_access(self.request.user, self.permission_required)
+
 
 class AssemblyManagementRequiredMixin(GovernanceRequiredMixin, PermissionRequiredMixin):
     """
@@ -40,6 +45,9 @@ class AssemblyManagementRequiredMixin(GovernanceRequiredMixin, PermissionRequire
     """
     permission_required = 'governance.manage_assembly'
     raise_exception = True
+
+    def has_permission(self):
+        return user_has_governance_access(self.request.user, self.permission_required)
 
 
 class FinancialManagementRequiredMixin(GovernanceRequiredMixin, PermissionRequiredMixin):
@@ -49,6 +57,9 @@ class FinancialManagementRequiredMixin(GovernanceRequiredMixin, PermissionRequir
     permission_required = 'governance.manage_finances'
     raise_exception = True
 
+    def has_permission(self):
+        return user_has_governance_access(self.request.user, self.permission_required)
+
 
 class ExpenseApprovalRequiredMixin(GovernanceRequiredMixin, PermissionRequiredMixin):
     """
@@ -56,6 +67,9 @@ class ExpenseApprovalRequiredMixin(GovernanceRequiredMixin, PermissionRequiredMi
     """
     permission_required = 'governance.approve_expense'
     raise_exception = True
+
+    def has_permission(self):
+        return user_has_governance_access(self.request.user, self.permission_required)
 
 
 

@@ -26,6 +26,8 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     list_display = ['username', 'email', 'full_name', 'role', 'is_approved', 'email_verified', 'is_active', 'date_joined']
     list_filter = ['role', 'is_approved', 'email_verified', 'is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'full_name']
+    search_help_text = _('Search by username, email, or full name.')
+    list_per_page = 25
     
     fieldsets = BaseUserAdmin.fieldsets + (
         (_('ASCAI Lazio Information'), {
@@ -300,6 +302,8 @@ class UserDocumentAdmin(ModelAdmin):
     list_filter = ['document_type', 'is_verified', 'uploaded_at']
     search_fields = ['user__username', 'user__email']
     readonly_fields = ['user', 'uploaded_at']
+    autocomplete_fields = ['user']
+    list_per_page = 25
     fieldsets = (
         (_('Document Information'), {
             'fields': ('user', 'document_type', 'file', 'is_verified', 'notes')
@@ -321,4 +325,3 @@ class UserDocumentAdmin(ModelAdmin):
         updated = queryset.update(is_verified=False)
         self.message_user(request, _('{} documents unverified.').format(updated))
     unverify_documents.short_description = _('Unverify selected documents')
-

@@ -34,7 +34,7 @@
                 {{ form.sanction_type }}
                 {% if form.sanction_type.errors %}<p class="mt-1 text-sm text-red-600">{{ form.sanction_type.errors.0 }}</p>{% endif %}
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                     <label for="{{ form.applied_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
                         {{ form.applied_date.label }} *

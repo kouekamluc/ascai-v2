@@ -10,6 +10,7 @@ from .models import (
     GeneralAssembly, MembershipDues, FinancialTransaction, ExpenseApproval,
     BoardOfAuditors, AuditorMember
 )
+from .services import sync_membership_state_from_dues
 
 
 @receiver(post_save, sender=Member)
@@ -63,45 +64,7 @@ def update_membership_status_on_payment(sender, instance, **kwargs):
     Automatically set validity period from January to December when 10 EUR is paid.
     """
     if instance.status == 'paid' and instance.payment_date:
-        # Update last payment date in membership status
-        latest_status = instance.member.status_history.first()
-        if latest_status:
-            latest_status.last_payment_date = instance.payment_date
-            latest_status.save(update_fields=['last_payment_date'])
-        
-        # Automatically set validity period for 10 EUR payments (members)
-        # Valid from January 1st to December 31st of the year
-        # Always set these values to ensure data consistency and prevent tampering
-        if float(instance.amount) == 10.0:
-            from datetime import date
-            year = instance.year
-            valid_from = date(year, 1, 1)  # January 1st
-            valid_until = date(year, 12, 31)  # December 31st
-            
-            # Always update validity dates to ensure they match the year
-            # This prevents any tampered values from persisting
-            needs_update = False
-            if instance.valid_from != valid_from:
-                instance.valid_from = valid_from
-                needs_update = True
-            if instance.valid_until != valid_until:
-                instance.valid_until = valid_until
-                needs_update = True
-            
-            if needs_update:
-                instance.save(update_fields=['valid_from', 'valid_until'])
-            
-            # Update member's membership dates
-            if not instance.member.membership_start_date or instance.member.membership_start_date > valid_from:
-                instance.member.membership_start_date = valid_from
-            if not instance.member.membership_end_date or instance.member.membership_end_date < valid_until:
-                instance.member.membership_end_date = valid_until
-            instance.member.save(update_fields=['membership_start_date', 'membership_end_date'])
-        
-        # Mark member as active if they pay dues
-        if not instance.member.is_active_member:
-            instance.member.is_active_member = True
-            instance.member.save(update_fields=['is_active_member'])
+        sync_membership_state_from_dues(instance)
 
 
 @receiver(post_save, sender=MembershipDues)
@@ -110,39 +73,7 @@ def check_membership_expiration(sender, instance, **kwargs):
     Check if membership should expire (3 months after due date without payment).
     Also check if membership validity period has ended (valid_until date passed).
     """
-    today = timezone.now().date()
-    
-    # Check if validity period has ended (for 10 EUR payments)
-    if instance.status == 'paid' and instance.valid_until and today > instance.valid_until:
-        # Membership validity has expired
-        if instance.member.is_active_member:
-            instance.member.is_active_member = False
-            instance.member.save(update_fields=['is_active_member'])
-            
-            # Create status change
-            MembershipStatus.objects.create(
-                member=instance.member,
-                status='inactive',
-                effective_date=instance.valid_until,
-                reason=f'Membership validity expired on {instance.valid_until}'
-            )
-    
-    # Check for non-payment (3 months after due date without payment)
-    if instance.status != 'paid' and instance.due_date:
-        three_months_later = instance.due_date + timedelta(days=90)
-        if today > three_months_later:
-            # Membership should be lost (Article 29)
-            if instance.member.is_active_member:
-                instance.member.is_active_member = False
-                instance.member.save(update_fields=['is_active_member'])
-                
-                # Create status change
-                MembershipStatus.objects.create(
-                    member=instance.member,
-                    status='inactive',
-                    effective_date=three_months_later,
-                    reason='Non-payment of annual dues (3 months after due date)'
-                )
+    sync_membership_state_from_dues(instance)
 
 
 @receiver(post_save, sender=FinancialTransaction)

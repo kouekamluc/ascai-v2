@@ -1,1050 +1,158 @@
 """
-Django Allauth adapters for custom user signup.
+Allauth adapters and forms for the account lifecycle.
 """
 from allauth.account.adapter import DefaultAccountAdapter
-from allauth.account.forms import SignupForm, LoginForm
+from allauth.account.forms import LoginForm, SignupForm
 from allauth.account.models import EmailAddress
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from allauth.core.exceptions import ImmediateHttpResponse
 from django import forms
-from django.core.exceptions import ValidationError
 from django.conf import settings
-from django.http import HttpResponseRedirect
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from .models import User
-import logging
 
-logger = logging.getLogger(__name__)
+from .models import User
 
 
 class CustomLoginForm(LoginForm):
-    """
-    Custom login form that checks user approval status.
-    """
-    
+    """Login form that enforces ASCAI approval rules."""
+
     def clean(self):
-        """
-        Validate login and check if user is approved.
-        """
         cleaned_data = super().clean()
-        login = cleaned_data.get('login')
-        password = cleaned_data.get('password')
-        
-        if login and password:
-            # Try to get user by username or email
+        login_value = cleaned_data.get("login")
+        password = cleaned_data.get("password")
+
+        if not login_value or not password:
+            return cleaned_data
+
+        try:
+            user = User.objects.get(username=login_value)
+        except User.DoesNotExist:
             try:
-                user = User.objects.get(username=login)
+                user = User.objects.get(email=login_value)
             except User.DoesNotExist:
-                try:
-                    user = User.objects.get(email=login)
-                except User.DoesNotExist:
-                    # Let parent form handle authentication error
-                    return cleaned_data
-            
-            # Superusers bypass all checks (is_active and is_approved)
-            if user.is_superuser:
                 return cleaned_data
-            
-            # Check if user is active (non-superusers only)
-            if not user.is_active:
-                raise ValidationError(
-                    _('Your account is inactive. Please contact an administrator.')
+
+        if user.is_superuser:
+            return cleaned_data
+
+        if not user.is_active:
+            raise ValidationError(
+                _("Your account is inactive. Please contact an administrator.")
+            )
+
+        if not user.is_approved:
+            raise ValidationError(
+                _(
+                    "Your account is pending admin approval. Please wait for approval before logging in."
                 )
-            
-            # Check if user is approved (non-superusers only)
-            if not user.is_approved:
-                raise ValidationError(
-                    _('Your account is pending admin approval. Please wait for approval before logging in.')
-                )
-        
+            )
+
         return cleaned_data
 
 
 class CustomSignupForm(SignupForm):
-    """
-    Custom signup form that includes additional fields.
-    """
+    """Signup form with the extra profile fields used on the site."""
+
     phone = forms.CharField(
         max_length=20,
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
-            'placeholder': _('Phone number (optional)')
-        }),
-        label=_('Phone Number')
+        widget=forms.TextInput(
+            attrs={
+                "class": "w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green",
+                "placeholder": _("Phone number (optional)"),
+            }
+        ),
+        label=_("Phone Number"),
     )
-    
     role = forms.ChoiceField(
-        choices=[
-            ('student', _('Student')),
-            ('mentor', _('Mentor')),
-        ],
-        widget=forms.Select(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
-        }),
-        initial='student',
-        label=_('I am a')
+        choices=[("student", _("Student")), ("mentor", _("Mentor"))],
+        initial="student",
+        widget=forms.Select(
+            attrs={
+                "class": "w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green",
+            }
+        ),
+        label=_("I am a"),
     )
-    
     language_preference = forms.ChoiceField(
         choices=User.LANGUAGE_CHOICES,
-        widget=forms.Select(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
-        }),
-        initial='en',
-        label=_('Language Preference')
+        initial="en",
+        widget=forms.Select(
+            attrs={
+                "class": "w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green",
+            }
+        ),
+        label=_("Language Preference"),
     )
-    
+
     def save(self, request):
-        """
-        Save the user with custom fields and set approval status.
-        """
         user = super().save(request)
-        
-        # Set custom fields
-        user.phone = self.cleaned_data.get('phone', '')
-        user.role = self.cleaned_data.get('role', 'student')
-        user.language_preference = self.cleaned_data.get('language_preference', 'en')
-        
-        # Set approval status - auto-approve new users so they can login immediately
+        user.phone = self.cleaned_data.get("phone", "")
+        user.role = self.cleaned_data.get("role", "student")
+        user.language_preference = self.cleaned_data.get("language_preference", "en")
         user.is_approved = True
-        user.is_active = True  # Active so they can login
-        
+        user.is_active = True
         user.save()
         return user
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
-    """
-    Custom account adapter to handle signup with custom fields.
-    """
-    
+    """Keeps the account flow centered on email/password and approval rules."""
+
     def get_login_form_class(self):
-        """
-        Return the custom login form class.
-        """
         return CustomLoginForm
-    
+
     def get_signup_form_class(self):
-        """
-        Return the custom signup form class.
-        """
         return CustomSignupForm
-    
+
     def save_user(self, request, user, form, commit=True):
-        """
-        Save the user with custom fields.
-        Note: We keep user active initially so email confirmation can be sent.
-        User will be set to inactive after email confirmation if needed.
-        """
-        is_new_user = not user.pk
         user = super().save_user(request, user, form, commit=False)
-        
-        # Set custom fields from form
-        if hasattr(form, 'cleaned_data'):
-            user.phone = form.cleaned_data.get('phone', '')
-            user.role = form.cleaned_data.get('role', 'student')
-            user.language_preference = form.cleaned_data.get('language_preference', 'en')
-        
-        # Set approval status - auto-approve new users so they can login immediately
+
+        if hasattr(form, "cleaned_data"):
+            user.phone = form.cleaned_data.get("phone", "")
+            user.role = form.cleaned_data.get("role", "student")
+            user.language_preference = form.cleaned_data.get(
+                "language_preference", "en"
+            )
+
         user.is_approved = True
-        # Keep user active initially so email confirmation can be sent
-        # The backend will check is_approved for login, not just is_active
-        # We'll handle inactive status after email confirmation if needed
-        user.is_active = True  # Keep active for email confirmation
-        
+        user.is_active = True
+
         if commit:
             user.save()
-            logger.info(
-                f"User {user.username} ({user.email}) created with is_approved=True, is_active=True "
-                f"(auto-approved for immediate login)"
-            )
-            
-            # NOTE: Do NOT create EmailAddress here - allauth's setup_user_email will handle it
-            # Creating it here causes AssertionError because allauth expects to create it itself
-            # We can clean up orphaned EmailAddress records, but don't create new ones
-            if is_new_user and user.email:
-                # Delete any orphaned EmailAddress records that don't belong to any user
-                # or belong to a different user with the same email
-                # This prevents issues with email verification for re-registered emails
+            if user.email:
                 EmailAddress.objects.filter(email=user.email).exclude(user=user).delete()
-        
+
         return user
-    
+
     def is_open_for_signup(self, request):
-        """
-        Allow signup by default.
-        """
         return True
-    
+
     def is_account_active(self, user):
-        """
-        Check if account is active. Superusers bypass this check.
-        This prevents redirect to /accounts/inactive/ for superusers.
-        """
-        # Superusers can always log in, even if is_active is False
         if user.is_superuser:
             return True
-        # For regular users, check is_active
         return user.is_active
-    
+
     def get_email_confirmation_url(self, request, emailconfirmation):
-        """
-        Returns the email confirmation URL using absolute URLs for production.
-        This ensures email links work correctly in production environments.
-        Always uses the Railway domain (ascai.up.railway.app) instead of ascai.org.
-        The URL is generated without language prefix since it's outside i18n_patterns.
-        """
-        # Generate the URL path (without language prefix since it's outside i18n_patterns)
         url = reverse("account_confirm_email", args=[emailconfirmation.key])
-        
-        # Log the generated URL path for debugging
-        logger.info(f"Generated email confirmation URL path: {url} for key: {emailconfirmation.key[:10]}...")
-        
-        # Priority 1: Use request.build_absolute_uri (works when request is available)
+
         if request:
-            absolute_url = request.build_absolute_uri(url)
-            logger.info(f"Built absolute URL from request: {absolute_url}")
-            # Ensure we're using Railway domain, not ascai.org
-            if 'ascai.org' in absolute_url and 'railway.app' not in absolute_url:
-                absolute_url = absolute_url.replace('ascai.org', 'ascai.up.railway.app')
-                logger.info(f"Replaced ascai.org with Railway domain: {absolute_url}")
-            return absolute_url
-        
-        # Priority 2: Use Railway domain from ALLOWED_HOSTS or environment
-        protocol = 'https' if not settings.DEBUG else 'http'
-        
-        # Check for Railway domain in ALLOWED_HOSTS first
-        railway_domain = None
-        for host in settings.ALLOWED_HOSTS:
-            if 'railway.app' in host and not host.startswith('.'):
-                railway_domain = host
-                break
-        
-        # If not found in ALLOWED_HOSTS, check environment variables
-        if not railway_domain:
-            from decouple import config
-            railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
-            if not railway_domain:
-                # Check ALLOWED_HOSTS again for any non-wildcard domain
-                for host in settings.ALLOWED_HOSTS:
-                    if not host.startswith('.') and host not in ['healthcheck.railway.app', '*']:
-                        railway_domain = host
-                        break
-        
-        # Priority 3: Fallback to Site model
-        if not railway_domain:
-            from django.contrib.sites.models import Site
-            try:
-                site = Site.objects.get_current()
-                railway_domain = site.domain
-            except Exception:
-                pass
-        
-        # Priority 4: Hardcoded fallback to Railway domain
-        if not railway_domain:
-            railway_domain = 'ascai.up.railway.app'
-            logger.warning(
-                f"Could not determine domain from ALLOWED_HOSTS or Site model. "
-                f"Using fallback domain: {railway_domain}"
-            )
-        
-        # Ensure we always use Railway domain, not ascai.org
-        if railway_domain == 'ascai.org' or railway_domain == 'ascailazio.org':
-            railway_domain = 'ascai.up.railway.app'
-            logger.info(f"Replaced {railway_domain} with Railway domain: ascai.up.railway.app")
-        
-        absolute_url = f"{protocol}://{railway_domain}{url}"
-        logger.info(f"Final email confirmation URL: {absolute_url}")
-        
-        return absolute_url
-    
-    def send_confirmation_mail(self, request, emailconfirmation, signup):
-        """
-        Send email confirmation with proper error handling and logging.
-        This ensures emails are actually sent and logs any failures.
-        CRITICAL: Ensure the EmailConfirmation object is saved to the database
-        before sending, as allauth sometimes creates it on-the-fly without saving.
-        """
-        from django.conf import settings
-        from django.core.mail import get_connection
-        
-        # Log email sending attempt with configuration details
-        email = emailconfirmation.email_address.email
-        username = emailconfirmation.email_address.user.username
-        user = emailconfirmation.email_address.user
-        
-        logger.info("=" * 60)
-        logger.info("EMAIL CONFIRMATION ATTEMPT")
-        logger.info("=" * 60)
-        logger.info(f"User: {username} ({email})")
-        logger.info(f"User is_active: {user.is_active}, is_approved: {user.is_approved}")
-        logger.info(f"Email backend: {settings.EMAIL_BACKEND}")
-        
-        # Check if this is a database-backed EmailConfirmation or HMAC-based
-        # HMAC-based confirmations don't have a 'pk' attribute
-        has_pk = hasattr(emailconfirmation, 'pk')
-        is_db_confirmation = has_pk
-        
-        if not is_db_confirmation:
-            # HMAC-based confirmation (no database storage)
-            logger.info(f"Using HMAC-based EmailConfirmation (no database storage needed)")
-            logger.info(f"Confirmation key: {emailconfirmation.key[:20]}...")
-        else:
-            # Database-backed EmailConfirmation
-            # CRITICAL FIX: Ensure EmailConfirmation is saved to database before sending
-            # Allauth sometimes creates confirmations on-the-fly that aren't persisted
-            if not emailconfirmation.pk:
-                logger.warning(f"EmailConfirmation for {email} has no primary key! Saving it now...")
-                emailconfirmation.save()
-                logger.info(f"✓ Saved EmailConfirmation with key: {emailconfirmation.key[:20]}... (ID: {emailconfirmation.pk})")
-            else:
-                logger.info(f"EmailConfirmation already exists with key: {emailconfirmation.key[:20]}... (ID: {emailconfirmation.pk})")
-            
-            # Verify the confirmation exists in the database
-            from allauth.account.models import EmailConfirmation
-            db_confirmation = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).first()
-            if db_confirmation:
-                logger.info(f"✓ EmailConfirmation verified in database")
-            else:
-                logger.error(f"✗ EmailConfirmation NOT found in database! Saving again...")
-                emailconfirmation.save()
-                logger.info(f"✓ Re-saved EmailConfirmation (ID: {emailconfirmation.pk})")
-        
-        logger.info(f"SMTP Host: {getattr(settings, 'EMAIL_HOST', 'N/A')}")
-        logger.info(f"SMTP Port: {getattr(settings, 'EMAIL_PORT', 'N/A')}")
-        logger.info(f"SMTP User: {getattr(settings, 'EMAIL_HOST_USER', 'N/A')}")
-        logger.info(f"SMTP Password: {'SET' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'NOT SET'}")
-        
-        # Verify email backend is not console in production
-        if settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
-            error_msg = (
-                f"CRITICAL ERROR: Console email backend is active! "
-                f"Email to {email} will NOT be sent in production. "
-                f"Set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend in Railway."
-            )
-            logger.error("=" * 60)
-            logger.error(error_msg)
-            logger.error("=" * 60)
-        
-        # Skip SMTP connection test - it can cause blocking/timeout issues
-        # Just try to send the email directly
-        
-        try:
-            # Call parent method to send the email
-            # The parent method will automatically call get_email_confirmation_url() 
-            # and pass it to the template as 'activate_url'
-            logger.info(f"Attempting to send email confirmation to {email}...")
-            result = super().send_confirmation_mail(request, emailconfirmation, signup)
-            
-            # Verify confirmation still exists after sending (it should!)
-            # Only check database if it's a database-backed confirmation
-            if hasattr(emailconfirmation, 'pk') and emailconfirmation.pk:
-                from allauth.account.models import EmailConfirmation
-                final_check = EmailConfirmation.objects.filter(pk=emailconfirmation.pk).exists()
-                logger.info(f"EmailConfirmation still in database after sending: {final_check}")
-            else:
-                logger.info(f"HMAC-based confirmation (no database check needed)")
-            
-            logger.info("=" * 60)
-            logger.info(f"SUCCESS: Email confirmation sent to {email}")
-            logger.info("=" * 60)
-            
-            return result
-        except Exception as e:
-            # Catch ALL exceptions including SystemExit to prevent worker crashes
-            # Log the error with full details but DON'T break signup
-            logger.error("=" * 60)
-            logger.error("EMAIL CONFIRMATION FAILED - BUT SIGNUP WILL CONTINUE")
-            logger.error("=" * 60)
-            logger.error(f"Failed to send email to {email}: {str(e)}", exc_info=True)
-            logger.error(f"Exception type: {type(e).__name__}")
-            logger.error(f"Backend: {settings.EMAIL_BACKEND}")
-            logger.error(f"Host: {getattr(settings, 'EMAIL_HOST', 'Not set')}")
-            logger.error(f"User: {getattr(settings, 'EMAIL_HOST_USER', 'Not set')}")
-            logger.error(f"Password: {'SET' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'NOT SET'}")
-            logger.error("=" * 60)
-            logger.error("User signup will complete, but email confirmation was not sent.")
-            logger.error("Admin should check email configuration and resend confirmation email if needed.")
-            logger.error("=" * 60)
-            # DON'T re-raise - allow signup to complete even if email fails
-            # The user account is created, admin can manually send confirmation email later
-            # Return None to indicate email was not sent, but don't break the signup flow
-            # This prevents SystemExit and other exceptions from crashing the worker
-            return None
-    
-    def send_account_already_exists_mail(self, email):
-        """
-        Override to prevent email sending errors from crashing the app.
-        When a user tries to sign in with Google but account already exists,
-        we don't want to crash if email sending fails.
-        """
-        try:
-            logger.info(f"Attempting to send 'account already exists' email to {email}...")
-            result = super().send_account_already_exists_mail(email)
-            logger.info(f"SUCCESS: 'Account already exists' email sent to {email}")
-            return result
-        except Exception as e:
-            # Log the error but don't crash the app
-            logger.error(
-                f"Failed to send 'account already exists' email to {email}: {str(e)}",
-                exc_info=True
-            )
-            logger.warning(
-                "Email sending failed, but login process will continue. "
-                "This is likely due to SMTP blocking on Railway."
-            )
-            # Return None instead of raising - this prevents 500 errors
-            return None
-    
-    def render_mail(self, template_prefix, email, context, headers=None):
-        """
-        Override to ensure activate_url is always an absolute URL in the context.
-        This is called by send_confirmation_mail to render the email template.
-        """
-        # Ensure activate_url is in context and is absolute
-        if 'activate_url' in context:
-            # If it's already absolute, use it; otherwise make it absolute
-            activate_url = context['activate_url']
-            if not activate_url.startswith('http'):
-                # This shouldn't happen if get_email_confirmation_url works correctly,
-                # but this is a safety check
-                logger.warning(f"activate_url is not absolute: {activate_url}")
-        return super().render_mail(template_prefix, email, context, headers)
-    
-    def is_email_verified(self, request, email_address):
-        """
-        Override to allow login for approved users even if email is not verified.
-        Since ACCOUNT_EMAIL_VERIFICATION = 'optional', approved users can login immediately.
-        Also handles Google OAuth users with pre-verified emails.
-        
-        Note: email_address can be either an EmailAddress object or a string (email).
-        """
-        from allauth.account.models import EmailAddress
-        
-        # Get user object from email_address (handle both string and EmailAddress object)
-        user = None
-        if isinstance(email_address, str):
-            # If it's a string, try to find the EmailAddress object or user
-            try:
-                email_address_obj = EmailAddress.objects.get(email=email_address)
-                user = email_address_obj.user
-            except EmailAddress.DoesNotExist:
-                # If EmailAddress doesn't exist, try to find user by email
-                try:
-                    user = User.objects.get(email=email_address)
-                except User.DoesNotExist:
-                    # Can't determine if verified, use default behavior
-                    return super().is_email_verified(request, email_address)
-        else:
-            # It's an EmailAddress object
-            user = email_address.user if hasattr(email_address, 'user') else None
-        
-        # If user is approved or superuser, allow login even without email verification
-        # This ensures new users can login immediately after registration
-        if user and (user.is_approved or user.is_superuser):
-            # With ACCOUNT_EMAIL_VERIFICATION = 'optional', approved users can login
-            # We still check for actual verification, but don't block login
-            logger.info(f"Allowing login for approved user {user.username} (email_verified={user.email_verified})")
-            return True
-        
-        # Check if user has a social account (Google OAuth)
-        if user:
-            from allauth.socialaccount.models import SocialAccount
-            has_social_account = SocialAccount.objects.filter(user=user, provider='google').exists()
-            
-            if has_social_account:
-                # For Google OAuth users, emails are pre-verified
-                # Mark as verified if not already
-                if isinstance(email_address, str):
-                    # If we got a string, update/create EmailAddress
-                    EmailAddress.objects.update_or_create(
-                        user=user,
-                        email=email_address,
-                        defaults={'verified': True, 'primary': True}
-                    )
-                elif hasattr(email_address, 'verified') and not email_address.verified:
-                    email_address.verified = True
-                    email_address.save()
-                    logger.info(f"Marked email as verified for Google OAuth user: {user.email}")
-                
-                if not user.email_verified:
-                    user.email_verified = True
-                    user.save(update_fields=['email_verified'])
-                    logger.info(f"Marked user.email_verified=True for Google OAuth user: {user.email}")
-                
-                # Return True to skip email verification
-                return True
-        
-        # For regular users, use default behavior (but with optional verification, this should allow login)
-        return super().is_email_verified(request, email_address)
-    
-    def is_open_for_signup(self, request):
-        """
-        Allow signup by default.
-        """
-        return True
-    
-    def require_email_verification(self, request, user):
-        """
-        Override to skip email verification requirement for Google OAuth users.
-        This is called by allauth to determine if email verification is required.
-        Return False for Google OAuth users to skip email verification.
-        """
-        # Check if user has a Google social account
-        from allauth.socialaccount.models import SocialAccount
-        has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
-        
-        if has_google_account:
-            # For Google OAuth users, mark email as verified and skip verification requirement
-            if user.email:
-                EmailAddress.objects.update_or_create(
-                    user=user,
-                    email=user.email,
-                    defaults={
-                        'verified': True,
-                        'primary': True
-                    }
-                )
-                user.email_verified = True
-                user.save(update_fields=['email_verified'])
-                logger.info(f"REQUIRE_EMAIL_VERIFICATION: Skipped email verification requirement for Google OAuth user: {user.email}")
-            # Return False to indicate email verification is NOT required
-            return False
-        
-        # For regular users, use default behavior (check ACCOUNT_EMAIL_VERIFICATION setting)
-        return super().require_email_verification(request, user) if hasattr(super(), 'require_email_verification') else True
-    
-    def respond_email_verification_sent(self, request, user):
-        """
-        Override to prevent email verification redirect for Google OAuth users.
-        This is called by allauth when it wants to redirect to email verification.
-        For Google OAuth users, we skip this and redirect to dashboard instead.
-        """
-        # Check if user has a Google social account
-        from allauth.socialaccount.models import SocialAccount
-        has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
-        
-        if has_google_account:
-            # For Google OAuth users, mark email as verified and redirect to dashboard
-            if user.email:
-                EmailAddress.objects.update_or_create(
-                    user=user,
-                    email=user.email,
-                    defaults={
-                        'verified': True,
-                        'primary': True
-                    }
-                )
-                user.email_verified = True
-                user.save(update_fields=['email_verified'])
-                logger.info(f"BYPASSED email verification for Google OAuth user: {user.email}")
-            
-            # Redirect to dashboard instead of email verification page
-            from django.shortcuts import redirect
-            from django.conf import settings
-            from django.utils.translation import get_language
-            
-            if user.is_approved or user.is_superuser:
-                current_language = get_language()
-                if current_language != settings.LANGUAGE_CODE:
-                    return redirect(f'/{current_language}/dashboard/')
-                return redirect('/dashboard/')
-            else:
-                return redirect('/')
-        
-        # For regular users, use default behavior (show email verification page)
-        return super().respond_email_verification_sent(request, user)
-    
-    
-    def get_login_redirect_url(self, request):
-        """
-        Redirect users to dashboard after login, skipping email verification for Google OAuth users.
-        """
-        if request.user.is_authenticated:
-            user = request.user
-            
-            # Check if user has a Google social account
-            from allauth.socialaccount.models import SocialAccount
-            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
-            
-            # For Google OAuth users, ensure email is verified and skip verification page
-            if has_google_account:
-                # Ensure email is marked as verified
-                if user.email:
-                    EmailAddress.objects.update_or_create(
-                        user=user,
-                        email=user.email,
-                        defaults={
-                            'verified': True,
-                            'primary': True
-                        }
-                    )
-                    if not user.email_verified:
-                        user.email_verified = True
-                        user.save(update_fields=['email_verified'])
-                
-                # Redirect to dashboard if approved, otherwise home
-                if user.is_approved or user.is_superuser:
-                    from django.conf import settings
-                    from django.utils.translation import get_language
-                    
-                    current_language = get_language()
-                    if current_language != settings.LANGUAGE_CODE:
-                        return f'/{current_language}/dashboard/'
-                    return '/dashboard/'
-                else:
-                    return '/'
-            
-            # For regular users, check email verification
-            # If email is verified, redirect to dashboard
-            if user.email_verified or EmailAddress.objects.filter(
-                user=user,
-                email=user.email,
-                verified=True
-            ).exists():
-                if user.is_approved or user.is_superuser:
-                    from django.conf import settings
-                    from django.utils.translation import get_language
-                    
-                    current_language = get_language()
-                    if current_language != settings.LANGUAGE_CODE:
-                        return f'/{current_language}/dashboard/'
-                    return '/dashboard/'
-        
-        # Fallback to default behavior - check if method exists in parent
-        try:
-            return super().get_login_redirect_url(request)
-        except AttributeError:
-            # Method doesn't exist in parent, use settings default
-            from django.conf import settings
-            return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+            return request.build_absolute_uri(url)
 
+        protocol = "https" if not settings.DEBUG else "http"
+        domain = getattr(settings, "SITE_URL", "").rstrip("/")
+        if domain.startswith("http://") or domain.startswith("https://"):
+            return f"{domain}{url}"
 
-class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
-    """
-    Custom social account adapter to handle Google OAuth signups
-    with custom user model fields and approval workflow.
-    """
-    
-    def pre_social_login(self, request, sociallogin):
-        """
-        Called before a social account is logged in.
-        If a user with this email already exists, connect the accounts.
-        This allows existing users to login with Google OAuth.
-        CRITICAL: Mark email as verified immediately for Google OAuth users.
-        """
-        from allauth.account.models import EmailAddress
-        
-        # CRITICAL: For Google OAuth, mark email as verified BEFORE any checks
-        if sociallogin.account.provider == 'google':
-            email = sociallogin.account.extra_data.get('email')
-            if email:
-                # CRITICAL: Mark email addresses in sociallogin as verified BEFORE allauth processes
-                # This tells allauth that the email is already verified and no verification is needed
-                # This MUST happen before allauth checks email verification
-                for email_address in sociallogin.email_addresses:
-                    email_address.verified = True
-                    logger.info(f"PRE-SOCIAL-LOGIN: Marked email in sociallogin as verified: {email_address.email}")
-                
-                # Also ensure the email_address objects are properly set up
-                # This is critical - allauth checks these objects during the callback
-                if not sociallogin.email_addresses:
-                    # We'll create it later, but mark it as verified in the sociallogin state
-                    logger.info(f"PRE-SOCIAL-LOGIN: No email_addresses in sociallogin, will be created in populate_user")
-                
-                # Check if user already exists
-                try:
-                    user = User.objects.get(email=email)
-                    # Mark email as verified IMMEDIATELY for existing users
-                    EmailAddress.objects.update_or_create(
-                        user=user,
-                        email=email,
-                        defaults={
-                            'verified': True,
-                            'primary': True
-                        }
-                    )
-                    user.email_verified = True
-                    user.save(update_fields=['email_verified'])
-                    logger.info(
-                        f"PRE-SOCIAL-LOGIN: Marked email as verified for existing Google OAuth user: {email}"
-                    )
-                except User.DoesNotExist:
-                    # User doesn't exist yet, will be created in save_user
-                    # But we'll mark it as verified there
-                    logger.info(f"PRE-SOCIAL-LOGIN: New user signup via Google OAuth: {email}")
-        
-        # If the user is already logged in, connect the social account
-        if request.user.is_authenticated:
-            sociallogin.connect(request, request.user)
-            # Ensure email is marked as verified
-            if request.user.email:
-                EmailAddress.objects.update_or_create(
-                    user=request.user,
-                    email=request.user.email,
-                    defaults={
-                        'verified': True,
-                        'primary': True
-                    }
-                )
-                request.user.email_verified = True
-                request.user.save(update_fields=['email_verified'])
-            logger.info(f"Connecting Google account to already logged-in user: {request.user.email}")
-            return
-        
-        # Check if a user with this email already exists
-        email = sociallogin.account.extra_data.get('email')
-        if email:
-            try:
-                user = User.objects.get(email=email)
-                # Connect the social account to existing user
-                # This allows existing users to login with Google
-                sociallogin.connect(request, user)
-                
-                # CRITICAL: Mark email as verified immediately for existing users signing in with Google
-                # This ensures they can login directly without email verification
-                EmailAddress.objects.update_or_create(
-                    user=user,
-                    email=user.email,
-                    defaults={
-                        'verified': True,
-                        'primary': True
-                    }
-                )
-                user.email_verified = True
-                user.save(update_fields=['email_verified'])
-                logger.info(
-                    f"Linked Google account to existing user: {user.email} (username: {user.username}) - "
-                    f"email marked as verified for direct login"
-                )
-            except User.DoesNotExist:
-                # User doesn't exist, will be created in save_user
-                logger.info(f"New user signup via Google OAuth: {email}")
-                pass
-            except User.MultipleObjectsReturned:
-                # Multiple users with same email (shouldn't happen, but handle it)
-                logger.warning(f"Multiple users found with email {email}, using first one")
-                user = User.objects.filter(email=email).first()
-                if user:
-                    sociallogin.connect(request, user)
-                    # Mark email as verified
-                    EmailAddress.objects.update_or_create(
-                        user=user,
-                        email=user.email,
-                        defaults={
-                            'verified': True,
-                            'primary': True
-                        }
-                    )
-                    user.email_verified = True
-                    user.save(update_fields=['email_verified'])
-    
-    def populate_user(self, request, sociallogin, data):
-        """
-        Populate user fields from Google OAuth data.
-        CRITICAL: Mark email addresses in sociallogin as verified BEFORE allauth processes them.
-        """
-        user = super().populate_user(request, sociallogin, data)
-        
-        # CRITICAL: Mark all email addresses in sociallogin as verified BEFORE allauth checks
-        # This ensures allauth knows the email is already verified and won't require verification
-        if sociallogin.account.provider == 'google':
-            for email_address in sociallogin.email_addresses:
-                email_address.verified = True
-                logger.info(f"POPULATE_USER: Marked email in sociallogin as verified: {email_address.email}")
-        
-        # Extract name from Google profile
-        if not user.username:
-            # Use email as username if name not available
-            email = data.get('email', '')
-            user.username = email.split('@')[0] if email else f"user_{sociallogin.account.uid}"
-        
-        # Set full_name from Google profile
-        if not user.full_name:
-            given_name = data.get('given_name', '')
-            family_name = data.get('family_name', '')
-            if given_name or family_name:
-                user.full_name = f"{given_name} {family_name}".strip()
-            elif data.get('name'):
-                user.full_name = data.get('name')
-        
-        # Set default role to student
-        if not user.role:
-            user.role = 'student'
-        
-        # Set default language preference
-        if not user.language_preference:
-            user.language_preference = 'en'
-        
-        # Google emails are already verified
-        user.email_verified = True
-        
-        # Set approval status - auto-approve new users so they can login immediately
-        user.is_approved = True
-        user.is_active = True  # Active so they can login
-        
-        return user
-    
-    def save_user(self, request, sociallogin, form=None):
-        """
-        Save the user after social login.
-        For new users: sets default values and requires approval.
-        For existing users (linked accounts): preserves existing data.
-        CRITICAL: Always mark Google OAuth emails as verified to bypass email verification.
-        """
-        # Check if user already exists before calling super
-        email = sociallogin.account.extra_data.get('email', '')
-        existing_user = None
-        if email:
-            try:
-                existing_user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                pass
-        
-        # CRITICAL: For Google OAuth, ensure EmailAddress objects in sociallogin are properly configured
-        # but don't have user set yet (for new users) to avoid duplicate creation
-        if sociallogin.account.provider == 'google' and email:
-            # Mark all email addresses as verified in sociallogin object
-            # This tells allauth the email is verified, but don't set user yet for new users
-            for email_addr in sociallogin.email_addresses:
-                email_addr.verified = True
-                # For new users, don't set user yet - let allauth create the user first
-                if existing_user is None and hasattr(email_addr, 'user') and email_addr.user is None:
-                    # Don't set user - let allauth handle it
-                    pass
-                logger.info(f"SAVE_USER: Marked email in sociallogin as verified BEFORE super: {email_addr.email}")
-        
-        # Call super to create/link the user
-        # This will call sociallogin.save() which creates EmailAddress via setup_user_email()
-        # We need to catch any IntegrityError and handle it gracefully
-        from django.db import IntegrityError
-        try:
-            user = super().save_user(request, sociallogin, form)
-        except (IntegrityError, Exception) as e:
-            # If there's an IntegrityError, it might be because EmailAddress already exists
-            # This can happen if a previous attempt partially succeeded
-            is_integrity_error = (
-                isinstance(e, IntegrityError) or
-                'duplicate key' in str(e).lower() or
-                'unique constraint' in str(e).lower() or
-                'IntegrityError' in str(type(e).__name__)
-            )
-            
-            if is_integrity_error:
-                logger.warning(f"IntegrityError during save_user (likely duplicate EmailAddress), recovering: {e}")
-                if email:
-                    try:
-                        # Get the user that was created (or already exists)
-                        user = User.objects.get(email=email)
-                        # Delete any existing EmailAddress to avoid duplicates
-                        EmailAddress.objects.filter(user=user, email=email).delete()
-                        # Create a fresh EmailAddress
-                        email_address = EmailAddress.objects.create(
-                            user=user,
-                            email=email,
-                            verified=True,
-                            primary=True
-                        )
-                        logger.info(f"Recovered from IntegrityError, created fresh EmailAddress for: {email}")
-                    except User.DoesNotExist:
-                        logger.error(f"User not found after IntegrityError for email: {email}")
-                        raise
-                    except Exception as recovery_error:
-                        logger.error(f"Error during recovery from IntegrityError: {recovery_error}")
-                        raise
-                else:
-                    raise
-            else:
-                raise
-        
-        # Check if this is a new user or an existing user being linked
-        is_new_user = existing_user is None
-        
-        # CRITICAL: Mark email as verified IMMEDIATELY for ALL Google OAuth users
-        # Note: super().save_user() already creates EmailAddress via sociallogin.save()
-        # Use get_or_create to safely handle the case where it might already exist
-        if user.email and sociallogin.account.provider == 'google':
-            # Use get_or_create to safely get the EmailAddress that allauth just created
-            # If it already exists (from a previous attempt or pre_social_login), get it
-            try:
-                email_address = EmailAddress.objects.get(user=user, email=user.email)
-                # Update existing EmailAddress
-                email_address.verified = True
-                email_address.primary = True
-                email_address.save()
-                logger.info(f"CRITICAL: Updated existing EmailAddress as verified for Google OAuth user: {user.email}")
-            except EmailAddress.DoesNotExist:
-                # If it doesn't exist (shouldn't happen, but handle it), create it
-                email_address = EmailAddress.objects.create(
-                    user=user,
-                    email=user.email,
-                    verified=True,
-                    primary=True
-                )
-                logger.info(f"CRITICAL: Created EmailAddress as verified for Google OAuth user: {user.email}")
-            
-            # Also mark in User model
-            user.email_verified = True
-        
-        if is_new_user:
-            # New user signup - set defaults and auto-approve
-            if not user.role:
-                user.role = 'student'
-            if not user.language_preference:
-                user.language_preference = 'en'
-            
-            # Set approval status for new users - auto-approve so they can login immediately
-            user.is_approved = True
-            user.is_active = True
-        
-        # Save user with all updates (including email_verified=True)
-        user.save()
-        
-        # CRITICAL: Double-check and force email verification after save
-        # This ensures it's verified even if something reset it
-        if user.email:
-            email_address = EmailAddress.objects.filter(user=user, email=user.email).first()
-            if email_address:
-                if not email_address.verified:
-                    email_address.verified = True
-                    email_address.save()
-                    logger.warning(
-                        f"EmailAddress was not verified after save_user, FORCED verification: {user.email}"
-                    )
-            else:
-                # EmailAddress doesn't exist, create it as verified
-                EmailAddress.objects.create(
-                    user=user,
-                    email=user.email,
-                    verified=True,
-                    primary=True
-                )
-                logger.warning(
-                    f"EmailAddress didn't exist after save_user, CREATED as verified: {user.email}"
-                )
-            
-            # Ensure user.email_verified is also True
-            if not user.email_verified:
-                user.email_verified = True
-                user.save(update_fields=['email_verified'])
-                logger.warning(f"user.email_verified was False, FORCED to True: {user.email}")
-        
-        logger.info(
-            f"Google OAuth user saved: {user.username} ({user.email}) - "
-            f"email_verified={user.email_verified}, "
-            f"EmailAddress.verified={EmailAddress.objects.filter(user=user, email=user.email).first().verified if user.email else 'N/A'}"
+        if domain:
+            return f"{protocol}://{domain}{url}"
+
+        allowed_host = next(
+            (
+                host
+                for host in settings.ALLOWED_HOSTS
+                if host not in {"*", "healthcheck.railway.app"} and not host.startswith(".")
+            ),
+            "ascai.up.railway.app",
         )
-        
-        return user
-    
-    def is_open_for_signup(self, request, sociallogin):
-        """
-        Allow social account signups.
-        """
-        return True
-    
-    def is_auto_signup_allowed(self, request, sociallogin):
-        """
-        Allow automatic signup for social accounts.
-        This is called by allauth to determine if auto-signup is allowed.
-        """
-        return True
-    
-    def should_auto_signup(self, request, sociallogin):
-        """
-        Determine if auto-signup should happen.
-        For Google OAuth, we always allow auto-signup and mark email as verified.
-        """
-        # Mark email as verified immediately for Google OAuth
-        email = sociallogin.account.extra_data.get('email')
-        if email and sociallogin.account.provider == 'google':
-            # Get or create the user that will be created
-            # We need to mark the email as verified BEFORE allauth checks
-            try:
-                user = User.objects.get(email=email)
-                # Mark email as verified
-                EmailAddress.objects.update_or_create(
-                    user=user,
-                    email=email,
-                    defaults={
-                        'verified': True,
-                        'primary': True
-                    }
-                )
-                user.email_verified = True
-                user.save(update_fields=['email_verified'])
-                logger.info(f"Pre-verified email for Google OAuth user: {email}")
-            except User.DoesNotExist:
-                # User doesn't exist yet, will be created in save_user
-                pass
-        
-        return True
-    
-    
-    def get_login_redirect_url(self, request):
-        """
-        Redirect Google OAuth users directly to dashboard after login.
-        This bypasses email verification since Google emails are already verified.
-        """
-        # Check if user is authenticated (they should be after social login)
-        if request.user.is_authenticated:
-            user = request.user
-            
-            # Check if user has a Google social account
-            from allauth.socialaccount.models import SocialAccount
-            has_google_account = SocialAccount.objects.filter(user=user, provider='google').exists()
-            
-            if has_google_account:
-                # For Google OAuth users, ensure email is verified and redirect to dashboard
-                if user.email:
-                    EmailAddress.objects.update_or_create(
-                        user=user,
-                        email=user.email,
-                        defaults={
-                            'verified': True,
-                            'primary': True
-                        }
-                    )
-                    if not user.email_verified:
-                        user.email_verified = True
-                        user.save(update_fields=['email_verified'])
-                
-                # Redirect to dashboard if approved, otherwise home
-                if user.is_approved or user.is_superuser:
-                    from django.conf import settings
-                    from django.utils.translation import get_language
-                    
-                    # Handle language prefix
-                    current_language = get_language()
-                    if current_language != settings.LANGUAGE_CODE:
-                        return f'/{current_language}/dashboard/'
-                    return '/dashboard/'
-                else:
-                    # User not approved yet, redirect to home
-                    return '/'
-            
-            # For regular users, check email verification
-            # If email is verified, redirect to dashboard
-            if user.email_verified or EmailAddress.objects.filter(
-                user=user,
-                email=user.email,
-                verified=True
-            ).exists():
-                if user.is_approved or user.is_superuser:
-                    from django.conf import settings
-                    from django.utils.translation import get_language
-                    
-                    current_language = get_language()
-                    if current_language != settings.LANGUAGE_CODE:
-                        return f'/{current_language}/dashboard/'
-                    return '/dashboard/'
-        
-        # Fallback to default behavior - check if method exists in parent
-        try:
-            return super().get_login_redirect_url(request)
-        except AttributeError:
-            # Method doesn't exist in parent, use settings default
-            from django.conf import settings
-            return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+        return f"{protocol}://{allowed_host}{url}"

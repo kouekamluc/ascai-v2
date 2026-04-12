@@ -33,6 +33,15 @@ from apps.scholarships.models import SavedScholarship
 from apps.diaspora.models import Event
 from apps.downloads.models import Document
 from apps.mentorship.models import MentorshipRequest
+from apps.mentorship.services import (
+    accept_request as accept_mentorship_request,
+    complete_request as complete_mentorship_request,
+    create_request as create_mentorship_request,
+    get_request_queryset_for_user,
+    reject_request as reject_mentorship_request,
+    send_message as send_mentorship_message,
+    update_availability as update_mentor_availability,
+)
 
 
 class DashboardHomeView(DashboardRequiredMixin, TemplateView):
@@ -1164,16 +1173,7 @@ class DashboardRequestDetailView(DashboardRequiredMixin, DetailView):
     context_object_name = 'request'
     
     def get_queryset(self):
-        from apps.mentorship.models import MentorshipRequest
-        user = self.request.user
-        try:
-            queryset = MentorshipRequest.objects.filter(
-                Q(student=user) | Q(mentor__user=user)
-            ).select_related('mentor', 'mentor__user', 'student')
-            return queryset
-        except Exception:
-            # Fallback: only filter by student if mentor query fails
-            return MentorshipRequest.objects.filter(student=user).select_related('mentor', 'mentor__user', 'student')
+        return get_request_queryset_for_user(self.request.user)
     
     def get_context_data(self, **kwargs):
         from apps.mentorship.forms import MentorshipMessageForm, MentorRatingForm
@@ -1186,7 +1186,7 @@ class DashboardRequestDetailView(DashboardRequiredMixin, DetailView):
         
         context['messages'] = self.object.messages.all().order_by('created_at')
         context['form'] = MentorshipMessageForm()
-        context['rating_form'] = MentorRatingForm() if self.object.status == 'accepted' and not self.object.has_rating() and self.object.student == user else None
+        context['rating_form'] = MentorRatingForm() if self.object.status == 'completed' and not self.object.has_rating() and self.object.student == user else None
         context['can_complete'] = self.object.can_be_completed()
         context['is_student'] = self.object.student == user
         # Fix: Check if mentor exists before accessing mentor.user
@@ -1207,10 +1207,18 @@ class DashboardRequestDetailView(DashboardRequiredMixin, DetailView):
         
         form = MentorshipMessageForm(request.POST)
         if form.is_valid():
-            message = form.save(commit=False)
-            message.request = self.object
-            message.sender = request.user
-            message.save()
+            from django.core.exceptions import PermissionDenied, ValidationError
+
+            try:
+                message = send_mentorship_message(
+                    mentorship_request=self.object,
+                    sender=request.user,
+                    content=form.cleaned_data["content"],
+                )
+            except PermissionDenied as exc:
+                return JsonResponse({'error': str(exc)}, status=403)
+            except ValidationError as exc:
+                return JsonResponse({'error': exc.messages[0]}, status=400)
             
             # Return message item for HTMX
             if request.headers.get('HX-Request'):
@@ -1227,25 +1235,20 @@ class DashboardRequestDetailView(DashboardRequiredMixin, DetailView):
 @require_http_methods(["POST"])
 def dashboard_accept_request(request, request_id):
     """Accept mentorship request from dashboard (HTMX endpoint)."""
-    from apps.mentorship.models import MentorshipRequest
-    from django.utils import timezone
-    
-    # Access control: only mentor can accept their own requests
-    mentorship_request = get_object_or_404(
-        MentorshipRequest,
-        id=request_id,
-        mentor__user=request.user,
-        status='pending'
-    )
-    
-    # Additional check: ensure user is the mentor
-    if not mentorship_request.mentor or mentorship_request.mentor.user != request.user:
-        messages.error(request, _('You do not have permission to accept this request.'))
-        return JsonResponse({'error': _('Access denied.')}, status=403)
-    
-    mentorship_request.status = 'accepted'
-    mentorship_request.responded_at = timezone.now()
-    mentorship_request.save()
+    from django.core.exceptions import PermissionDenied, ValidationError
+
+    mentorship_request = get_object_or_404(MentorshipRequest, id=request_id)
+    try:
+        mentorship_request = accept_mentorship_request(
+            mentorship_request=mentorship_request,
+            actor=request.user,
+        ).request
+    except PermissionDenied as exc:
+        messages.error(request, str(exc))
+        return JsonResponse({'error': str(exc)}, status=403)
+    except ValidationError as exc:
+        messages.error(request, exc.messages[0])
+        return JsonResponse({'error': exc.messages[0]}, status=400)
     
     messages.success(request, _('Mentorship request accepted successfully!'))
     
@@ -1262,25 +1265,20 @@ def dashboard_accept_request(request, request_id):
 @require_http_methods(["POST"])
 def dashboard_reject_request(request, request_id):
     """Reject mentorship request from dashboard (HTMX endpoint)."""
-    from apps.mentorship.models import MentorshipRequest
-    from django.utils import timezone
-    
-    # Access control: only mentor can reject their own requests
-    mentorship_request = get_object_or_404(
-        MentorshipRequest,
-        id=request_id,
-        mentor__user=request.user,
-        status='pending'
-    )
-    
-    # Additional check: ensure user is the mentor
-    if not mentorship_request.mentor or mentorship_request.mentor.user != request.user:
-        messages.error(request, _('You do not have permission to reject this request.'))
-        return JsonResponse({'error': _('Access denied.')}, status=403)
-    
-    mentorship_request.status = 'rejected'
-    mentorship_request.responded_at = timezone.now()
-    mentorship_request.save()
+    from django.core.exceptions import PermissionDenied, ValidationError
+
+    mentorship_request = get_object_or_404(MentorshipRequest, id=request_id)
+    try:
+        mentorship_request = reject_mentorship_request(
+            mentorship_request=mentorship_request,
+            actor=request.user,
+        ).request
+    except PermissionDenied as exc:
+        messages.error(request, str(exc))
+        return JsonResponse({'error': str(exc)}, status=403)
+    except ValidationError as exc:
+        messages.error(request, exc.messages[0])
+        return JsonResponse({'error': exc.messages[0]}, status=400)
     
     messages.info(request, _('Mentorship request rejected.'))
     
@@ -1297,30 +1295,20 @@ def dashboard_reject_request(request, request_id):
 @require_http_methods(["POST"])
 def dashboard_complete_request(request, request_id):
     """Mark mentorship request as completed from dashboard (HTMX endpoint)."""
-    from apps.mentorship.models import MentorshipRequest
-    from django.utils import timezone
-    
-    mentorship_request = get_object_or_404(
-        MentorshipRequest,
-        id=request_id
-    )
-    
-    # Only student or mentor can complete
-    if mentorship_request.student != request.user and (not mentorship_request.mentor or mentorship_request.mentor.user != request.user):
-        messages.error(request, _('Access denied.'))
-        return JsonResponse({'error': _('Access denied.')}, status=403)
-    
-    if not mentorship_request.can_be_completed():
-        messages.error(request, _('Only accepted requests can be completed.'))
-        return JsonResponse({'error': _('Only accepted requests can be completed.')}, status=400)
-    
-    mentorship_request.status = 'completed'
-    mentorship_request.responded_at = timezone.now()
-    mentorship_request.save()
-    
-    # Increment students helped if mentor completed it
-    if mentorship_request.mentor and mentorship_request.mentor.user == request.user:
-        mentorship_request.mentor.increment_students_helped()
+    from django.core.exceptions import PermissionDenied, ValidationError
+
+    mentorship_request = get_object_or_404(MentorshipRequest, id=request_id)
+    try:
+        mentorship_request = complete_mentorship_request(
+            mentorship_request=mentorship_request,
+            actor=request.user,
+        ).request
+    except PermissionDenied as exc:
+        messages.error(request, str(exc))
+        return JsonResponse({'error': str(exc)}, status=403)
+    except ValidationError as exc:
+        messages.error(request, exc.messages[0])
+        return JsonResponse({'error': exc.messages[0]}, status=400)
     
     messages.success(request, _('Mentorship request marked as completed.'))
     
@@ -1338,18 +1326,19 @@ def dashboard_complete_request(request, request_id):
 def dashboard_update_availability(request):
     """Update mentor availability status from dashboard (HTMX endpoint)."""
     from apps.mentorship.models import MentorProfile
-    
-    mentor_profile = get_object_or_404(
-        MentorProfile,
-        user=request.user
-    )
-    
-    new_status = request.POST.get('availability_status')
-    if new_status not in dict(MentorProfile.AVAILABILITY_CHOICES).keys():
-        return JsonResponse({'error': _('Invalid availability status.')}, status=400)
-    
-    mentor_profile.availability_status = new_status
-    mentor_profile.save()
+    from django.core.exceptions import PermissionDenied, ValidationError
+
+    mentor_profile = get_object_or_404(MentorProfile, user=request.user)
+    try:
+        update_mentor_availability(
+            mentor_profile=mentor_profile,
+            actor=request.user,
+            new_status=request.POST.get('availability_status'),
+        )
+    except PermissionDenied as exc:
+        return JsonResponse({'error': str(exc)}, status=403)
+    except ValidationError as exc:
+        return JsonResponse({'error': exc.messages[0]}, status=400)
     
     messages.success(request, _('Availability status updated successfully.'))
     return JsonResponse({'status': 'updated', 'availability_status': new_status})
@@ -1475,28 +1464,22 @@ class DashboardMentorshipRequestCreateView(DashboardRequiredMixin, CreateView):
     def form_valid(self, form):
         from apps.mentorship.models import MentorProfile, MentorshipRequest
         mentor = get_object_or_404(MentorProfile, id=self.kwargs['mentor_id'])
-        
-        # Prevent duplicate requests
-        existing_request = MentorshipRequest.objects.filter(
-            student=self.request.user,
-            mentor=mentor,
-            status__in=['pending', 'accepted']
-        ).first()
-        
-        if existing_request:
-            messages.error(self.request, _('You already have an active request with this mentor.'))
+
+        from django.core.exceptions import PermissionDenied, ValidationError
+
+        try:
+            self.object = create_mentorship_request(
+                student=self.request.user,
+                mentor=mentor,
+                subject=form.cleaned_data["subject"],
+                message=form.cleaned_data["message"],
+            )
+        except (PermissionDenied, ValidationError) as exc:
+            messages.error(self.request, exc.messages[0] if hasattr(exc, "messages") else str(exc))
             return redirect('dashboard:mentorship_mentor_detail', pk=mentor.pk)
-        
-        # Prevent self-request
-        if mentor.user == self.request.user:
-            messages.error(self.request, _('You cannot request mentorship from yourself.'))
-            return redirect('dashboard:mentorship_mentor_detail', pk=mentor.pk)
-        
-        form.instance.student = self.request.user
-        form.instance.mentor = mentor
-        response = super().form_valid(form)
+
         messages.success(self.request, _('Mentorship request sent successfully!'))
-        return response
+        return redirect(self.get_success_url())
     
     def get_success_url(self):
         return reverse_lazy('dashboard:mentorship_student_requests')
