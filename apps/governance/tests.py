@@ -12,6 +12,11 @@ from .models import (
     MembershipStatus,
     ExecutiveBoard,
     ExecutivePosition,
+    ElectoralCommission,
+    CommissionMember,
+    Election,
+    Candidacy,
+    ElectionVote,
     BoardOfAuditors,
     AuditorMember,
     AssociationEvent,
@@ -364,4 +369,191 @@ class GovernanceWorkflowServiceTest(TestCase):
         self.assertFalse(
             user_has_governance_access(self.member_user, 'governance.approve_expense')
         )
+
+
+class ElectionWorkflowRegressionTest(TestCase):
+    """Election flow regression coverage for member-facing workflows."""
+
+    def setUp(self):
+        self.client = Client()
+        self.voter = User.objects.create_user(
+            username='voter_user',
+            email='voter@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        self.voter_member = Member.objects.create(
+            user=self.voter,
+            member_type='student',
+            is_active_member=True,
+            membership_start_date=date.today() - timedelta(days=400),
+            lazio_residence_verified=True,
+            cameroonian_origin_verified=True,
+        )
+        self.candidate_one = User.objects.create_user(
+            username='candidate_one',
+            email='candidate1@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        Member.objects.create(
+            user=self.candidate_one,
+            member_type='student',
+            is_active_member=True,
+            membership_start_date=date.today() - timedelta(days=500),
+            lazio_residence_verified=True,
+            cameroonian_origin_verified=True,
+        )
+        self.candidate_two = User.objects.create_user(
+            username='candidate_two',
+            email='candidate2@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        Member.objects.create(
+            user=self.candidate_two,
+            member_type='student',
+            is_active_member=True,
+            membership_start_date=date.today() - timedelta(days=500),
+            lazio_residence_verified=True,
+            cameroonian_origin_verified=True,
+        )
+        self.commission = ElectoralCommission.objects.create(
+            name='2026 Electoral Commission',
+            start_date=date.today() - timedelta(days=10),
+            status='active',
+        )
+        self.election = Election.objects.create(
+            commission=self.commission,
+            election_type='executive_board',
+            start_date=date.today() - timedelta(days=1),
+            end_date=date.today() + timedelta(days=7),
+            status='in_progress',
+        )
+        self.candidacy_one = Candidacy.objects.create(
+            election=self.election,
+            candidate=self.candidate_one,
+            position='president',
+            application_date=date.today() - timedelta(days=2),
+            status='approved',
+            seniority_verified=True,
+            lazio_residence_verified=True,
+            cameroonian_origin_verified=True,
+        )
+        self.candidacy_two = Candidacy.objects.create(
+            election=self.election,
+            candidate=self.candidate_two,
+            position='president',
+            application_date=date.today() - timedelta(days=2),
+            status='approved',
+            seniority_verified=True,
+            lazio_residence_verified=True,
+            cameroonian_origin_verified=True,
+        )
+
+    def test_member_candidacy_application_submits_without_hidden_admin_fields(self):
+        self.client.login(username='voter_user', password='testpass123')
+
+        response = self.client.post(
+            reverse('governance:candidacy_apply'),
+            {
+                'election': self.election.pk,
+                'position': 'vice_president',
+                'eligibility_notes': 'Ready to serve the community.',
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('governance:member_portal'))
+
+        candidacy = Candidacy.objects.get(
+            election=self.election,
+            candidate=self.voter,
+            position='vice_president',
+        )
+        self.assertEqual(candidacy.status, 'pending')
+        self.assertTrue(candidacy.seniority_verified)
+        self.assertTrue(candidacy.lazio_residence_verified)
+        self.assertTrue(candidacy.cameroonian_origin_verified)
+
+    def test_member_can_review_and_update_vote_while_election_is_open(self):
+        self.client.login(username='voter_user', password='testpass123')
+
+        first_vote_response = self.client.post(
+            reverse('governance:cast_election_vote', args=[self.election.pk]),
+            {'position_president': str(self.candidacy_one.pk)},
+        )
+        self.assertEqual(first_vote_response.status_code, 302)
+        self.assertEqual(
+            ElectionVote.objects.filter(election=self.election, voter=self.voter).count(),
+            1,
+        )
+        self.assertEqual(
+            ElectionVote.objects.get(election=self.election, voter=self.voter).candidate,
+            self.candidacy_one,
+        )
+
+        detail_response = self.client.get(
+            reverse('governance:election_detail', args=[self.election.pk])
+        )
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, 'Review or Update Vote')
+
+        vote_page_response = self.client.get(
+            reverse('governance:election_vote', args=[self.election.pk])
+        )
+        self.assertEqual(vote_page_response.status_code, 200)
+        self.assertContains(vote_page_response, 'You have already voted for this position')
+
+        second_vote_response = self.client.post(
+            reverse('governance:cast_election_vote', args=[self.election.pk]),
+            {'position_president': str(self.candidacy_two.pk)},
+        )
+        self.assertEqual(second_vote_response.status_code, 302)
+        self.assertEqual(
+            ElectionVote.objects.filter(election=self.election, voter=self.voter).count(),
+            1,
+        )
+        self.assertEqual(
+            ElectionVote.objects.get(election=self.election, voter=self.voter).candidate,
+            self.candidacy_two,
+        )
+
+    def test_member_and_admin_election_lists_have_distinct_routes(self):
+        self.assertEqual(reverse('governance:member_elections'), '/governance/elections/')
+        self.assertEqual(reverse('governance:election_list'), '/governance/elections/manage/')
+
+    def test_commission_member_can_manage_candidacies_without_manual_django_permission(self):
+        commission_user = User.objects.create_user(
+            username='commission_user',
+            email='commission@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        CommissionMember.objects.create(
+            commission=self.commission,
+            user=commission_user,
+            role='secretary',
+        )
+        pending_candidacy = Candidacy.objects.create(
+            election=self.election,
+            candidate=self.voter,
+            position='vice_president',
+            application_date=date.today(),
+            status='pending',
+        )
+
+        self.client.login(username='commission_user', password='testpass123')
+
+        list_response = self.client.get(reverse('governance:election_list'))
+        self.assertEqual(list_response.status_code, 200)
+
+        approve_response = self.client.post(
+            reverse('governance:approve_candidacy', args=[pending_candidacy.pk]),
+            {'action': 'approve'},
+        )
+        self.assertEqual(approve_response.status_code, 302)
+
+        pending_candidacy.refresh_from_db()
+        self.assertEqual(pending_candidacy.status, 'approved')
 

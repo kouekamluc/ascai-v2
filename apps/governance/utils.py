@@ -223,7 +223,8 @@ def check_voting_eligibility(user, assembly=None, election=None):
     """
     eligibility = {
         'eligible': False,
-        'reason': ''
+        'reason': '',
+        'has_voted': False,
     }
     
     # Check if user has member profile
@@ -240,6 +241,10 @@ def check_voting_eligibility(user, assembly=None, election=None):
     
     # For elections, check if already voted
     if election:
+        if election.status != 'in_progress':
+            eligibility['reason'] = 'This election is not currently open for voting'
+            return eligibility
+
         # Check if user already voted for any position in this election
         existing_votes = ElectionVote.objects.filter(
             election=election,
@@ -247,8 +252,8 @@ def check_voting_eligibility(user, assembly=None, election=None):
         ).exists()
         
         if existing_votes:
-            eligibility['reason'] = 'You have already voted in this election'
-            return eligibility
+            eligibility['has_voted'] = True
+            eligibility['reason'] = 'You can review or update your vote while the election is open'
     
     # For assemblies, check if already voted
     if assembly:

@@ -50,6 +50,17 @@ class AssemblyManagementRequiredMixin(GovernanceRequiredMixin, PermissionRequire
         return user_has_governance_access(self.request.user, self.permission_required)
 
 
+class ElectionManagementRequiredMixin(GovernanceRequiredMixin, PermissionRequiredMixin):
+    """
+    Mixin for views that require election management permissions.
+    """
+    permission_required = 'governance.manage_elections'
+    raise_exception = True
+
+    def has_permission(self):
+        return user_has_governance_access(self.request.user, self.permission_required)
+
+
 class FinancialManagementRequiredMixin(GovernanceRequiredMixin, PermissionRequiredMixin):
     """
     Mixin for views that require financial management permissions.

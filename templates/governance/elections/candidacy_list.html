@@ -60,7 +60,7 @@
                     </span>
                 </div>
             </div>
-            {% if perms.governance.manage_elections and candidacy.status == 'pending' %}
+            {% if can_manage_elections and candidacy.status == 'pending' %}
             <div class="ml-4 flex space-x-2">
                 <form method="post" action="{% url 'governance:approve_candidacy' candidacy.pk %}" class="inline">
                     {% csrf_token %}

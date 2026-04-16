@@ -18,7 +18,8 @@ from django import forms
 
 from .mixins import (
     GovernanceRequiredMixin, ExecutiveBoardRequiredMixin,
-    AssemblyManagementRequiredMixin, FinancialManagementRequiredMixin,
+    AssemblyManagementRequiredMixin, ElectionManagementRequiredMixin,
+    FinancialManagementRequiredMixin,
     ExpenseApprovalRequiredMixin
 )
 from .models import (
@@ -1269,7 +1270,7 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
 # ELECTORAL SYSTEM VIEWS
 # ============================================================================
 
-class ElectoralCommissionListView(GovernanceRequiredMixin, ListView):
+class ElectoralCommissionListView(ElectionManagementRequiredMixin, ListView):
     """List electoral commissions."""
     model = ElectoralCommission
     template_name = 'governance/elections/commission_list.html'
@@ -1283,8 +1284,16 @@ class ElectoralCommissionListView(GovernanceRequiredMixin, ListView):
             queryset = queryset.filter(status=status)
         return queryset.order_by('-start_date')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_manage_elections'] = user_has_governance_access(
+            self.request.user,
+            'governance.manage_elections',
+        )
+        return context
 
-class ElectoralCommissionDetailView(GovernanceRequiredMixin, DetailView):
+
+class ElectoralCommissionDetailView(ElectionManagementRequiredMixin, DetailView):
     """Electoral commission detail."""
     model = ElectoralCommission
     template_name = 'governance/elections/commission_detail.html'
@@ -1298,7 +1307,7 @@ class ElectoralCommissionDetailView(GovernanceRequiredMixin, DetailView):
         return context
 
 
-class ElectoralCommissionCreateView(AssemblyManagementRequiredMixin, CreateView):
+class ElectoralCommissionCreateView(ElectionManagementRequiredMixin, CreateView):
     """Create electoral commission."""
     model = ElectoralCommission
     fields = ['name', 'start_date', 'end_date', 'status', 'notes']
@@ -1313,7 +1322,7 @@ class ElectoralCommissionCreateView(AssemblyManagementRequiredMixin, CreateView)
         return form
 
 
-class ElectoralCommissionUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+class ElectoralCommissionUpdateView(ElectionManagementRequiredMixin, UpdateView):
     """Update electoral commission."""
     model = ElectoralCommission
     fields = ['name', 'start_date', 'end_date', 'status', 'notes']
@@ -1328,14 +1337,14 @@ class ElectoralCommissionUpdateView(AssemblyManagementRequiredMixin, UpdateView)
         return form
 
 
-class ElectoralCommissionDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+class ElectoralCommissionDeleteView(ElectionManagementRequiredMixin, DeleteView):
     """Delete electoral commission."""
     model = ElectoralCommission
     template_name = 'governance/elections/commission_confirm_delete.html'
     success_url = reverse_lazy('governance:electoral_commission_list')
 
 
-class ElectionListView(GovernanceRequiredMixin, ListView):
+class ElectionListView(ElectionManagementRequiredMixin, ListView):
     """List elections (admin view)."""
     model = Election
     template_name = 'governance/elections/election_list.html'
@@ -1348,6 +1357,14 @@ class ElectionListView(GovernanceRequiredMixin, ListView):
         if status:
             queryset = queryset.filter(status=status)
         return queryset.order_by('-start_date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_manage_elections'] = user_has_governance_access(
+            self.request.user,
+            'governance.manage_elections',
+        )
+        return context
 
 
 class MemberElectionListView(LoginRequiredMixin, ListView):
@@ -1430,7 +1447,7 @@ class ElectionDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ElectionCreateView(AssemblyManagementRequiredMixin, CreateView):
+class ElectionCreateView(ElectionManagementRequiredMixin, CreateView):
     """Create election."""
     model = Election
     form_class = ElectionForm
@@ -1438,7 +1455,7 @@ class ElectionCreateView(AssemblyManagementRequiredMixin, CreateView):
     success_url = reverse_lazy('governance:election_list')
 
 
-class ElectionUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+class ElectionUpdateView(ElectionManagementRequiredMixin, UpdateView):
     """Update election."""
     model = Election
     form_class = ElectionForm
@@ -1446,14 +1463,14 @@ class ElectionUpdateView(AssemblyManagementRequiredMixin, UpdateView):
     success_url = reverse_lazy('governance:election_list')
 
 
-class ElectionDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+class ElectionDeleteView(ElectionManagementRequiredMixin, DeleteView):
     """Delete election."""
     model = Election
     template_name = 'governance/elections/election_confirm_delete.html'
     success_url = reverse_lazy('governance:election_list')
 
 
-class CandidacyListView(GovernanceRequiredMixin, ListView):
+class CandidacyListView(ElectionManagementRequiredMixin, ListView):
     """List candidacies."""
     model = Candidacy
     template_name = 'governance/elections/candidacy_list.html'
@@ -1469,6 +1486,14 @@ class CandidacyListView(GovernanceRequiredMixin, ListView):
         if status:
             queryset = queryset.filter(status=status)
         return queryset.order_by('-application_date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_manage_elections'] = user_has_governance_access(
+            self.request.user,
+            'governance.manage_elections',
+        )
+        return context
 
 
 class CandidacyCreateView(LoginRequiredMixin, CreateView):
@@ -1526,7 +1551,7 @@ def approve_candidacy(request, candidacy_id):
     """Approve or reject a candidacy (Electoral Commission only)."""
     candidacy = get_object_or_404(Candidacy, pk=candidacy_id)
     
-    if not request.user.has_perm('governance.manage_elections'):
+    if not user_has_governance_access(request.user, 'governance.manage_elections'):
         messages.error(request, _('You do not have permission to approve candidacies.'))
         return redirect('governance:candidacy_list')
     
@@ -2232,7 +2257,7 @@ class FinancialReportDeleteView(FinancialManagementRequiredMixin, DeleteView):
 # COMMISSION MEMBER & AUDITOR MEMBER MANAGEMENT
 # ============================================================================
 
-class CommissionMemberCreateView(AssemblyManagementRequiredMixin, CreateView):
+class CommissionMemberCreateView(ElectionManagementRequiredMixin, CreateView):
     """Add member to electoral commission."""
     model = CommissionMember
     fields = ['commission', 'user', 'role']
@@ -2247,7 +2272,7 @@ class CommissionMemberCreateView(AssemblyManagementRequiredMixin, CreateView):
         return initial
 
 
-class CommissionMemberUpdateView(AssemblyManagementRequiredMixin, UpdateView):
+class CommissionMemberUpdateView(ElectionManagementRequiredMixin, UpdateView):
     """Update commission member."""
     model = CommissionMember
     fields = ['commission', 'user', 'role']
@@ -2255,7 +2280,7 @@ class CommissionMemberUpdateView(AssemblyManagementRequiredMixin, UpdateView):
     success_url = reverse_lazy('governance:electoral_commission_list')
 
 
-class CommissionMemberDeleteView(AssemblyManagementRequiredMixin, DeleteView):
+class CommissionMemberDeleteView(ElectionManagementRequiredMixin, DeleteView):
     """Remove member from electoral commission."""
     model = CommissionMember
     template_name = 'governance/elections/commission_member_confirm_delete.html'

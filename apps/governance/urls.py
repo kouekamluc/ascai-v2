@@ -84,7 +84,7 @@ urlpatterns = [
     path('elections/commission-members/create/', views.CommissionMemberCreateView.as_view(), name='commission_member_create'),
     path('elections/commission-members/<int:pk>/edit/', views.CommissionMemberUpdateView.as_view(), name='commission_member_edit'),
     path('elections/commission-members/<int:pk>/delete/', views.CommissionMemberDeleteView.as_view(), name='commission_member_delete'),
-    path('elections/', views.ElectionListView.as_view(), name='election_list'),
+    path('elections/manage/', views.ElectionListView.as_view(), name='election_list'),
     path('elections/<int:pk>/', views.ElectionDetailView.as_view(), name='election_detail'),
     path('elections/create/', views.ElectionCreateView.as_view(), name='election_create'),
     path('elections/<int:pk>/edit/', views.ElectionUpdateView.as_view(), name='election_edit'),
@@ -153,4 +153,3 @@ urlpatterns = [
     path('amendments/<int:pk>/edit/', views.RulesOfProcedureAmendmentUpdateView.as_view(), name='amendment_edit'),
     path('amendments/<int:pk>/delete/', views.RulesOfProcedureAmendmentDeleteView.as_view(), name='amendment_delete'),
 ]
-

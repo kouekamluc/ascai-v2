@@ -38,14 +38,19 @@
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div class="flex items-center justify-between">
             <div>
+                {% if voting_eligibility.has_voted %}
+                <p class="font-semibold text-blue-900">{% trans "Your vote can still be reviewed" %}</p>
+                <p class="text-sm text-blue-700 mt-1">{{ voting_eligibility.reason }}</p>
+                {% else %}
                 <p class="font-semibold text-blue-900">{% trans "Election is open for voting" %}</p>
                 <p class="text-sm text-blue-700 mt-1">{% trans "Cast your vote now" %}</p>
+                {% endif %}
             </div>
             <a href="{% url 'governance:election_vote' election_id=election.pk %}" class="btn-primary">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                {% trans "Vote Now" %}
+                {% if voting_eligibility.has_voted %}{% trans "Review or Update Vote" %}{% else %}{% trans "Vote Now" %}{% endif %}
             </a>
         </div>
     </div>
