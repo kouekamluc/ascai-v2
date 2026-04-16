@@ -84,6 +84,11 @@ class DownloadsViewsTest(TestCase):
                 b"file_content",
                 content_type="application/pdf"
             ),
+            thumbnail=SimpleUploadedFile(
+                "thumb.jpg",
+                b"thumbnail_content",
+                content_type="image/jpeg"
+            ),
             uploaded_by=self.user
         )
     
@@ -108,4 +113,13 @@ class DownloadsViewsTest(TestCase):
         recent_response = self.client.get(reverse('downloads:recent'))
         self.assertEqual(popular_response.status_code, 200)
         self.assertEqual(recent_response.status_code, 200)
+
+    def test_thumbnail_is_rendered_on_list_and_detail_pages(self):
+        list_response = self.client.get(reverse('downloads:index'))
+        detail_response = self.client.get(
+            reverse('downloads:document_detail', kwargs={'pk': self.document.pk})
+        )
+
+        self.assertContains(list_response, self.document.thumbnail.url)
+        self.assertContains(detail_response, self.document.thumbnail.url)
 

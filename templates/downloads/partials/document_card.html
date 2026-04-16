@@ -1,20 +1,15 @@
 {% load i18n %}
 <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-    <div class="flex items-start justify-between">
+    {% include 'downloads/partials/document_thumbnail.html' with document=document wrapper_class='aspect-[4/3] w-full overflow-hidden rounded-2xl border border-black/5 bg-stone-100' image_class='h-full w-full object-cover' fallback_class='flex h-full min-h-[10rem] w-full flex-col items-center justify-center bg-gradient-to-br from-stone-100 via-white to-stone-200 px-4 text-center' %}
+    <div class="mt-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div class="flex-1">
-            <div class="flex items-center mb-2">
-                {% if document.thumbnail %}
-                <img src="{{ document.thumbnail.url }}" alt="{{ document.title }}" class="w-12 h-12 object-cover rounded mr-3">
-                {% else %}
-                <svg class="w-6 h-6 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                </svg>
-                {% endif %}
+            <div class="flex items-start justify-between gap-3 mb-2">
                 <h3 class="text-lg font-semibold">
                     <a href="{% url 'downloads:document_detail' document.pk %}" class="hover:text-cameroon-green">
                         {{ document.title }}
                     </a>
                 </h3>
+                <span class="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-cameroon-green">{{ document.file_type|default:"file" }}</span>
             </div>
             
             {% if document.description %}
@@ -44,7 +39,7 @@
             </div>
         </div>
         
-        <div class="ml-4">
+        <div class="md:ml-4">
             <a href="{% url 'downloads:document_download' document.pk %}" class="inline-flex items-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 transition">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
