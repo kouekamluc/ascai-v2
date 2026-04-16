@@ -3,12 +3,12 @@ Signals for mentorship app.
 """
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 import logging
+
+from apps.core.email_utils import send_branded_email
 
 from .models import MentorshipRequest, MentorshipMessage
 
@@ -56,9 +56,29 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
                 direct_url=f"{site_url}/mentorship/requests/{instance.pk}/"
             )
             
-            send_mail(
+            send_branded_email(
                 subject=subject,
-                message=message,
+                text_body=message,
+                template_name='email/generic_message.html',
+                context={
+                    'email_title': subject,
+                    'greeting': _('Hello') + f" {mentor.get_full_name() or mentor.username},",
+                    'body_paragraphs': [
+                        _('You have received a new mentorship request from {student_name}.').format(
+                            student_name=student.get_full_name() or student.username
+                        ),
+                        _('Subject: {subject}').format(subject=instance.subject),
+                        _('Message: {message}').format(message=instance.message),
+                    ],
+                    'button_label': _('Open Mentorship Request'),
+                    'button_url': f"{site_url}/dashboard/mentorship/requests/{instance.pk}/",
+                    'closing_paragraphs': [
+                        _('Direct link: {url}').format(
+                            url=f"{site_url}/mentorship/requests/{instance.pk}/"
+                        ),
+                    ],
+                },
+                site_url=site_url,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[mentor.email],
                 fail_silently=True,
@@ -120,9 +140,35 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
             else:
                 return  # Don't send email for other status changes
             
-            send_mail(
+            send_branded_email(
                 subject=subject,
-                message=message,
+                text_body=message,
+                template_name='email/generic_message.html',
+                context={
+                    'email_title': subject,
+                    'greeting': _('Hello') + f" {student.get_full_name() or student.username},",
+                    'body_paragraphs': [message.split('\n\n')[0]],
+                    'button_label': _('Open Mentorship Dashboard'),
+                    'button_url': (
+                        f"{site_url}/dashboard/mentorship/requests/{instance.pk}/"
+                        if instance.status != 'rejected'
+                        else f"{site_url}/dashboard/mentorship/browse/"
+                    ),
+                    'closing_paragraphs': [
+                        _('Direct link: {url}').format(
+                            url=(
+                                f"{site_url}/mentorship/requests/{instance.pk}/rate/"
+                                if instance.status == 'completed'
+                                else (
+                                    f"{site_url}/mentorship/requests/{instance.pk}/"
+                                    if instance.status == 'accepted'
+                                    else f"{site_url}/mentorship/"
+                                )
+                            )
+                        ),
+                    ],
+                },
+                site_url=site_url,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[student.email],
                 fail_silently=True,
@@ -166,9 +212,29 @@ def notify_new_message(sender, instance, created, **kwargs):
                 direct_url=f"{site_url}/mentorship/requests/{request.pk}/"
             )
             
-            send_mail(
+            send_branded_email(
                 subject=subject,
-                message=message,
+                text_body=message,
+                template_name='email/generic_message.html',
+                context={
+                    'email_title': subject,
+                    'greeting': _('Hello') + f" {recipient.get_full_name() or recipient.username},",
+                    'body_paragraphs': [
+                        _('You have received a new message from {sender_name}.').format(
+                            sender_name=sender_name
+                        ),
+                        _('Request: {subject}').format(subject=request.subject),
+                        _('Message preview: {content}').format(content=instance.content[:200]),
+                    ],
+                    'button_label': _('Reply to Message'),
+                    'button_url': f"{site_url}/dashboard/mentorship/requests/{request.pk}/",
+                    'closing_paragraphs': [
+                        _('Direct link: {url}').format(
+                            url=f"{site_url}/mentorship/requests/{request.pk}/"
+                        ),
+                    ],
+                },
+                site_url=site_url,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[recipient.email],
                 fail_silently=True,

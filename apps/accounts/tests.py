@@ -1,10 +1,11 @@
-"""
-Tests for accounts app.
-"""
-from django.test import TestCase, Client
+"""Tests for accounts app."""
+from allauth.account.models import EmailAddress, get_emailconfirmation_model
 from django.contrib.auth import get_user_model
-from django.urls import reverse
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, TestCase
+from django.urls import reverse
+
 from .models import User, UserDocument
 
 User = get_user_model()
@@ -155,9 +156,20 @@ class AccountsViewsTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
+        verification_sent_url = reverse('account_email_verification_notice')
+        self.assertTrue(response.url.startswith(verification_sent_url))
+        self.assertIn('email=newmember%40example.com', response.url)
         created_user = User.objects.get(username='newmember')
         self.assertTrue(created_user.is_approved)
         self.assertTrue(created_user.is_active)
+        self.assertEqual(created_user.emailaddress_set.count(), 1)
+        self.assertFalse(created_user.emailaddress_set.first().verified)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('confirm', mail.outbox[0].subject.lower())
+        self.assertTrue(mail.outbox[0].alternatives)
+        signup_html = mail.outbox[0].alternatives[0][0]
+        self.assertIn('web-app-manifest-512x512.png', signup_html)
+        self.assertIn('Thank you for signing up with ASCAI Lazio.', signup_html)
 
     def test_login_flow_redirects_approved_user_to_dashboard(self):
         """Approved users should enter through the dashboard route."""
@@ -182,6 +194,100 @@ class AccountsViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_login_page_matches_current_session_behavior(self):
+        """Remember-me checkbox should only appear when the form actually supports it."""
+        response = self.client.get(reverse('account_login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'Remember me')
+
+    def test_signup_page_mentions_email_confirmation(self):
+        response = self.client.get(reverse('account_signup'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Email Confirmation Sent')
+        self.assertNotContains(response, 'Account Approval Required')
+        self.assertContains(response, 'name="phone"', html=False)
+        self.assertContains(response, 'name="role"', html=False)
+        self.assertContains(response, 'name="language_preference"', html=False)
+
+    def test_resend_verification_email_sends_confirmation(self):
+        unverified_user = User.objects.create_user(
+            username='unverified',
+            email='unverified@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        EmailAddress.objects.create(
+            user=unverified_user,
+            email=unverified_user.email,
+            primary=True,
+            verified=False,
+        )
+
+        response = self.client.post(
+            reverse('accounts:resend_verification_email'),
+            {'email': unverified_user.email},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('account_email_verification_notice'), response.url)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('confirm', mail.outbox[0].subject.lower())
+
+    def test_verification_notice_allows_anonymous_resend_entry(self):
+        response = self.client.get(reverse('account_email_verification_notice'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Resend Verification Email')
+        self.assertContains(response, 'name="email"', html=False)
+
+    def test_confirm_email_marks_user_verified(self):
+        pending_user = User.objects.create_user(
+            username='confirmme',
+            email='confirmme@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        email_address = EmailAddress.objects.create(
+            user=pending_user,
+            email=pending_user.email,
+            primary=True,
+            verified=False,
+        )
+        confirmation = get_emailconfirmation_model().create(email_address)
+
+        get_response = self.client.get(
+            reverse('account_confirm_email', args=[confirmation.key])
+        )
+        self.assertEqual(get_response.status_code, 200)
+        self.assertContains(get_response, 'Confirm Your Email')
+
+        post_response = self.client.post(
+            reverse('account_confirm_email', args=[confirmation.key])
+        )
+        self.assertEqual(post_response.status_code, 200)
+
+        pending_user.refresh_from_db()
+        email_address.refresh_from_db()
+        self.assertTrue(pending_user.email_verified)
+        self.assertTrue(email_address.verified)
+        self.assertContains(post_response, 'Your email has been successfully verified')
+        self.assertContains(post_response, 'Your account is ready to use')
+        self.assertContains(post_response, 'Sign In')
+
+    def test_password_reset_sends_branded_email(self):
+        mail.outbox = []
+        response = self.client.post(
+            reverse('account_reset_password'),
+            {'email': self.user.email},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('account_reset_password_done'))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(mail.outbox[0].alternatives)
+        html_body = mail.outbox[0].alternatives[0][0]
+        self.assertIn('web-app-manifest-512x512.png', html_body)
+        self.assertIn('Reset Password', html_body)
+
 
 class AccountsURLsTest(TestCase):
     """Test accounts URLs."""
@@ -193,4 +299,32 @@ class AccountsURLsTest(TestCase):
 
     def test_allauth_login_url_resolves(self):
         self.assertEqual(reverse('account_login'), '/accounts/login/')
+
+    def test_verification_notice_url_resolves(self):
+        self.assertEqual(
+            reverse('account_email_verification_notice'),
+            '/accounts/email-verification-sent/',
+        )
+
+
+class ApprovalEmailBrandingTest(TestCase):
+    """Ensure approval emails keep the branded HTML version."""
+
+    def test_approval_email_includes_logo(self):
+        user = User.objects.create_user(
+            username='pendinguser',
+            email='pending@example.com',
+            password='testpass123',
+            is_approved=False,
+        )
+
+        mail.outbox = []
+        user.is_approved = True
+        user.save()
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(mail.outbox[0].alternatives)
+        html_body = mail.outbox[0].alternatives[0][0]
+        self.assertIn('<img src="', html_body)
+        self.assertIn('web-app-manifest-512x512.png', html_body)
 

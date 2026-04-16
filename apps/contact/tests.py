@@ -1,6 +1,7 @@
 """
 Tests for contact app.
 """
+from django.core import mail
 from django.test import TestCase, Client
 from django.urls import reverse
 from .models import ContactSubmission
@@ -59,4 +60,9 @@ class ContactViewsTest(TestCase):
         self.assertIn(response.status_code, [200, 302])
         # Check that submission was created
         self.assertTrue(ContactSubmission.objects.filter(email='john@example.com').exists())
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(mail.outbox[0].alternatives)
+        html_body = mail.outbox[0].alternatives[0][0]
+        self.assertIn('<img src="', html_body)
+        self.assertIn('web-app-manifest-512x512.png', html_body)
 

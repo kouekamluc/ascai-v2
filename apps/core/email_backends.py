@@ -4,8 +4,8 @@ This bypasses Railway's SMTP blocking issues.
 """
 from django.core.mail.backends.base import BaseEmailBackend
 from django.conf import settings
+from django.utils.html import strip_tags
 import logging
-import re
 
 logger = logging.getLogger(__name__)
 
@@ -66,24 +66,30 @@ class SendGridBackend(BaseEmailBackend):
                 elif not isinstance(to_emails, (list, tuple)):
                     to_emails = list(to_emails)
                 
-                # Determine content type
-                is_html = message.content_subtype == 'html'
-                
-                # SendGrid requires at least one content type (html or plain text)
-                # Ensure body is not empty
-                body = message.body or '(No content)'
-                
-                if is_html:
-                    html_content = body
-                    # For HTML emails, also provide plain text fallback
-                    plain_text_content = body.replace('<br>', '\n').replace('<br/>', '\n').replace('<br />', '\n')
-                    # Remove HTML tags for plain text version (simple approach)
-                    plain_text_content = re.sub(r'<[^>]+>', '', plain_text_content).strip()
-                    if not plain_text_content:
-                        plain_text_content = 'Please view this email in an HTML-compatible email client.'
-                else:
-                    html_content = None
-                    plain_text_content = body
+                # Django's send_mail(html_message=...) stores HTML in message.alternatives.
+                body = message.body or ''
+                html_content = body if message.content_subtype == 'html' else None
+                plain_text_content = body.strip()
+
+                for alternative in getattr(message, 'alternatives', []):
+                    content = getattr(alternative, 'content', None)
+                    mimetype = getattr(alternative, 'mimetype', None)
+                    if content is None and isinstance(alternative, (list, tuple)) and len(alternative) >= 2:
+                        content, mimetype = alternative[0], alternative[1]
+                    if mimetype == 'text/html':
+                        html_content = content
+                        break
+
+                if html_content and not plain_text_content:
+                    plain_text_content = strip_tags(
+                        html_content
+                        .replace('<br>', '\n')
+                        .replace('<br/>', '\n')
+                        .replace('<br />', '\n')
+                    ).strip()
+
+                if not plain_text_content:
+                    plain_text_content = '(No content)'
                 
                 # Create Mail object - SendGrid requires at least one content type
                 mail = Mail(
@@ -180,4 +186,3 @@ class SendGridBackend(BaseEmailBackend):
                     raise
         
         return sent_count
-

@@ -27,7 +27,7 @@ urlpatterns = [
     # Friendly fallback for /accounts/confirm-email/ without a verification key
     path('accounts/confirm-email/', email_verification_required_view, name='account_email_verification_required'),
     # Branded email verification sent page
-    path('accounts/email-verification-sent/', CustomEmailVerificationSentView.as_view(), name='account_email_verification_sent'),
+    path('accounts/email-verification-sent/', CustomEmailVerificationSentView.as_view(), name='account_email_verification_notice'),
 ]
 
 # Language-prefixed URLs

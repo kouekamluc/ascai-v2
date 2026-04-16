@@ -2,10 +2,11 @@
 {% load i18n %}
 
 {% block email_title %}{% trans 'Confirm Your Email' %}{% endblock %}
-{% block header_title %}{% trans 'Confirm Your Email' %}{% endblock %}
+{% block header_title %}{% trans 'Welcome to ASCAI Lazio' %}{% endblock %}
 
 {% block email_content %}
     <p>{% trans 'Hello' %} {{ user.username }},</p>
+    <p>{% trans 'Thank you for signing up with ASCAI Lazio.' %}</p>
     <p>{% trans 'Please confirm your email address by clicking the link below:' %}</p>
     <div class="button-wrap">
         <a href="{{ activate_url }}" class="button">{% trans 'Confirm Email' %}</a>

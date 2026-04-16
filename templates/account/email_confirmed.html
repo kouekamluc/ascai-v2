@@ -29,7 +29,7 @@
                     </div>
                     
                     <p class="text-gray-700 text-base mb-6 leading-relaxed">
-                        {% trans 'Thank you for confirming your email address. Your account is now pending admin approval.' %}
+                        {% trans 'Thank you for confirming your email address. Your account is active and your contact details are now verified.' %}
                     </p>
                 </div>
                 
@@ -43,7 +43,7 @@
                             <div>
                                 <p class="text-sm font-semibold text-blue-900 mb-1">{% trans 'What\'s Next?' %}</p>
                                 <p class="text-sm text-blue-700">
-                                    {% trans 'You will receive an email notification once your account has been approved by an administrator.' %}
+                                    {% trans 'You can continue using your account normally, and password recovery and notifications will now go to this verified email address.' %}
                                 </p>
                             </div>
                         </div>
@@ -57,7 +57,7 @@
                             <div>
                                 <p class="text-sm font-semibold text-cameroon-green mb-1">{% trans 'Account Status' %}</p>
                                 <p class="text-sm text-cameroon-green/80">
-                                    {% trans 'Your account is currently pending approval. Once approved, you will be able to access all features of the platform.' %}
+                                    {% trans 'Your account is ready to use. If you signed in during registration, you can go straight back to the platform.' %}
                                 </p>
                             </div>
                         </div>
@@ -66,12 +66,21 @@
                 
                 <!-- Action buttons -->
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <a href="{% url 'core:home' %}" class="flex-1 text-center px-6 py-3 bg-cameroon-green text-white rounded-lg font-semibold hover:bg-cameroon-green/90 transition-all duration-200 shadow-md hover:shadow-lg">
-                        {% trans 'Go to Home' %}
+                    {% if request.user.is_authenticated %}
+                    <a href="{% url 'dashboard:home' %}" class="flex-1 text-center px-6 py-3 bg-cameroon-green text-white rounded-lg font-semibold hover:bg-cameroon-green/90 transition-all duration-200 shadow-md hover:shadow-lg">
+                        {% trans 'Go to Dashboard' %}
                     </a>
-                    <a href="{% url 'account_login' %}" class="flex-1 text-center px-6 py-3 border-2 border-cameroon-green text-cameroon-green rounded-lg font-semibold hover:bg-cameroon-green/5 transition-all duration-200">
+                    <a href="{% url 'account_email' %}" class="flex-1 text-center px-6 py-3 border-2 border-cameroon-green text-cameroon-green rounded-lg font-semibold hover:bg-cameroon-green/5 transition-all duration-200">
+                        {% trans 'Manage Email' %}
+                    </a>
+                    {% else %}
+                    <a href="{% url 'account_login' %}" class="flex-1 text-center px-6 py-3 bg-cameroon-green text-white rounded-lg font-semibold hover:bg-cameroon-green/90 transition-all duration-200 shadow-md hover:shadow-lg">
                         {% trans 'Sign In' %}
                     </a>
+                    <a href="{% url 'core:home' %}" class="flex-1 text-center px-6 py-3 border-2 border-cameroon-green text-cameroon-green rounded-lg font-semibold hover:bg-cameroon-green/5 transition-all duration-200">
+                        {% trans 'Go to Home' %}
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

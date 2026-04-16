@@ -2,11 +2,13 @@
 Views for the accounts app.
 """
 import logging
+from urllib.parse import urlencode
 
-from allauth.account.models import EmailAddress, EmailConfirmation
+from allauth.account.models import EmailAddress, EmailConfirmation, get_emailconfirmation_model
 from allauth.account.views import ConfirmEmailView, EmailVerificationSentView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
@@ -28,7 +30,10 @@ class CustomConfirmEmailView(ConfirmEmailView):
     """
 
     def get(self, *args, **kwargs):
-        self.object = self.get_object()
+        try:
+            self.object = self.get_object()
+        except Http404:
+            self.object = None
         if not self.object:
             return render(self.request, "account/email_confirm.html", {"confirmation": None})
 
@@ -49,7 +54,10 @@ class CustomConfirmEmailView(ConfirmEmailView):
         )
 
     def post(self, *args, **kwargs):
-        self.object = self.get_object()
+        try:
+            self.object = self.get_object()
+        except Http404:
+            self.object = None
         if not self.object:
             return render(self.request, "account/email_confirm.html", {"confirmation": None})
 
@@ -90,7 +98,7 @@ def resend_verification_email(request):
 
     if not email:
         messages.error(request, _("Please provide an email address."))
-        return redirect("account_email_verification_sent")
+        return redirect("account_email_verification_notice")
 
     try:
         user = User.objects.get(email=email)
@@ -100,7 +108,7 @@ def resend_verification_email(request):
     except User.MultipleObjectsReturned:
         user = User.objects.filter(email=email).first()
 
-    email_address, _ = EmailAddress.objects.get_or_create(
+    email_address, _created = EmailAddress.objects.get_or_create(
         user=user,
         email=email,
         defaults={"verified": False, "primary": True},
@@ -110,9 +118,11 @@ def resend_verification_email(request):
         return redirect("account_login")
 
     try:
-        EmailConfirmation.objects.filter(email_address=email_address).delete()
-        emailconfirmation = EmailConfirmation.create(email_address)
-        if not emailconfirmation.pk:
+        confirmation_model = get_emailconfirmation_model()
+        if confirmation_model is EmailConfirmation:
+            EmailConfirmation.objects.filter(email_address=email_address).delete()
+        emailconfirmation = confirmation_model.create(email_address)
+        if getattr(emailconfirmation, "pk", None) is None and confirmation_model is EmailConfirmation:
             emailconfirmation.save()
         adapter.send_confirmation_mail(request, emailconfirmation, signup=False)
         messages.success(
@@ -130,7 +140,9 @@ def resend_verification_email(request):
             _("Failed to send verification email. Please try again later or contact support."),
         )
 
-    return redirect(f"{reverse('account_email_verification_sent')}?email={email}")
+    return redirect(
+        f"{reverse('account_email_verification_notice')}?{urlencode({'email': email})}"
+    )
 
 
 def email_verification_required_view(request):
@@ -150,3 +162,5 @@ def email_verification_required_view(request):
 
 class CustomEmailVerificationSentView(EmailVerificationSentView):
     """Use the branded verification-sent page without any social-auth branching."""
+
+    template_name = "account/email_verification_sent.html"

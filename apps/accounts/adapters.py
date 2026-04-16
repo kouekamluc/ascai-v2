@@ -1,103 +1,24 @@
 """
 Allauth adapters and forms for the account lifecycle.
 """
+from urllib.parse import urlencode
+
 from allauth.account.adapter import DefaultAccountAdapter
-from allauth.account.forms import LoginForm, SignupForm
 from allauth.account.models import EmailAddress
-from django import forms
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
+from django.shortcuts import resolve_url
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 
-from .models import User
+from apps.core.email_utils import get_email_branding_context
 
-
-class CustomLoginForm(LoginForm):
-    """Login form that enforces ASCAI approval rules."""
-
-    def clean(self):
-        cleaned_data = super().clean()
-        login_value = cleaned_data.get("login")
-        password = cleaned_data.get("password")
-
-        if not login_value or not password:
-            return cleaned_data
-
-        try:
-            user = User.objects.get(username=login_value)
-        except User.DoesNotExist:
-            try:
-                user = User.objects.get(email=login_value)
-            except User.DoesNotExist:
-                return cleaned_data
-
-        if user.is_superuser:
-            return cleaned_data
-
-        if not user.is_active:
-            raise ValidationError(
-                _("Your account is inactive. Please contact an administrator.")
-            )
-
-        if not user.is_approved:
-            raise ValidationError(
-                _(
-                    "Your account is pending admin approval. Please wait for approval before logging in."
-                )
-            )
-
-        return cleaned_data
-
-
-class CustomSignupForm(SignupForm):
-    """Signup form with the extra profile fields used on the site."""
-
-    phone = forms.CharField(
-        max_length=20,
-        required=False,
-        widget=forms.TextInput(
-            attrs={
-                "class": "w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green",
-                "placeholder": _("Phone number (optional)"),
-            }
-        ),
-        label=_("Phone Number"),
-    )
-    role = forms.ChoiceField(
-        choices=[("student", _("Student")), ("mentor", _("Mentor"))],
-        initial="student",
-        widget=forms.Select(
-            attrs={
-                "class": "w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green",
-            }
-        ),
-        label=_("I am a"),
-    )
-    language_preference = forms.ChoiceField(
-        choices=User.LANGUAGE_CHOICES,
-        initial="en",
-        widget=forms.Select(
-            attrs={
-                "class": "w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green",
-            }
-        ),
-        label=_("Language Preference"),
-    )
-
-    def save(self, request):
-        user = super().save(request)
-        user.phone = self.cleaned_data.get("phone", "")
-        user.role = self.cleaned_data.get("role", "student")
-        user.language_preference = self.cleaned_data.get("language_preference", "en")
-        user.is_approved = True
-        user.is_active = True
-        user.save()
-        return user
+from .forms import CustomLoginForm, CustomSignupForm
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     """Keeps the account flow centered on email/password and approval rules."""
+
+    verification_sent_route_name = "account_email_verification_notice"
 
     def get_login_form_class(self):
         return CustomLoginForm
@@ -156,3 +77,21 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             "ascai.up.railway.app",
         )
         return f"{protocol}://{allowed_host}{url}"
+
+    def render_mail(self, template_prefix, email, context, headers=None):
+        email_context = get_email_branding_context(request=context.get("request"))
+        email_context.update(context)
+        return super().render_mail(template_prefix, email, email_context, headers=headers)
+
+    def respond_email_verification_sent(self, request, user):
+        return HttpResponseRedirect(self._build_verification_sent_url(request, user))
+
+    def get_signup_redirect_url(self, request):
+        return self._build_verification_sent_url(request, getattr(request, "user", None))
+
+    def _build_verification_sent_url(self, request, user):
+        base_url = resolve_url(self.verification_sent_route_name)
+        email = getattr(user, "email", "")
+        if email:
+            return f"{base_url}?{urlencode({'email': email})}"
+        return base_url

@@ -1,0 +1,134 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block email_title %}{{ organization_name }}{% endblock %}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f1e8;
+            font-family: Arial, sans-serif;
+            color: #1f2b27;
+        }
+        .wrapper {
+            width: 100%;
+            padding: 24px 12px;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #e5dfd4;
+        }
+        .header {
+            text-align: center;
+            padding: 32px 24px 24px;
+            background: linear-gradient(135deg, #10392f 0%, #0d6b52 70%, #f2c94c 150%);
+            color: #ffffff;
+        }
+        .header img {
+            display: block;
+            margin: 0 auto 16px;
+            width: 88px;
+            height: 88px;
+            border-radius: 18px;
+            background-color: rgba(255, 255, 255, 0.12);
+            padding: 8px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+        .header p {
+            margin: 8px 0 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.88);
+        }
+        .content {
+            padding: 32px 24px;
+            background-color: #ffffff;
+        }
+        .content p {
+            margin: 0 0 16px;
+            line-height: 1.7;
+        }
+        .button-wrap {
+            text-align: center;
+            margin: 28px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 999px;
+            background-color: #0d6b52;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .details {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .details th,
+        .details td {
+            text-align: left;
+            vertical-align: top;
+            padding: 10px 12px;
+            border-bottom: 1px solid #ece7dc;
+            font-size: 14px;
+        }
+        .details th {
+            width: 120px;
+            color: #496057;
+            font-weight: bold;
+        }
+        .message-box {
+            margin: 22px 0;
+            padding: 18px;
+            border-radius: 14px;
+            background-color: #f7f3ea;
+            border-left: 4px solid #0d6b52;
+            white-space: pre-wrap;
+        }
+        .footer {
+            padding: 20px 24px 28px;
+            text-align: center;
+            background-color: #f7f3ea;
+            color: #61726b;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+        .footer a {
+            color: #0d6b52;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <a href="{{ site_url }}">
+                    <img src="{{ logo_url }}" alt="{% trans 'ASCAI Lazio Logo' %}">
+                </a>
+                <h1>{% block header_title %}{{ organization_name }}{% endblock %}</h1>
+                <p>{{ organization_tagline }}</p>
+            </div>
+            <div class="content">
+                {% block email_content %}{% endblock %}
+            </div>
+            <div class="footer">
+                <p>{{ organization_name }}<br>{{ organization_tagline }}</p>
+                <p><a href="{{ site_url }}">{{ site_url }}</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

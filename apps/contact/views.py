@@ -5,9 +5,11 @@ from django.shortcuts import render
 from django.views.generic import FormView, TemplateView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+
+from apps.core.email_utils import send_branded_email
+
 from .models import ContactSubmission
 from .forms import ContactForm
 
@@ -44,12 +46,32 @@ Submitted on: {submission.created_at.strftime('%Y-%m-%d %H:%M:%S')}
             # Get contact email from settings (defaults to info@ascai.org)
             contact_email = getattr(settings, 'CONTACT_EMAIL', 'info@ascai.org')
             
-            send_mail(
+            send_branded_email(
                 subject=f"ASCAI Lazio Contact: {submission.subject}",
-                message=email_body.strip(),
+                text_body=email_body,
+                template_name='email/generic_message.html',
+                context={
+                    'email_title': _('New Contact Form Submission'),
+                    'greeting': _('Hello,'),
+                    'body_paragraphs': [
+                        _('A new message has been submitted from the ASCAI Lazio website contact form.'),
+                    ],
+                    'detail_rows': [
+                        {'label': _('From'), 'value': submission.name},
+                        {'label': _('Email'), 'value': submission.email},
+                        {'label': _('Phone'), 'value': submission.phone or '-'},
+                        {'label': _('Subject'), 'value': submission.subject},
+                        {'label': _('Submitted'), 'value': submission.created_at.strftime('%Y-%m-%d %H:%M:%S')},
+                    ],
+                    'message_body': submission.message,
+                    'closing_paragraphs': [
+                        _('This message was sent from the ASCAI Lazio contact form.'),
+                    ],
+                },
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[contact_email],
                 fail_silently=False,
+                request=self.request,
             )
         except Exception as e:
             # Log error but don't fail the submission
@@ -75,4 +97,3 @@ Submitted on: {submission.created_at.strftime('%Y-%m-%d %H:%M:%S')}
 class ContactSuccessView(TemplateView):
     """Contact success page."""
     template_name = 'contact/success.html'
-

@@ -86,3 +86,16 @@ class CoreContextProcessorsTest(TestCase):
         self.assertIn('association_settings', context)
         self.assertIsInstance(context['association_settings'], AssociationSettings)
 
+
+class CoreEmailUtilsTest(TestCase):
+    """Test branded email helpers."""
+
+    def test_email_branding_context_has_absolute_logo_url(self):
+        from apps.core.email_utils import get_email_branding_context
+
+        context = get_email_branding_context(site_url='https://ascai.test')
+
+        self.assertEqual(context['site_url'], 'https://ascai.test')
+        self.assertTrue(context['logo_url'].startswith('https://ascai.test/'))
+        self.assertIn('web-app-manifest-512x512.png', context['logo_url'])
+

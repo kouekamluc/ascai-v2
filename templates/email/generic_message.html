@@ -1,0 +1,39 @@
+{% extends "email/base.html" %}
+
+{% block email_title %}{{ email_title|default:organization_name }}{% endblock %}
+{% block header_title %}{{ email_title|default:organization_name }}{% endblock %}
+
+{% block email_content %}
+    {% if greeting %}
+        <p>{{ greeting }}</p>
+    {% endif %}
+
+    {% for paragraph in body_paragraphs %}
+        <p>{{ paragraph }}</p>
+    {% endfor %}
+
+    {% if detail_rows %}
+        <table class="details" role="presentation">
+            {% for row in detail_rows %}
+                <tr>
+                    <th>{{ row.label }}</th>
+                    <td>{{ row.value|linebreaksbr }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    {% if message_body %}
+        <div class="message-box">{{ message_body|linebreaksbr }}</div>
+    {% endif %}
+
+    {% if button_url and button_label %}
+        <div class="button-wrap">
+            <a href="{{ button_url }}" class="button">{{ button_label }}</a>
+        </div>
+    {% endif %}
+
+    {% for paragraph in closing_paragraphs %}
+        <p>{{ paragraph }}</p>
+    {% endfor %}
+{% endblock %}

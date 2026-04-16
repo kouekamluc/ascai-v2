@@ -5,13 +5,13 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.conf import settings
 from allauth.account.models import EmailAddress
 from unfold.admin import ModelAdmin
 from config.admin import BaseAdmin
 import logging
+
+from apps.core.email_utils import send_branded_email
 
 from .models import User, UserDocument
 
@@ -146,14 +146,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
                 'username': user.get_display_name(),
                 'login_url': login_url,
             }
-            
-            # Render email template
-            email_html = render_to_string(
-                'accounts/email/account_approved.html',
-                context,
-                using='django'
-            )
-            
+
             # Prepare plain text version
             email_text = f"""
 {_('Hello')} {user.get_display_name()},
@@ -169,12 +162,13 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 ---
 {_('ASCAI Lazio - Association of Cameroonian Students and Academics in Lazio')}
 """
-            
-            # Send email
-            send_mail(
+
+            send_branded_email(
                 subject=_('Your ASCAI Lazio Account Has Been Approved'),
-                message=email_text.strip(),
-                html_message=email_html,
+                text_body=email_text,
+                template_name='accounts/email/account_approved.html',
+                context=context,
+                site_url=site_url,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
                 fail_silently=False,

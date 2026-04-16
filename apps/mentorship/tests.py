@@ -1,6 +1,7 @@
 """
 Tests for mentorship app.
 """
+from django.core import mail
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -95,6 +96,20 @@ class MentorshipRequestModelTest(TestCase):
         # The __str__ method returns "Request from {student} to {mentor}"
         self.assertIn('student', str(request).lower())
         self.assertIn('mentor', str(request).lower())
+
+    def test_new_request_email_includes_logo(self):
+        MentorshipRequest.objects.create(
+            student=self.student,
+            mentor=self.mentor_profile,
+            subject='Email Branding',
+            message='Please help me settle in Rome.',
+        )
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(mail.outbox[0].alternatives)
+        html_body = mail.outbox[0].alternatives[0][0]
+        self.assertIn('<img src="', html_body)
+        self.assertIn('web-app-manifest-512x512.png', html_body)
 
 
 class MentorRatingModelTest(TestCase):

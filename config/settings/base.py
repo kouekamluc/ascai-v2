@@ -429,19 +429,27 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomAccountAdapter'
 ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
-# Changed from 'mandatory' to 'optional' to allow users to login immediately after registration
-# Users can still verify their email later for full access to all features
+# Email verification stays optional, but signup still sends a confirmation mail.
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = False
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-# Changed to redirect to dashboard after signup since email verification is optional
-ACCOUNT_SIGNUP_REDIRECT_URL = 'dashboard:home'
+# Fresh signups land on the branded verification notice page while staying signed in.
+ACCOUNT_SIGNUP_REDIRECT_URL = 'account_email_verification_notice'
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'dashboard:home'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = 'account_login'
 ACCOUNT_PASSWORD_MIN_LENGTH = 8
+ACCOUNT_FORMS = {
+    'add_email': 'apps.accounts.forms.CustomAddEmailForm',
+    'change_password': 'apps.accounts.forms.CustomChangePasswordForm',
+    'login': 'apps.accounts.forms.CustomLoginForm',
+    'reset_password': 'apps.accounts.forms.CustomResetPasswordForm',
+    'reset_password_from_key': 'apps.accounts.forms.CustomResetPasswordKeyForm',
+    'set_password': 'apps.accounts.forms.CustomSetPasswordForm',
+    'signup': 'apps.accounts.forms.CustomSignupForm',
+}
 ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/5m',  # 5 attempts per 5 minutes
 }

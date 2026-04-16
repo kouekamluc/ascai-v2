@@ -7,11 +7,11 @@ from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
+
+from apps.core.email_utils import send_branded_email
 
 from .models import User
 
@@ -54,8 +54,6 @@ def _send_approval_email(user):
         "username": user.get_display_name(),
         "login_url": login_url,
     }
-
-    email_html = render_to_string("accounts/email/account_approved.html", context)
     email_text = f"""
 {_('Hello')} {user.get_display_name()},
 
@@ -68,10 +66,12 @@ def _send_approval_email(user):
 {_('Thank you for your patience.')}
 """
 
-    send_mail(
+    send_branded_email(
         subject=_("Your ASCAI Lazio Account Has Been Approved"),
-        message=email_text.strip(),
-        html_message=email_html,
+        text_body=email_text,
+        template_name="accounts/email/account_approved.html",
+        context=context,
+        site_url=site_url,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user.email],
         fail_silently=False,
@@ -82,10 +82,7 @@ def _send_approval_email(user):
 def send_approval_email(sender, instance, created, **kwargs):
     """Send a single approval email when a user becomes approved."""
     previous_status = getattr(instance, "_previous_is_approved", False)
-    if previous_status or not instance.is_approved or not instance.email:
-        return
-
-    if created and not instance.is_approved:
+    if created or previous_status or not instance.is_approved or not instance.email:
         return
 
     try:
