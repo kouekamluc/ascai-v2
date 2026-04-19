@@ -1,9 +1,9 @@
 """
 Custom middleware for ASCAI Lazio project.
 """
-from django.middleware.security import SecurityMiddleware
-from django.http import HttpResponsePermanentRedirect, HttpResponse, HttpResponseRedirect
 from django.conf import settings
+from django.http import HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.middleware.security import SecurityMiddleware
 from django.urls import translate_url
 from django.utils import translation
 
@@ -23,9 +23,12 @@ class UserPreferredLocaleMiddleware:
     def __call__(self, request):
         current_language = translation.get_language()
         path_language = translation.get_language_from_path(request.path_info)
+        selected_language = self._get_selected_language(request)
         preferred_language = None
 
-        if path_language in self.supported_languages:
+        if selected_language:
+            preferred_language = selected_language
+        elif path_language in self.supported_languages:
             preferred_language = path_language
         elif getattr(request, "user", None) and request.user.is_authenticated:
             candidate = getattr(request.user, "language_preference", None)
@@ -54,15 +57,55 @@ class UserPreferredLocaleMiddleware:
                     translated_url = f"{translated_url}?{request.META['QUERY_STRING']}"
             if translated_url and translated_url != request.get_full_path():
                 response = HttpResponseRedirect(translated_url)
-                return self._set_language_cookie(response, preferred_language)
+                response = self._set_language_cookie(response, preferred_language)
+                self._restore_language(current_language)
+                return response
 
         response = self.get_response(request)
 
-        active_language = getattr(request, "LANGUAGE_CODE", None) or translation.get_language()
+        if (
+            selected_language
+            and getattr(request, "user", None)
+            and request.user.is_authenticated
+            and request.user.language_preference != selected_language
+        ):
+            request.user.language_preference = selected_language
+            request.user.save(update_fields=["language_preference"])
+
+        if settings.LANGUAGE_COOKIE_NAME in response.cookies:
+            self._restore_language(current_language)
+            return response
+
+        active_language = (
+            selected_language
+            or getattr(request, "LANGUAGE_CODE", None)
+            or translation.get_language()
+        )
         if active_language in self.supported_languages:
             response = self._set_language_cookie(response, active_language)
 
+        self._restore_language(current_language)
         return response
+
+    def _get_selected_language(self, request):
+        """Return the explicitly requested language from the language switch form."""
+        if request.method != "POST":
+            return None
+
+        if not request.path_info.rstrip("/").endswith("/i18n/setlang"):
+            return None
+
+        selected_language = request.POST.get("language")
+        if selected_language in self.supported_languages:
+            return selected_language
+        return None
+
+    def _restore_language(self, language_code):
+        """Avoid leaking the active language between requests on the same worker."""
+        if language_code:
+            translation.activate(language_code)
+        else:
+            translation.deactivate()
 
     def _set_language_cookie(self, response, language_code):
         response.set_cookie(

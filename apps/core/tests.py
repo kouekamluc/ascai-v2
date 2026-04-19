@@ -152,6 +152,51 @@ class UserPreferredLocaleMiddlewareTest(TestCase):
             'it',
         )
 
+    def test_set_language_post_updates_cookie_for_anonymous_user(self):
+        response = self.client.post(
+            reverse('set_language'),
+            {'language': 'fr', 'next': '/'},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/')
+        self.assertEqual(
+            response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+            'fr',
+        )
+        self.assertEqual(
+            self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+            'fr',
+        )
+
+    def test_set_language_post_persists_authenticated_user_preference(self):
+        user = User.objects.create_user(
+            username='switcher',
+            email='switcher@example.com',
+            password='testpass123',
+            language_preference='en',
+        )
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse('set_language'),
+            {'language': 'it', 'next': '/premium-services/'},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/premium-services/')
+        self.assertEqual(
+            response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+            'it',
+        )
+
+        user.refresh_from_db()
+        self.assertEqual(user.language_preference, 'it')
+
+        follow_up = self.client.get('/premium-services/')
+        self.assertEqual(follow_up.status_code, 302)
+        self.assertEqual(follow_up.url, '/it/premium-services/')
+
 
 class TranslateCurrentUrlTemplateTagTest(TestCase):
     """Ensure translated redirect targets stay stable across languages."""
