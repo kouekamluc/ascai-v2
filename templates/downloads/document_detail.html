@@ -2,7 +2,8 @@
 {% load i18n %}
 
 {% block title %}{{ document.title }} | ASCAI Lazio{% endblock %}
-{% block meta_description %}{{ document.description|striptags|truncatewords:30|default:"Download ASCAI Lazio resource." }}{% endblock %}
+{% trans 'Download ASCAI Lazio resource.' as document_meta_default %}
+{% block meta_description %}{% firstof document.description|striptags|truncatewords:30 document_meta_default %}{% endblock %}
 
 {% block content %}
 <div class="page-shell space-y-10">

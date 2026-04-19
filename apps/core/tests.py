@@ -4,6 +4,7 @@ Tests for core app.
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from apps.core.models import AssociationSettings, Collaborator, ServicePartner
 
 User = get_user_model()
@@ -107,6 +108,46 @@ class CoreContextProcessorsTest(TestCase):
 
         self.assertIn('association_settings', context)
         self.assertIsInstance(context['association_settings'], AssociationSettings)
+
+
+class UserPreferredLocaleMiddlewareTest(TestCase):
+    """Test saved language preferences are applied consistently."""
+
+    def test_authenticated_user_preference_sets_request_language_and_cookie(self):
+        user = User.objects.create_user(
+            username='frenchmember',
+            email='french@example.com',
+            password='testpass123',
+            language_preference='fr',
+        )
+
+        self.client.force_login(user)
+        response = self.client.get(reverse('core:home'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith('/fr/'))
+        self.assertEqual(
+            response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+            'fr',
+        )
+
+    def test_url_language_prefix_overrides_saved_preference(self):
+        user = User.objects.create_user(
+            username='italianmember',
+            email='italian@example.com',
+            password='testpass123',
+            language_preference='fr',
+        )
+
+        self.client.force_login(user)
+        response = self.client.get('/it/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.wsgi_request.LANGUAGE_CODE, 'it')
+        self.assertEqual(
+            response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+            'it',
+        )
 
 
 class CoreEmailUtilsTest(TestCase):

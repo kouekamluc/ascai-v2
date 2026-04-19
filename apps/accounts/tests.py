@@ -1,4 +1,6 @@
 """Tests for accounts app."""
+import re
+
 from allauth.account.models import EmailAddress, get_emailconfirmation_model
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -287,6 +289,10 @@ class AccountsViewsTest(TestCase):
         html_body = mail.outbox[0].alternatives[0][0]
         self.assertIn('web-app-manifest-512x512.png', html_body)
         self.assertIn('Reset Password', html_body)
+        match = re.search(r'href="([^"]+/accounts/password/reset/key/[^"]+)"', html_body)
+        self.assertIsNotNone(match)
+        self.assertIn('/accounts/password/reset/key/', match.group(1))
+        self.assertTrue(match.group(1).startswith('http://testserver/'))
 
 
 class AccountsURLsTest(TestCase):

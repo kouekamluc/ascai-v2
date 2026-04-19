@@ -1,16 +1,16 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load i18n static static_utils %}
 
-{% block title %}ASCAI Lazio | Cameroonian Community in Rome & Lazio{% endblock %}
-{% block meta_description %}ASCAI Lazio connects Cameroonian students, academics, and professionals in Rome and Lazio through mentorship, opportunities, events, and community support.{% endblock %}
-{% block meta_keywords %}ASCAI Lazio, Cameroonian community, Rome, Lazio, scholarships, universities, mentorship, events{% endblock %}
+{% block title %}{% trans 'ASCAI Lazio | Cameroonian Community in Rome & Lazio' %}{% endblock %}
+{% block meta_description %}{% trans 'ASCAI Lazio connects Cameroonian students, academics, and professionals in Rome and Lazio through mentorship, opportunities, events, and community support.' %}{% endblock %}
+{% block meta_keywords %}{% trans 'ASCAI Lazio, Cameroonian community, Rome, Lazio, scholarships, universities, mentorship, events' %}{% endblock %}
 
 {% block extra_head %}
 <link rel="canonical" href="{{ site_url }}/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ site_url }}/">
-<meta property="og:title" content="ASCAI Lazio | Cameroonian Community in Rome & Lazio">
-<meta property="og:description" content="A stronger digital home for Cameroonian students, academics, and professionals in Lazio.">
+<meta property="og:title" content="{% trans 'ASCAI Lazio | Cameroonian Community in Rome & Lazio' %}">
+<meta property="og:description" content="{% trans 'A stronger digital home for Cameroonian students, academics, and professionals in Lazio.' %}">
 <meta property="og:image" content="{% absolute_static 'images/web-app-manifest-512x512.png' site_url %}">
 {% endblock %}
 
@@ -185,7 +185,7 @@
             </div>
             <div class="rounded-[2rem] border border-black/5 bg-stone-50 p-7">
                 <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-yellow">{% trans 'Provider channel' %}</p>
-                <h3 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans '€20/year for verified service partners' %}</h3>
+                <h3 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'EUR 20/year for verified service partners' %}</h3>
                 <p class="mt-4 text-sm leading-7 text-gray-600">{% trans 'This fee is reserved for providers using the platform to promote services such as money transfer, translation, relocation help, and logistics.' %}</p>
                 <div class="mt-5 space-y-3">
                     {% for partner in partner_opportunity_cards|slice:":3" %}
@@ -352,3 +352,4 @@
     </section>
 </div>
 {% endblock %}
+

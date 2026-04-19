@@ -2,7 +2,8 @@
 {% load i18n static %}
 
 {% block title %}{{ mentor.user.get_full_name|default:mentor.user.username }} | ASCAI Lazio{% endblock %}
-{% block meta_description %}{{ mentor.bio|striptags|truncatewords:30|default:"Mentor profile" }}{% endblock %}
+{% trans 'Mentor profile' as mentor_meta_default %}
+{% block meta_description %}{% firstof mentor.bio|striptags|truncatewords:30 mentor_meta_default %}{% endblock %}
 
 {% block extra_head %}
 <link rel="canonical" href="https://ascai.org/mentorship/mentors/{{ mentor.pk }}/">

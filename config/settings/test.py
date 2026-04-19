@@ -1,9 +1,28 @@
 """
 Test settings for ASCAI Lazio project.
 """
+import importlib.util
+
 from .base import *
 
 DEBUG = False
+ROOT_URLCONF = 'config.test_urls'
+
+
+def _module_available(app_name):
+    """Return True when the app's top-level module is installed."""
+    module_name = app_name.split('.')[0]
+    return importlib.util.find_spec(module_name) is not None
+
+
+INSTALLED_APPS = [
+    app for app in INSTALLED_APPS
+    if app != 'django.contrib.admin' and not app.startswith('unfold') and (
+        app.startswith('apps.')
+        or app.startswith('django.')
+        or _module_available(app)
+    )
+]
 
 # Use SQLite for faster tests
 DATABASES = {
@@ -35,8 +54,6 @@ MIGRATION_MODULES = DisableMigrations()
 USE_S3 = False
 
 # Static files settings for tests
-STATICFILES_STORAGE = None
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 STORAGES = {
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
@@ -49,12 +66,16 @@ STORAGES = {
 # Test-specific middleware (can remove some for speed)
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
+    'config.middleware.UserPreferredLocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
+
+if _module_available('allauth'):
+    MIDDLEWARE.insert(5, 'allauth.account.middleware.AccountMiddleware')
 
 
 

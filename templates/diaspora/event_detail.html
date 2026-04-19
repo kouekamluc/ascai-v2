@@ -1,9 +1,15 @@
 {% extends 'base.html' %}
 {% load i18n static %}
 
-{% block title %}{{ event.title }} | Cameroonian Community Events - ASCAI Lazio{% endblock %}
+{% block title %}{{ event.title }} | {% trans 'Cameroonian Community Events - ASCAI Lazio' %}{% endblock %}
 
-{% block meta_description %}{{ event.description|striptags|truncatewords:30|default:"Join us for this Cameroonian community event in Lazio, Italy." }} Event location: {{ event.location }}. Date: {{ event.start_datetime|date:"F d, Y" }}.{% endblock %}
+{% block meta_description %}
+{% if event.description %}
+{{ event.description|striptags|truncatewords:30 }}
+{% else %}
+{% blocktrans with location=event.location date=event.start_datetime|date:"DATE_FORMAT" %}Join us for this Cameroonian community event in Lazio, Italy. Event location: {{ location }}. Date: {{ date }}.{% endblocktrans %}
+{% endif %}
+{% endblock %}
 
 {% block meta_keywords %}Cameroonian events, Lazio, Rome, Italy, community events, Cameroonian community, diaspora events, {{ event.location }}{% endblock %}
 
@@ -195,4 +201,3 @@
     {% endif %}
 </div>
 {% endblock %}
-

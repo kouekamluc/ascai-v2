@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load i18n static %}
 
-{% block title %}{{ news.title }} | Cameroonian Community News - ASCAI Lazio{% endblock %}
-
-{% block meta_description %}{{ news.content|striptags|truncatewords:30|default:"Latest news from the Cameroonian community in Lazio, Italy." }}{% endblock %}
+{% block title %}{{ news.title }} | {% trans 'Cameroonian Community News - ASCAI Lazio' %}{% endblock %}
+{% trans 'Latest news from the Cameroonian community in Lazio, Italy.' as news_meta_default %}
+{% block meta_description %}{% firstof news.content|striptags|truncatewords:30 news_meta_default %}{% endblock %}
 
 {% block meta_keywords %}Cameroonian news, Lazio, Rome, Italy, Cameroonian community, {{ news.get_category_display|lower }}, diaspora news{% endblock %}
 
@@ -83,4 +83,3 @@
     {% endif %}
 </div>
 {% endblock %}
-

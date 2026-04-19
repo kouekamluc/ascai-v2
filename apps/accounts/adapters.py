@@ -56,27 +56,14 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
     def get_email_confirmation_url(self, request, emailconfirmation):
         url = reverse("account_confirm_email", args=[emailconfirmation.key])
+        return self._build_absolute_account_url(request=request, url=url)
 
-        if request:
-            return request.build_absolute_uri(url)
-
-        protocol = "https" if not settings.DEBUG else "http"
-        domain = getattr(settings, "SITE_URL", "").rstrip("/")
-        if domain.startswith("http://") or domain.startswith("https://"):
-            return f"{domain}{url}"
-
-        if domain:
-            return f"{protocol}://{domain}{url}"
-
-        allowed_host = next(
-            (
-                host
-                for host in settings.ALLOWED_HOSTS
-                if host not in {"*", "healthcheck.railway.app"} and not host.startswith(".")
-            ),
-            "ascai.up.railway.app",
-        )
-        return f"{protocol}://{allowed_host}{url}"
+    def get_reset_password_from_key_url(self, key):
+        url = reverse(
+            "account_reset_password_from_key",
+            kwargs={"uidb36": "UID", "key": "KEY"},
+        ).replace("UID-KEY", key)
+        return self._build_absolute_account_url(request=self.request, url=url)
 
     def render_mail(self, template_prefix, email, context, headers=None):
         email_context = get_email_branding_context(request=context.get("request"))
@@ -95,3 +82,25 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if email:
             return f"{base_url}?{urlencode({'email': email})}"
         return base_url
+
+    def _build_absolute_account_url(self, *, request, url):
+        if request:
+            return request.build_absolute_uri(url)
+
+        protocol = "https" if not settings.DEBUG else "http"
+        domain = getattr(settings, "SITE_URL", "").rstrip("/")
+        if domain.startswith(("http://", "https://")):
+            return f"{domain}{url}"
+
+        if domain:
+            return f"{protocol}://{domain}{url}"
+
+        allowed_host = next(
+            (
+                host
+                for host in settings.ALLOWED_HOSTS
+                if host not in {"*", "healthcheck.railway.app"} and not host.startswith(".")
+            ),
+            "ascai.up.railway.app",
+        )
+        return f"{protocol}://{allowed_host}{url}"

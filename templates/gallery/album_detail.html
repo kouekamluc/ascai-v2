@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
 {% load i18n static %}
 
-{% block title %}{{ album.title }} | Photo Gallery - ASCAI Lazio{% endblock %}
-
-{% block meta_description %}{{ album.description|striptags|truncatewords:30|default:"View photos from" }} {{ album.title }}. Cameroonian community gallery showcasing events and activities in Lazio, Italy.{% endblock %}
+{% block title %}{{ album.title }} | {% trans 'Photo Gallery - ASCAI Lazio' %}{% endblock %}
+{% block meta_description %}
+{% if album.description %}
+{{ album.description|striptags|truncatewords:30 }}
+{% else %}
+{% blocktrans with title=album.title %}View photos from {{ title }}. Cameroonian community gallery showcasing events and activities in Lazio, Italy.{% endblocktrans %}
+{% endif %}
+{% endblock %}
 
 {% block meta_keywords %}gallery, photos, {{ album.title }}, Cameroonian community, Lazio events, community photos{% endblock %}
 
@@ -163,4 +168,3 @@ document.addEventListener('keydown', function(event) {
 });
 </script>
 {% endblock %}
-

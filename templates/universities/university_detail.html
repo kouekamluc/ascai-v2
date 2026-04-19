@@ -2,7 +2,8 @@
 {% load i18n static %}
 
 {% block title %}{{ university.name }} | ASCAI Lazio{% endblock %}
-{% block meta_description %}{{ university.description|striptags|truncatewords:30|default:"University guide for students in Lazio." }}{% endblock %}
+{% trans 'University guide for students in Lazio.' as university_meta_default %}
+{% block meta_description %}{% firstof university.description|striptags|truncatewords:30 university_meta_default %}{% endblock %}
 
 {% block extra_head %}
 <link rel="canonical" href="https://ascai.org/universities/{{ university.slug }}/">

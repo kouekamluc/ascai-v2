@@ -2,7 +2,8 @@
 {% load i18n static %}
 
 {% block title %}{{ scholarship.title }} | ASCAI Lazio{% endblock %}
-{% block meta_description %}{{ scholarship.description|striptags|truncatewords:30|default:"Scholarship opportunity for students in Lazio." }}{% endblock %}
+{% trans 'Scholarship opportunity for students in Lazio.' as scholarship_meta_default %}
+{% block meta_description %}{% firstof scholarship.description|striptags|truncatewords:30 scholarship_meta_default %}{% endblock %}
 
 {% block extra_head %}
 <link rel="canonical" href="https://ascai.org/scholarships/{{ scholarship.slug }}/">
