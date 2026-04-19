@@ -15,6 +15,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 # Contact Page Translations
 msgid "Contact Us"
@@ -37,6 +38,170 @@ msgstr "Subject"
 
 msgid "Message"
 msgstr "Message"
+
+# Scholarship and University UX Refresh
+msgid "Discover funding opportunities without the clutter."
+msgstr "Discover funding opportunities without the clutter."
+
+msgid "Track scholarships, spot urgent deadlines faster, and keep the grants that matter to Cameroonian students in Lazio visible from the first screen."
+msgstr "Track scholarships, spot urgent deadlines faster, and keep the grants that matter to Cameroonian students in Lazio visible from the first screen."
+
+msgid "Browse all opportunities"
+msgstr "Browse all opportunities"
+
+msgid "Active opportunities"
+msgstr "Active opportunities"
+
+msgid "Funding calls students can still plan around right now."
+msgstr "Funding calls students can still plan around right now."
+
+msgid "Closing soon"
+msgstr "Closing soon"
+
+msgid "Search by provider or title, then reduce the list by level, region, urgency, or DISCO Lazio support."
+msgstr "Search by provider or title, then reduce the list by level, region, urgency, or DISCO Lazio support."
+
+msgid "Results now"
+msgstr "Results now"
+
+msgid "Upcoming deadlines"
+msgstr "Upcoming deadlines"
+
+msgid "Best for Lazio"
+msgstr "Best for Lazio"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Search by title, provider, or keyword"
+msgstr "Search by title, provider, or keyword"
+
+msgid "Priority lane"
+msgstr "Priority lane"
+
+msgid "Refreshing results"
+msgstr "Refreshing results"
+
+msgid "Results"
+msgstr "Results"
+
+msgid "%(total)s scholarship available"
+msgid_plural "%(total)s scholarships available"
+msgstr[0] "%(total)s scholarship available"
+msgstr[1] "%(total)s scholarships available"
+
+msgid "These results reflect your current search and filter choices."
+msgstr "These results reflect your current search and filter choices."
+
+msgid "A curated view of active funding opportunities for students preparing to study in Lazio and beyond."
+msgstr "A curated view of active funding opportunities for students preparing to study in Lazio and beyond."
+
+msgid "Funding"
+msgstr "Funding"
+
+msgid "Amount not listed"
+msgstr "Amount not listed"
+
+msgid "No fixed date"
+msgstr "No fixed date"
+
+msgid "Try adjusting your filters, broadening your level or region, or removing the deadline constraint to see more results."
+msgstr "Try adjusting your filters, broadening your level or region, or removing the deadline constraint to see more results."
+
+msgid "Rolling"
+msgstr "Rolling"
+
+msgid "No fixed deadline announced"
+msgstr "No fixed deadline announced"
+
+msgid "Deadline has passed"
+msgstr "Deadline has passed"
+
+msgid "{} days left"
+msgstr "{} days left"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "Deadline in {} days"
+msgstr "Deadline in {} days"
+
+msgid "Explore institutions, compare cities, languages, tuition ranges, and study fields, and shortlist the campuses that fit your academic plan in Italy."
+msgstr "Explore institutions, compare cities, languages, tuition ranges, and study fields, and shortlist the campuses that fit your academic plan in Italy."
+
+msgid "Start comparing now"
+msgstr "Start comparing now"
+
+msgid "Universities listed"
+msgstr "Universities listed"
+
+msgid "Institutions students can compare in one place."
+msgstr "Institutions students can compare in one place."
+
+msgid "Programs tracked"
+msgstr "Programs tracked"
+
+msgid "Degree paths connected to those campuses."
+msgstr "Degree paths connected to those campuses."
+
+msgid "Cities covered"
+msgstr "Cities covered"
+
+msgid "English-friendly"
+msgstr "English-friendly"
+
+msgid "Use the filters below to compare location, degree type, language, study field, and tuition range without jumping between tabs."
+msgstr "Use the filters below to compare location, degree type, language, study field, and tuition range without jumping between tabs."
+
+msgid "Matches"
+msgstr "Matches"
+
+msgid "Cities"
+msgstr "Cities"
+
+msgid "Search by university, city, or keyword"
+msgstr "Search by university, city, or keyword"
+
+msgid "Degree"
+msgstr "Degree"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "Field"
+msgstr "Field"
+
+msgid "Min tuition"
+msgstr "Min tuition"
+
+msgid "Max tuition"
+msgstr "Max tuition"
+
+msgid "Tip: start with city and language, then narrow by tuition or field only if you need to reduce the list further."
+msgstr "Tip: start with city and language, then narrow by tuition or field only if you need to reduce the list further."
+
+msgid "%(total)s university ready to compare"
+msgid_plural "%(total)s universities ready to compare"
+msgstr[0] "%(total)s university ready to compare"
+msgstr[1] "%(total)s universities ready to compare"
+
+msgid "These schools match your current city, degree, tuition, and language filters."
+msgstr "These schools match your current city, degree, tuition, and language filters."
+
+msgid "A broad overview of universities in Lazio, with practical facts visible before you open each profile."
+msgstr "A broad overview of universities in Lazio, with practical facts visible before you open each profile."
+
+msgid "programs"
+msgstr "programs"
+
+msgid "Contact university"
+msgstr "Contact university"
+
+msgid "Not specified"
+msgstr "Not specified"
+
+msgid "Try widening the tuition range, removing one filter, or searching with a broader keyword."
+msgstr "Try widening the tuition range, removing one filter, or searching with a broader keyword."
 
 msgid "Send Message"
 msgstr "Send Message"

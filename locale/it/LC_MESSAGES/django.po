@@ -15,6 +15,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 # Contact Page Translations
 msgid "Contact Us"
@@ -77,6 +78,170 @@ msgstr "Chiuso"
 
 msgid "ASCAI Lazio Location"
 msgstr "Posizione ASCAI Lazio"
+
+# Scholarship and University UX Refresh
+msgid "Discover funding opportunities without the clutter."
+msgstr "Scopri opportunità di finanziamento senza confusione."
+
+msgid "Track scholarships, spot urgent deadlines faster, and keep the grants that matter to Cameroonian students in Lazio visible from the first screen."
+msgstr "Segui le borse, individua più rapidamente le scadenze urgenti e tieni in primo piano fin da subito gli aiuti che contano per gli studenti camerunesi nel Lazio."
+
+msgid "Browse all opportunities"
+msgstr "Vedi tutte le opportunità"
+
+msgid "Active opportunities"
+msgstr "Opportunità attive"
+
+msgid "Funding calls students can still plan around right now."
+msgstr "Bandi di finanziamento che gli studenti possono ancora programmare da subito."
+
+msgid "Closing soon"
+msgstr "In chiusura"
+
+msgid "Search by provider or title, then reduce the list by level, region, urgency, or DISCO Lazio support."
+msgstr "Cerca per ente o titolo, poi restringi l'elenco per livello, regione, urgenza o supporto DISCO Lazio."
+
+msgid "Results now"
+msgstr "Risultati"
+
+msgid "Upcoming deadlines"
+msgstr "Scadenze in arrivo"
+
+msgid "Best for Lazio"
+msgstr "Priorità Lazio"
+
+msgid "Search"
+msgstr "Cerca"
+
+msgid "Search by title, provider, or keyword"
+msgstr "Cerca per titolo, ente o parola chiave"
+
+msgid "Priority lane"
+msgstr "Corsia prioritaria"
+
+msgid "Refreshing results"
+msgstr "Aggiornamento risultati"
+
+msgid "Results"
+msgstr "Risultati"
+
+msgid "%(total)s scholarship available"
+msgid_plural "%(total)s scholarships available"
+msgstr[0] "%(total)s borsa disponibile"
+msgstr[1] "%(total)s borse disponibili"
+
+msgid "These results reflect your current search and filter choices."
+msgstr "Questi risultati riflettono le tue scelte attuali di ricerca e filtro."
+
+msgid "A curated view of active funding opportunities for students preparing to study in Lazio and beyond."
+msgstr "Una selezione curata di opportunità di finanziamento attive per studenti che si preparano a studiare nel Lazio e oltre."
+
+msgid "Funding"
+msgstr "Finanziamento"
+
+msgid "Amount not listed"
+msgstr "Importo non indicato"
+
+msgid "No fixed date"
+msgstr "Nessuna data fissa"
+
+msgid "Try adjusting your filters, broadening your level or region, or removing the deadline constraint to see more results."
+msgstr "Prova a modificare i filtri, ampliare livello o regione, oppure rimuovere il vincolo sulla scadenza per vedere più risultati."
+
+msgid "Rolling"
+msgstr "Continuativa"
+
+msgid "No fixed deadline announced"
+msgstr "Nessuna scadenza fissa annunciata"
+
+msgid "Deadline has passed"
+msgstr "La scadenza è superata"
+
+msgid "{} days left"
+msgstr "{} giorni rimasti"
+
+msgid "Open"
+msgstr "Aperta"
+
+msgid "Deadline in {} days"
+msgstr "Scadenza tra {} giorni"
+
+msgid "Explore institutions, compare cities, languages, tuition ranges, and study fields, and shortlist the campuses that fit your academic plan in Italy."
+msgstr "Esplora gli atenei, confronta città, lingue, fasce di tasse e aree di studio, e crea una shortlist dei campus più adatti al tuo percorso accademico in Italia."
+
+msgid "Start comparing now"
+msgstr "Inizia a confrontare"
+
+msgid "Universities listed"
+msgstr "Università presenti"
+
+msgid "Institutions students can compare in one place."
+msgstr "Atenei che gli studenti possono confrontare in un unico posto."
+
+msgid "Programs tracked"
+msgstr "Programmi monitorati"
+
+msgid "Degree paths connected to those campuses."
+msgstr "Percorsi di laurea collegati a questi campus."
+
+msgid "Cities covered"
+msgstr "Città coperte"
+
+msgid "English-friendly"
+msgstr "Con offerta in inglese"
+
+msgid "Use the filters below to compare location, degree type, language, study field, and tuition range without jumping between tabs."
+msgstr "Usa i filtri qui sotto per confrontare sede, livello di laurea, lingua, area di studio e tasse senza saltare da una scheda all'altra."
+
+msgid "Matches"
+msgstr "Corrispondenze"
+
+msgid "Cities"
+msgstr "Città"
+
+msgid "Search by university, city, or keyword"
+msgstr "Cerca per università, città o parola chiave"
+
+msgid "Degree"
+msgstr "Titolo"
+
+msgid "Language"
+msgstr "Lingua"
+
+msgid "Field"
+msgstr "Area"
+
+msgid "Min tuition"
+msgstr "Tasse min."
+
+msgid "Max tuition"
+msgstr "Tasse max."
+
+msgid "Tip: start with city and language, then narrow by tuition or field only if you need to reduce the list further."
+msgstr "Suggerimento: inizia da città e lingua, poi restringi per tasse o area solo se devi ridurre ulteriormente l'elenco."
+
+msgid "%(total)s university ready to compare"
+msgid_plural "%(total)s universities ready to compare"
+msgstr[0] "%(total)s università pronta da confrontare"
+msgstr[1] "%(total)s università pronte da confrontare"
+
+msgid "These schools match your current city, degree, tuition, and language filters."
+msgstr "Questi atenei corrispondono ai filtri attuali su città, titolo, tasse e lingua."
+
+msgid "A broad overview of universities in Lazio, with practical facts visible before you open each profile."
+msgstr "Una panoramica ampia delle università del Lazio, con informazioni pratiche visibili prima ancora di aprire ogni scheda."
+
+msgid "programs"
+msgstr "programmi"
+
+msgid "Contact university"
+msgstr "Contatta l'università"
+
+msgid "Not specified"
+msgstr "Non specificato"
+
+msgid "Try widening the tuition range, removing one filter, or searching with a broader keyword."
+msgstr "Prova ad ampliare la fascia di tasse, rimuovere un filtro o usare una parola chiave più ampia."
 
 msgid "Thank you!"
 msgstr "Grazie!"
