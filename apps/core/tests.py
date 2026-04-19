@@ -1,11 +1,14 @@
 """
 Tests for core app.
 """
-from django.test import TestCase, Client
+from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.utils import translation
+
 from apps.core.models import AssociationSettings, Collaborator, ServicePartner
+from apps.core.templatetags.i18n_utils import translate_current_url
 
 User = get_user_model()
 
@@ -148,6 +151,34 @@ class UserPreferredLocaleMiddlewareTest(TestCase):
             response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
             'it',
         )
+
+
+class TranslateCurrentUrlTemplateTagTest(TestCase):
+    """Ensure translated redirect targets stay stable across languages."""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_translate_current_url_adds_non_default_prefix(self):
+        request = self.factory.get('/premium-services/')
+        with translation.override('en'):
+            translated_url = translate_current_url({'request': request}, 'fr')
+
+        self.assertEqual(translated_url, '/fr/premium-services/')
+
+    def test_translate_current_url_removes_prefix_for_default_language(self):
+        request = self.factory.get('/fr/premium-services/')
+        with translation.override('fr'):
+            translated_url = translate_current_url({'request': request}, 'en')
+
+        self.assertEqual(translated_url, '/premium-services/')
+
+    def test_translate_current_url_preserves_query_string(self):
+        request = self.factory.get('/downloads/?type=forms&page=2')
+        with translation.override('en'):
+            translated_url = translate_current_url({'request': request}, 'it')
+
+        self.assertEqual(translated_url, '/it/downloads/?type=forms&page=2')
 
 
 class CoreEmailUtilsTest(TestCase):
