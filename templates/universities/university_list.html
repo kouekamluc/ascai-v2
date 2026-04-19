@@ -7,55 +7,128 @@
 {% block content %}
 <div class="page-shell space-y-10">
     <section class="page-hero">
-        <div class="max-w-3xl">
-            <span class="eyebrow">{% trans 'Universities' %}</span>
-            <h1 class="mt-6 text-5xl md:text-6xl font-bold">{% trans 'Compare study destinations across Lazio with more clarity.' %}</h1>
-            <p class="mt-5 text-lg text-white/82 leading-8">
-                {% trans 'Explore institutions, discover programs, and narrow your search with a cleaner path to the information that matters most.' %}
-            </p>
+        <div class="grid gap-8 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.75fr)] xl:items-end">
+            <div class="max-w-3xl">
+                <span class="eyebrow">{% trans 'Universities' %}</span>
+                <h1 class="mt-6 text-5xl font-bold md:text-6xl">{% trans 'Compare study destinations across Lazio with more clarity.' %}</h1>
+                <p class="mt-5 text-lg leading-8 text-white/82">
+                    {% trans 'Explore institutions, compare cities, languages, tuition ranges, and study fields, and shortlist the campuses that fit your academic plan in Italy.' %}
+                </p>
+                <a href="#university-list-container" class="mt-8 inline-flex rounded-full bg-white px-5 py-3 text-sm font-semibold text-ascai-ink shadow-lg transition hover:bg-cameroon-yellow">
+                    {% trans 'Start comparing now' %}
+                </a>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+                <div class="rounded-[1.6rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-white/70">{% trans 'Universities listed' %}</p>
+                    <p class="mt-3 text-4xl font-bold text-white">{{ total_university_count }}</p>
+                    <p class="mt-2 text-sm text-white/78">{% trans 'Institutions students can compare in one place.' %}</p>
+                </div>
+                <div class="rounded-[1.6rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-white/70">{% trans 'Programs tracked' %}</p>
+                    <p class="mt-3 text-4xl font-bold text-white">{{ total_program_count }}</p>
+                    <p class="mt-2 text-sm text-white/78">{% trans 'Degree paths connected to those campuses.' %}</p>
+                </div>
+                <div class="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 backdrop-blur">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-white/70">{% trans 'Cities covered' %}</p>
+                    <p class="mt-2 text-3xl font-bold text-white">{{ city_coverage_count }}</p>
+                </div>
+                <div class="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 backdrop-blur">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-white/70">{% trans 'English-friendly' %}</p>
+                    <p class="mt-2 text-3xl font-bold text-white">{{ english_friendly_count }}</p>
+                </div>
+            </div>
         </div>
     </section>
 
     <section class="section-card p-7 md:p-10">
-        <div class="section-heading">
+        <div class="section-heading gap-6">
             <div>
                 <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Search and filter' %}</p>
                 <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Find your best-fit university' %}</h2>
+                <p class="mt-3 max-w-3xl text-sm leading-7 text-gray-600">
+                    {% trans 'Use the filters below to compare location, degree type, language, study field, and tuition range without jumping between tabs.' %}
+                </p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-3">
+                <div class="rounded-[1.35rem] bg-stone-50 px-4 py-4">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Matches' %}</p>
+                    <p class="mt-2 text-2xl font-bold text-ascai-ink">{{ matching_university_count }}</p>
+                </div>
+                <div class="rounded-[1.35rem] bg-stone-50 px-4 py-4">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Cities' %}</p>
+                    <p class="mt-2 text-2xl font-bold text-ascai-ink">{{ city_coverage_count }}</p>
+                </div>
+                <div class="rounded-[1.35rem] bg-stone-50 px-4 py-4">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Languages' %}</p>
+                    <p class="mt-2 text-2xl font-bold text-ascai-ink">{{ available_languages|length }}</p>
+                </div>
             </div>
         </div>
+
         <form hx-get="{% url 'universities:index' %}"
               hx-target="#university-list-container"
               hx-trigger="change from:select, keyup delay:400ms from:input"
               hx-push-url="true"
               hx-swap="innerHTML"
-              class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            <input type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search by name or city' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm xl:col-span-2">
-            <select name="city" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
-                <option value="">{% trans 'All cities' %}</option>
-                <option value="rome" {% if filter_city == 'rome' %}selected{% endif %}>{% trans 'Rome' %}</option>
-                <option value="cassino" {% if filter_city == 'cassino' %}selected{% endif %}>{% trans 'Cassino' %}</option>
-                <option value="viterbo" {% if filter_city == 'viterbo' %}selected{% endif %}>{% trans 'Viterbo' %}</option>
-                <option value="latina" {% if filter_city == 'latina' %}selected{% endif %}>{% trans 'Latina' %}</option>
-                <option value="frosinone" {% if filter_city == 'frosinone' %}selected{% endif %}>{% trans 'Frosinone' %}</option>
-                <option value="rieti" {% if filter_city == 'rieti' %}selected{% endif %}>{% trans 'Rieti' %}</option>
-            </select>
-            <select name="degree_type" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
-                <option value="">{% trans 'All degree levels' %}</option>
-                <option value="Bachelor" {% if filter_degree_type == 'Bachelor' %}selected{% endif %}>{% trans 'Bachelor' %}</option>
-                <option value="Master" {% if filter_degree_type == 'Master' %}selected{% endif %}>{% trans 'Master' %}</option>
-                <option value="PhD" {% if filter_degree_type == 'PhD' %}selected{% endif %}>{% trans 'PhD' %}</option>
-            </select>
-            <select name="field" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
-                <option value="">{% trans 'All fields' %}</option>
-                <option value="Engineering" {% if filter_field == 'Engineering' %}selected{% endif %}>{% trans 'Engineering' %}</option>
-                <option value="Medicine" {% if filter_field == 'Medicine' %}selected{% endif %}>{% trans 'Medicine' %}</option>
-                <option value="Law" {% if filter_field == 'Law' %}selected{% endif %}>{% trans 'Law' %}</option>
-                <option value="Business" {% if filter_field == 'Business' %}selected{% endif %}>{% trans 'Business' %}</option>
-                <option value="Arts" {% if filter_field == 'Arts' %}selected{% endif %}>{% trans 'Arts' %}</option>
-                <option value="Sciences" {% if filter_field == 'Sciences' %}selected{% endif %}>{% trans 'Sciences' %}</option>
-            </select>
-            <div class="md:col-span-2 xl:col-span-5 flex justify-end">
-                <a href="{% url 'universities:index' %}" class="rounded-full bg-stone-100 px-5 py-3 text-sm font-semibold text-gray-700">{% trans 'Reset filters' %}</a>
+              hx-indicator="#loading"
+              class="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+            <div class="xl:col-span-2">
+                <label for="university-search" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Search' %}</label>
+                <input id="university-search" type="text" name="search" value="{{ search_query }}" placeholder="{% trans 'Search by university, city, or keyword' %}" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            </div>
+            <div>
+                <label for="university-city" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'City' %}</label>
+                <select id="university-city" name="city" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                    <option value="">{% trans 'All cities' %}</option>
+                    <option value="rome" {% if filter_city == 'rome' %}selected{% endif %}>{% trans 'Rome' %}</option>
+                    <option value="cassino" {% if filter_city == 'cassino' %}selected{% endif %}>{% trans 'Cassino' %}</option>
+                    <option value="viterbo" {% if filter_city == 'viterbo' %}selected{% endif %}>{% trans 'Viterbo' %}</option>
+                    <option value="latina" {% if filter_city == 'latina' %}selected{% endif %}>{% trans 'Latina' %}</option>
+                    <option value="frosinone" {% if filter_city == 'frosinone' %}selected{% endif %}>{% trans 'Frosinone' %}</option>
+                    <option value="rieti" {% if filter_city == 'rieti' %}selected{% endif %}>{% trans 'Rieti' %}</option>
+                </select>
+            </div>
+            <div>
+                <label for="university-degree" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Degree' %}</label>
+                <select id="university-degree" name="degree_type" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                    <option value="">{% trans 'All degree levels' %}</option>
+                    {% for degree in available_degree_types %}
+                    <option value="{{ degree }}" {% if filter_degree_type == degree %}selected{% endif %}>{{ degree }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="university-language" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Language' %}</label>
+                <select id="university-language" name="language" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                    <option value="">{% trans 'All languages' %}</option>
+                    {% for language in available_languages %}
+                    <option value="{{ language }}" {% if filter_language == language %}selected{% endif %}>{{ language }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="university-field" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Field' %}</label>
+                <select id="university-field" name="field" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                    <option value="">{% trans 'All fields' %}</option>
+                    {% for field_name in available_fields %}
+                    <option value="{{ field_name }}" {% if filter_field == field_name %}selected{% endif %}>{{ field_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="university-tuition-min" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Min tuition' %}</label>
+                <input id="university-tuition-min" type="number" min="0" step="100" name="tuition_min" value="{{ filter_tuition_min }}" placeholder="0" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            </div>
+            <div>
+                <label for="university-tuition-max" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Max tuition' %}</label>
+                <input id="university-tuition-max" type="number" min="0" step="100" name="tuition_max" value="{{ filter_tuition_max }}" placeholder="15000" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            </div>
+            <div class="md:col-span-2 xl:col-span-6 flex flex-wrap items-end justify-between gap-3">
+                <p class="text-sm leading-7 text-gray-600">
+                    {% trans 'Tip: start with city and language, then narrow by tuition or field only if you need to reduce the list further.' %}
+                </p>
+                <a href="{% url 'universities:index' %}" class="rounded-full bg-stone-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-stone-200">{% trans 'Reset filters' %}</a>
             </div>
         </form>
     </section>
@@ -64,7 +137,7 @@
         {% include 'universities/partials/university_list_partial.html' %}
     </div>
 
-    <div id="loading" class="htmx-indicator text-center py-12">
+    <div id="loading" class="htmx-indicator py-12 text-center">
         <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-cameroon-green border-t-transparent"></div>
         <p class="mt-4 text-sm font-semibold text-gray-600">{% trans 'Loading universities...' %}</p>
     </div>

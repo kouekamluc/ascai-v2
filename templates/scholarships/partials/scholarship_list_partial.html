@@ -1,93 +1,155 @@
 {% load i18n %}
-{% for scholarship in scholarships %}
-<article class="content-card overflow-hidden">
-    <div class="border-b border-black/5 bg-gradient-to-r from-cameroon-green/8 via-white to-cameroon-yellow/14 p-6">
-        <div class="flex items-start justify-between gap-4">
-            <div class="min-w-0">
-                <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ scholarship.provider }}</p>
-                <h3 class="mt-3 text-2xl font-bold leading-tight text-ascai-ink">
-                    <a href="{% url 'scholarships:detail' scholarship.slug %}" class="hover:text-cameroon-green">{{ scholarship.title }}</a>
+<section id="scholarship-results" class="space-y-6">
+    <div class="section-card p-6 md:p-7">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{% trans 'Results' %}</p>
+                <h3 class="mt-2 text-3xl font-bold text-ascai-ink">
+                    {% blocktrans count total=matching_scholarship_count %}{{ total }} scholarship available{% plural %}{{ total }} scholarships available{% endblocktrans %}
                 </h3>
+                <p class="mt-2 text-sm leading-7 text-gray-600">
+                    {% if has_active_filters %}
+                        {% trans 'These results reflect your current search and filter choices.' %}
+                    {% else %}
+                        {% trans 'A curated view of active funding opportunities for students preparing to study in Lazio and beyond.' %}
+                    {% endif %}
+                </p>
             </div>
-            {% if scholarship.is_disco_lazio %}
-            <span class="rounded-full bg-cameroon-green px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.18em] text-white">DISCO</span>
-            {% endif %}
-        </div>
-        <div class="mt-4 flex flex-wrap gap-2">
-            {% if scholarship.level != 'all' %}
-            <span class="rounded-full bg-blue-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-blue-700">{{ scholarship.get_level_display }}</span>
-            {% endif %}
-            {% if scholarship.region != 'all' %}
-            <span class="rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-emerald-700">{{ scholarship.get_region_display }}</span>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="p-6">
-        {% if scholarship.amount %}
-        <div class="rounded-[1.25rem] bg-emerald-50 px-4 py-4">
-            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-700">{% trans 'Amount' %}</p>
-            <p class="mt-2 text-3xl font-bold text-ascai-ink">{{ scholarship.amount|floatformat:0 }} {{ scholarship.currency }}</p>
-        </div>
-        {% endif %}
-
-        <p class="mt-5 text-sm leading-7 text-gray-600">{{ scholarship.description|striptags|truncatewords:30 }}</p>
-
-        {% if scholarship.application_deadline %}
-        <div class="mt-5 rounded-[1.25rem] bg-stone-50 px-4 py-3 text-sm text-gray-600">
-            <span class="font-extrabold uppercase tracking-[0.16em] text-cameroon-red">{% trans 'Deadline' %}</span>
-            <p class="mt-1 font-semibold text-ascai-ink">{{ scholarship.application_deadline|date:"d M Y" }}</p>
-        </div>
-        {% endif %}
-
-        <div class="mt-6 flex items-center justify-between gap-3 border-t border-black/5 pt-5">
-            <a href="{% url 'scholarships:detail' scholarship.slug %}" class="rounded-full bg-cameroon-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-cameroon-green/90">
-                {% trans 'View details' %}
-            </a>
-            {% if user.is_authenticated %}
-            <form hx-post="{% url 'scholarships:toggle_save' scholarship.slug %}" hx-target="this" hx-swap="outerHTML">
-                {% csrf_token %}
-                {% if scholarship.id in saved_scholarship_ids %}
-                <button type="submit" class="rounded-full bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-100">
-                    {% trans 'Saved' %}
-                </button>
-                {% else %}
-                <button type="submit" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-stone-200">
-                    {% trans 'Save' %}
-                </button>
+            <div class="flex flex-wrap gap-2">
+                {% if current_level != 'all' %}
+                <span class="rounded-full bg-blue-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-blue-700">{{ current_level }}</span>
                 {% endif %}
-            </form>
-            {% endif %}
+                {% if current_region != 'all' %}
+                <span class="rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-emerald-700">{{ current_region }}</span>
+                {% endif %}
+                {% if current_deadline %}
+                <span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-amber-700">{{ current_deadline }}</span>
+                {% endif %}
+                {% if current_disco == 'true' %}
+                <span class="rounded-full bg-cameroon-green px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-white">DISCO Lazio</span>
+                {% endif %}
+            </div>
         </div>
     </div>
-</article>
-{% empty %}
-<div class="col-span-full section-card p-10 text-center">
-    <h3 class="text-2xl font-bold text-ascai-ink">{% trans 'No scholarships found' %}</h3>
-    <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Try adjusting your filters to see more results.' %}</p>
-</div>
-{% endfor %}
 
-{% if is_paginated %}
-<div class="col-span-full mt-4 flex justify-center">
-    <nav class="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-4 py-3 shadow-sm backdrop-blur">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
-           hx-get="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
-           hx-target="#scholarship-list"
-           class="rounded-full bg-stone-100 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-stone-200">
-            {% trans 'Previous' %}
-        </a>
-        {% endif %}
-        <span class="text-sm font-semibold text-gray-600">{% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
-           hx-get="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
-           hx-target="#scholarship-list"
-           class="rounded-full bg-cameroon-green px-4 py-2 text-sm font-semibold text-white hover:bg-cameroon-green/90">
-            {% trans 'Next' %}
-        </a>
-        {% endif %}
-    </nav>
-</div>
-{% endif %}
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {% for scholarship in scholarships %}
+        <article class="content-card overflow-hidden">
+            <div class="border-b border-black/5 bg-gradient-to-r from-cameroon-green/8 via-white to-cameroon-yellow/14 p-6">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0">
+                        <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ scholarship.provider }}</p>
+                        <h3 class="mt-3 text-2xl font-bold leading-tight text-ascai-ink">
+                            <a href="{% url 'scholarships:detail' scholarship.slug %}" class="hover:text-cameroon-green">{{ scholarship.title }}</a>
+                        </h3>
+                    </div>
+                    {% if scholarship.is_disco_lazio %}
+                    <span class="rounded-full bg-cameroon-green px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.18em] text-white">DISCO</span>
+                    {% endif %}
+                </div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    {% if scholarship.level != 'all' %}
+                    <span class="rounded-full bg-blue-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-blue-700">{{ scholarship.get_level_display }}</span>
+                    {% endif %}
+                    {% if scholarship.region != 'all' %}
+                    <span class="rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-emerald-700">{{ scholarship.get_region_display }}</span>
+                    {% endif %}
+                    <span class="
+                        rounded-full px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em]
+                        {% if scholarship.deadline_state.tone == 'red' %}bg-red-50 text-red-700
+                        {% elif scholarship.deadline_state.tone == 'amber' %}bg-amber-50 text-amber-700
+                        {% elif scholarship.deadline_state.tone == 'green' %}bg-emerald-50 text-emerald-700
+                        {% else %}bg-stone-100 text-gray-600{% endif %}
+                    ">{{ scholarship.deadline_state.label }}</span>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="rounded-[1.2rem] bg-emerald-50 px-4 py-4">
+                        <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-700">{% trans 'Funding' %}</p>
+                        <p class="mt-2 text-xl font-bold text-ascai-ink">
+                            {% if scholarship.amount %}
+                                {{ scholarship.amount|floatformat:0 }} {{ scholarship.currency }}
+                            {% else %}
+                                {% trans 'Amount not listed' %}
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="rounded-[1.2rem] bg-stone-50 px-4 py-4">
+                        <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-gray-500">{% trans 'Deadline' %}</p>
+                        <p class="mt-2 text-base font-bold text-ascai-ink">
+                            {% if scholarship.application_deadline %}
+                                {{ scholarship.application_deadline|date:"d M Y" }}
+                            {% else %}
+                                {% trans 'No fixed date' %}
+                            {% endif %}
+                        </p>
+                        <p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em]
+                            {% if scholarship.deadline_state.tone == 'red' %}text-red-600
+                            {% elif scholarship.deadline_state.tone == 'amber' %}text-amber-600
+                            {% elif scholarship.deadline_state.tone == 'green' %}text-emerald-600
+                            {% else %}text-gray-500{% endif %}
+                        ">{{ scholarship.deadline_state.detail }}</p>
+                    </div>
+                </div>
+
+                <p class="mt-5 text-sm leading-7 text-gray-600">{{ scholarship.description|striptags|truncatewords:30 }}</p>
+
+                <div class="mt-6 flex items-center justify-between gap-3 border-t border-black/5 pt-5">
+                    <a href="{% url 'scholarships:detail' scholarship.slug %}" class="rounded-full bg-cameroon-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-cameroon-green/90">
+                        {% trans 'View details' %}
+                    </a>
+                    {% if user.is_authenticated %}
+                    <form hx-post="{% url 'scholarships:toggle_save' scholarship.slug %}" hx-target="this" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        {% if scholarship.id in saved_scholarship_ids %}
+                        <button type="submit" class="rounded-full bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-100">
+                            {% trans 'Saved' %}
+                        </button>
+                        {% else %}
+                        <button type="submit" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-stone-200">
+                            {% trans 'Save' %}
+                        </button>
+                        {% endif %}
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <div class="col-span-full section-card p-10 text-center">
+            <h3 class="text-2xl font-bold text-ascai-ink">{% trans 'No scholarships found' %}</h3>
+            <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Try adjusting your filters, broadening your level or region, or removing the deadline constraint to see more results.' %}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <div class="flex justify-center">
+        <nav class="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-4 py-3 shadow-sm backdrop-blur">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
+               hx-get="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
+               hx-target="#scholarship-results"
+               hx-push-url="true"
+               hx-indicator="#scholarship-loading"
+               class="rounded-full bg-stone-100 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-stone-200">
+                {% trans 'Previous' %}
+            </a>
+            {% endif %}
+            <span class="text-sm font-semibold text-gray-600">{% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
+               hx-get="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_level != 'all' %}&level={{ current_level }}{% endif %}{% if current_region != 'all' %}&region={{ current_region }}{% endif %}{% if current_deadline %}&deadline={{ current_deadline }}{% endif %}{% if current_disco == 'true' %}&is_disco_lazio=true{% endif %}"
+               hx-target="#scholarship-results"
+               hx-push-url="true"
+               hx-indicator="#scholarship-loading"
+               class="rounded-full bg-cameroon-green px-4 py-2 text-sm font-semibold text-white hover:bg-cameroon-green/90">
+                {% trans 'Next' %}
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</section>

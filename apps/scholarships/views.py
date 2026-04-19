@@ -1,14 +1,17 @@
 """
 Views for scholarships app.
 """
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView, TemplateView
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django.http import JsonResponse
+from datetime import timedelta
+
 from django.db.models import Q
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_http_methods
+from django.views.generic import DetailView, ListView, TemplateView
+from django.contrib.auth.decorators import login_required
+
 from .models import Scholarship, SavedScholarship
 
 
@@ -71,6 +74,11 @@ class ScholarshipListView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        today = timezone.now().date()
+        active_queryset = Scholarship.objects.filter(status='active')
+        matching_count = (
+            context['paginator'].count if context.get('is_paginated') else len(context['scholarships'])
+        )
         
         if self.request.user.is_authenticated:
             context['saved_scholarship_ids'] = list(
@@ -85,8 +93,59 @@ class ScholarshipListView(ListView):
         context['current_deadline'] = self.request.GET.get('deadline', '')
         context['current_search'] = self.request.GET.get('search', '')
         context['current_disco'] = self.request.GET.get('is_disco_lazio', '')
+        context['matching_scholarship_count'] = matching_count
+        context['total_scholarship_count'] = active_queryset.count()
+        context['disco_scholarship_count'] = active_queryset.filter(is_disco_lazio=True).count()
+        context['upcoming_deadline_count'] = active_queryset.filter(application_deadline__gte=today).count()
+        context['closing_soon_count'] = active_queryset.filter(
+            application_deadline__gte=today,
+            application_deadline__lte=today + timedelta(days=14),
+        ).count()
+        context['has_active_filters'] = any(
+            [
+                context['current_search'],
+                context['current_level'] != 'all',
+                context['current_region'] != 'all',
+                context['current_deadline'],
+                context['current_disco'] == 'true',
+            ]
+        )
+
+        scholarship_list = context['scholarships']
+        for scholarship in scholarship_list:
+            scholarship.deadline_state = self._get_deadline_state(scholarship, today)
         
         return context
+
+    def _get_deadline_state(self, scholarship, today):
+        """Return a small deadline summary the template can render quickly."""
+        if not scholarship.application_deadline:
+            return {
+                'label': _('Rolling'),
+                'tone': 'stone',
+                'detail': _('No fixed deadline announced'),
+            }
+
+        if scholarship.application_deadline < today:
+            return {
+                'label': _('Closed'),
+                'tone': 'red',
+                'detail': _('Deadline has passed'),
+            }
+
+        days_remaining = (scholarship.application_deadline - today).days
+        if days_remaining <= 14:
+            return {
+                'label': _('Closing soon'),
+                'tone': 'amber',
+                'detail': _('{} days left').format(days_remaining),
+            }
+
+        return {
+            'label': _('Open'),
+            'tone': 'green',
+            'detail': _('Deadline in {} days').format(days_remaining),
+        }
 
 
 class ScholarshipDetailView(DetailView):
@@ -148,4 +207,3 @@ def toggle_save_scholarship(request, slug):
         })
     
     return JsonResponse({'saved': is_saved})
-

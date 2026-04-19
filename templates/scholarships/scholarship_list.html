@@ -7,56 +7,125 @@
 {% block content %}
 <div class="page-shell space-y-10">
     <section class="page-hero">
-        <div class="max-w-3xl">
-            <span class="eyebrow">{% trans 'Scholarships' %}</span>
-            <h1 class="mt-6 text-5xl md:text-6xl font-bold">{% trans 'Discover funding opportunities without the clutter.' %}</h1>
-            <p class="mt-5 text-lg text-white/82 leading-8">
-                {% trans 'Track scholarships, focus on the opportunities that fit your profile, and keep DISCO Lazio support visible from the start.' %}
-            </p>
-            <a href="{% url 'scholarships:disco_lazio' %}" class="mt-8 inline-flex rounded-full bg-white px-5 py-3 text-sm font-semibold text-ascai-ink shadow-lg hover:bg-cameroon-yellow transition">
-                {% trans 'Explore DISCO Lazio' %}
-            </a>
+        <div class="grid gap-8 xl:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)] xl:items-end">
+            <div class="max-w-3xl">
+                <span class="eyebrow">{% trans 'Scholarships' %}</span>
+                <h1 class="mt-6 text-5xl font-bold md:text-6xl">{% trans 'Discover funding opportunities without the clutter.' %}</h1>
+                <p class="mt-5 text-lg leading-8 text-white/82">
+                    {% trans 'Track scholarships, spot urgent deadlines faster, and keep the grants that matter to Cameroonian students in Lazio visible from the first screen.' %}
+                </p>
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a href="{% url 'scholarships:disco_lazio' %}" class="inline-flex rounded-full bg-white px-5 py-3 text-sm font-semibold text-ascai-ink shadow-lg transition hover:bg-cameroon-yellow">
+                        {% trans 'Explore DISCO Lazio' %}
+                    </a>
+                    <a href="#scholarship-results" class="inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/18">
+                        {% trans 'Browse all opportunities' %}
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                <div class="rounded-[1.75rem] border border-white/15 bg-white/10 p-5 backdrop-blur">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-white/70">{% trans 'Active opportunities' %}</p>
+                    <p class="mt-3 text-4xl font-bold text-white">{{ total_scholarship_count }}</p>
+                    <p class="mt-2 text-sm leading-6 text-white/78">{% trans 'Funding calls students can still plan around right now.' %}</p>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
+                    <div class="rounded-[1.5rem] border border-white/15 bg-white/10 p-4 backdrop-blur">
+                        <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-white/70">{% trans 'DISCO Lazio' %}</p>
+                        <p class="mt-2 text-3xl font-bold text-white">{{ disco_scholarship_count }}</p>
+                    </div>
+                    <div class="rounded-[1.5rem] border border-white/15 bg-white/10 p-4 backdrop-blur">
+                        <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-white/70">{% trans 'Closing soon' %}</p>
+                        <p class="mt-2 text-3xl font-bold text-white">{{ closing_soon_count }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
     <section class="section-card p-7 md:p-10">
-        <div class="section-heading">
+        <div class="section-heading gap-6">
             <div>
                 <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Filter scholarships' %}</p>
                 <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Narrow the opportunities that matter' %}</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-gray-600">
+                    {% trans 'Search by provider or title, then reduce the list by level, region, urgency, or DISCO Lazio support.' %}
+                </p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-3">
+                <div class="rounded-[1.35rem] bg-stone-50 px-4 py-4">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Results now' %}</p>
+                    <p class="mt-2 text-2xl font-bold text-ascai-ink">{{ matching_scholarship_count }}</p>
+                </div>
+                <div class="rounded-[1.35rem] bg-stone-50 px-4 py-4">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Upcoming deadlines' %}</p>
+                    <p class="mt-2 text-2xl font-bold text-ascai-ink">{{ upcoming_deadline_count }}</p>
+                </div>
+                <div class="rounded-[1.35rem] bg-stone-50 px-4 py-4">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Best for Lazio' %}</p>
+                    <p class="mt-2 text-2xl font-bold text-ascai-ink">{{ disco_scholarship_count }}</p>
+                </div>
             </div>
         </div>
-        <form hx-get="{% url 'scholarships:index' %}"
-              hx-target="#scholarship-list"
+
+        <form id="scholarship-filter-form"
+              hx-get="{% url 'scholarships:index' %}"
+              hx-target="#scholarship-results"
               hx-trigger="change from:select, change from:input[type='checkbox'], keyup delay:400ms from:input[type='text']"
               hx-push-url="true"
-              class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <input type="text" name="search" value="{{ current_search }}" placeholder="{% trans 'Search by title or provider' %}" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm xl:col-span-2">
-            <select name="level" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
-                <option value="all" {% if current_level == 'all' %}selected{% endif %}>{% trans 'All education levels' %}</option>
-                <option value="bachelor" {% if current_level == 'bachelor' %}selected{% endif %}>{% trans "Bachelor's Degree" %}</option>
-                <option value="master" {% if current_level == 'master' %}selected{% endif %}>{% trans "Master's Degree" %}</option>
-                <option value="phd" {% if current_level == 'phd' %}selected{% endif %}>{% trans 'PhD' %}</option>
-            </select>
-            <select name="region" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
-                <option value="all" {% if current_region == 'all' %}selected{% endif %}>{% trans 'All regions' %}</option>
-                <option value="lazio" {% if current_region == 'lazio' %}selected{% endif %}>{% trans 'Lazio' %}</option>
-                <option value="other" {% if current_region == 'other' %}selected{% endif %}>{% trans 'Other' %}</option>
-            </select>
-            <select name="deadline" class="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
-                <option value="" {% if not current_deadline %}selected{% endif %}>{% trans 'All deadlines' %}</option>
-                <option value="upcoming" {% if current_deadline == 'upcoming' %}selected{% endif %}>{% trans 'Upcoming' %}</option>
-                <option value="this_month" {% if current_deadline == 'this_month' %}selected{% endif %}>{% trans 'This month' %}</option>
-                <option value="past" {% if current_deadline == 'past' %}selected{% endif %}>{% trans 'Past deadlines' %}</option>
-            </select>
-            <label class="flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm font-medium text-gray-700 xl:col-span-2">
-                <input type="checkbox" name="is_disco_lazio" value="true" {% if current_disco == 'true' %}checked{% endif %} class="h-4 w-4 rounded border-gray-300 text-cameroon-green">
-                {% trans 'Show only DISCO Lazio scholarships' %}
-            </label>
+              hx-indicator="#scholarship-loading"
+              class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            <div class="xl:col-span-2">
+                <label for="scholarship-search" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Search' %}</label>
+                <input id="scholarship-search" type="text" name="search" value="{{ current_search }}" placeholder="{% trans 'Search by title, provider, or keyword' %}" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+            </div>
+            <div>
+                <label for="scholarship-level" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Level' %}</label>
+                <select id="scholarship-level" name="level" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                    <option value="all" {% if current_level == 'all' %}selected{% endif %}>{% trans 'All education levels' %}</option>
+                    <option value="bachelor" {% if current_level == 'bachelor' %}selected{% endif %}>{% trans "Bachelor's Degree" %}</option>
+                    <option value="master" {% if current_level == 'master' %}selected{% endif %}>{% trans "Master's Degree" %}</option>
+                    <option value="phd" {% if current_level == 'phd' %}selected{% endif %}>{% trans 'PhD' %}</option>
+                </select>
+            </div>
+            <div>
+                <label for="scholarship-region" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Region' %}</label>
+                <select id="scholarship-region" name="region" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                    <option value="all" {% if current_region == 'all' %}selected{% endif %}>{% trans 'All regions' %}</option>
+                    <option value="lazio" {% if current_region == 'lazio' %}selected{% endif %}>{% trans 'Lazio' %}</option>
+                    <option value="other" {% if current_region == 'other' %}selected{% endif %}>{% trans 'Other' %}</option>
+                </select>
+            </div>
+            <div>
+                <label for="scholarship-deadline" class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Deadline' %}</label>
+                <select id="scholarship-deadline" name="deadline" class="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
+                    <option value="" {% if not current_deadline %}selected{% endif %}>{% trans 'All deadlines' %}</option>
+                    <option value="upcoming" {% if current_deadline == 'upcoming' %}selected{% endif %}>{% trans 'Upcoming' %}</option>
+                    <option value="this_month" {% if current_deadline == 'this_month' %}selected{% endif %}>{% trans 'This month' %}</option>
+                    <option value="past" {% if current_deadline == 'past' %}selected{% endif %}>{% trans 'Past deadlines' %}</option>
+                </select>
+            </div>
+            <div class="md:col-span-2 xl:col-span-3">
+                <label class="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Priority lane' %}</label>
+                <label class="flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm font-medium text-gray-700">
+                    <input type="checkbox" name="is_disco_lazio" value="true" {% if current_disco == 'true' %}checked{% endif %} class="h-4 w-4 rounded border-gray-300 text-cameroon-green">
+                    {% trans 'Show only DISCO Lazio scholarships' %}
+                </label>
+            </div>
+            <div class="md:col-span-2 xl:col-span-2 flex flex-wrap items-end justify-start gap-3 xl:justify-end">
+                <a href="{% url 'scholarships:index' %}" class="inline-flex rounded-full bg-stone-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-stone-200">
+                    {% trans 'Reset filters' %}
+                </a>
+                <span id="scholarship-loading" class="htmx-indicator inline-flex items-center gap-2 rounded-full bg-cameroon-green/10 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.16em] text-cameroon-green">
+                    <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-cameroon-green border-t-transparent"></span>
+                    {% trans 'Refreshing results' %}
+                </span>
+            </div>
         </form>
     </section>
 
-    <div id="scholarship-list" class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <div id="scholarship-results">
         {% include 'scholarships/partials/scholarship_list_partial.html' %}
     </div>
 </div>

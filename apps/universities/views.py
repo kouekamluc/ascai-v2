@@ -1,14 +1,14 @@
 """
 Views for universities app.
 """
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
 from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.db.models import Q
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext_lazy as _
-from django.core.paginator import Paginator
+from django.views.decorators.http import require_http_methods
+from django.views.generic import DetailView, ListView
+
 from .models import University, UniversityProgram, SavedUniversity
 
 
@@ -22,7 +22,7 @@ class UniversityListView(ListView):
     paginate_by = 12
     
     def get_queryset(self):
-        queryset = University.objects.all()
+        queryset = University.objects.annotate(program_count=Count('programs', distinct=True))
         
         # HTMX filtering
         city = self.request.GET.get('city')
@@ -93,6 +93,33 @@ class UniversityListView(ListView):
         context['filter_tuition_min'] = self.request.GET.get('tuition_min', '')
         context['filter_tuition_max'] = self.request.GET.get('tuition_max', '')
         context['search_query'] = self.request.GET.get('search', '')
+        all_universities = University.objects.all()
+        matching_count = (
+            context['paginator'].count if context.get('is_paginated') else len(context['universities'])
+        )
+        context['matching_university_count'] = matching_count
+        context['total_university_count'] = all_universities.count()
+        context['total_program_count'] = UniversityProgram.objects.count()
+        context['city_coverage_count'] = all_universities.values('city').distinct().count()
+        context['english_friendly_count'] = sum(
+            1
+            for languages in all_universities.values_list('languages', flat=True)
+            if any(str(language).lower() == 'english' for language in (languages or []))
+        )
+        context['available_degree_types'] = self._get_flattened_values(all_universities, 'degree_types')
+        context['available_fields'] = self._get_flattened_values(all_universities, 'fields_of_study')
+        context['available_languages'] = self._get_flattened_values(all_universities, 'languages')
+        context['has_active_filters'] = any(
+            [
+                context['filter_city'],
+                context['filter_degree_type'],
+                context['filter_field'],
+                context['filter_language'],
+                context['filter_tuition_min'],
+                context['filter_tuition_max'],
+                context['search_query'],
+            ]
+        )
         
         # Get saved universities for logged-in users
         if self.request.user.is_authenticated:
@@ -101,8 +128,22 @@ class UniversityListView(ListView):
             )
         else:
             context['saved_university_ids'] = []
+
+        university_list = context['universities']
+        for university in university_list:
+            university.language_preview = (university.languages or [])[:3]
+            university.field_preview = (university.fields_of_study or [])[:3]
         
         return context
+
+    def _get_flattened_values(self, queryset, field_name):
+        """Collect unique values from a JSON list field for the filter UI."""
+        values = set()
+        for entry in queryset.values_list(field_name, flat=True):
+            for item in entry or []:
+                if item:
+                    values.add(str(item))
+        return sorted(values)
 
 
 class UniversityDetailView(DetailView):
@@ -158,4 +199,3 @@ def toggle_save_university(request, slug):
         })
     
     return JsonResponse({'saved': is_saved})
-
