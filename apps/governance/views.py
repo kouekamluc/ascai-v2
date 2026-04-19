@@ -45,7 +45,12 @@ from .utils import (
     check_general_report_requirement, check_assembly_frequency_compliance,
     calculate_dues_totals, calculate_dues_summary
 )
-from .services import can_publish_communication, user_has_governance_access
+from .services import (
+    can_publish_communication,
+    ensure_current_year_dues,
+    get_expected_dues_amount,
+    user_has_governance_access,
+)
 from .forms import (
     MemberForm, MemberSelfRegistrationForm, GeneralAssemblyForm, AgendaItemForm, AssemblyAttendanceForm,
     AssemblyVoteForm, FinancialTransactionForm, MembershipDuesForm, ContributionForm,
@@ -79,22 +84,11 @@ class MemberPortalView(LoginRequiredMixin, TemplateView):
         
         # Get current year dues
         current_year = timezone.now().year
-        current_dues = MembershipDues.objects.filter(
-            member=member,
-            year=current_year
-        ).first()
-        
-        # Create current year dues if it doesn't exist and member is active
-        if not current_dues and member.is_active_member:
-            # Determine amount based on member type
-            amount = 10.00 if member.member_type == 'student' else 5.00
-            current_dues = MembershipDues.objects.create(
-                member=member,
-                year=current_year,
-                amount=amount,
-                due_date=timezone.datetime(current_year, 3, 31).date(),
-                status='pending'
-            )
+        current_dues = MembershipDues.objects.filter(member=member, year=current_year).first()
+
+        # Ensure each member has a current-year dues record to pay against.
+        if not current_dues:
+            current_dues = ensure_current_year_dues(member, year=current_year)
         
         # Get all dues
         all_dues = MembershipDues.objects.filter(member=member).order_by('-year')
@@ -173,16 +167,21 @@ class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
         member.is_active_member = False  # Will be activated after verification and payment
         
         member.save()
+        dues_amount = get_expected_dues_amount(member)
         
         if member.member_type == 'sympathizer':
             messages.success(
                 self.request,
-                _('Successfully registered as ASCAI sympathizer! Sympathizers are anyone sharing our ideals living in Italy. Your membership is pending admin verification. Once verified and you pay your dues (€5), you will have full member privileges.')
+                _('Successfully registered as ASCAI sympathizer! Sympathizers are anyone sharing our ideals living in Italy. Your membership is pending admin verification. Once verified and you pay your dues (€%(amount)s), you will have full member privileges.') % {
+                    'amount': dues_amount,
+                }
             )
         else:
             messages.success(
                 self.request,
-                _('Successfully registered as ASCAI member! Your membership is pending admin verification. Once verified and you pay your dues, you will have full member privileges.')
+                _('Successfully registered as ASCAI member! Your membership is pending admin verification. Once verified and you pay your annual dues (€%(amount)s), you will have full member privileges.') % {
+                    'amount': dues_amount,
+                }
             )
         return redirect('governance:member_portal')
     
@@ -222,16 +221,9 @@ class MyDuesView(LoginRequiredMixin, TemplateView):
         current_year = timezone.now().year
         dues = MembershipDues.objects.filter(member=member).order_by('-year')
         current_dues = dues.filter(year=current_year).first()
-        
-        # Create current year dues if it doesn't exist and member is active
-        if not current_dues and member.is_active_member:
-            current_dues = MembershipDues.objects.create(
-                member=member,
-                year=current_year,
-                amount=10.00 if member.member_type == 'student' else 5.00,
-                due_date=timezone.datetime(current_year, 3, 31).date(),
-                status='pending'
-            )
+
+        if not current_dues:
+            current_dues = ensure_current_year_dues(member, year=current_year)
             dues = MembershipDues.objects.filter(member=member).order_by('-year')
         
         context.update({

@@ -1,16 +1,39 @@
 """
 Views for downloads app.
 """
-from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView
 from django.http import FileResponse, Http404, JsonResponse
 from django.db.models import Q, Count
 from django.utils.translation import gettext_lazy as _
 from collections import OrderedDict
+from apps.core.membership_content import (
+    MEMBER_RESOURCE_COLLECTIONS,
+    MEMBERSHIP_BENEFIT_PILLARS,
+)
+from apps.governance.services import get_member_resource_access
 from .models import Document
 
 
-class DownloadListView(ListView):
+class MemberResourceAccessMixin:
+    """Adds dues-based member access state to downloads views."""
+
+    _membership_access = None
+
+    def get_membership_access(self):
+        if self._membership_access is None:
+            self._membership_access = get_member_resource_access(self.request.user)
+        return self._membership_access
+
+    def get_document_queryset(self):
+        queryset = Document.objects.filter(is_active=True)
+        if not self.get_membership_access()['is_paid_member']:
+            queryset = queryset.filter(is_reserved=False)
+        return queryset
+
+
+class DownloadListView(MemberResourceAccessMixin, ListView):
     """Enhanced list view for downloadable documents with better filtering."""
     model = Document
     template_name = 'downloads/document_list.html'
@@ -18,7 +41,7 @@ class DownloadListView(ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        queryset = Document.objects.filter(is_active=True)
+        queryset = self.get_document_queryset()
         
         category = self.request.GET.get('category')
         search = self.request.GET.get('search')
@@ -54,20 +77,32 @@ class DownloadListView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        membership_access = self.get_membership_access()
+        reserved_documents = Document.objects.filter(is_active=True, is_reserved=True)
+        category_labels = dict(Document.CATEGORY_CHOICES)
+
         context['filter_category'] = self.request.GET.get('category', '')
         context['search_query'] = self.request.GET.get('search', '')
         context['tags_query'] = self.request.GET.get('tags', '')
         context['sort_by'] = self.request.GET.get('sort', 'recent')
+        context['membership_access'] = membership_access
+        context['membership_benefits'] = MEMBERSHIP_BENEFIT_PILLARS
+        context['member_resource_collections'] = MEMBER_RESOURCE_COLLECTIONS
+        context['member_only_documents_count'] = reserved_documents.count()
+        context['member_only_category_counts'] = [
+            {
+                'key': row['category'],
+                'label': category_labels.get(row['category'], row['category']),
+                'count': row['total'],
+            }
+            for row in reserved_documents.values('category').annotate(total=Count('id')).order_by('-total')
+        ]
         
         # Get popular downloads
-        context['popular_documents'] = Document.objects.filter(
-            is_active=True
-        ).order_by('-download_count')[:10]
+        context['popular_documents'] = self.get_document_queryset().order_by('-download_count', '-uploaded_at')[:10]
         
         # Get recent downloads
-        context['recent_documents'] = Document.objects.filter(
-            is_active=True
-        ).order_by('-uploaded_at')[:10]
+        context['recent_documents'] = self.get_document_queryset().order_by('-uploaded_at')[:10]
         
         # Group documents by category
         documents = context['documents']
@@ -117,6 +152,14 @@ class DownloadListView(ListView):
 def document_download(request, pk):
     """Download document view."""
     document = get_object_or_404(Document, pk=pk, is_active=True)
+    membership_access = get_member_resource_access(request.user)
+
+    if document.is_reserved and not membership_access['is_paid_member']:
+        messages.warning(
+            request,
+            _('This resource is reserved for members whose dues are up to date.')
+        )
+        return redirect(membership_access['cta_url'])
     
     # Increment download count (if not already incremented by HTMX)
     if not request.headers.get('HX-Request'):
@@ -137,6 +180,14 @@ def increment_download_count(request, pk):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     document = get_object_or_404(Document, pk=pk, is_active=True)
+    membership_access = get_member_resource_access(request.user)
+
+    if document.is_reserved and not membership_access['is_paid_member']:
+        return JsonResponse(
+            {'error': str(_('Paid membership is required to access this resource.'))},
+            status=403,
+        )
+
     document.increment_download_count()
     
     return render(request, 'downloads/partials/download_count.html', {
@@ -144,26 +195,30 @@ def increment_download_count(request, pk):
     })
 
 
-class DocumentDetailView(DetailView):
+class DocumentDetailView(MemberResourceAccessMixin, DetailView):
     """Individual document detail page."""
     model = Document
     template_name = 'downloads/document_detail.html'
     context_object_name = 'document'
     
     def get_queryset(self):
-        return Document.objects.filter(is_active=True)
+        return self.get_document_queryset()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Get related documents
-        context['related_documents'] = self.object.get_related_documents(limit=5)
+        related_documents = list(self.object.get_related_documents(limit=8))
+        if not self.get_membership_access()['is_paid_member']:
+            related_documents = [doc for doc in related_documents if not doc.is_reserved]
+        context['related_documents'] = related_documents[:5]
         # Check if document can be downloaded
         context['can_download'] = self.object.can_be_downloaded()
         context['is_expired'] = self.object.is_expired()
+        context['membership_access'] = self.get_membership_access()
         return context
 
 
-class PopularDownloadsView(ListView):
+class PopularDownloadsView(MemberResourceAccessMixin, ListView):
     """Most downloaded documents."""
     model = Document
     template_name = 'downloads/popular.html'
@@ -171,17 +226,16 @@ class PopularDownloadsView(ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        return Document.objects.filter(
-            is_active=True
-        ).order_by('-download_count', '-uploaded_at')
+        return self.get_document_queryset().order_by('-download_count', '-uploaded_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_variant'] = 'popular'
+        context['membership_access'] = self.get_membership_access()
         return context
 
 
-class RecentDownloadsView(ListView):
+class RecentDownloadsView(MemberResourceAccessMixin, ListView):
     """Recently uploaded documents."""
     model = Document
     template_name = 'downloads/recent.html'
@@ -189,11 +243,10 @@ class RecentDownloadsView(ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        return Document.objects.filter(
-            is_active=True
-        ).order_by('-uploaded_at')
+        return self.get_document_queryset().order_by('-uploaded_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_variant'] = 'recent'
+        context['membership_access'] = self.get_membership_access()
         return context

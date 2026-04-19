@@ -22,7 +22,7 @@ from .models import (
     AssociationEvent,
     MembershipDues,
 )
-from .services import user_has_governance_access
+from .services import ensure_current_year_dues, user_has_governance_access
 
 User = get_user_model()
 
@@ -356,6 +356,56 @@ class GovernanceWorkflowServiceTest(TestCase):
                 reason__icontains='Dues paid',
             ).exists()
         )
+
+    def test_sympathizer_dues_also_expire_on_december_31(self):
+        sympathizer_user = User.objects.create_user(
+            username='sympathizer_user',
+            email='sympathizer@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        sympathizer = Member.objects.create(
+            user=sympathizer_user,
+            member_type='sympathizer',
+            is_active_member=False,
+        )
+
+        dues = MembershipDues.objects.create(
+            member=sympathizer,
+            year=date.today().year,
+            amount=Decimal('5.00'),
+            due_date=date(date.today().year, 3, 31),
+            payment_date=date.today(),
+            payment_method='cash',
+            status='paid',
+        )
+
+        sympathizer.refresh_from_db()
+        dues.refresh_from_db()
+        self.assertTrue(sympathizer.is_active_member)
+        self.assertEqual(dues.valid_from, date(date.today().year, 1, 1))
+        self.assertEqual(dues.valid_until, date(date.today().year, 12, 31))
+
+    def test_ensure_current_year_dues_uses_member_type_amount(self):
+        student_dues = ensure_current_year_dues(self.member, year=date.today().year)
+        self.assertEqual(student_dues.amount, Decimal('10.00'))
+        self.assertEqual(student_dues.due_date, date(date.today().year, 3, 31))
+
+        sympathizer_user = User.objects.create_user(
+            username='sympathizer_dues',
+            email='sympathizer_dues@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        sympathizer = Member.objects.create(
+            user=sympathizer_user,
+            member_type='sympathizer',
+            is_active_member=False,
+        )
+        sympathizer_dues = ensure_current_year_dues(sympathizer, year=date.today().year)
+
+        self.assertEqual(sympathizer_dues.amount, Decimal('5.00'))
+        self.assertEqual(sympathizer_dues.due_date, date(date.today().year, 3, 31))
 
     def test_active_president_gets_governance_access_without_manual_permission(self):
         self.assertTrue(

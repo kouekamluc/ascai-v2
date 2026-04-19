@@ -6,11 +6,83 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponse
 from django.db import connection
 from apps.diaspora.models import News, Event
+from apps.downloads.models import Document
+from apps.core.models import CommunityService, ServicePartner
+from apps.governance.services import get_member_resource_access
+from apps.core.membership_content import (
+    MEMBER_RESOURCE_COLLECTIONS,
+    MEMBERSHIP_BENEFIT_PILLARS,
+)
+from apps.core.service_catalog import (
+    DEFAULT_COMMUNITY_SERVICES,
+    DEFAULT_PARTNER_OPPORTUNITIES,
+    DEFAULT_REVENUE_CHANNELS,
+)
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def get_premium_service_context():
+    """Return services and partner opportunities, using DB content when available."""
+    try:
+        services = list(
+            CommunityService.objects.filter(is_active=True, is_featured=True)
+            .select_related("partner")
+            .order_by("display_order", "title")
+        )
+        partners = list(
+            ServicePartner.objects.filter(is_active=True, is_featured=True)
+            .order_by("display_order", "name")
+        )
+    except Exception as e:
+        logger.error("Error loading premium service content: %s", str(e), exc_info=True)
+        services = []
+        partners = []
+
+    if services:
+        service_cards = [
+            {
+                "title": service.title,
+                "category": service.get_category_display(),
+                "audience": service.audience,
+                "summary": service.summary,
+                "access": service.get_access_level_display(),
+                "delivery": service.get_delivery_mode_display(),
+                "revenue": service.get_revenue_stream_display(),
+                "association_benefit": service.association_benefit,
+                "partner_name": service.partner.name if service.partner else "",
+            }
+            for service in services
+        ]
+    else:
+        service_cards = DEFAULT_COMMUNITY_SERVICES
+
+    if partners:
+        partner_cards = [
+            {
+                "title": partner.name,
+                "summary": partner.short_description,
+                "listing_fee_eur": f"{partner.annual_listing_fee:.0f}",
+                "value": (
+                    f"{partner.get_category_display()} visibility"
+                    + (f" in {partner.cities_served}" if partner.cities_served else "")
+                ),
+                "verification_status": partner.get_verification_status_display(),
+            }
+            for partner in partners
+        ]
+    else:
+        partner_cards = DEFAULT_PARTNER_OPPORTUNITIES
+
+    return {
+        "community_service_cards": service_cards,
+        "partner_opportunity_cards": partner_cards,
+        "revenue_channel_cards": DEFAULT_REVENUE_CHANNELS,
+        "service_partner_listing_fee": "20",
+    }
 
 
 class ExecutiveBoardPublicContextMixin:
@@ -71,6 +143,20 @@ class HomeView(ExecutiveBoardPublicContextMixin, TemplateView):
         except Exception as e:
             logger.error(f"Error fetching success stories: {str(e)}", exc_info=True)
             context['success_stories'] = []
+
+        context['membership_access'] = get_member_resource_access(self.request.user)
+        context['membership_benefits'] = MEMBERSHIP_BENEFIT_PILLARS
+        context['member_resource_collections'] = MEMBER_RESOURCE_COLLECTIONS
+        context.update(get_premium_service_context())
+
+        try:
+            context['premium_resource_count'] = Document.objects.filter(
+                is_active=True,
+                is_reserved=True,
+            ).count()
+        except Exception as e:
+            logger.error(f"Error fetching premium resource count: {str(e)}", exc_info=True)
+            context['premium_resource_count'] = 0
         
         return context
 
@@ -78,6 +164,17 @@ class HomeView(ExecutiveBoardPublicContextMixin, TemplateView):
 class LeadershipView(ExecutiveBoardPublicContextMixin, TemplateView):
     """Public page listing current executive board members."""
     template_name = 'core/leadership.html'
+
+
+class PremiumServicesView(TemplateView):
+    """Public page for monetisable premium services and partner offers."""
+    template_name = 'core/premium_services.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['membership_access'] = get_member_resource_access(self.request.user)
+        context.update(get_premium_service_context())
+        return context
 
 
 class HealthCheckView(TemplateView):
@@ -258,4 +355,3 @@ class EventsLoadMoreView(TemplateView):
         context['next_offset'] = offset + limit
         
         return context
-

@@ -2,7 +2,10 @@
 Shared governance business rules and role resolution helpers.
 """
 from datetime import date, timedelta
+from decimal import Decimal
 
+from django.db.models import Q
+from django.urls import reverse
 from django.utils import timezone
 
 from .models import (
@@ -10,6 +13,7 @@ from .models import (
     CommissionMember,
     ExecutiveBoard,
     ExecutivePosition,
+    Member,
     MembershipDues,
     MembershipStatus,
 )
@@ -120,6 +124,129 @@ def can_publish_communication(user):
     )
 
 
+def get_membership_validity_window(year):
+    """Membership runs from January 1 to December 31 of the dues year."""
+    return date(year, 1, 1), date(year, 12, 31)
+
+
+def get_membership_due_date(year):
+    """Annual dues are due on March 31."""
+    return date(year, 3, 31)
+
+
+def get_expected_dues_amount(member):
+    """Standard annual dues amount based on member type."""
+    if member.member_type == "sympathizer":
+        return Decimal("5.00")
+    return Decimal("10.00")
+
+
+def ensure_current_year_dues(member, year=None):
+    """Create the current year's dues record if it doesn't exist yet."""
+    target_year = year or timezone.now().year
+    dues, _created = MembershipDues.objects.get_or_create(
+        member=member,
+        year=target_year,
+        defaults={
+            "amount": get_expected_dues_amount(member),
+            "due_date": get_membership_due_date(target_year),
+            "status": "pending",
+        },
+    )
+    return dues
+
+
+def get_member_resource_access(user):
+    """
+    Resolve whether a user can access dues-gated association resources.
+    """
+    access = {
+        "is_authenticated": bool(getattr(user, "is_authenticated", False)),
+        "has_member_profile": False,
+        "is_paid_member": False,
+        "status": "login_required",
+        "member": None,
+        "current_dues": None,
+        "active_due": None,
+        "reason": (
+            "Create an account, register with ASCAI, and pay your dues to unlock "
+            "member-only association resources."
+        ),
+        "cta_url": reverse("account_signup"),
+        "cta_label": "Create account",
+    }
+
+    if not access["is_authenticated"]:
+        return access
+
+    try:
+        member = user.member_profile
+    except Member.DoesNotExist:
+        access.update(
+            status="registration_required",
+            reason=(
+                "Register as a member or sympathizer first, then complete your dues "
+                "payment to unlock member resources."
+            ),
+            cta_url=reverse("governance:member_register"),
+            cta_label="Register membership",
+        )
+        return access
+
+    today = timezone.now().date()
+    current_year = today.year
+    current_dues = member.dues.filter(year=current_year).first()
+    active_due = (
+        member.dues.filter(status="paid")
+        .filter(
+            Q(valid_from__lte=today, valid_until__gte=today)
+            | Q(valid_from__isnull=True, valid_until__isnull=True, year=current_year)
+        )
+        .order_by("-year", "-payment_date", "-updated_at")
+        .first()
+    )
+
+    access.update(
+        has_member_profile=True,
+        member=member,
+        current_dues=current_dues,
+        active_due=active_due,
+        status="dues_required",
+        cta_url=reverse("governance:my_dues"),
+        cta_label="Pay my dues",
+    )
+
+    if active_due:
+        access.update(
+            is_paid_member=True,
+            status="granted",
+            reason="Your dues are up to date. Member-only resources are unlocked.",
+            cta_url=reverse("downloads:index"),
+            cta_label="Browse resources",
+        )
+        return access
+
+    if current_dues and current_dues.status != "paid":
+        access["reason"] = (
+            f"Your {current_year} dues are not marked as paid yet. Complete payment to "
+            "unlock ASCAI's member-only resources."
+        )
+    else:
+        access["reason"] = (
+            "Pay your current dues to unlock ASCAI's member-only resources, practical "
+            "toolkits, and premium association materials."
+        )
+
+    return access
+
+
+def user_can_access_member_resources(user):
+    """
+    Boolean helper for dues-gated resource access.
+    """
+    return get_member_resource_access(user)["is_paid_member"]
+
+
 def sync_membership_state_from_dues(dues):
     """
     Centralizes dues-driven membership activation and expiry logic.
@@ -133,21 +260,19 @@ def sync_membership_state_from_dues(dues):
             latest_status.last_payment_date = dues.payment_date
             latest_status.save(update_fields=["last_payment_date"])
 
-        if float(dues.amount) == 10.0:
-            valid_from = date(dues.year, 1, 1)
-            valid_until = date(dues.year, 12, 31)
-            updates = []
-            if dues.valid_from != valid_from:
-                dues.valid_from = valid_from
-                updates.append("valid_from")
-            if dues.valid_until != valid_until:
-                dues.valid_until = valid_until
-                updates.append("valid_until")
-            if updates:
-                dues.save(update_fields=updates)
+        valid_from, valid_until = get_membership_validity_window(dues.year)
+        updates = []
+        if dues.valid_from != valid_from:
+            dues.valid_from = valid_from
+            updates.append("valid_from")
+        if dues.valid_until != valid_until:
+            dues.valid_until = valid_until
+            updates.append("valid_until")
+        if updates:
+            dues.save(update_fields=updates)
 
-            member.membership_start_date = valid_from
-            member.membership_end_date = valid_until
+        member.membership_start_date = valid_from
+        member.membership_end_date = valid_until
 
         member.is_active_member = True
         member.save(

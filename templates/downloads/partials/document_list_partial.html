@@ -14,6 +14,9 @@
                 {% include 'downloads/partials/document_thumbnail.html' with document=document wrapper_class='aspect-[4/3] w-full overflow-hidden rounded-[1.5rem] border border-black/5 bg-stone-100' image_class='h-full w-full object-cover' fallback_class='flex h-full min-h-[11rem] w-full flex-col items-center justify-center bg-gradient-to-br from-stone-100 via-white to-stone-200 px-4 text-center' %}
                 <div class="mt-5 flex items-start justify-between gap-4">
                     <div>
+                        {% if document.is_reserved %}
+                        <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{% trans 'Member-only resource' %}</p>
+                        {% endif %}
                         <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ document.file_type|default:"file" }}</p>
                         <h3 class="mt-3 text-2xl font-bold leading-tight text-ascai-ink">{{ document.title }}</h3>
                         {% if document.description %}
@@ -40,6 +43,12 @@
 {% else %}
     <section class="section-card p-10 text-center">
         <h3 class="text-2xl font-bold text-ascai-ink">{% trans 'No documents found' %}</h3>
-        <p class="mt-3 text-sm leading-7 text-gray-600">{% trans 'Try another category, search term, or tag.' %}</p>
+        <p class="mt-3 text-sm leading-7 text-gray-600">
+            {% if membership_access.is_paid_member %}
+                {% trans 'Try another category, search term, or tag.' %}
+            {% else %}
+                {% trans 'Try another category, search term, or tag. Member-only resources unlock after dues payment.' %}
+            {% endif %}
+        </p>
     </section>
 {% endif %}

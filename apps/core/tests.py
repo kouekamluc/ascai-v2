@@ -4,7 +4,7 @@ Tests for core app.
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from apps.core.models import AssociationSettings, Collaborator
+from apps.core.models import AssociationSettings, Collaborator, ServicePartner
 
 User = get_user_model()
 
@@ -50,6 +50,28 @@ class CoreViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Partner Org')
         self.assertNotContains(response, 'Hidden Org')
+
+    def test_premium_services_view_renders_fallback_content(self):
+        response = self.client.get(reverse('core:premium_services'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Premium services')
+        self.assertContains(response, 'Verified remittance partner referrals')
+
+    def test_premium_services_view_can_render_real_partners(self):
+        ServicePartner.objects.create(
+            name='Trusted Transfers',
+            category='money_transfer',
+            short_description='Money transfer service for Cameroon.',
+            verification_status='verified',
+            is_featured=True,
+            is_active=True,
+        )
+
+        response = self.client.get(reverse('core:premium_services'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Trusted Transfers')
 
 
 class CoreContextProcessorsTest(TestCase):

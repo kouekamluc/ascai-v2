@@ -16,11 +16,89 @@
         </div>
     </section>
 
+    <section class="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+        <div class="section-card p-7 md:p-10">
+            <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Member resource vault' %}</p>
+            <h2 class="mt-3 text-4xl font-bold text-ascai-ink">
+                {% if membership_access.is_paid_member %}
+                    {% trans 'Your dues are active, so premium association resources are unlocked.' %}
+                {% else %}
+                    {% trans 'Paid-up members unlock ASCAI resources the wider public cannot see.' %}
+                {% endif %}
+            </h2>
+            <p class="mt-4 text-sm leading-7 text-gray-600">{{ membership_access.reason }}</p>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-3">
+                {% for benefit in membership_benefits %}
+                <article class="rounded-[1.5rem] border border-black/5 bg-stone-50 p-5">
+                    <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ benefit.eyebrow }}</p>
+                    <h3 class="mt-2 text-xl font-bold text-ascai-ink">{{ benefit.title }}</h3>
+                    <p class="mt-3 text-sm leading-7 text-gray-600">{{ benefit.description }}</p>
+                </article>
+                {% endfor %}
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+                {% if membership_access.is_paid_member %}
+                <a href="{% url 'governance:member_portal' %}" class="rounded-full bg-cameroon-green px-5 py-3 text-sm font-semibold text-white hover:bg-cameroon-green/90">{% trans 'Open Member Portal' %}</a>
+                <a href="{% url 'core:premium_services' %}" class="rounded-full bg-stone-100 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-stone-200">{% trans 'See Practical Services' %}</a>
+                {% else %}
+                <a href="{{ membership_access.cta_url }}" class="rounded-full bg-cameroon-green px-5 py-3 text-sm font-semibold text-white hover:bg-cameroon-green/90">{{ membership_access.cta_label }}</a>
+                <a href="{% url 'core:premium_services' %}" class="rounded-full bg-stone-100 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-stone-200">{% trans 'See Practical Services' %}</a>
+                <a href="{% url 'governance:member_portal' %}" class="rounded-full bg-stone-100 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-stone-200">{% trans 'See membership space' %}</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="section-card p-7 md:p-10">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Reserved collections' %}</p>
+                    <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% blocktrans with count=member_only_documents_count %}{{ count }} member-only resources currently available{% endblocktrans %}</h2>
+                </div>
+                <span class="rounded-full bg-cameroon-red/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-red">{% trans 'Dues required' %}</span>
+            </div>
+            <div class="mt-6 space-y-4">
+                {% for collection in member_resource_collections %}
+                <article class="rounded-[1.5rem] border border-black/5 bg-white p-5">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-gray-500">{{ collection.audience }}</p>
+                            <h3 class="mt-2 text-2xl font-bold text-ascai-ink">{{ collection.title }}</h3>
+                        </div>
+                        {% if collection.accent == 'green' %}
+                        <span class="rounded-full bg-cameroon-green/10 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.16em] text-cameroon-green">{% trans 'Student value' %}</span>
+                        {% elif collection.accent == 'red' %}
+                        <span class="rounded-full bg-cameroon-red/10 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.16em] text-cameroon-red">{% trans 'Career value' %}</span>
+                        {% else %}
+                        <span class="rounded-full bg-cameroon-yellow/20 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.16em] text-ascai-ink">{% trans 'Community value' %}</span>
+                        {% endif %}
+                    </div>
+                    <p class="mt-3 text-sm leading-7 text-gray-600">{{ collection.description }}</p>
+                </article>
+                {% endfor %}
+            </div>
+            {% if member_only_category_counts %}
+            <div class="mt-6 flex flex-wrap gap-2">
+                {% for item in member_only_category_counts %}
+                <span class="rounded-full bg-stone-100 px-3 py-2 text-xs font-semibold text-gray-700">{{ item.label }} · {{ item.count }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
     <section class="section-card p-7 md:p-10">
         <div class="section-heading">
             <div>
                 <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Find resources' %}</p>
-                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Filter by category, search, or popularity' %}</h2>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">
+                    {% if membership_access.is_paid_member %}
+                        {% trans 'Filter public and member-only resources' %}
+                    {% else %}
+                        {% trans 'Filter public resources and preview what membership unlocks' %}
+                    {% endif %}
+                </h2>
             </div>
         </div>
         <form hx-get="{% url 'downloads:index' %}" hx-target="#document-list" hx-trigger="change, keyup delay:400ms" class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -50,7 +128,10 @@
             <div class="mt-5 space-y-3">
                 {% for doc in popular_documents|slice:":5" %}
                 <a href="{% url 'downloads:document_detail' doc.pk %}" class="flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-black/5 hover:border-cameroon-green/20">
-                    <span class="font-semibold text-gray-800">{{ doc.title }}</span>
+                    <div>
+                        <span class="font-semibold text-gray-800">{{ doc.title }}</span>
+                        {% if doc.is_reserved %}<span class="ml-2 rounded-full bg-cameroon-green/10 px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-cameroon-green">{% trans 'Members' %}</span>{% endif %}
+                    </div>
                     <span class="text-xs font-bold uppercase tracking-[0.16em] text-cameroon-green">{{ doc.download_count }} {% trans 'downloads' %}</span>
                 </a>
                 {% endfor %}
@@ -64,7 +145,10 @@
             <div class="mt-5 space-y-3">
                 {% for doc in recent_documents|slice:":5" %}
                 <a href="{% url 'downloads:document_detail' doc.pk %}" class="flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-black/5 hover:border-cameroon-green/20">
-                    <span class="font-semibold text-gray-800">{{ doc.title }}</span>
+                    <div>
+                        <span class="font-semibold text-gray-800">{{ doc.title }}</span>
+                        {% if doc.is_reserved %}<span class="ml-2 rounded-full bg-cameroon-green/10 px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-cameroon-green">{% trans 'Members' %}</span>{% endif %}
+                    </div>
                     <span class="text-xs font-bold uppercase tracking-[0.16em] text-gray-500">{{ doc.uploaded_at|timesince }} {% trans 'ago' %}</span>
                 </a>
                 {% endfor %}
@@ -90,6 +174,9 @@
                         {% include 'downloads/partials/document_thumbnail.html' with document=document wrapper_class='aspect-[4/3] w-full overflow-hidden rounded-[1.5rem] border border-black/5 bg-stone-100' image_class='h-full w-full object-cover' fallback_class='flex h-full min-h-[11rem] w-full flex-col items-center justify-center bg-gradient-to-br from-stone-100 via-white to-stone-200 px-4 text-center' %}
                         <div class="mt-5 flex items-start justify-between gap-4">
                             <div>
+                                {% if document.is_reserved %}
+                                <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{% trans 'Member-only resource' %}</p>
+                                {% endif %}
                                 <h3 class="text-2xl font-bold text-ascai-ink leading-tight">{{ document.title }}</h3>
                                 {% if document.description %}<p class="mt-3 text-sm leading-7 text-gray-600">{{ document.description|striptags|truncatewords:18 }}</p>{% endif %}
                             </div>
@@ -113,7 +200,13 @@
             {% endfor %}
         {% else %}
         <section class="section-card p-10 text-center">
-            <p class="text-gray-600">{% trans 'No documents are available right now.' %}</p>
+            <p class="text-gray-600">
+                {% if membership_access.is_paid_member %}
+                    {% trans 'No resources are available right now.' %}
+                {% else %}
+                    {% trans 'No public documents match your filters right now. Member-only resources unlock when dues are paid.' %}
+                {% endif %}
+            </p>
         </section>
         {% endif %}
     </div>

@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from config.admin import BaseAdmin
 
-from .models import AssociationSettings, Collaborator
+from .models import AssociationSettings, Collaborator, CommunityService, ServicePartner
 
 
 @admin.register(Collaborator)
@@ -102,3 +102,101 @@ class AssociationSettingsAdmin(BaseAdmin):
         if obj:
             return redirect(reverse("admin:core_associationsettings_change", args=[obj.pk]))
         return redirect(reverse("admin:core_associationsettings_add"))
+
+
+@admin.register(ServicePartner)
+class ServicePartnerAdmin(BaseAdmin):
+    list_display = [
+        "name",
+        "category",
+        "verification_status",
+        "annual_listing_fee",
+        "is_featured",
+        "is_active",
+        "display_order",
+    ]
+    list_filter = ["category", "verification_status", "is_featured", "is_active"]
+    search_fields = ["name", "short_description", "contact_name", "cities_served"]
+    search_help_text = _("Search service providers by name, contact, or city coverage.")
+    list_editable = ["verification_status", "is_featured", "is_active", "display_order"]
+    readonly_fields = ["created_at", "updated_at"]
+    list_per_page = 25
+    fieldsets = (
+        (_("Partner Details"), {
+            "fields": (
+                "name",
+                "category",
+                "short_description",
+                "cities_served",
+            ),
+        }),
+        (_("Contacts"), {
+            "fields": (
+                "contact_name",
+                "contact_email",
+                "phone_number",
+                "whatsapp_number",
+                "website_url",
+            ),
+        }),
+        (_("Verification and Revenue"), {
+            "fields": (
+                "verification_status",
+                "annual_listing_fee",
+                "is_featured",
+                "is_active",
+                "display_order",
+            ),
+        }),
+        (_("Timestamps"), {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",),
+        }),
+    )
+
+
+@admin.register(CommunityService)
+class CommunityServiceAdmin(BaseAdmin):
+    list_display = [
+        "title",
+        "category",
+        "access_level",
+        "revenue_stream",
+        "partner",
+        "is_featured",
+        "is_active",
+        "display_order",
+    ]
+    list_filter = ["category", "access_level", "delivery_mode", "revenue_stream", "is_featured", "is_active"]
+    search_fields = ["title", "summary", "audience", "association_benefit"]
+    search_help_text = _("Search services by title, audience, or service summary.")
+    list_editable = ["is_featured", "is_active", "display_order"]
+    autocomplete_fields = ["partner"]
+    readonly_fields = ["created_at", "updated_at"]
+    list_per_page = 25
+    fieldsets = (
+        (_("Service Details"), {
+            "fields": (
+                "title",
+                "category",
+                "audience",
+                "summary",
+                "association_benefit",
+            ),
+        }),
+        (_("Access and Delivery"), {
+            "fields": (
+                "access_level",
+                "delivery_mode",
+                "revenue_stream",
+                "partner",
+            ),
+        }),
+        (_("Visibility"), {
+            "fields": ("is_featured", "is_active", "display_order"),
+        }),
+        (_("Timestamps"), {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",),
+        }),
+    )
