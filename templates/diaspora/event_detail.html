@@ -35,9 +35,9 @@
         {% if event.image %}
         <img src="{{ event.image.url }}" alt="{{ event.title }}" class="w-full h-64 object-cover rounded-lg mb-6">
         {% endif %}
-        
+
         <h1 class="text-4xl font-bold mb-4">{{ event.title }}</h1>
-        
+
         <div class="mb-6 space-y-3">
             <div class="flex items-center gap-3 text-gray-700">
                 <svg class="w-5 h-5 text-cameroon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,50 +67,57 @@
             </div>
             {% endif %}
         </div>
-        
+
         {% if event.registration_required %}
         <div class="mb-6 p-4 bg-cameroon-green/10 border-l-4 border-cameroon-green rounded-lg">
             <p class="text-cameroon-green font-semibold mb-1">{% trans 'Registration is required for this event.' %}</p>
-            {% if event.max_participants %}
-            <p class="text-cameroon-green text-sm">{% trans 'Maximum participants:' %} {{ event.max_participants }}</p>
+            {% if capacity %}
+            <p class="text-cameroon-green text-sm">{% trans 'Maximum participants:' %} {{ capacity }}</p>
             {% endif %}
         </div>
         {% endif %}
-        
+
         {% if is_past %}
         <div class="mb-6 p-4 bg-gray-100 border-l-4 border-gray-400 rounded-lg">
             <p class="text-gray-700 font-medium">{% trans 'This event has ended.' %}</p>
         </div>
         {% endif %}
-        
+
         <div class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-cameroon-green prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 mb-6">
             {{ event.description|safe }}
         </div>
-        
+
         {% if not is_past and event.registration_required %}
         <div class="mb-6">
-            {% if can_register %}
-                {% if is_registered %}
+            {% if user.is_authenticated %}
+                {% if is_registered and registration %}
                 <div class="p-4 bg-green-50 border border-green-200 rounded-lg mb-4">
-                    <p class="text-green-800 font-semibold mb-2">✓ {% trans 'You are registered for this event!' %}</p>
+                    <p class="text-green-800 font-semibold mb-2">{% trans 'You are registered for this event!' %}</p>
                     <p class="text-sm text-green-700">{% trans 'We look forward to seeing you there.' %}</p>
                 </div>
-                {% else %}
-                <form method="post" action="{% url 'dashboard:event_register' event.slug %}">
+                <div class="flex flex-wrap gap-3">
+                    <a href="{% url 'dashboard:event_ticket' registration.pk %}" class="px-6 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 font-semibold transition-colors shadow-md hover:shadow-lg">
+                        {% trans 'View Ticket' %}
+                    </a>
+                    <form method="post" action="{% url 'diaspora:event_unregister' event.slug %}">
+                        {% csrf_token %}
+                        <button type="submit" class="px-6 py-3 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 font-semibold transition-colors">
+                            {% trans 'Cancel Registration' %}
+                        </button>
+                    </form>
+                </div>
+                {% elif can_register %}
+                <form method="post" action="{% url 'diaspora:event_register' event.slug %}">
                     {% csrf_token %}
                     <button type="submit" class="px-8 py-3 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90 font-semibold transition-colors shadow-md hover:shadow-lg">
                         {% trans 'Register for Event' %}
                     </button>
                 </form>
-                {% endif %}
-            {% else %}
-                {% if is_full %}
+                {% elif is_full %}
                 <div class="p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
                     <p class="text-red-800 font-semibold">{% trans 'This event is full.' %}</p>
                     {% if waitlist_enabled %}
-                    <button class="mt-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                        {% trans 'Join Waitlist' %}
-                    </button>
+                    <p class="mt-2 text-sm text-red-700">{% trans 'Waitlist support is enabled for this event. Please contact the organizers for next steps.' %}</p>
                     {% endif %}
                 </div>
                 {% else %}
@@ -118,34 +125,41 @@
                     <p class="text-yellow-800">{% trans 'Registration deadline has passed.' %}</p>
                 </div>
                 {% endif %}
+            {% else %}
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <p class="text-gray-700">
+                    <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}" class="text-cameroon-green hover:underline font-semibold">
+                        {% trans 'Log in' %}
+                    </a>
+                    {% trans 'to register for this event.' %}
+                </p>
+            </div>
             {% endif %}
-            
-            {% if registered_count %}
+
+            {% if capacity %}
             <div class="mt-4">
                 <p class="text-sm text-gray-600 mb-2">{% trans 'Registration Status' %}</p>
                 <div class="capacity-indicator">
                     <div class="capacity-bar">
                         <div class="capacity-fill {% if is_full %}full{% elif spots_remaining and spots_remaining < 10 %}warning{% endif %}" style="width: {% widthratio registered_count capacity 100 %}%"></div>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2">{{ registered_count }}{% if capacity %}/{{ capacity }}{% endif %} {% trans 'registered' %}</span>
+                    <span class="text-sm text-gray-700 ml-2">{{ registered_count }}/{{ capacity }} {% trans 'registered' %}</span>
                 </div>
-                {% if spots_remaining %}
                 <p class="text-sm text-gray-600 mt-1">{{ spots_remaining }} {% trans 'spots remaining' %}</p>
-                {% endif %}
             </div>
             {% endif %}
         </div>
         {% endif %}
-        
+
         {% if event.location_map %}
         <div class="mb-6">
             <h3 class="text-lg font-semibold mb-2">{% trans 'Location Map' %}</h3>
             <a href="{{ event.location_map }}" target="_blank" rel="noopener noreferrer" class="text-cameroon-green hover:underline">
-                {% trans 'View on Map' %} →
+                {% trans 'View on Map' %} ->
             </a>
         </div>
         {% endif %}
-        
+
         {% if event.related_resources.all %}
         <div class="mb-6">
             <h3 class="text-lg font-semibold mb-4">{% trans 'Related Resources' %}</h3>
@@ -159,23 +173,19 @@
             </div>
         </div>
         {% endif %}
-        
-        {% if is_registered and not is_past %}
+
+        {% if is_registered and registration and not is_past %}
         <div class="mt-6 p-4 bg-cameroon-green/10 border border-cameroon-green rounded-lg">
             <h3 class="font-semibold mb-2">{% trans 'Your Registration' %}</h3>
-            <p class="text-sm text-gray-700 mb-3">{% trans 'You are registered for this event. Save this QR code for easy check-in:' %}</p>
-            <div class="qr-code-container">
-                <!-- QR Code would be generated here -->
-                <div class="w-32 h-32 bg-white border-2 border-gray-300 flex items-center justify-center">
-                    <span class="text-xs text-gray-500">QR Code</span>
-                </div>
-            </div>
-            <p class="text-xs text-gray-600 mt-2">{% trans 'Event ID:' %} {{ event.slug }}</p>
+            <p class="text-sm text-gray-700 mb-3">{% trans 'Your ticket and QR code are available from your registration page.' %}</p>
+            <a href="{% url 'dashboard:event_ticket' registration.pk %}" class="inline-flex items-center px-5 py-3 bg-white text-cameroon-green border border-cameroon-green rounded-lg hover:bg-cameroon-green/5 font-semibold">
+                {% trans 'Open Ticket' %}
+            </a>
+            <p class="text-xs text-gray-600 mt-2">{% trans 'Registration code:' %} {{ registration.registration_code }}</p>
         </div>
         {% endif %}
     </article>
-    
-    <!-- Related Events -->
+
     {% if related_events %}
     <div class="mt-12">
         <h2 class="text-2xl font-bold mb-6 text-gray-900">{% trans 'Related Events' %}</h2>

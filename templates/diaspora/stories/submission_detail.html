@@ -73,8 +73,8 @@
         <div class="mb-6">
             <div class="text-sm text-gray-600 mb-2">{% trans 'Tags' %}</div>
             <div class="flex flex-wrap gap-2">
-                {% for tag in submission.tags.split:"," %}
-                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">{{ tag.strip }}</span>
+                {% for tag in submission.tag_list %}
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">{{ tag }}</span>
                 {% endfor %}
             </div>
         </div>

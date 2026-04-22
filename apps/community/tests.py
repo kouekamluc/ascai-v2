@@ -4,7 +4,9 @@ Tests for community/forum app.
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.utils.translation import override
 from .models import ForumCategory, ForumThread, ForumPost
+from apps.dashboard.models import CommunityGroup
 
 User = get_user_model()
 
@@ -140,4 +142,56 @@ class CommunityViewsTest(TestCase):
         url = reverse('community:index')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_anonymous_thread_reply_redirects_to_login(self):
+        """Anonymous replies should redirect instead of crashing the thread page."""
+        thread = ForumThread.objects.create(
+            title='Protected Thread',
+            category=self.category,
+            author=self.user,
+            content='Test content'
+        )
+
+        response = self.client.post(
+            reverse('community:thread_detail', kwargs={'slug': thread.slug}),
+            {'content': 'Anonymous reply'}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('account_login'), response.url)
+
+    def test_public_group_detail_with_tags_renders(self):
+        """Public group pages should render tag pills without template errors."""
+        group = CommunityGroup.objects.create(
+            name='Students Hub',
+            description='Community group description',
+            category='students',
+            is_public=True,
+            tags='students, rome, support',
+            created_by=self.user,
+        )
+
+        response = self.client.get(reverse('community:group_detail', kwargs={'slug': group.slug}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'students')
+        self.assertContains(response, 'support')
+
+    def test_thread_detail_translates_to_italian(self):
+        """Thread detail replies section should render translated Italian copy."""
+        thread = ForumThread.objects.create(
+            title='Translated Thread',
+            category=self.category,
+            author=self.user,
+            content='Test content'
+        )
+
+        with override('it'):
+            response = self.client.get(
+                reverse('community:thread_detail', kwargs={'slug': thread.slug}),
+                HTTP_ACCEPT_LANGUAGE='it',
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Risposte')
 

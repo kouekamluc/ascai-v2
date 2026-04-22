@@ -4,9 +4,10 @@ Views for community/forum app.
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.urls import reverse_lazy
 from django.db.models import Count, Q, F
 from django.utils.translation import gettext_lazy as _
@@ -14,6 +15,37 @@ from django.contrib import messages
 from .models import ForumCategory, ForumThread, ForumPost, ThreadUpvote, PostUpvote
 from .forms import ThreadForm, PostForm
 from apps.dashboard.models import CommunityGroup, GroupDiscussion
+
+
+def _get_thread_posts_context(thread, user):
+    """Build the replies section context."""
+    context = {
+        'thread': thread,
+        'posts': thread.posts.select_related('author').order_by('-is_solution', 'created_at'),
+        'user': user,
+    }
+
+    if user.is_authenticated:
+        context['upvoted_post_ids'] = list(
+            PostUpvote.objects.filter(
+                user=user,
+                post__thread=thread
+            ).values_list('post_id', flat=True)
+        )
+    else:
+        context['upvoted_post_ids'] = []
+
+    return context
+
+
+def _render_posts_section(request, thread, status=200):
+    """Render the full replies section for HTMX updates."""
+    return render(
+        request,
+        'community/partials/posts_section.html',
+        _get_thread_posts_context(thread, request.user),
+        status=status,
+    )
 
 
 class ForumIndexView(ListView):
@@ -80,16 +112,14 @@ class ThreadDetailView(DetailView):
     def get_object(self, queryset=None):
         """Increment views count when thread is viewed."""
         obj = super().get_object(queryset)
-        # Increment views count
-        ForumThread.objects.filter(pk=obj.pk).update(views_count=F('views_count') + 1)
-        # Refresh from database to get updated count
-        obj.refresh_from_db()
+        if self.request.method == 'GET':
+            ForumThread.objects.filter(pk=obj.pk).update(views_count=F('views_count') + 1)
+            obj.refresh_from_db()
         return obj
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Order posts: solutions first, then by creation date
-        context['posts'] = self.object.posts.select_related('author').order_by('-is_solution', 'created_at')
+        context.update(_get_thread_posts_context(self.object, self.request.user))
         
         # Check if user has upvoted
         if self.request.user.is_authenticated:
@@ -97,24 +127,22 @@ class ThreadDetailView(DetailView):
                 thread=self.object,
                 user=self.request.user
             ).exists()
-            context['upvoted_post_ids'] = list(
-                PostUpvote.objects.filter(
-                    user=self.request.user,
-                    post__thread=self.object
-                ).values_list('post_id', flat=True)
-            )
         else:
             context['has_upvoted_thread'] = False
-            context['upvoted_post_ids'] = []
-        
-        # Pass user to context for moderation checks
-        context['user'] = self.request.user
         
         return context
     
     def post(self, request, *args, **kwargs):
         """Handle post creation via HTMX."""
         self.object = self.get_object()
+        if not request.user.is_authenticated:
+            login_response = redirect_to_login(request.get_full_path())
+            if request.headers.get('HX-Request'):
+                response = HttpResponse(status=401)
+                response['HX-Redirect'] = login_response.url
+                return response
+            return login_response
+
         if self.object.is_locked:
             return JsonResponse({'error': _('Thread is locked.')}, status=403)
         
@@ -127,23 +155,8 @@ class ThreadDetailView(DetailView):
             # Update thread updated_at
             from django.utils import timezone
             ForumThread.objects.filter(pk=self.object.pk).update(updated_at=timezone.now())
-            context = self.get_context_data(**kwargs)
-            context['post'] = post
-            # Get upvoted post IDs for the new post
-            if request.user.is_authenticated:
-                upvoted_post_ids = list(
-                    PostUpvote.objects.filter(
-                        user=request.user,
-                        post__thread=self.object
-                    ).values_list('post_id', flat=True)
-                )
-            else:
-                upvoted_post_ids = []
-            return render(request, 'community/partials/post_item.html', {
-                'post': post, 
-                'user': request.user,
-                'upvoted_post_ids': upvoted_post_ids
-            })
+            self.object.refresh_from_db()
+            return _render_posts_section(request, self.object)
         return JsonResponse({'error': _('Invalid form data.')}, status=400)
 
 
@@ -292,9 +305,7 @@ def delete_post(request, post_id):
     messages.success(request, _('Post deleted successfully.'))
     
     if request.headers.get('HX-Request'):
-        # Return empty string to remove the element
-        from django.http import HttpResponse
-        return HttpResponse('')
+        return _render_posts_section(request, thread)
     
     return redirect('community:thread_detail', slug=thread.slug)
 
@@ -351,26 +362,9 @@ def toggle_post_solution(request, post_id):
     
     post.is_solution = not post.is_solution
     post.save()
-    post.refresh_from_db()
     
     if request.headers.get('HX-Request'):
-        # Get upvoted post IDs
-        if request.user.is_authenticated:
-            upvoted_post_ids = list(
-                PostUpvote.objects.filter(
-                    user=request.user,
-                    post__thread=thread
-                ).values_list('post_id', flat=True)
-            )
-        else:
-            upvoted_post_ids = []
-        
-        return render(request, 'community/partials/post_item.html', {
-            'post': post,
-            'user': request.user,
-            'upvoted_post_ids': upvoted_post_ids,
-            'thread': thread
-        })
+        return _render_posts_section(request, thread)
     
     return JsonResponse({'is_solution': post.is_solution})
 
@@ -528,4 +522,3 @@ class GroupDiscussionListView(ListView):
             context['is_member'] = False
         
         return context
-

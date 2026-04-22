@@ -138,8 +138,8 @@
                     <div>
                         <div class="text-gray-600 mb-2">{% trans 'Tags' %}</div>
                         <div class="flex flex-wrap gap-2">
-                            {% for tag in group.tags.split:"," %}
-                            <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">{{ tag.strip }}</span>
+                            {% for tag in group.tag_list %}
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">{{ tag }}</span>
                             {% endfor %}
                         </div>
                     </div>

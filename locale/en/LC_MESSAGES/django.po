@@ -2249,3 +2249,102 @@ msgstr "Dues History"
 
 msgid "No dues records"
 msgstr "No dues records"
+
+msgid "Register for Event"
+msgstr "Register for Event"
+
+msgid "Cancel Registration"
+msgstr "Cancel Registration"
+
+msgid "Open Ticket"
+msgstr "Open Ticket"
+
+msgid "Your Registration"
+msgstr "Your Registration"
+
+msgid "Registration code:"
+msgstr "Registration code:"
+
+msgid "spots remaining"
+msgstr "spots remaining"
+
+msgid "Log in"
+msgstr "Log in"
+
+msgid "to register for this event."
+msgstr "to register for this event."
+
+msgid "Waitlist support is enabled for this event. Please contact the organizers for next steps."
+msgstr "Waitlist support is enabled for this event. Please contact the organizers for next steps."
+
+msgid "You are registered for this event!"
+msgstr "You are registered for this event!"
+
+msgid "My Events"
+msgstr "My Events"
+
+msgid "View and manage your event registrations"
+msgstr "View and manage your event registrations"
+
+msgid "Upcoming Events"
+msgstr "Upcoming Events"
+
+msgid "Past Events"
+msgstr "Past Events"
+
+msgid "Ticket"
+msgstr "Ticket"
+
+msgid "View on Map"
+msgstr "View on Map"
+
+msgid "Registration Status"
+msgstr "Registration Status"
+
+msgid "Maximum participants:"
+msgstr "Maximum participants:"
+
+msgid "Registration is required for this event."
+msgstr "Registration is required for this event."
+
+msgid "This event is full."
+msgstr "This event is full."
+
+msgid "Registration deadline has passed."
+msgstr "Registration deadline has passed."
+
+msgid "Your ticket and QR code are available from your registration page."
+msgstr "Your ticket and QR code are available from your registration page."
+
+msgid "This event has ended."
+msgstr "This event has ended."
+
+msgid "Replies"
+msgstr "Replies"
+
+msgid "No replies yet."
+msgstr "No replies yet."
+
+msgid "Be the first to reply to this thread!"
+msgstr "Be the first to reply to this thread!"
+
+msgid "Your account must be approved to register for events."
+msgstr "Your account must be approved to register for events."
+
+msgid "Registration is not required for this event."
+msgstr "Registration is not required for this event."
+
+msgid "This event has already ended."
+msgstr "This event has already ended."
+
+msgid "You are already registered for this event."
+msgstr "You are already registered for this event."
+
+msgid "Successfully registered for the event."
+msgstr "Successfully registered for the event."
+
+msgid "This event has already started, so your registration can no longer be canceled."
+msgstr "This event has already started, so your registration can no longer be canceled."
+
+msgid "Your event registration has been canceled."
+msgstr "Your event registration has been canceled."

@@ -10,7 +10,6 @@
         <p class="text-lg text-gray-600">{% trans 'View and manage your event registrations' %}</p>
     </div>
 
-    <!-- Tabs -->
     <div class="mb-6 border-b border-gray-200">
         <nav class="flex space-x-8">
             <a href="#upcoming" class="py-4 px-1 border-b-2 border-cameroon-green font-medium text-cameroon-green">
@@ -22,7 +21,6 @@
         </nav>
     </div>
 
-    <!-- Upcoming Events -->
     <div id="upcoming" class="mb-12">
         <h2 class="text-2xl font-bold mb-6">{% trans 'Upcoming Events' %}</h2>
         {% if upcoming_registrations %}
@@ -64,10 +62,21 @@
                         <span class="text-xs text-gray-500">
                             {% trans 'Registered' %} {{ registration.registered_at|date:"d M Y" }}
                         </span>
-                        <a href="{% url 'diaspora:event_detail' registration.event.slug %}" class="text-cameroon-green hover:underline text-sm font-medium">
-                            {% trans 'View Details' %} →
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <a href="{% url 'dashboard:event_ticket' registration.pk %}" class="text-cameroon-green hover:underline text-sm font-medium">
+                                {% trans 'Ticket' %}
+                            </a>
+                            <a href="{% url 'diaspora:event_detail' registration.event.slug %}" class="text-cameroon-green hover:underline text-sm font-medium">
+                                {% trans 'View Details' %} ->
+                            </a>
+                        </div>
                     </div>
+                    <form method="post" action="{% url 'diaspora:event_unregister' registration.event.slug %}" class="mt-4">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100">
+                            {% trans 'Cancel Registration' %}
+                        </button>
+                    </form>
                 </div>
             </div>
             {% endfor %}
@@ -85,7 +94,6 @@
         {% endif %}
     </div>
 
-    <!-- Past Events -->
     <div id="past">
         <h2 class="text-2xl font-bold mb-6">{% trans 'Past Events' %}</h2>
         {% if past_registrations %}

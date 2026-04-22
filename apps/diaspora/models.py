@@ -10,6 +10,25 @@ from django.utils.text import slugify
 User = get_user_model()
 
 
+def _generate_unique_slug(model_class, value, instance_pk=None, fallback='item', max_length=200):
+    """Generate a unique slug for a model instance."""
+    base_slug = slugify(value) or fallback
+    base_slug = base_slug[:max_length]
+    slug = base_slug
+    counter = 1
+
+    queryset = model_class.objects.all()
+    if instance_pk:
+        queryset = queryset.exclude(pk=instance_pk)
+
+    while queryset.filter(slug=slug).exists():
+        suffix = f"-{counter}"
+        slug = f"{base_slug[:max_length - len(suffix)]}{suffix}"
+        counter += 1
+
+    return slug
+
+
 class News(models.Model):
     """
     News article model for diaspora news and announcements.
@@ -80,7 +99,7 @@ class News(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = _generate_unique_slug(News, self.title, self.pk, fallback='news')
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
@@ -195,7 +214,7 @@ class Event(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = _generate_unique_slug(Event, self.title, self.pk, fallback='event')
         # Set capacity to max_participants if not specified
         if not self.capacity and self.max_participants:
             self.capacity = self.max_participants
@@ -337,7 +356,12 @@ class SuccessStory(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = _generate_unique_slug(
+                SuccessStory,
+                self.title,
+                self.pk,
+                fallback='success-story',
+            )
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
@@ -431,7 +455,12 @@ class LifeInItaly(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = _generate_unique_slug(
+                LifeInItaly,
+                self.title,
+                self.pk,
+                fallback='life-in-italy',
+            )
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):

@@ -5,9 +5,11 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.utils.translation import override
 from datetime import timedelta
 from django.core.files.uploadedfile import SimpleUploadedFile
 from .models import News, Event
+from apps.dashboard.models import EventRegistration, UserStorySubmission
 
 User = get_user_model()
 
@@ -55,6 +57,21 @@ class NewsModelTest(TestCase):
         self.assertIsNotNone(news.slug)
         self.assertIn('test-news-article', news.slug)
 
+    def test_duplicate_news_titles_get_unique_slugs(self):
+        """Duplicate news titles should not collide on the slug field."""
+        first = News.objects.create(
+            title='Shared Title',
+            content='First',
+            author=self.user
+        )
+        second = News.objects.create(
+            title='Shared Title',
+            content='Second',
+            author=self.user
+        )
+
+        self.assertNotEqual(first.slug, second.slug)
+
 
 class EventModelTest(TestCase):
     """Test Event model."""
@@ -91,6 +108,26 @@ class EventModelTest(TestCase):
         )
         self.assertEqual(str(event), 'Test Event')
 
+    def test_duplicate_event_titles_get_unique_slugs(self):
+        """Duplicate event titles should not collide on the slug field."""
+        start = timezone.now() + timedelta(days=1)
+        first = Event.objects.create(
+            title='Shared Event',
+            description='First description',
+            start_datetime=start,
+            end_datetime=start + timedelta(hours=2),
+            location='Rome'
+        )
+        second = Event.objects.create(
+            title='Shared Event',
+            description='Second description',
+            start_datetime=start + timedelta(days=1),
+            end_datetime=start + timedelta(days=1, hours=2),
+            location='Milan'
+        )
+
+        self.assertNotEqual(first.slug, second.slug)
+
 
 class DiasporaViewsTest(TestCase):
     """Test diaspora views."""
@@ -101,7 +138,8 @@ class DiasporaViewsTest(TestCase):
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
-            password='testpass123'
+            password='testpass123',
+            is_approved=True
         )
         self.news = News.objects.create(
             title='Test News',
@@ -143,4 +181,93 @@ class DiasporaViewsTest(TestCase):
         url = reverse('diaspora:event_detail', kwargs={'slug': self.event.slug})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_event_detail_view_renders_registration_flow(self):
+        """Registration-required event pages should render without reverse errors."""
+        event = Event.objects.create(
+            title='Registration Event',
+            description='Test description',
+            start_datetime=timezone.now() + timedelta(days=3),
+            end_datetime=timezone.now() + timedelta(days=3, hours=2),
+            location='Rome',
+            is_published=True,
+            registration_required=True,
+            capacity=5,
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('diaspora:event_detail', kwargs={'slug': event.slug}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse('diaspora:event_register', kwargs={'slug': event.slug}))
+
+    def test_event_register_and_unregister_flow(self):
+        """Users can register and later cancel from the diaspora flow."""
+        event = Event.objects.create(
+            title='Flow Event',
+            description='Test description',
+            start_datetime=timezone.now() + timedelta(days=4),
+            end_datetime=timezone.now() + timedelta(days=4, hours=2),
+            location='Rome',
+            is_published=True,
+            registration_required=True,
+            capacity=5,
+        )
+
+        self.client.force_login(self.user)
+
+        register_response = self.client.post(
+            reverse('diaspora:event_register', kwargs={'slug': event.slug}),
+            follow=True,
+        )
+        self.assertEqual(register_response.status_code, 200)
+        self.assertTrue(EventRegistration.objects.filter(event=event, user=self.user).exists())
+
+        unregister_response = self.client.post(
+            reverse('diaspora:event_unregister', kwargs={'slug': event.slug}),
+            follow=True,
+        )
+        self.assertEqual(unregister_response.status_code, 200)
+        self.assertFalse(EventRegistration.objects.filter(event=event, user=self.user).exists())
+
+    def test_story_submission_detail_with_tags_renders(self):
+        """Tagged story details should render without template method calls."""
+        submission = UserStorySubmission.objects.create(
+            user=self.user,
+            title='Tagged Story',
+            story='Story content',
+            tags='rome, student, community',
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse('diaspora:story_submission_detail', kwargs={'pk': submission.pk})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'rome')
+        self.assertContains(response, 'student')
+
+    def test_event_detail_page_translates_to_french(self):
+        """The public event flow should render translated French copy."""
+        event = Event.objects.create(
+            title='French Event',
+            description='Test description',
+            start_datetime=timezone.now() + timedelta(days=5),
+            end_datetime=timezone.now() + timedelta(days=5, hours=2),
+            location='Rome',
+            is_published=True,
+            registration_required=True,
+            capacity=5,
+        )
+
+        self.client.force_login(self.user)
+        with override('fr'):
+            response = self.client.get(
+                reverse('diaspora:event_detail', kwargs={'slug': event.slug}),
+                HTTP_ACCEPT_LANGUAGE='fr',
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'S inscrire a l evenement')
 

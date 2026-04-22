@@ -5,6 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -25,7 +26,7 @@ class DiasporaIndexView(TemplateView):
         context['latest_news'] = News.objects.filter(is_published=True)[:5]
         context['upcoming_events'] = Event.objects.filter(
             is_published=True,
-            start_datetime__gte=timezone.now()
+            end_datetime__gte=timezone.now()
         )[:5]
         context['featured_testimonials'] = Testimonial.objects.filter(
             is_published=True,
@@ -123,7 +124,7 @@ class EventListView(ListView):
         if date_filter == 'past':
             queryset = queryset.filter(end_datetime__lt=timezone.now())
         else:  # upcoming
-            queryset = queryset.filter(start_datetime__gte=timezone.now())
+            queryset = queryset.filter(end_datetime__gte=timezone.now())
         
         # Filter by location
         location = self.request.GET.get('location')
@@ -154,7 +155,7 @@ class EventListView(ListView):
         context['search_query'] = self.request.GET.get('search', '')
         context['featured_events'] = Event.objects.filter(
             is_published=True,
-            start_datetime__gte=timezone.now()
+            end_datetime__gte=timezone.now()
         ).order_by('start_datetime')[:6]
         return context
 
@@ -178,6 +179,8 @@ class EventDetailView(DetailView):
         
         # Registration info
         if self.object.registration_required:
+            context['capacity'] = self.object.capacity or self.object.max_participants
+            context['waitlist_enabled'] = self.object.waitlist_enabled
             context['registered_count'] = self.object.get_registered_count()
             context['spots_remaining'] = self.object.spots_remaining()
             context['is_full'] = self.object.is_full()
@@ -189,11 +192,13 @@ class EventDetailView(DetailView):
             
             # Check if user is registered
             if self.request.user.is_authenticated:
-                context['is_registered'] = EventRegistration.objects.filter(
+                context['registration'] = EventRegistration.objects.filter(
                     event=self.object,
                     user=self.request.user
-                ).exists()
+                ).first()
+                context['is_registered'] = context['registration'] is not None
             else:
+                context['registration'] = None
                 context['is_registered'] = False
         
         # Add absolute image URL for meta tags
@@ -237,7 +242,7 @@ class MyEventsView(LoginRequiredMixin, ListView):
         # Separate upcoming and past events
         context['upcoming_registrations'] = [
             reg for reg in self.get_queryset()
-            if reg.event.start_datetime >= now
+            if reg.event.end_datetime >= now
         ]
         context['past_registrations'] = [
             reg for reg in self.get_queryset()
@@ -384,3 +389,59 @@ class StorySubmissionDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return UserStorySubmission.objects.filter(user=self.request.user)
 
+
+@login_required
+@require_http_methods(["POST"])
+def event_register(request, slug):
+    """Register the current user for a published event."""
+    event = get_object_or_404(Event, slug=slug, is_published=True)
+
+    if not getattr(request.user, 'is_approved', True) and not request.user.is_superuser:
+        messages.error(request, _('Your account must be approved to register for events.'))
+        return redirect(event.get_absolute_url())
+
+    if not event.registration_required:
+        messages.info(request, _('Registration is not required for this event.'))
+        return redirect(event.get_absolute_url())
+
+    if event.end_datetime <= timezone.now():
+        messages.error(request, _('This event has already ended.'))
+        return redirect(event.get_absolute_url())
+
+    if event.registration_deadline and event.registration_deadline <= timezone.now():
+        messages.error(request, _('Registration deadline has passed.'))
+        return redirect(event.get_absolute_url())
+
+    registration, created = EventRegistration.objects.get_or_create(
+        event=event,
+        user=request.user,
+    )
+
+    if not created:
+        messages.info(request, _('You are already registered for this event.'))
+        return redirect(event.get_absolute_url())
+
+    capacity = event.capacity or event.max_participants
+    if capacity and event.get_registered_count() > capacity:
+        registration.delete()
+        messages.error(request, _('This event is full.'))
+        return redirect(event.get_absolute_url())
+
+    messages.success(request, _('Successfully registered for the event.'))
+    return redirect(event.get_absolute_url())
+
+
+@login_required
+@require_http_methods(["POST"])
+def event_unregister(request, slug):
+    """Cancel the current user's registration for an upcoming event."""
+    event = get_object_or_404(Event, slug=slug, is_published=True)
+    registration = get_object_or_404(EventRegistration, event=event, user=request.user)
+
+    if event.start_datetime <= timezone.now():
+        messages.error(request, _('This event has already started, so your registration can no longer be canceled.'))
+        return redirect(event.get_absolute_url())
+
+    registration.delete()
+    messages.success(request, _('Your event registration has been canceled.'))
+    return redirect(event.get_absolute_url())

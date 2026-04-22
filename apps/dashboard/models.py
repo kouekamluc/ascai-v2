@@ -12,6 +12,25 @@ import uuid
 User = get_user_model()
 
 
+def _generate_unique_slug(model_class, value, instance_pk=None, fallback='item', max_length=200):
+    """Generate a unique slug for public-facing models."""
+    base_slug = slugify(value) or fallback
+    base_slug = base_slug[:max_length]
+    slug = base_slug
+    counter = 1
+
+    queryset = model_class.objects.all()
+    if instance_pk:
+        queryset = queryset.exclude(pk=instance_pk)
+
+    while queryset.filter(slug=slug).exists():
+        suffix = f"-{counter}"
+        slug = f"{base_slug[:max_length - len(suffix)]}{suffix}"
+        counter += 1
+
+    return slug
+
+
 class SupportTicket(models.Model):
     """
     Support ticket model for user-admin communication.
@@ -220,7 +239,12 @@ class CommunityGroup(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = _generate_unique_slug(
+                CommunityGroup,
+                self.name,
+                self.pk,
+                fallback='community-group',
+            )
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
@@ -234,6 +258,13 @@ class CommunityGroup(models.Model):
     def member_count(self):
         """Get the number of members in the group."""
         return self.members.count()
+
+    @property
+    def tag_list(self):
+        """Return cleaned tags for display."""
+        if not self.tags:
+            return []
+        return [tag.strip() for tag in self.tags.split(',') if tag.strip()]
     
     @property
     def activity_count(self):
@@ -560,6 +591,13 @@ class UserStorySubmission(models.Model):
             from django.utils import timezone
             self.published_date = timezone.now()
         super().save(*args, **kwargs)
+
+    @property
+    def tag_list(self):
+        """Return cleaned tags for display."""
+        if not self.tags:
+            return []
+        return [tag.strip() for tag in self.tags.split(',') if tag.strip()]
 
 
 class EventRegistration(models.Model):

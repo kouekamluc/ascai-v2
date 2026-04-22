@@ -3212,3 +3212,102 @@ msgstr ""
 "Documenti dell associazione, risorse di orientamento affidabili, accesso "
 "agli eventi e percorsi comunitari per le persone che vogliono contribuire "
 "oltre la vita studentesca."
+
+msgid "Register for Event"
+msgstr "Registrati all evento"
+
+msgid "Cancel Registration"
+msgstr "Annulla registrazione"
+
+msgid "Open Ticket"
+msgstr "Apri biglietto"
+
+msgid "Your Registration"
+msgstr "La tua registrazione"
+
+msgid "Registration code:"
+msgstr "Codice di registrazione:"
+
+msgid "spots remaining"
+msgstr "posti rimanenti"
+
+msgid "Log in"
+msgstr "Accedi"
+
+msgid "to register for this event."
+msgstr "per registrarti a questo evento."
+
+msgid "Waitlist support is enabled for this event. Please contact the organizers for next steps."
+msgstr "La lista di attesa e attiva per questo evento. Contatta gli organizzatori per i prossimi passi."
+
+msgid "You are registered for this event!"
+msgstr "Sei registrato a questo evento!"
+
+msgid "My Events"
+msgstr "I miei eventi"
+
+msgid "View and manage your event registrations"
+msgstr "Visualizza e gestisci le tue registrazioni agli eventi"
+
+msgid "Upcoming Events"
+msgstr "Eventi in arrivo"
+
+msgid "Past Events"
+msgstr "Eventi passati"
+
+msgid "Ticket"
+msgstr "Biglietto"
+
+msgid "View on Map"
+msgstr "Vedi sulla mappa"
+
+msgid "Registration Status"
+msgstr "Stato registrazioni"
+
+msgid "Maximum participants:"
+msgstr "Partecipanti massimi:"
+
+msgid "Registration is required for this event."
+msgstr "La registrazione e richiesta per questo evento."
+
+msgid "This event is full."
+msgstr "Questo evento e al completo."
+
+msgid "Registration deadline has passed."
+msgstr "La scadenza per la registrazione e passata."
+
+msgid "Your ticket and QR code are available from your registration page."
+msgstr "Il tuo biglietto e il codice QR sono disponibili dalla tua pagina di registrazione."
+
+msgid "This event has ended."
+msgstr "Questo evento e terminato."
+
+msgid "Replies"
+msgstr "Risposte"
+
+msgid "No replies yet."
+msgstr "Nessuna risposta ancora."
+
+msgid "Be the first to reply to this thread!"
+msgstr "Sii il primo a rispondere a questa discussione!"
+
+msgid "Your account must be approved to register for events."
+msgstr "Il tuo account deve essere approvato per registrarti agli eventi."
+
+msgid "Registration is not required for this event."
+msgstr "La registrazione non e richiesta per questo evento."
+
+msgid "This event has already ended."
+msgstr "Questo evento e gia terminato."
+
+msgid "You are already registered for this event."
+msgstr "Sei gia registrato a questo evento."
+
+msgid "Successfully registered for the event."
+msgstr "Registrazione all evento completata con successo."
+
+msgid "This event has already started, so your registration can no longer be canceled."
+msgstr "Questo evento e gia iniziato, quindi la tua registrazione non puo piu essere annullata."
+
+msgid "Your event registration has been canceled."
+msgstr "La tua registrazione all evento e stata annullata."
