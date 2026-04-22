@@ -213,6 +213,20 @@ class UserPreferredLocaleMiddlewareTest(TestCase):
         self.assertEqual(follow_up.status_code, 302)
         self.assertEqual(follow_up.url, '/it/premium-services/')
 
+    def test_admin_route_is_not_forced_under_language_prefix(self):
+        user = User.objects.create_user(
+            username='adminswitch',
+            email='adminswitch@example.com',
+            password='testpass123',
+            language_preference='fr',
+        )
+
+        self.client.force_login(user)
+        response = self.client.get('/admin/', follow=False)
+
+        self.assertIn(response.status_code, [200, 302, 403])
+        self.assertFalse(response.get('Location', '').startswith('/fr/admin/'))
+
 
 class TranslateCurrentUrlTemplateTagTest(TestCase):
     """Ensure translated redirect targets stay stable across languages."""

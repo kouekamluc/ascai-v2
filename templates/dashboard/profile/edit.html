@@ -4,15 +4,13 @@
 {% block page_heading %}{% trans 'Edit Profile' %}{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 max-w-4xl">
-    <!-- Header -->
-    <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-2xl font-bold text-gray-900">{% trans 'Edit Profile' %}</h2>
-        <p class="text-sm text-gray-600 mt-1">{% trans 'Update your personal information and preferences' %}</p>
+<div class="dashboard-card mx-auto max-w-5xl p-7">
+    <div class="dashboard-card-header">
+        <h2 class="text-3xl font-bold text-ascai-ink">{% trans 'Edit Profile' %}</h2>
+        <p class="mt-2 text-sm leading-7 text-gray-600">{% trans 'Update your personal information and preferences' %}</p>
     </div>
     
-    <!-- Form -->
-    <form method="post" enctype="multipart/form-data" class="p-6">
+    <form method="post" enctype="multipart/form-data" class="dashboard-form space-y-8">
         {% csrf_token %}
         {% if form.non_field_errors %}
         <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -22,13 +20,13 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% for field in form %}
-            <div class="{% if field.name == 'bio' %}md:col-span-2{% endif %}">
-                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+            <div class="field-shell {% if field.name == 'bio' %}md:col-span-2{% endif %}">
+                <label for="{{ field.id_for_label }}">
                     {{ field.label }}
                     {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
                 </label>
                 {% if field.field.widget.input_type == 'file' %}
-                <div class="flex items-center gap-4">
+                <div class="field-card">
                     {{ field }}
                     {% if user.avatar %}
                     <img src="{{ user.avatar.url }}" alt="{% trans 'Current avatar' %}" class="h-12 w-12 rounded-full border border-gray-200 object-cover">
@@ -52,12 +50,12 @@
             {% endfor %}
         </div>
         
-        <!-- Form Actions -->
-        <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-4">
-            <a href="{% url 'dashboard:profile_view' %}" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+        <div class="section-divider"></div>
+        <div class="flex flex-wrap justify-end gap-4">
+            <a href="{% url 'dashboard:profile_view' %}" class="btn-secondary">
                 {% trans 'Cancel' %}
             </a>
-            <button type="submit" class="px-6 py-2 bg-cameroon-green text-white rounded-lg font-medium hover:bg-cameroon-green/90 transition-colors shadow-sm">
+            <button type="submit" class="btn-primary">
                 <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
@@ -67,4 +65,3 @@
     </form>
 </div>
 {% endblock %}
-

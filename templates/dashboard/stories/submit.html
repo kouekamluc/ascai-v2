@@ -8,33 +8,36 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-card max-w-3xl mx-auto">
+<div class="dashboard-card mx-auto max-w-4xl p-7">
     <div class="dashboard-card-header">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">{% trans 'Submit Your Story' %}</h2>
-            <p class="text-gray-600 mt-2 leading-relaxed">{% trans 'Share your success story with the ASCAI community. Your story will be reviewed by our team before publication.' %}</p>
+            <h2 class="text-3xl font-bold text-ascai-ink">{% trans 'Submit Your Story' %}</h2>
+            <p class="mt-2 max-w-2xl text-sm leading-7 text-gray-600">{% trans 'Share your success story with the ASCAI community. Your story will be reviewed by our team before publication.' %}</p>
         </div>
     </div>
     
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="dashboard-form space-y-8">
         {% csrf_token %}
         
         <div class="space-y-6">
             {% for field in form %}
-            <div class="{% if field.name == 'story' %}md:col-span-2{% endif %}">
-                <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+            <div class="field-shell {% if field.name == 'story' %}md:col-span-2{% endif %}">
+                <label for="{{ field.id_for_label }}">
                     {{ field.label }}
                     {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
                 </label>
                 {% if field.name == 'is_anonymous' %}
-                <div class="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div class="field-card">
                     {{ field }}
-                    <label for="{{ field.id_for_label }}" class="ml-3 text-sm font-medium text-gray-700">
+                    <label for="{{ field.id_for_label }}" class="mb-0 text-sm font-medium text-gray-700">
                         {{ field.label }}
                     </label>
                 </div>
                 {% else %}
                 {{ field }}
+                {% endif %}
+                {% if field.help_text %}
+                <p class="text-sm text-gray-500">{{ field.help_text }}</p>
                 {% endif %}
                 {% if field.errors %}
                 <p class="mt-1 text-sm text-red-600 flex items-center">
@@ -50,7 +53,7 @@
         
         <div class="section-divider"></div>
         
-        <div class="flex justify-end space-x-4">
+        <div class="flex flex-wrap justify-end gap-4">
             <a href="{% url 'dashboard:stories_list' %}" class="btn-secondary">
                 {% trans 'Cancel' %}
             </a>
@@ -64,4 +67,3 @@
     </form>
 </div>
 {% endblock %}
-

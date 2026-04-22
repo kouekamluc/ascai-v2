@@ -277,6 +277,79 @@
             color: #25332f;
         }
 
+        .dashboard-form {
+            width: 100%;
+        }
+
+        .dashboard-form .field-shell {
+            display: grid;
+            gap: 0.6rem;
+        }
+
+        .dashboard-form .field-card {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            border: 1px solid rgba(17, 35, 29, 0.12);
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 1.05rem;
+        }
+
+        .dashboard-form input[type="checkbox"] {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--dash-green);
+        }
+
+        .dashboard-form input[type="file"] {
+            padding: 0.75rem 0.85rem;
+        }
+
+        .dashboard-form input[type="file"]::file-selector-button {
+            margin-right: 0.85rem;
+            border: 0;
+            border-radius: 9999px;
+            background: var(--dash-green);
+            color: white;
+            font-weight: 700;
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+        }
+
+        .dashboard-form .django-ckeditor-widget,
+        .dashboard-form .ck-editor,
+        .dashboard-form .ck-editor__main {
+            display: block;
+            width: 100%;
+        }
+
+        .dashboard-form .ck.ck-toolbar {
+            border-color: rgba(17, 35, 29, 0.12);
+            border-radius: 1rem 1rem 0 0;
+            background: rgba(255, 255, 255, 0.94);
+            padding: 0.55rem 0.7rem;
+        }
+
+        .dashboard-form .ck.ck-content,
+        .dashboard-form .ck-editor__editable_inline {
+            min-height: 18rem;
+            border-color: rgba(17, 35, 29, 0.12);
+            border-radius: 0 0 1rem 1rem;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: inset 0 1px 2px rgba(17, 35, 29, 0.04);
+        }
+
+        .dashboard-form .ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused,
+        .dashboard-form .ck.ck-toolbar.ck-toolbar_grouping {
+            border-color: rgba(13, 107, 82, 0.26);
+        }
+
+        .section-divider {
+            margin: 2rem 0;
+            border-top: 1px solid rgba(17, 35, 29, 0.08);
+        }
+
         img, video, iframe, svg {
             max-width: 100%;
         }

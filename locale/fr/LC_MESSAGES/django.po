@@ -3255,6 +3255,78 @@ msgstr "Cet evenement a deja commence, votre inscription ne peut donc plus etre 
 msgid "Your event registration has been canceled."
 msgstr "Votre inscription a l evenement a ete annulee."
 
+msgid "Reserved Area"
+msgstr "Espace reserve"
+
+msgid "Keep your ASCAI journey organized in one place."
+msgstr "Gardez tout votre parcours ASCAI organise au meme endroit."
+
+msgid "Track what matters most: your membership standing, dues, events, mentorship activity, support requests, and the association processes that need your attention."
+msgstr "Suivez l essentiel : votre situation d adhesion, vos cotisations, les evenements, le mentorat, les demandes d aide et les processus de l association qui demandent votre attention."
+
+msgid "Quick summary"
+msgstr "Resume rapide"
+
+msgid "Association rules"
+msgstr "Regles de l association"
+
+msgid "General assemblies require at least 10 days notice."
+msgstr "Les assemblees generales exigent un preavis d au moins 10 jours."
+
+msgid "Annual dues are due by March 31."
+msgstr "Les cotisations annuelles sont exigibles au plus tard le 31 mars."
+
+msgid "Active membership depends on dues and participation."
+msgstr "L adhesion active depend des cotisations et de la participation."
+
+msgid "Membership health"
+msgstr "Etat de l adhesion"
+
+msgid "Your standing under the association rules"
+msgstr "Votre situation au regard des regles de l association"
+
+msgid "Participation"
+msgstr "Participation"
+
+msgid "Assemblies and voting"
+msgstr "Assemblees et vote"
+
+msgid "Active member"
+msgstr "Membre actif"
+
+msgid "Inactive member"
+msgstr "Membre inactif"
+
+msgid "Due by"
+msgstr "A regler avant le"
+
+msgid "Status:"
+msgstr "Statut :"
+
+msgid "Review my dues"
+msgstr "Consulter mes cotisations"
+
+msgid "No upcoming assembly is currently scheduled for you."
+msgstr "Aucune assemblee a venir n est actuellement programmee pour vous."
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Story"
+msgstr "Histoire"
+
+msgid "Anonymous"
+msgstr "Anonyme"
+
+msgid "Supporting Documents"
+msgstr "Documents justificatifs"
+
+msgid "Submit a support request and our team will assist you"
+msgstr "Envoyez une demande d assistance et notre equipe vous aidera."
+
+msgid "Update your personal information and preferences"
+msgstr "Mettez a jour vos informations personnelles et vos preferences"
+
 msgid "Create an account, register with ASCAI, and pay your dues to unlock member-only association resources."
 msgstr "Creez un compte, inscrivez-vous a l ASCAI et payez vos cotisations pour acceder aux ressources reservees aux membres."
 

@@ -48,13 +48,6 @@ class UserPreferredLocaleMiddleware:
             and request.method in {"GET", "HEAD"}
         ):
             translated_url = translate_url(request.get_full_path(), preferred_language)
-            if translated_url == request.get_full_path():
-                base_path = request.path_info
-                if not base_path.startswith("/"):
-                    base_path = f"/{base_path}"
-                translated_url = f"/{preferred_language}{base_path}"
-                if request.META.get("QUERY_STRING"):
-                    translated_url = f"{translated_url}?{request.META['QUERY_STRING']}"
             if translated_url and translated_url != request.get_full_path():
                 response = HttpResponseRedirect(translated_url)
                 response = self._set_language_cookie(response, preferred_language)

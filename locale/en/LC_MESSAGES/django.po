@@ -2349,6 +2349,78 @@ msgstr "This event has already started, so your registration can no longer be ca
 msgid "Your event registration has been canceled."
 msgstr "Your event registration has been canceled."
 
+msgid "Reserved Area"
+msgstr "Reserved Area"
+
+msgid "Keep your ASCAI journey organized in one place."
+msgstr "Keep your ASCAI journey organized in one place."
+
+msgid "Track what matters most: your membership standing, dues, events, mentorship activity, support requests, and the association processes that need your attention."
+msgstr "Track what matters most: your membership standing, dues, events, mentorship activity, support requests, and the association processes that need your attention."
+
+msgid "Quick summary"
+msgstr "Quick summary"
+
+msgid "Association rules"
+msgstr "Association rules"
+
+msgid "General assemblies require at least 10 days notice."
+msgstr "General assemblies require at least 10 days notice."
+
+msgid "Annual dues are due by March 31."
+msgstr "Annual dues are due by March 31."
+
+msgid "Active membership depends on dues and participation."
+msgstr "Active membership depends on dues and participation."
+
+msgid "Membership health"
+msgstr "Membership health"
+
+msgid "Your standing under the association rules"
+msgstr "Your standing under the association rules"
+
+msgid "Participation"
+msgstr "Participation"
+
+msgid "Assemblies and voting"
+msgstr "Assemblies and voting"
+
+msgid "Active member"
+msgstr "Active member"
+
+msgid "Inactive member"
+msgstr "Inactive member"
+
+msgid "Due by"
+msgstr "Due by"
+
+msgid "Status:"
+msgstr "Status:"
+
+msgid "Review my dues"
+msgstr "Review my dues"
+
+msgid "No upcoming assembly is currently scheduled for you."
+msgstr "No upcoming assembly is currently scheduled for you."
+
+msgid "Title"
+msgstr "Title"
+
+msgid "Story"
+msgstr "Story"
+
+msgid "Anonymous"
+msgstr "Anonymous"
+
+msgid "Supporting Documents"
+msgstr "Supporting Documents"
+
+msgid "Submit a support request and our team will assist you"
+msgstr "Submit a support request and our team will assist you"
+
+msgid "Update your personal information and preferences"
+msgstr "Update your personal information and preferences"
+
 msgid "Create an account, register with ASCAI, and pay your dues to unlock member-only association resources."
 msgstr "Create an account, register with ASCAI, and pay your dues to unlock member-only association resources."
 
