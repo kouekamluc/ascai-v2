@@ -3254,3 +3254,145 @@ msgstr "Cet evenement a deja commence, votre inscription ne peut donc plus etre 
 
 msgid "Your event registration has been canceled."
 msgstr "Votre inscription a l evenement a ete annulee."
+
+msgid "Create an account, register with ASCAI, and pay your dues to unlock member-only association resources."
+msgstr "Creez un compte, inscrivez-vous a l ASCAI et payez vos cotisations pour acceder aux ressources reservees aux membres."
+
+msgid "Create account"
+msgstr "Creez un compte"
+
+msgid "Register as a member or sympathizer first, then complete your dues payment to unlock member resources."
+msgstr "Inscrivez-vous d abord comme membre ou sympathisant, puis reglez votre cotisation pour debloquer les ressources membres."
+
+msgid "Register membership"
+msgstr "Enregistrer l adhesion"
+
+msgid "Pay my dues"
+msgstr "Payer mes cotisations"
+
+msgid "Your dues are up to date. Member-only resources are unlocked."
+msgstr "Vos cotisations sont a jour. Les ressources reservees aux membres sont debloquees."
+
+msgid "Browse resources"
+msgstr "Parcourir les ressources"
+
+msgid "Your %(year)s dues are not marked as paid yet. Complete payment to unlock ASCAI's member-only resources."
+msgstr "Vos cotisations %(year)s ne sont pas encore marquees comme payees. Terminez le paiement pour debloquer les ressources reservees aux membres de l ASCAI."
+
+msgid "Pay your current dues to unlock ASCAI's member-only resources, practical toolkits, and premium association materials."
+msgstr "Payez vos cotisations actuelles pour debloquer les ressources reservees aux membres de l ASCAI, les trousses pratiques et les supports premium de l association."
+
+msgid "User is not a registered member"
+msgstr "L utilisateur n est pas un membre enregistre"
+
+msgid "Members of the Electoral Commission cannot be candidates (Article 33)"
+msgstr "Les membres de la commission electorale ne peuvent pas etre candidats (article 33)"
+
+msgid "Insufficient seniority: %(days)s days (requires 365+ days)"
+msgstr "Anciennete insuffisante : %(days)s jours (365+ jours requis)"
+
+msgid "Membership start date not set"
+msgstr "La date de debut d adhesion n est pas definie"
+
+msgid "Lazio residence not verified"
+msgstr "La residence dans le Latium n est pas verifiee"
+
+msgid "Cameroonian origin not verified"
+msgstr "L origine camerounaise n est pas verifiee"
+
+msgid "Member is not currently active"
+msgstr "Le membre n est pas actuellement actif"
+
+msgid "Low assembly participation: %(count)s attendances in last year (recommended: 2+)"
+msgstr "Participation faible aux assemblees : %(count)s presences au cours de la derniere annee (2+ recommandees)"
+
+msgid "Only active members can vote"
+msgstr "Seuls les membres actifs peuvent voter"
+
+msgid "This election is not currently open for voting"
+msgstr "Cette election n est pas actuellement ouverte au vote"
+
+msgid "You can review or update your vote while the election is open"
+msgstr "Vous pouvez revoir ou modifier votre vote tant que l election est ouverte"
+
+msgid "Non-payment of dues: Overdue by %(days)s days"
+msgstr "Cotisations impayees : retard de %(days)s jours"
+
+msgid "Repeated disciplinary violations: %(count)s active sanctions"
+msgstr "Violations disciplinaires repetees : %(count)s sanctions actives"
+
+msgid "Active exclusion sanction"
+msgstr "Sanction d exclusion active"
+
+msgid "Unknown"
+msgstr "Inconnu"
+
+msgid "%(count)d year"
+msgid_plural "%(count)d years"
+msgstr[0] "%(count)d an"
+msgstr[1] "%(count)d ans"
+
+msgid "%(count)d month"
+msgid_plural "%(count)d months"
+msgstr[0] "%(count)d mois"
+msgstr[1] "%(count)d mois"
+
+msgid "No active position holder"
+msgstr "Aucun titulaire actif du poste"
+
+msgid "Position holder resigned"
+msgstr "Le titulaire du poste a demissionne"
+
+msgid "Excessive absences: %(count)s missed meetings/assemblies (automatic resignation per Article 13)"
+msgstr "Absences excessives : %(count)s reunions ou assemblees manquees (demission automatique selon l article 13)"
+
+msgid "Missing convocation or assembly date"
+msgstr "Date de convocation ou d assemblee manquante"
+
+msgid "Notice period: %(days)s days (required: 10 days)"
+msgstr "Delai de convocation : %(days)s jours (10 jours requis)"
+
+msgid "Insufficient notice: %(days)s days (required: 10 days)"
+msgstr "Delai de convocation insuffisant : %(days)s jours (10 jours requis)"
+
+msgid "Assembly date not set"
+msgstr "La date de l assemblee n est pas definie"
+
+msgid "Proposal deadline: %(days)s days before assembly (required: 14 days)"
+msgstr "Delai de proposition : %(days)s jours avant l assemblee (14 jours requis)"
+
+msgid "Too late: %(days)s days before assembly (required: 14 days)"
+msgstr "Trop tard : %(days)s jours avant l assemblee (14 jours requis)"
+
+msgid "No general reports found. First report due within 6 months."
+msgstr "Aucun rapport general trouve. Le premier rapport est attendu dans les 6 mois."
+
+msgid "Last report: %(last_report)s. Next due: %(next_due)s. %(status)s"
+msgstr "Dernier rapport : %(last_report)s. Prochaine echeance : %(next_due)s. %(status)s"
+
+msgid "Overdue by %(days)s days"
+msgstr "En retard de %(days)s jours"
+
+msgid "Due in %(days)s days"
+msgstr "Echeance dans %(days)s jours"
+
+msgid "Assembly not provided"
+msgstr "Assemblee non fournie"
+
+msgid "Missing required agenda items: %(items)s"
+msgstr "Elements obligatoires de l ordre du jour manquants : %(items)s"
+
+msgid "All required agenda items present"
+msgstr "Tous les elements obligatoires de l ordre du jour sont presents"
+
+msgid "Assembly frequency: %(count)s assemblies in last year. %(status)s"
+msgstr "Frequence des assemblees : %(count)s assemblees au cours de la derniere annee. %(status)s"
+
+msgid "Meets requirements"
+msgstr "Respecte les exigences"
+
+msgid "Too few assemblies (minimum 2 per year)"
+msgstr "Trop peu d assemblees (minimum 2 par an)"
+
+msgid "Too frequent assemblies (maximum quarterly)"
+msgstr "Assemblees trop frequentes (maximum trimestriel)"

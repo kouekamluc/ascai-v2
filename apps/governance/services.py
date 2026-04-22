@@ -7,6 +7,7 @@ from decimal import Decimal
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from .models import (
     AuditorMember,
@@ -168,12 +169,12 @@ def get_member_resource_access(user):
         "member": None,
         "current_dues": None,
         "active_due": None,
-        "reason": (
+        "reason": _(
             "Create an account, register with ASCAI, and pay your dues to unlock "
             "member-only association resources."
         ),
         "cta_url": reverse("account_signup"),
-        "cta_label": "Create account",
+        "cta_label": _("Create account"),
     }
 
     if not access["is_authenticated"]:
@@ -184,12 +185,12 @@ def get_member_resource_access(user):
     except Member.DoesNotExist:
         access.update(
             status="registration_required",
-            reason=(
+            reason=_(
                 "Register as a member or sympathizer first, then complete your dues "
                 "payment to unlock member resources."
             ),
             cta_url=reverse("governance:member_register"),
-            cta_label="Register membership",
+            cta_label=_("Register membership"),
         )
         return access
 
@@ -213,26 +214,26 @@ def get_member_resource_access(user):
         active_due=active_due,
         status="dues_required",
         cta_url=reverse("governance:my_dues"),
-        cta_label="Pay my dues",
+        cta_label=_("Pay my dues"),
     )
 
     if active_due:
         access.update(
             is_paid_member=True,
             status="granted",
-            reason="Your dues are up to date. Member-only resources are unlocked.",
+            reason=_("Your dues are up to date. Member-only resources are unlocked."),
             cta_url=reverse("downloads:index"),
-            cta_label="Browse resources",
+            cta_label=_("Browse resources"),
         )
         return access
 
     if current_dues and current_dues.status != "paid":
-        access["reason"] = (
-            f"Your {current_year} dues are not marked as paid yet. Complete payment to "
+        access["reason"] = _(
+            "Your %(year)s dues are not marked as paid yet. Complete payment to "
             "unlock ASCAI's member-only resources."
-        )
+        ) % {"year": current_year}
     else:
-        access["reason"] = (
+        access["reason"] = _(
             "Pay your current dues to unlock ASCAI's member-only resources, practical "
             "toolkits, and premium association materials."
         )

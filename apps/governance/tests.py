@@ -4,7 +4,9 @@ Tests for governance app.
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
+from django.utils import translation
 from datetime import date, timedelta
 from decimal import Decimal
 from .models import (
@@ -23,6 +25,8 @@ from .models import (
     MembershipDues,
 )
 from .services import ensure_current_year_dues, user_has_governance_access
+from .services import get_member_resource_access
+from .utils import calculate_member_seniority, check_general_report_requirement
 
 User = get_user_model()
 
@@ -606,4 +610,41 @@ class ElectionWorkflowRegressionTest(TestCase):
 
         pending_candidacy.refresh_from_db()
         self.assertEqual(pending_candidacy.status, 'approved')
+
+
+class GovernanceTranslationRegressionTest(TestCase):
+    """Keep Python-generated member-facing copy translatable."""
+
+    def test_calculate_member_seniority_formats_text_in_french(self):
+        user = User.objects.create_user(
+            username='seniority_user',
+            email='seniority@example.com',
+            password='testpass123',
+        )
+        member = Member.objects.create(
+            user=user,
+            member_type='student',
+            membership_start_date=date.today() - timedelta(days=400),
+        )
+
+        with translation.override('fr'):
+            seniority = calculate_member_seniority(member)
+
+        self.assertEqual(seniority['formatted'], '1 an, 1 mois')
+
+    def test_member_resource_access_reason_is_translated_in_italian(self):
+        with translation.override('it'):
+            access = get_member_resource_access(AnonymousUser())
+
+        self.assertEqual(access['cta_label'], 'Crea un account')
+        self.assertIn('paga la quota', access['reason'])
+
+    def test_general_report_requirement_message_is_translated(self):
+        with translation.override('fr'):
+            report_requirement = check_general_report_requirement()
+
+        self.assertEqual(
+            report_requirement['message'],
+            'Aucun rapport general trouve. Le premier rapport est attendu dans les 6 mois.',
+        )
 

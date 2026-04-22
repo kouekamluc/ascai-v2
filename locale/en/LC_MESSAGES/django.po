@@ -2348,3 +2348,145 @@ msgstr "This event has already started, so your registration can no longer be ca
 
 msgid "Your event registration has been canceled."
 msgstr "Your event registration has been canceled."
+
+msgid "Create an account, register with ASCAI, and pay your dues to unlock member-only association resources."
+msgstr "Create an account, register with ASCAI, and pay your dues to unlock member-only association resources."
+
+msgid "Create account"
+msgstr "Create account"
+
+msgid "Register as a member or sympathizer first, then complete your dues payment to unlock member resources."
+msgstr "Register as a member or sympathizer first, then complete your dues payment to unlock member resources."
+
+msgid "Register membership"
+msgstr "Register membership"
+
+msgid "Pay my dues"
+msgstr "Pay my dues"
+
+msgid "Your dues are up to date. Member-only resources are unlocked."
+msgstr "Your dues are up to date. Member-only resources are unlocked."
+
+msgid "Browse resources"
+msgstr "Browse resources"
+
+msgid "Your %(year)s dues are not marked as paid yet. Complete payment to unlock ASCAI's member-only resources."
+msgstr "Your %(year)s dues are not marked as paid yet. Complete payment to unlock ASCAI's member-only resources."
+
+msgid "Pay your current dues to unlock ASCAI's member-only resources, practical toolkits, and premium association materials."
+msgstr "Pay your current dues to unlock ASCAI's member-only resources, practical toolkits, and premium association materials."
+
+msgid "User is not a registered member"
+msgstr "User is not a registered member"
+
+msgid "Members of the Electoral Commission cannot be candidates (Article 33)"
+msgstr "Members of the Electoral Commission cannot be candidates (Article 33)"
+
+msgid "Insufficient seniority: %(days)s days (requires 365+ days)"
+msgstr "Insufficient seniority: %(days)s days (requires 365+ days)"
+
+msgid "Membership start date not set"
+msgstr "Membership start date not set"
+
+msgid "Lazio residence not verified"
+msgstr "Lazio residence not verified"
+
+msgid "Cameroonian origin not verified"
+msgstr "Cameroonian origin not verified"
+
+msgid "Member is not currently active"
+msgstr "Member is not currently active"
+
+msgid "Low assembly participation: %(count)s attendances in last year (recommended: 2+)"
+msgstr "Low assembly participation: %(count)s attendances in last year (recommended: 2+)"
+
+msgid "Only active members can vote"
+msgstr "Only active members can vote"
+
+msgid "This election is not currently open for voting"
+msgstr "This election is not currently open for voting"
+
+msgid "You can review or update your vote while the election is open"
+msgstr "You can review or update your vote while the election is open"
+
+msgid "Non-payment of dues: Overdue by %(days)s days"
+msgstr "Non-payment of dues: Overdue by %(days)s days"
+
+msgid "Repeated disciplinary violations: %(count)s active sanctions"
+msgstr "Repeated disciplinary violations: %(count)s active sanctions"
+
+msgid "Active exclusion sanction"
+msgstr "Active exclusion sanction"
+
+msgid "Unknown"
+msgstr "Unknown"
+
+msgid "%(count)d year"
+msgid_plural "%(count)d years"
+msgstr[0] "%(count)d year"
+msgstr[1] "%(count)d years"
+
+msgid "%(count)d month"
+msgid_plural "%(count)d months"
+msgstr[0] "%(count)d month"
+msgstr[1] "%(count)d months"
+
+msgid "No active position holder"
+msgstr "No active position holder"
+
+msgid "Position holder resigned"
+msgstr "Position holder resigned"
+
+msgid "Excessive absences: %(count)s missed meetings/assemblies (automatic resignation per Article 13)"
+msgstr "Excessive absences: %(count)s missed meetings/assemblies (automatic resignation per Article 13)"
+
+msgid "Missing convocation or assembly date"
+msgstr "Missing convocation or assembly date"
+
+msgid "Notice period: %(days)s days (required: 10 days)"
+msgstr "Notice period: %(days)s days (required: 10 days)"
+
+msgid "Insufficient notice: %(days)s days (required: 10 days)"
+msgstr "Insufficient notice: %(days)s days (required: 10 days)"
+
+msgid "Assembly date not set"
+msgstr "Assembly date not set"
+
+msgid "Proposal deadline: %(days)s days before assembly (required: 14 days)"
+msgstr "Proposal deadline: %(days)s days before assembly (required: 14 days)"
+
+msgid "Too late: %(days)s days before assembly (required: 14 days)"
+msgstr "Too late: %(days)s days before assembly (required: 14 days)"
+
+msgid "No general reports found. First report due within 6 months."
+msgstr "No general reports found. First report due within 6 months."
+
+msgid "Last report: %(last_report)s. Next due: %(next_due)s. %(status)s"
+msgstr "Last report: %(last_report)s. Next due: %(next_due)s. %(status)s"
+
+msgid "Overdue by %(days)s days"
+msgstr "Overdue by %(days)s days"
+
+msgid "Due in %(days)s days"
+msgstr "Due in %(days)s days"
+
+msgid "Assembly not provided"
+msgstr "Assembly not provided"
+
+msgid "Missing required agenda items: %(items)s"
+msgstr "Missing required agenda items: %(items)s"
+
+msgid "All required agenda items present"
+msgstr "All required agenda items present"
+
+msgid "Assembly frequency: %(count)s assemblies in last year. %(status)s"
+msgstr "Assembly frequency: %(count)s assemblies in last year. %(status)s"
+
+msgid "Meets requirements"
+msgstr "Meets requirements"
+
+msgid "Too few assemblies (minimum 2 per year)"
+msgstr "Too few assemblies (minimum 2 per year)"
+
+msgid "Too frequent assemblies (maximum quarterly)"
+msgstr "Too frequent assemblies (maximum quarterly)"

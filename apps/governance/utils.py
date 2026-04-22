@@ -3,6 +3,7 @@ Business logic utilities for governance app.
 Implements algorithms for vote counting, eligibility checking, etc.
 """
 from django.utils import timezone
+from django.utils.translation import gettext as _, ngettext
 from django.db.models import Q, Count, Sum
 from datetime import timedelta, datetime
 from .models import (
@@ -160,7 +161,7 @@ def check_candidacy_eligibility(user, position, election=None):
         member = user.member_profile
     except Member.DoesNotExist:
         eligibility['eligible'] = False
-        eligibility['reasons'].append('User is not a registered member')
+        eligibility['reasons'].append(_('User is not a registered member'))
         return eligibility
     
     # Check if user is a member of Electoral Commission (Article 33 - cannot be candidate)
@@ -172,7 +173,7 @@ def check_candidacy_eligibility(user, position, election=None):
         if is_commission_member:
             eligibility['eligible'] = False
             eligibility['reasons'].append(
-                'Members of the Electoral Commission cannot be candidates (Article 33)'
+                _('Members of the Electoral Commission cannot be candidates (Article 33)')
             )
             return eligibility
     
@@ -182,24 +183,25 @@ def check_candidacy_eligibility(user, position, election=None):
         if seniority_days < 365:
             eligibility['eligible'] = False
             eligibility['reasons'].append(
-                f'Insufficient seniority: {seniority_days} days (requires 365+ days)'
+                _('Insufficient seniority: %(days)s days (requires 365+ days)')
+                % {'days': seniority_days}
             )
     else:
-        eligibility['warnings'].append('Membership start date not set')
+        eligibility['warnings'].append(_('Membership start date not set'))
     
     # Check Lazio residence
     if not member.lazio_residence_verified:
         eligibility['eligible'] = False
-        eligibility['reasons'].append('Lazio residence not verified')
+        eligibility['reasons'].append(_('Lazio residence not verified'))
     
     # Check Cameroonian origin
     if not member.cameroonian_origin_verified:
         eligibility['eligible'] = False
-        eligibility['reasons'].append('Cameroonian origin not verified')
+        eligibility['reasons'].append(_('Cameroonian origin not verified'))
     
     # Check active membership
     if not member.is_active_member:
-        eligibility['warnings'].append('Member is not currently active')
+        eligibility['warnings'].append(_('Member is not currently active'))
     
     # Check regular participation (at least 2 assemblies in last year)
     one_year_ago = timezone.now() - timedelta(days=365)
@@ -210,7 +212,11 @@ def check_candidacy_eligibility(user, position, election=None):
     
     if assembly_attendances < 2:
         eligibility['warnings'].append(
-            f'Low assembly participation: {assembly_attendances} attendances in last year (recommended: 2+)'
+            _(
+                'Low assembly participation: %(count)s attendances in last year '
+                '(recommended: 2+)'
+            )
+            % {'count': assembly_attendances}
         )
     
     return eligibility
@@ -231,18 +237,18 @@ def check_voting_eligibility(user, assembly=None, election=None):
     try:
         member = user.member_profile
     except Member.DoesNotExist:
-        eligibility['reason'] = 'User is not a registered member'
+        eligibility['reason'] = _('User is not a registered member')
         return eligibility
     
     # Check active membership
     if not member.is_active_member:
-        eligibility['reason'] = 'Only active members can vote'
+        eligibility['reason'] = _('Only active members can vote')
         return eligibility
     
     # For elections, check if already voted
     if election:
         if election.status != 'in_progress':
-            eligibility['reason'] = 'This election is not currently open for voting'
+            eligibility['reason'] = _('This election is not currently open for voting')
             return eligibility
 
         # Check if user already voted for any position in this election
@@ -253,7 +259,9 @@ def check_voting_eligibility(user, assembly=None, election=None):
         
         if existing_votes:
             eligibility['has_voted'] = True
-            eligibility['reason'] = 'You can review or update your vote while the election is open'
+            eligibility['reason'] = _(
+                'You can review or update your vote while the election is open'
+            )
     
     # For assemblies, check if already voted
     if assembly:
@@ -291,7 +299,8 @@ def check_membership_loss_criteria(member):
         if timezone.now().date() > three_months_after_due:
             status['should_lose_membership'] = True
             status['reasons'].append(
-                f'Non-payment of dues: Overdue by {(timezone.now().date() - three_months_after_due).days} days'
+                _('Non-payment of dues: Overdue by %(days)s days')
+                % {'days': (timezone.now().date() - three_months_after_due).days}
             )
     
     # Check for repeated disciplinary sanctions
@@ -302,7 +311,10 @@ def check_membership_loss_criteria(member):
     
     if active_sanctions >= 3:
         status['should_lose_membership'] = True
-        status['reasons'].append(f'Repeated disciplinary violations: {active_sanctions} active sanctions')
+        status['reasons'].append(
+            _('Repeated disciplinary violations: %(count)s active sanctions')
+            % {'count': active_sanctions}
+        )
     
     # Check for exclusion sanction
     exclusion_sanction = DisciplinarySanction.objects.filter(
@@ -313,7 +325,7 @@ def check_membership_loss_criteria(member):
     
     if exclusion_sanction:
         status['should_lose_membership'] = True
-        status['reasons'].append('Active exclusion sanction')
+        status['reasons'].append(_('Active exclusion sanction'))
     
     return status
 
@@ -328,7 +340,7 @@ def calculate_member_seniority(member):
             'days': 0,
             'years': 0,
             'months': 0,
-            'formatted': 'Unknown'
+            'formatted': _('Unknown')
         }
     
     start_date = member.membership_start_date
@@ -339,12 +351,16 @@ def calculate_member_seniority(member):
     months = (delta.days % 365) // 30
     days = delta.days % 30
     
+    years_text = ngettext('%(count)d year', '%(count)d years', years) % {'count': years}
+    months_text = ngettext('%(count)d month', '%(count)d months', months) % {'count': months}
+    formatted = f'{years_text}, {months_text}' if years > 0 else months_text
+
     return {
         'days': delta.days,
         'years': years,
         'months': months,
         'days_remaining': days,
-        'formatted': f'{years} years, {months} months' if years > 0 else f'{months} months'
+        'formatted': formatted
     }
 
 
@@ -366,7 +382,7 @@ def check_executive_board_vacancy(board, position):
         return {
             'is_vacant': True,
             'position': position_obj,
-            'reason': 'No active position holder'
+            'reason': _('No active position holder')
         }
     
     # Check for resignation
@@ -374,7 +390,7 @@ def check_executive_board_vacancy(board, position):
         return {
             'is_vacant': True,
             'position': position_obj,
-            'reason': 'Position holder resigned'
+            'reason': _('Position holder resigned')
         }
     
     # Check for absence (Article 13: 2 assemblies + 4 meetings)
@@ -414,7 +430,10 @@ def check_executive_board_vacancy(board, position):
             return {
                 'is_vacant': True,
                 'position': position_obj,
-                'reason': f'Excessive absences: {absences} missed meetings/assemblies (automatic resignation per Article 13)',
+                'reason': _(
+                    'Excessive absences: %(count)s missed meetings/assemblies '
+                    '(automatic resignation per Article 13)'
+                ) % {'count': absences},
                 'auto_resigned': True
             }
     
@@ -437,7 +456,7 @@ def get_executive_board_vacancies(board):
             vacancies.append({
                 'position_code': position_code,
                 'position_name': position_name,
-                'reason': vacancy_status.get('reason', 'Vacant'),
+                'reason': vacancy_status.get('reason', _('Vacant')),
                 'position_obj': vacancy_status.get('position')
             })
     
@@ -711,7 +730,7 @@ def check_assembly_notice_period(assembly):
         return {
             'compliant': False,
             'days': None,
-            'message': 'Missing convocation or assembly date'
+            'message': _('Missing convocation or assembly date')
         }
     
     notice_days = (assembly.date.date() - assembly.convocation_date).days
@@ -721,7 +740,11 @@ def check_assembly_notice_period(assembly):
         'compliant': compliant,
         'days': notice_days,
         'required': 10,
-        'message': f'Notice period: {notice_days} days (required: 10 days)' if compliant else f'Insufficient notice: {notice_days} days (required: 10 days)'
+        'message': (
+            _('Notice period: %(days)s days (required: 10 days)')
+            if compliant
+            else _('Insufficient notice: %(days)s days (required: 10 days)')
+        ) % {'days': notice_days}
     }
 
 
@@ -734,7 +757,7 @@ def check_agenda_item_proposal_deadline(assembly, proposal_date):
         return {
             'compliant': False,
             'days': None,
-            'message': 'Assembly date not set'
+            'message': _('Assembly date not set')
         }
     
     days_before = (assembly.date.date() - proposal_date).days
@@ -744,7 +767,11 @@ def check_agenda_item_proposal_deadline(assembly, proposal_date):
         'compliant': compliant,
         'days': days_before,
         'required': 14,
-        'message': f'Proposal deadline: {days_before} days before assembly (required: 14 days)' if compliant else f'Too late: {days_before} days before assembly (required: 14 days)'
+        'message': (
+            _('Proposal deadline: %(days)s days before assembly (required: 14 days)')
+            if compliant
+            else _('Too late: %(days)s days before assembly (required: 14 days)')
+        ) % {'days': days_before}
     }
 
 
@@ -768,7 +795,7 @@ def check_general_report_requirement():
             'last_report_date': None,
             'days_overdue': None,
             'next_due_date': today + timedelta(days=180),
-            'message': 'No general reports found. First report due within 6 months.'
+            'message': _('No general reports found. First report due within 6 months.')
         }
     
     # Calculate next due date (6 months after last report period end)
@@ -780,8 +807,17 @@ def check_general_report_requirement():
         'last_report_date': last_report.period_end,
         'days_overdue': days_overdue,
         'next_due_date': next_due_date,
-        'message': f'Last report: {last_report.period_end}. Next due: {next_due_date}. ' + 
-                   (f'Overdue by {days_overdue} days' if days_overdue else f'Due in {(next_due_date - today).days} days')
+        'message': _(
+            'Last report: %(last_report)s. Next due: %(next_due)s. %(status)s'
+        ) % {
+            'last_report': last_report.period_end,
+            'next_due': next_due_date,
+            'status': (
+                _('Overdue by %(days)s days') % {'days': days_overdue}
+                if days_overdue
+                else _('Due in %(days)s days') % {'days': (next_due_date - today).days}
+            ),
+        }
     }
 
 
@@ -795,7 +831,7 @@ def check_agenda_structure_requirements(assembly):
         return {
             'compliant': False,
             'missing_items': [],
-            'message': 'Assembly not provided'
+            'message': _('Assembly not provided')
         }
     
     agenda_items = assembly.agenda_items.all()
@@ -814,7 +850,11 @@ def check_agenda_structure_requirements(assembly):
         'has_finance': 'finance' in item_types,
         'has_activities': 'activities' in item_types,
         'has_miscellaneous': 'miscellaneous' in item_types,
-        'message': f'Missing required agenda items: {", ".join(missing_items)}' if missing_items else 'All required agenda items present'
+        'message': (
+            _('Missing required agenda items: %(items)s') % {'items': ', '.join(missing_items)}
+            if missing_items
+            else _('All required agenda items present')
+        )
     }
 
 
@@ -855,9 +895,19 @@ def check_assembly_frequency_compliance():
         'assembly_count': assembly_count,
         'meets_minimum': meets_minimum,
         'meets_maximum': meets_maximum,
-        'message': f'Assembly frequency: {assembly_count} assemblies in last year. ' +
-                   ('Meets requirements' if (meets_minimum and meets_maximum) else
-                    ('Too few assemblies (minimum 2 per year)' if not meets_minimum else
-                     'Too frequent assemblies (maximum quarterly)'))
+        'message': _(
+            'Assembly frequency: %(count)s assemblies in last year. %(status)s'
+        ) % {
+            'count': assembly_count,
+            'status': (
+                _('Meets requirements')
+                if (meets_minimum and meets_maximum)
+                else (
+                    _('Too few assemblies (minimum 2 per year)')
+                    if not meets_minimum
+                    else _('Too frequent assemblies (maximum quarterly)')
+                )
+            ),
+        }
     }
 

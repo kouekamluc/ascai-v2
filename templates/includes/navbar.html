@@ -53,7 +53,11 @@
                 </a>
                 <div class="relative" x-data="{ open: false }" @keydown.escape.window="open = false">
                     <button type="button" @click="open = !open" class="flex items-center gap-2 rounded-full bg-ascai-ink py-2 pl-2 pr-3 text-white shadow-lg">
+                        {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="h-9 w-9 rounded-full object-cover">
+                        {% else %}
                         <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cameroon-yellow font-bold text-ascai-ink">{{ user.username|first|upper }}</span>
+                        {% endif %}
                         <span class="hidden max-w-24 truncate text-sm font-semibold 2xl:inline">{{ user.get_display_name|default:user.username }}</span>
                     </button>
                     <div x-show="open"

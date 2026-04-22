@@ -55,6 +55,22 @@ class CoreViewsTest(TestCase):
         self.assertContains(response, 'Partner Org')
         self.assertNotContains(response, 'Hidden Org')
 
+    def test_home_view_uses_authenticated_user_avatar_in_navbar(self):
+        user = User.objects.create_user(
+            username='avataruser',
+            email='avatar@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        user.avatar = 'profiles/avataruser.jpg'
+        user.save(update_fields=['avatar'])
+
+        self.client.force_login(user)
+        response = self.client.get(reverse('core:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '/media/profiles/avataruser.jpg')
+
     def test_premium_services_view_renders_fallback_content(self):
         response = self.client.get(reverse('core:premium_services'))
 

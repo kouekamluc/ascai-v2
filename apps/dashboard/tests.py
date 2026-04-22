@@ -149,6 +149,16 @@ class DashboardViewsTest(TestCase):
         url = reverse('dashboard:home')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_dashboard_home_keeps_language_switcher_dropdown_visible(self):
+        """Dashboard header should not clip the language dropdown."""
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.get(reverse('dashboard:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'overflow-visible')
+        self.assertNotContains(response, 'max-w-[8rem] overflow-hidden md:block')
     
     def test_profile_view(self):
         """Test profile view."""
