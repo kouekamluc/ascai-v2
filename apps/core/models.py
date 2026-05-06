@@ -1,6 +1,8 @@
 """
 Core models for site-wide content.
 """
+import re
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
@@ -187,6 +189,22 @@ class ServicePartner(models.Model):
     @property
     def is_verified(self):
         return self.verification_status == "verified"
+
+    @property
+    def initials(self):
+        words = [word for word in self.name.replace("-", " ").split() if word]
+        if not words:
+            return "SP"
+        if len(words) == 1:
+            return words[0][:2].upper()
+        return "".join(word[0] for word in words[:2]).upper()
+
+    @property
+    def whatsapp_url(self):
+        if not self.whatsapp_number:
+            return ""
+        digits = re.sub(r"\D", "", self.whatsapp_number)
+        return f"https://wa.me/{digits}" if digits else ""
 
 
 class CommunityService(models.Model):

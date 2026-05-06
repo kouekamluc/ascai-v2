@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ASCAI Lazio 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 19:19+0200\n"
+"POT-Creation-Date: 2026-05-06 19:55+0200\n"
 "PO-Revision-Date: 2024-12-04 12:00+0000\n"
 "Last-Translator: ASCAI Lazio Team\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -144,7 +144,7 @@ msgstr ""
 
 # Model field translations
 #: .\apps\accounts\forms.py:126 .\apps\accounts\models.py:30
-#: .\apps\core\models.py:147 .\templates\account\signup.html:77
+#: .\apps\core\models.py:149 .\templates\account\signup.html:77
 #: .\templates\accounts\register.html:103
 msgid "Phone Number"
 msgstr "Numero di telefono"
@@ -311,7 +311,7 @@ msgstr "Una breve biografia su di te."
 msgid "Avatar"
 msgstr "Avatar"
 
-#: .\apps\accounts\models.py:69 .\apps\core\models.py:308
+#: .\apps\accounts\models.py:69 .\apps\core\models.py:326
 #: .\apps\dashboard\models.py:76 .\apps\dashboard\models.py:129
 #: .\apps\dashboard\models.py:224 .\apps\dashboard\models.py:318
 #: .\apps\dashboard\models.py:369 .\apps\dashboard\models.py:727
@@ -424,7 +424,7 @@ msgid "User notification settings"
 msgstr "Impostazioni notifiche utente"
 
 #: .\apps\accounts\models.py:166 .\apps\accounts\models.py:218
-#: .\apps\core\models.py:303 .\apps\dashboard\models.py:49
+#: .\apps\core\models.py:321 .\apps\dashboard\models.py:49
 #: .\apps\dashboard\models.py:482 .\apps\dashboard\models.py:618
 #: .\apps\dashboard\models.py:661 .\apps\dashboard\models.py:694
 #: .\apps\dashboard\models.py:753 .\apps\governance\models.py:84
@@ -451,8 +451,8 @@ msgstr "Student Card"
 msgid "Residence Permit"
 msgstr "Residence Permit"
 
-#: .\apps\accounts\models.py:211 .\apps\core\models.py:123
-#: .\apps\core\models.py:202 .\apps\dashboard\models.py:475
+#: .\apps\accounts\models.py:211 .\apps\core\models.py:125
+#: .\apps\core\models.py:220 .\apps\dashboard\models.py:475
 #: .\apps\diaspora\models.py:127 .\apps\diaspora\models.py:406
 #: .\apps\downloads\models.py:19 .\apps\governance\models.py:557
 #: .\apps\governance\models.py:797 .\apps\governance\models.py:980
@@ -482,8 +482,8 @@ msgstr "File"
 msgid "Uploaded At"
 msgstr "Uploaded At"
 
-#: .\apps\accounts\models.py:239 .\apps\core\models.py:128
-#: .\templates\account\email.html:47
+#: .\apps\accounts\models.py:239 .\apps\core\models.py:130
+#: .\templates\account\email.html:47 .\templates\dashboard\home.html:136
 #: .\templates\dashboard\profile\documents.html:99
 #: .\templates\governance\members\detail.html:76
 #: .\templates\governance\members\detail.html:87
@@ -569,7 +569,7 @@ msgid "Your reply..."
 msgstr "Your reply..."
 
 #: .\apps\community\models.py:15 .\apps\contact\models.py:16
-#: .\apps\core\models.py:19 .\apps\dashboard\models.py:155
+#: .\apps\core\models.py:21 .\apps\dashboard\models.py:155
 #: .\apps\diaspora\models.py:254 .\apps\mentorship\models.py:17
 #: .\apps\students\models.py:19
 #: .\templates\contact\partials\contact_form.html:5
@@ -604,8 +604,8 @@ msgid "Order"
 msgstr "Ordine"
 
 #: .\apps\community\models.py:21 .\apps\community\models.py:37
-#: .\apps\core\models.py:24 .\apps\core\models.py:138
-#: .\apps\core\models.py:232 .\apps\dashboard\models.py:171
+#: .\apps\core\models.py:26 .\apps\core\models.py:140
+#: .\apps\core\models.py:250 .\apps\dashboard\models.py:171
 #: .\apps\dashboard\models.py:710 .\apps\diaspora\models.py:65
 #: .\apps\diaspora\models.py:421 .\apps\downloads\models.py:36
 #: .\apps\governance\models.py:999 .\apps\students\models.py:82
@@ -623,7 +623,7 @@ msgstr "Categoria"
 msgid "Categories"
 msgstr "Categorie"
 
-#: .\apps\community\models.py:31 .\apps\core\models.py:227
+#: .\apps\community\models.py:31 .\apps\core\models.py:245
 #: .\apps\dashboard\models.py:309 .\apps\dashboard\models.py:355
 #: .\apps\dashboard\models.py:406 .\apps\dashboard\models.py:487
 #: .\apps\diaspora\models.py:51 .\apps\diaspora\models.py:130
@@ -705,7 +705,7 @@ msgstr "Post"
 msgid "Thread is locked."
 msgstr "Thread is locked."
 
-#: .\apps\community\views.py:160 .\apps\dashboard\views.py:1278
+#: .\apps\community\views.py:160 .\apps\dashboard\views.py:1286
 #: .\apps\mentorship\views.py:296
 msgid "Invalid form data."
 msgstr "Invalid form data."
@@ -732,11 +732,11 @@ msgstr "Thread updated successfully."
 msgid "Post updated successfully."
 msgstr "Post updated successfully."
 
-#: .\apps\community\views.py:479 .\apps\dashboard\views.py:537
+#: .\apps\community\views.py:479 .\apps\dashboard\views.py:545
 msgid "You have left the group."
 msgstr "You have left the group."
 
-#: .\apps\community\views.py:484 .\apps\dashboard\views.py:540
+#: .\apps\community\views.py:484 .\apps\dashboard\views.py:548
 msgid "You have joined the group."
 msgstr "You have joined the group."
 
@@ -833,6 +833,7 @@ msgstr "Risposto"
 #: .\templates\account\signup.html:46 .\templates\accounts\profile.html:29
 #: .\templates\accounts\register.html:75 .\templates\contact\index.html:44
 #: .\templates\contact\partials\contact_form.html:15
+#: .\templates\dashboard\home.html:155
 #: .\templates\universities\university_detail.html:81
 msgid "Email"
 msgstr "Email"
@@ -904,7 +905,7 @@ msgstr "Branding"
 msgid "Visibility"
 msgstr "Visibility"
 
-#: .\apps\core\admin.py:59 .\apps\core\models.py:30
+#: .\apps\core\admin.py:59 .\apps\core\models.py:32
 #: .\apps\universities\models.py:67
 msgid "Logo"
 msgstr "Logo"
@@ -1070,51 +1071,51 @@ msgstr ""
 "agli eventi e percorsi comunitari per le persone che vogliono contribuire "
 "oltre la vita studentesca."
 
-#: .\apps\core\models.py:13 .\apps\core\models.py:58
+#: .\apps\core\models.py:15 .\apps\core\models.py:60
 msgid "Collaborator"
 msgstr "Collaborator"
 
-#: .\apps\core\models.py:14
+#: .\apps\core\models.py:16
 msgid "Partner"
 msgstr "Partner"
 
-#: .\apps\core\models.py:15
+#: .\apps\core\models.py:17
 msgid "Supporter"
 msgstr "Supporter"
 
-#: .\apps\core\models.py:16
+#: .\apps\core\models.py:18
 msgid "Institution"
 msgstr "Institution"
 
-#: .\apps\core\models.py:31
+#: .\apps\core\models.py:33
 msgid "Recommended: transparent PNG or SVG-friendly image."
 msgstr "Recommended: transparent PNG or SVG-friendly image."
 
-#: .\apps\core\models.py:35 .\apps\core\models.py:153
+#: .\apps\core\models.py:37 .\apps\core\models.py:155
 msgid "Website URL"
 msgstr "Website URL"
 
-#: .\apps\core\models.py:39 .\apps\core\models.py:140
+#: .\apps\core\models.py:41 .\apps\core\models.py:142
 msgid "Short Description"
 msgstr "Short Description"
 
-#: .\apps\core\models.py:43 .\apps\core\models.py:175
-#: .\apps\core\models.py:269
+#: .\apps\core\models.py:45 .\apps\core\models.py:177
+#: .\apps\core\models.py:287
 msgid "Display Order"
 msgstr "Display Order"
 
-#: .\apps\core\models.py:47
+#: .\apps\core\models.py:49
 msgid "Featured on Site"
 msgstr "Featured on Site"
 
-#: .\apps\core\models.py:51 .\apps\core\models.py:174
-#: .\apps\core\models.py:268
+#: .\apps\core\models.py:53 .\apps\core\models.py:176
+#: .\apps\core\models.py:286
 #: .\apps\governance\migrations\0006_alter_membershipstatus_status.py:18
 #: .\apps\governance\models.py:183 .\apps\governance\models.py:242
 #: .\apps\governance\models.py:299 .\apps\governance\models.py:1384
 #: .\apps\governance\models.py:1677 .\apps\governance\models.py:1955
 #: .\apps\governance\models.py:2231 .\apps\scholarships\models.py:21
-#: .\templates\dashboard\home.html:168
+#: .\templates\dashboard\home.html:228
 #: .\templates\dashboard\mentorship\dashboard.html:95
 #: .\templates\dashboard\mentorship\dashboard.html:190
 #: .\templates\dashboard\mentorship\mentor_management.html:113
@@ -1129,81 +1130,81 @@ msgstr "Featured on Site"
 msgid "Active"
 msgstr "Attivo"
 
-#: .\apps\core\models.py:59 .\config\admin.py:339
+#: .\apps\core\models.py:61 .\config\admin.py:339
 #: .\templates\contact\index.html:60 .\templates\core\home.html:356
 #: .\templates\includes\footer.html:87
 msgid "Collaborators"
 msgstr "Collaborators"
 
-#: .\apps\core\models.py:71
+#: .\apps\core\models.py:73
 msgid "Site Name"
 msgstr "Site Name"
 
-#: .\apps\core\models.py:76
+#: .\apps\core\models.py:78
 msgid "Tagline"
 msgstr "Tagline"
 
-#: .\apps\core\models.py:80
+#: .\apps\core\models.py:82
 msgid "Public Email"
 msgstr "Public Email"
 
-#: .\apps\core\models.py:82
+#: .\apps\core\models.py:84
 msgid "Facebook URL"
 msgstr "Facebook URL"
 
-#: .\apps\core\models.py:83
+#: .\apps\core\models.py:85
 msgid "Instagram URL"
 msgstr "Instagram URL"
 
-#: .\apps\core\models.py:84
+#: .\apps\core\models.py:86
 msgid "LinkedIn URL"
 msgstr "LinkedIn URL"
 
-#: .\apps\core\models.py:85
+#: .\apps\core\models.py:87
 msgid "TikTok URL"
 msgstr "TikTok URL"
 
-#: .\apps\core\models.py:86
+#: .\apps\core\models.py:88
 msgid "YouTube URL"
 msgstr "YouTube URL"
 
-#: .\apps\core\models.py:90 .\apps\core\models.py:91 .\apps\core\models.py:94
+#: .\apps\core\models.py:92 .\apps\core\models.py:93 .\apps\core\models.py:96
 msgid "Association Settings"
 msgstr "Association Settings"
 
-#: .\apps\core\models.py:106 .\templates\includes\footer.html:11
+#: .\apps\core\models.py:108 .\templates\includes\footer.html:11
 msgid "Association of Cameroonian Students and Academics in Lazio"
 msgstr "Association of Cameroonian Students and Academics in Lazio"
 
-#: .\apps\core\models.py:116 .\apps\core\models.py:199
+#: .\apps\core\models.py:118 .\apps\core\models.py:217
 msgid "Money Transfer"
 msgstr "Money Transfer"
 
-#: .\apps\core\models.py:117
+#: .\apps\core\models.py:119
 msgid "Documents and Translation"
 msgstr "Documents and Translation"
 
-#: .\apps\core\models.py:118
+#: .\apps\core\models.py:120
 msgid "Legal and Administrative Help"
 msgstr "Legal and Administrative Help"
 
-#: .\apps\core\models.py:119
+#: .\apps\core\models.py:121
 msgid "Housing and Settlement"
 msgstr "Housing and Settlement"
 
-#: .\apps\core\models.py:120
+#: .\apps\core\models.py:122
 msgid "Travel and Logistics"
 msgstr "Travel and Logistics"
 
-#: .\apps\core\models.py:121
+#: .\apps\core\models.py:123
 msgid "Business Services"
 msgstr "Business Services"
 
-#: .\apps\core\models.py:122
+#: .\apps\core\models.py:124
 msgid "Health and Wellbeing"
 msgstr "Health and Wellbeing"
 
-#: .\apps\core\models.py:127 .\apps\dashboard\models.py:40
+#: .\apps\core\models.py:129 .\apps\dashboard\models.py:40
 #: .\apps\dashboard\models.py:464
 #: .\apps\governance\migrations\0006_alter_membershipstatus_status.py:17
 #: .\apps\governance\models.py:182 .\apps\governance\models.py:984
@@ -1228,54 +1229,54 @@ msgid "Pending"
 msgstr "In sospeso"
 
 # Disciplinary Case Status
-#: .\apps\core\models.py:129
+#: .\apps\core\models.py:131
 msgid "Needs Review"
 msgstr "Needs Review"
 
-#: .\apps\core\models.py:130
+#: .\apps\core\models.py:132
 #: .\apps\governance\migrations\0006_alter_membershipstatus_status.py:20
 #: .\apps\governance\models.py:185
 msgid "Suspended"
 msgstr "Sospeso"
 
-#: .\apps\core\models.py:133
+#: .\apps\core\models.py:135
 msgid "Partner Name"
 msgstr "Partner Name"
 
-#: .\apps\core\models.py:144
+#: .\apps\core\models.py:146
 msgid "Contact Name"
 msgstr "Contact Name"
 
-#: .\apps\core\models.py:146
+#: .\apps\core\models.py:148
 msgid "Contact Email"
 msgstr "Contact Email"
 
 # Publication Channels
-#: .\apps\core\models.py:151
+#: .\apps\core\models.py:153
 msgid "WhatsApp Number"
 msgstr "WhatsApp Number"
 
-#: .\apps\core\models.py:157
+#: .\apps\core\models.py:159
 msgid "Cities Served"
 msgstr "Cities Served"
 
-#: .\apps\core\models.py:158
+#: .\apps\core\models.py:160
 msgid "Examples: Rome, Latina, online"
 msgstr "Examples: Rome, Latina, online"
 
-#: .\apps\core\models.py:164 .\templates\governance\members\detail.html:70
+#: .\apps\core\models.py:166 .\templates\governance\members\detail.html:70
 msgid "Verification Status"
 msgstr "Verification Status"
 
-#: .\apps\core\models.py:170
+#: .\apps\core\models.py:172
 msgid "Annual Listing Fee"
 msgstr "Annual Listing Fee"
 
-#: .\apps\core\models.py:171
+#: .\apps\core\models.py:173
 msgid "Annual fee charged to service providers for verified visibility."
 msgstr "Annual fee charged to service providers for verified visibility."
 
-#: .\apps\core\models.py:173 .\apps\core\models.py:267
+#: .\apps\core\models.py:175 .\apps\core\models.py:285
 #: .\apps\dashboard\models.py:210 .\apps\dashboard\models.py:545
 #: .\apps\diaspora\models.py:275 .\apps\diaspora\models.py:333
 #: .\apps\diaspora\models.py:432 .\apps\students\models.py:86
@@ -1286,173 +1287,173 @@ msgstr "Annual fee charged to service providers for verified visibility."
 msgid "Featured"
 msgstr "Featured"
 
-#: .\apps\core\models.py:181
+#: .\apps\core\models.py:183
 msgid "Service Partner"
 msgstr "Service Partner"
 
-#: .\apps\core\models.py:182
+#: .\apps\core\models.py:184
 msgid "Service Partners"
 msgstr "Service Partners"
 
-#: .\apps\core\models.py:196
+#: .\apps\core\models.py:214
 msgid "Consular Support"
 msgstr "Consular Support"
 
-#: .\apps\core\models.py:197 .\apps\core\service_catalog.py:25
+#: .\apps\core\models.py:215 .\apps\core\service_catalog.py:25
 #: .\apps\core\service_catalog.py:85
 msgid "Documentation"
 msgstr "Documentazione"
 
-#: .\apps\core\models.py:198
+#: .\apps\core\models.py:216
 msgid "Arrival and Settlement"
 msgstr "Arrival and Settlement"
 
-#: .\apps\core\models.py:200
+#: .\apps\core\models.py:218
 msgid "Career and Business"
 msgstr "Career and Business"
 
-#: .\apps\core\models.py:201
+#: .\apps\core\models.py:219
 msgid "Family and Community Life"
 msgstr "Family and Community Life"
 
-#: .\apps\core\models.py:206 .\apps\governance\models.py:2264
+#: .\apps\core\models.py:224 .\apps\governance\models.py:2264
 msgid "Public"
 msgstr "Pubblico"
 
-#: .\apps\core\models.py:207 .\apps\dashboard\admin.py:134
+#: .\apps\core\models.py:225 .\apps\dashboard\admin.py:134
 #: .\apps\dashboard\admin.py:147 .\apps\dashboard\models.py:178
 #: .\apps\governance\models.py:155 .\config\admin.py:473
-#: .\templates\dashboard\home.html:167
+#: .\templates\dashboard\home.html:227
 #: .\templates\dashboard\partials\sidebar_nav.html:47
 #: .\templates\downloads\document_list.html:133
 #: .\templates\downloads\document_list.html:150
 msgid "Members"
 msgstr "Members"
 
-#: .\apps\core\models.py:208
+#: .\apps\core\models.py:226
 msgid "Members with Verified Referrals"
 msgstr "Members with Verified Referrals"
 
-#: .\apps\core\models.py:212
+#: .\apps\core\models.py:230
 msgid "Resource Pack"
 msgstr "Resource Pack"
 
-#: .\apps\core\models.py:213 .\apps\diaspora\models.py:125
+#: .\apps\core\models.py:231 .\apps\diaspora\models.py:125
 #: .\templates\diaspora\event_list.html:43
 msgid "Workshop"
 msgstr "Workshop"
 
-#: .\apps\core\models.py:214
+#: .\apps\core\models.py:232
 msgid "Clinic"
 msgstr "Clinic"
 
-#: .\apps\core\models.py:215
+#: .\apps\core\models.py:233
 msgid "Partner Referral"
 msgstr "Partner Referral"
 
-#: .\apps\core\models.py:216
+#: .\apps\core\models.py:234
 msgid "Appointment Preparation"
 msgstr "Appointment Preparation"
 
-#: .\apps\core\models.py:220
+#: .\apps\core\models.py:238
 msgid "Included in Dues"
 msgstr "Included in Dues"
 
-#: .\apps\core\models.py:221
+#: .\apps\core\models.py:239
 msgid "Partner Listing Fee"
 msgstr "Partner Listing Fee"
 
-#: .\apps\core\models.py:222
+#: .\apps\core\models.py:240
 msgid "Paid Clinic"
 msgstr "Paid Clinic"
 
-#: .\apps\core\models.py:223
+#: .\apps\core\models.py:241
 msgid "Event Revenue"
 msgstr "Event Revenue"
 
-#: .\apps\core\models.py:224
+#: .\apps\core\models.py:242
 msgid "Sponsorship"
 msgstr "Sponsorship"
 
-#: .\apps\core\models.py:234
+#: .\apps\core\models.py:252
 msgid "Audience"
 msgstr "Audience"
 
-#: .\apps\core\models.py:235
+#: .\apps\core\models.py:253
 msgid "Summary"
 msgstr "Summary"
 
-#: .\apps\core\models.py:238
+#: .\apps\core\models.py:256
 msgid "Association Benefit"
 msgstr "Association Benefit"
 
-#: .\apps\core\models.py:239
+#: .\apps\core\models.py:257
 msgid "How this service can strengthen ASCAI's value or revenue."
 msgstr "How this service can strengthen ASCAI's value or revenue."
 
-#: .\apps\core\models.py:245
+#: .\apps\core\models.py:263
 msgid "Access Level"
 msgstr "Access Level"
 
-#: .\apps\core\models.py:251
+#: .\apps\core\models.py:269
 msgid "Delivery Mode"
 msgstr "Delivery Mode"
 
-#: .\apps\core\models.py:257
+#: .\apps\core\models.py:275
 msgid "Revenue Stream"
 msgstr "Revenue Stream"
 
-#: .\apps\core\models.py:265
+#: .\apps\core\models.py:283
 msgid "Linked Partner"
 msgstr "Linked Partner"
 
-#: .\apps\core\models.py:275
+#: .\apps\core\models.py:293
 msgid "Community Service"
 msgstr "Community Service"
 
-#: .\apps\core\models.py:276
+#: .\apps\core\models.py:294
 msgid "Community Services"
 msgstr "Community Services"
 
-#: .\apps\core\models.py:286
+#: .\apps\core\models.py:304
 msgid "Sponsor Interest"
 msgstr "Sponsor Interest"
 
-#: .\apps\core\models.py:287
+#: .\apps\core\models.py:305
 msgid "Orientation Request"
 msgstr "Orientation Request"
 
-#: .\apps\core\models.py:288
+#: .\apps\core\models.py:306
 msgid "Sponsor One-Pager Download"
 msgstr "Sponsor One-Pager Download"
 
-#: .\apps\core\models.py:294 .\apps\diaspora\models.py:146
+#: .\apps\core\models.py:312 .\apps\diaspora\models.py:146
 #: .\apps\governance\models.py:2047
 #: .\templates\governance\events\event_detail.html:15
 msgid "Event Type"
 msgstr "Event Type"
 
-#: .\apps\core\models.py:296
+#: .\apps\core\models.py:314
 msgid "Source Path"
 msgstr "Source Path"
 
-#: .\apps\core\models.py:305
+#: .\apps\core\models.py:323
 msgid "Session Key"
 msgstr "Session Key"
 
-#: .\apps\core\models.py:306
+#: .\apps\core\models.py:324
 msgid "IP Address"
 msgstr "IP Address"
 
-#: .\apps\core\models.py:307
+#: .\apps\core\models.py:325
 msgid "User Agent"
 msgstr "User Agent"
 
-#: .\apps\core\models.py:312
+#: .\apps\core\models.py:330
 msgid "Conversion Event"
 msgstr "Conversion Event"
 
-#: .\apps\core\models.py:313
+#: .\apps\core\models.py:331
 msgid "Conversion Events"
 msgstr "Conversion Events"
 
@@ -1886,7 +1887,7 @@ msgstr ""
 msgid "Integration"
 msgstr "Integration"
 
-#: .\apps\core\views.py:65 .\templates\dashboard\home.html:150
+#: .\apps\core\views.py:65 .\templates\dashboard\home.html:210
 #: .\templates\includes\navbar.html:33 .\templates\includes\navbar.html:127
 msgid "Community"
 msgstr "Comunità"
@@ -2249,7 +2250,7 @@ msgstr "Group Announcements"
 
 #: .\apps\dashboard\models.py:39 .\apps\scholarships\views.py:145
 #: .\templates\dashboard\groups\detail.html:136
-#: .\templates\dashboard\home.html:116
+#: .\templates\dashboard\home.html:176
 #: .\templates\dashboard\mentorship\dashboard.html:131
 #: .\templates\downloads\popular.html:37 .\templates\downloads\recent.html:37
 #: .\templates\governance\member_portal\index.html:163
@@ -2680,147 +2681,147 @@ msgstr "Needs Rescheduling"
 msgid "Pending Review"
 msgstr "Pending Review"
 
-#: .\apps\dashboard\views.py:153
+#: .\apps\dashboard\views.py:154
 msgid "Not generated"
 msgstr "Not generated"
 
-#: .\apps\dashboard\views.py:214
+#: .\apps\dashboard\views.py:222
 #: .\templates\dashboard\mentorship\profile_update.html:54
 #: .\templates\mentorship\mentor_profile_update.html:56
 msgid "Update Profile"
 msgstr "Update Profile"
 
-#: .\apps\dashboard\views.py:215
+#: .\apps\dashboard\views.py:223
 msgid "Book Orientation"
 msgstr "Book Orientation"
 
-#: .\apps\dashboard\views.py:216
+#: .\apps\dashboard\views.py:224
 msgid "Ask Student Question"
 msgstr "Ask Student Question"
 
-#: .\apps\dashboard\views.py:217
+#: .\apps\dashboard\views.py:225
 #: .\templates\dashboard\partials\sidebar_nav.html:29
 #: .\templates\dashboard\stories\submit.html:64
 #: .\templates\diaspora\stories\submit.html:165
 msgid "Submit Story"
 msgstr "Invia storia"
 
-#: .\apps\dashboard\views.py:218
+#: .\apps\dashboard\views.py:226
 msgid "Create Ticket"
 msgstr "Crea ticket"
 
-#: .\apps\dashboard\views.py:219
+#: .\apps\dashboard\views.py:227
 msgid "Browse Groups"
 msgstr "Browse Groups"
 
-#: .\apps\dashboard\views.py:226
+#: .\apps\dashboard\views.py:234
 #: .\templates\dashboard\partials\sidebar_nav.html:12
 msgid "My Membership"
 msgstr "My Membership"
 
 # Governance Translations
-#: .\apps\dashboard\views.py:236
+#: .\apps\dashboard\views.py:244
 #: .\templates\dashboard\partials\sidebar_nav.html:45
 #: .\templates\governance\dashboard.html:4
 msgid "Governance Dashboard"
 msgstr "Cruscotto di Governance"
 
-#: .\apps\dashboard\views.py:240 .\apps\governance\models.py:1045
+#: .\apps\dashboard\views.py:248 .\apps\governance\models.py:1045
 #: .\config\admin.py:508 .\templates\governance\finances\transactions.html:4
 #: .\templates\governance\finances\transactions.html:9
 msgid "Financial Transactions"
 msgstr "Transazioni finanziarie"
 
-#: .\apps\dashboard\views.py:320 .\apps\dashboard\views.py:323
+#: .\apps\dashboard\views.py:328 .\apps\dashboard\views.py:331
 msgid "Profile updated successfully."
 msgstr "Profile updated successfully."
 
-#: .\apps\dashboard\views.py:336
+#: .\apps\dashboard\views.py:344
 msgid "Password changed successfully."
 msgstr "Password changed successfully."
 
-#: .\apps\dashboard\views.py:349
+#: .\apps\dashboard\views.py:357
 msgid "Document uploaded successfully."
 msgstr "Document uploaded successfully."
 
-#: .\apps\dashboard\views.py:367
+#: .\apps\dashboard\views.py:375
 msgid "Document deleted successfully."
 msgstr "Document deleted successfully."
 
-#: .\apps\dashboard\views.py:389
+#: .\apps\dashboard\views.py:397
 msgid "Notification preferences updated."
 msgstr "Notification preferences updated."
 
-#: .\apps\dashboard\views.py:414
+#: .\apps\dashboard\views.py:422
 msgid "Support ticket created successfully."
 msgstr "Support ticket created successfully."
 
-#: .\apps\dashboard\views.py:464
+#: .\apps\dashboard\views.py:472
 msgid "Your reply has been sent."
 msgstr "Your reply has been sent."
 
-#: .\apps\dashboard\views.py:469
+#: .\apps\dashboard\views.py:477
 msgid "Please correct the errors below."
 msgstr "Please correct the errors below."
 
-#: .\apps\dashboard\views.py:531
+#: .\apps\dashboard\views.py:539
 msgid "Your account must be approved to join groups."
 msgstr "Your account must be approved to join groups."
 
-#: .\apps\dashboard\views.py:553
+#: .\apps\dashboard\views.py:561
 msgid "You must be a member to create discussions."
 msgstr "You must be a member to create discussions."
 
-#: .\apps\dashboard\views.py:565
+#: .\apps\dashboard\views.py:573
 msgid "Discussion created successfully."
 msgstr "Discussion created successfully."
 
-#: .\apps\dashboard\views.py:603
+#: .\apps\dashboard\views.py:611
 msgid "Story submitted successfully. It will be reviewed by an admin."
 msgstr "Story submitted successfully. It will be reviewed by an admin."
 
-#: .\apps\dashboard\views.py:650 .\apps\diaspora\views.py:400
+#: .\apps\dashboard\views.py:658 .\apps\diaspora\views.py:400
 msgid "Your account must be approved to register for events."
 msgstr "Il tuo account deve essere approvato per registrarti agli eventi."
 
-#: .\apps\dashboard\views.py:656 .\apps\diaspora\views.py:404
+#: .\apps\dashboard\views.py:664 .\apps\diaspora\views.py:404
 msgid "Registration is not required for this event."
 msgstr "La registrazione non e richiesta per questo evento."
 
-#: .\apps\dashboard\views.py:661 .\apps\diaspora\views.py:421
+#: .\apps\dashboard\views.py:669 .\apps\diaspora\views.py:421
 msgid "You are already registered for this event."
 msgstr "Sei gia registrato a questo evento."
 
-#: .\apps\dashboard\views.py:668 .\apps\diaspora\views.py:427
+#: .\apps\dashboard\views.py:676 .\apps\diaspora\views.py:427
 #: .\templates\diaspora\event_detail.html:118
 msgid "This event is full."
 msgstr "Questo evento e al completo."
 
-#: .\apps\dashboard\views.py:673 .\apps\diaspora\views.py:430
+#: .\apps\dashboard\views.py:681 .\apps\diaspora\views.py:430
 msgid "Successfully registered for the event."
 msgstr "Registrazione all evento completata con successo."
 
-#: .\apps\dashboard\views.py:756
+#: .\apps\dashboard\views.py:764
 msgid "Your account must be approved to download documents."
 msgstr "Your account must be approved to download documents."
 
-#: .\apps\dashboard\views.py:784
+#: .\apps\dashboard\views.py:792
 msgid "Your account must be approved to save documents."
 msgstr "Your account must be approved to save documents."
 
-#: .\apps\dashboard\views.py:794
+#: .\apps\dashboard\views.py:802
 msgid "Document removed from saved items."
 msgstr "Document removed from saved items."
 
-#: .\apps\dashboard\views.py:796
+#: .\apps\dashboard\views.py:804
 msgid "Document saved to your list."
 msgstr "Document saved to your list."
 
-#: .\apps\dashboard\views.py:822 .\apps\dashboard\views.py:870
+#: .\apps\dashboard\views.py:830 .\apps\dashboard\views.py:878
 msgid "Residence Permit (Permesso di Soggiorno)"
 msgstr "Residence Permit (Permesso di Soggiorno)"
 
-#: .\apps\dashboard\views.py:823 .\apps\dashboard\views.py:871
+#: .\apps\dashboard\views.py:831 .\apps\dashboard\views.py:879
 msgid ""
 "Apply for your residence permit within 8 days of arrival. Required documents"
 " include passport, visa, proof of enrollment, and health insurance. Visit "
@@ -2830,11 +2831,11 @@ msgstr ""
 " include passport, visa, proof of enrollment, and health insurance. Visit "
 "the local Questura (police station) to submit your application."
 
-#: .\apps\dashboard\views.py:827 .\apps\dashboard\views.py:881
+#: .\apps\dashboard\views.py:835 .\apps\dashboard\views.py:889
 msgid "Codice Fiscale"
 msgstr "Codice Fiscale"
 
-#: .\apps\dashboard\views.py:828
+#: .\apps\dashboard\views.py:836
 msgid ""
 "Obtain your tax code (Codice Fiscale) from the local tax office (Agenzia "
 "delle Entrate). This is required for many administrative procedures "
@@ -2846,12 +2847,12 @@ msgstr ""
 "including opening a bank account, signing contracts, and accessing "
 "healthcare services."
 
-#: .\apps\dashboard\views.py:832 .\apps\dashboard\views.py:891
+#: .\apps\dashboard\views.py:840 .\apps\dashboard\views.py:899
 #: .\apps\students\models.py:115
 msgid "University Enrollment"
 msgstr "University Enrollment"
 
-#: .\apps\dashboard\views.py:833
+#: .\apps\dashboard\views.py:841
 msgid ""
 "Complete your university enrollment process. Contact your university's "
 "international office for specific requirements. You will typically need your"
@@ -2861,11 +2862,11 @@ msgstr ""
 "international office for specific requirements. You will typically need your"
 " diploma, transcript, passport, and residence permit."
 
-#: .\apps\dashboard\views.py:837 .\apps\dashboard\views.py:902
+#: .\apps\dashboard\views.py:845 .\apps\dashboard\views.py:910
 msgid "Health Insurance (SSN)"
 msgstr "Health Insurance (SSN)"
 
-#: .\apps\dashboard\views.py:838
+#: .\apps\dashboard\views.py:846
 msgid ""
 "Register with the Italian National Health Service (Servizio Sanitario "
 "Nazionale) for healthcare coverage. This requires your residence permit, "
@@ -2875,13 +2876,13 @@ msgstr ""
 "Nazionale) for healthcare coverage. This requires your residence permit, "
 "Codice Fiscale, and proof of enrollment."
 
-#: .\apps\dashboard\views.py:842 .\apps\dashboard\views.py:912
+#: .\apps\dashboard\views.py:850 .\apps\dashboard\views.py:920
 #: .\apps\diaspora\models.py:402
 #: .\templates\diaspora\life_in_italy_list.html:23
 msgid "Housing"
 msgstr "Housing"
 
-#: .\apps\dashboard\views.py:843
+#: .\apps\dashboard\views.py:851
 msgid ""
 "Find accommodation and register your address with the local municipality "
 "(Comune). You will need a rental contract and your residence permit for "
@@ -2891,7 +2892,7 @@ msgstr ""
 "(Comune). You will need a rental contract and your residence permit for "
 "registration."
 
-#: .\apps\dashboard\views.py:873
+#: .\apps\dashboard\views.py:881
 msgid ""
 "Gather required documents: passport, visa, proof of enrollment, health "
 "insurance, proof of accommodation"
@@ -2899,23 +2900,23 @@ msgstr ""
 "Gather required documents: passport, visa, proof of enrollment, health "
 "insurance, proof of accommodation"
 
-#: .\apps\dashboard\views.py:874
+#: .\apps\dashboard\views.py:882
 msgid "Book an appointment at the Questura (police station)"
 msgstr "Book an appointment at the Questura (police station)"
 
-#: .\apps\dashboard\views.py:875
+#: .\apps\dashboard\views.py:883
 msgid "Submit your application and pay the required fees"
 msgstr "Submit your application and pay the required fees"
 
-#: .\apps\dashboard\views.py:876
+#: .\apps\dashboard\views.py:884
 msgid "Wait for processing (usually 30-60 days)"
 msgstr "Wait for processing (usually 30-60 days)"
 
-#: .\apps\dashboard\views.py:877
+#: .\apps\dashboard\views.py:885
 msgid "Collect your residence permit when ready"
 msgstr "Collect your residence permit when ready"
 
-#: .\apps\dashboard\views.py:882
+#: .\apps\dashboard\views.py:890
 msgid ""
 "Obtain your tax code (Codice Fiscale) from the local tax office (Agenzia "
 "delle Entrate). This is required for many administrative procedures."
@@ -2923,23 +2924,23 @@ msgstr ""
 "Obtain your tax code (Codice Fiscale) from the local tax office (Agenzia "
 "delle Entrate). This is required for many administrative procedures."
 
-#: .\apps\dashboard\views.py:884
+#: .\apps\dashboard\views.py:892
 msgid "Visit the Agenzia delle Entrate office"
 msgstr "Visit the Agenzia delle Entrate office"
 
-#: .\apps\dashboard\views.py:885
+#: .\apps\dashboard\views.py:893
 msgid "Bring your passport and visa"
 msgstr "Bring your passport and visa"
 
-#: .\apps\dashboard\views.py:886
+#: .\apps\dashboard\views.py:894
 msgid "Fill out the application form"
 msgstr "Fill out the application form"
 
-#: .\apps\dashboard\views.py:887
+#: .\apps\dashboard\views.py:895
 msgid "Receive your Codice Fiscale immediately"
 msgstr "Receive your Codice Fiscale immediately"
 
-#: .\apps\dashboard\views.py:892
+#: .\apps\dashboard\views.py:900
 msgid ""
 "Complete your university enrollment process. Contact your university's "
 "international office for specific requirements."
@@ -2947,27 +2948,27 @@ msgstr ""
 "Complete your university enrollment process. Contact your university's "
 "international office for specific requirements."
 
-#: .\apps\dashboard\views.py:894
+#: .\apps\dashboard\views.py:902
 msgid "Contact the international office of your university"
 msgstr "Contact the international office of your university"
 
-#: .\apps\dashboard\views.py:895
+#: .\apps\dashboard\views.py:903
 msgid "Submit required documents (diploma, transcript, passport)"
 msgstr "Submit required documents (diploma, transcript, passport)"
 
-#: .\apps\dashboard\views.py:896
+#: .\apps\dashboard\views.py:904
 msgid "Pay enrollment fees"
 msgstr "Pay enrollment fees"
 
-#: .\apps\dashboard\views.py:897
+#: .\apps\dashboard\views.py:905
 msgid "Complete any required language tests"
 msgstr "Complete any required language tests"
 
-#: .\apps\dashboard\views.py:898
+#: .\apps\dashboard\views.py:906
 msgid "Receive your student ID card"
 msgstr "Receive your student ID card"
 
-#: .\apps\dashboard\views.py:903
+#: .\apps\dashboard\views.py:911
 msgid ""
 "Register with the Italian National Health Service (Servizio Sanitario "
 "Nazionale) for healthcare coverage."
@@ -2975,23 +2976,23 @@ msgstr ""
 "Register with the Italian National Health Service (Servizio Sanitario "
 "Nazionale) for healthcare coverage."
 
-#: .\apps\dashboard\views.py:905
+#: .\apps\dashboard\views.py:913
 msgid "Obtain your residence permit and Codice Fiscale"
 msgstr "Obtain your residence permit and Codice Fiscale"
 
-#: .\apps\dashboard\views.py:906
+#: .\apps\dashboard\views.py:914
 msgid "Visit the local ASL (Azienda Sanitaria Locale) office"
 msgstr "Visit the local ASL (Azienda Sanitaria Locale) office"
 
-#: .\apps\dashboard\views.py:907
+#: .\apps\dashboard\views.py:915
 msgid "Submit your application with required documents"
 msgstr "Submit your application with required documents"
 
-#: .\apps\dashboard\views.py:908
+#: .\apps\dashboard\views.py:916
 msgid "Receive your health insurance card"
 msgstr "Receive your health insurance card"
 
-#: .\apps\dashboard\views.py:913
+#: .\apps\dashboard\views.py:921
 msgid ""
 "Find accommodation and register your address with the local municipality "
 "(Comune)."
@@ -2999,7 +3000,7 @@ msgstr ""
 "Find accommodation and register your address with the local municipality "
 "(Comune)."
 
-#: .\apps\dashboard\views.py:915
+#: .\apps\dashboard\views.py:923
 msgid ""
 "Search for accommodation (university housing, private rentals, shared "
 "apartments)"
@@ -3007,31 +3008,31 @@ msgstr ""
 "Search for accommodation (university housing, private rentals, shared "
 "apartments)"
 
-#: .\apps\dashboard\views.py:916
+#: .\apps\dashboard\views.py:924
 msgid "Sign a rental contract"
 msgstr "Sign a rental contract"
 
-#: .\apps\dashboard\views.py:917
+#: .\apps\dashboard\views.py:925
 msgid "Register your address at the Comune"
 msgstr "Register your address at the Comune"
 
-#: .\apps\dashboard\views.py:918
+#: .\apps\dashboard\views.py:926
 msgid "Set up utilities (electricity, gas, internet)"
 msgstr "Set up utilities (electricity, gas, internet)"
 
-#: .\apps\dashboard\views.py:924
+#: .\apps\dashboard\views.py:932
 msgid "Guide Not Found"
 msgstr "Guide Not Found"
 
-#: .\apps\dashboard\views.py:925
+#: .\apps\dashboard\views.py:933
 msgid "The requested guide section was not found."
 msgstr "The requested guide section was not found."
 
-#: .\apps\dashboard\views.py:959
+#: .\apps\dashboard\views.py:967
 msgid "Question submitted successfully."
 msgstr "Question submitted successfully."
 
-#: .\apps\dashboard\views.py:995
+#: .\apps\dashboard\views.py:1003
 msgid ""
 "You already have an active orientation request. We updated your dashboard so"
 " you can track it below."
@@ -3039,19 +3040,19 @@ msgstr ""
 "You already have an active orientation request. We updated your dashboard so"
 " you can track it below."
 
-#: .\apps\dashboard\views.py:1000
+#: .\apps\dashboard\views.py:1008
 msgid "Orientation session requested. You will be contacted soon."
 msgstr "Orientation session requested. You will be contacted soon."
 
-#: .\apps\dashboard\views.py:1058
+#: .\apps\dashboard\views.py:1066
 msgid "Only mentors can create mentor profiles."
 msgstr "Only mentors can create mentor profiles."
 
-#: .\apps\dashboard\views.py:1063
+#: .\apps\dashboard\views.py:1071
 msgid "You already have a mentor profile."
 msgstr "You already have a mentor profile."
 
-#: .\apps\dashboard\views.py:1073
+#: .\apps\dashboard\views.py:1081
 msgid ""
 "Mentor profile created! It will be reviewed by an admin before being "
 "published."
@@ -3059,44 +3060,44 @@ msgstr ""
 "Mentor profile created! It will be reviewed by an admin before being "
 "published."
 
-#: .\apps\dashboard\views.py:1088
+#: .\apps\dashboard\views.py:1096
 msgid "Only mentors can update mentor profiles."
 msgstr "Only mentors can update mentor profiles."
 
-#: .\apps\dashboard\views.py:1102 .\apps\mentorship\views.py:379
+#: .\apps\dashboard\views.py:1110 .\apps\mentorship\views.py:379
 msgid "Mentor profile updated successfully!"
 msgstr "Mentor profile updated successfully!"
 
-#: .\apps\dashboard\views.py:1113
+#: .\apps\dashboard\views.py:1121
 msgid "Only mentors can access this page."
 msgstr "Only mentors can access this page."
 
-#: .\apps\dashboard\views.py:1253 .\apps\mentorship\services.py:63
+#: .\apps\dashboard\views.py:1261 .\apps\mentorship\services.py:63
 #: .\apps\mentorship\views.py:272
 msgid "Request must be accepted to send messages."
 msgstr "Request must be accepted to send messages."
 
-#: .\apps\dashboard\views.py:1300
+#: .\apps\dashboard\views.py:1308
 msgid "Mentorship request accepted successfully!"
 msgstr "Mentorship request accepted successfully!"
 
-#: .\apps\dashboard\views.py:1330
+#: .\apps\dashboard\views.py:1338
 msgid "Mentorship request rejected."
 msgstr "Mentorship request rejected."
 
-#: .\apps\dashboard\views.py:1360 .\apps\mentorship\views.py:398
+#: .\apps\dashboard\views.py:1368 .\apps\mentorship\views.py:398
 msgid "Mentorship request marked as completed."
 msgstr "Mentorship request marked as completed."
 
-#: .\apps\dashboard\views.py:1390
+#: .\apps\dashboard\views.py:1398
 msgid "Availability status updated successfully."
 msgstr "Availability status updated successfully."
 
-#: .\apps\dashboard\views.py:1489 .\apps\mentorship\services.py:40
+#: .\apps\dashboard\views.py:1497 .\apps\mentorship\services.py:40
 msgid "Only students can create mentorship requests."
 msgstr "Only students can create mentorship requests."
 
-#: .\apps\dashboard\views.py:1528 .\apps\mentorship\views.py:191
+#: .\apps\dashboard\views.py:1536 .\apps\mentorship\views.py:191
 msgid "Mentorship request sent successfully!"
 msgstr "Mentorship request sent successfully!"
 
@@ -6747,7 +6748,7 @@ msgstr "Città"
 msgid "Address"
 msgstr "Indirizzo"
 
-#: .\apps\universities\models.py:30
+#: .\apps\universities\models.py:30 .\templates\dashboard\home.html:158
 #: .\templates\universities\university_detail.html:75
 msgid "Website"
 msgstr "Sito web"
@@ -7723,7 +7724,7 @@ msgstr "Caricamento..."
 #: .\templates\community\partials\group_card.html:30
 #: .\templates\dashboard\groups\detail.html:24
 #: .\templates\dashboard\groups\list.html:72
-#: .\templates\dashboard\home.html:154
+#: .\templates\dashboard\home.html:214
 #: .\templates\governance\auditors\board_list.html:37
 #: .\templates\governance\elections\commission_list.html:58
 msgid "members"
@@ -9524,7 +9525,7 @@ msgid "Open group"
 msgstr "Open group"
 
 #: .\templates\dashboard\groups\list.html:73
-#: .\templates\dashboard\home.html:154
+#: .\templates\dashboard\home.html:214
 msgid "View group"
 msgstr "View group"
 
@@ -9716,81 +9717,124 @@ msgstr "Requests still awaiting closure"
 msgid "Guidance requests in your history"
 msgstr "Guidance requests in your history"
 
-#: .\templates\dashboard\home.html:113
+#: .\templates\dashboard\home.html:115
+msgid "Verified services"
+msgstr "Servizi verificati"
+
+#: .\templates\dashboard\home.html:116
+msgid "Trusted providers for practical needs"
+msgstr "Fornitori affidabili per esigenze pratiche"
+
+#: .\templates\dashboard\home.html:118
+msgid ""
+"ASCAI lists only active providers that have been reviewed by the "
+"association, including money transfer, documents, housing, logistics, and "
+"other community services."
+msgstr ""
+"ASCAI mostra solo fornitori attivi esaminati dall?associazione, inclusi "
+"trasferimenti di denaro, documenti, alloggio, logistica e altri servizi per "
+"la comunit?."
+
+#: .\templates\dashboard\home.html:121
+msgid "See service program"
+msgstr "Vedi il programma servizi"
+
+#: .\templates\dashboard\home.html:144
+msgid "Serves"
+msgstr "Serve"
+
+# Publication Channels
+#: .\templates\dashboard\home.html:149
+msgid "WhatsApp"
+msgstr "WhatsApp"
+
+#: .\templates\dashboard\home.html:152
+msgid "Call"
+msgstr "Chiama"
+
+#: .\templates\dashboard\home.html:166
+msgid ""
+"No verified service providers are visible yet. ASCAI will publish partners "
+"here after review."
+msgstr ""
+"Nessun fornitore verificato ? ancora visibile. ASCAI pubblicher? qui i "
+"partner dopo la revisione."
+
+#: .\templates\dashboard\home.html:173
 msgid "Quick actions"
 msgstr "Quick actions"
 
-#: .\templates\dashboard\home.html:113
+#: .\templates\dashboard\home.html:173
 msgid "Common next steps"
 msgstr "Common next steps"
 
-#: .\templates\dashboard\home.html:122 .\templates\diaspora\index.html:71
+#: .\templates\dashboard\home.html:182 .\templates\diaspora\index.html:71
 msgid "Upcoming events"
 msgstr "Upcoming events"
 
-#: .\templates\dashboard\home.html:122
+#: .\templates\dashboard\home.html:182
 msgid "Registrations and tickets"
 msgstr "Registrations and tickets"
 
-#: .\templates\dashboard\home.html:122 .\templates\dashboard\home.html:137
-#: .\templates\dashboard\home.html:150
+#: .\templates\dashboard\home.html:182 .\templates\dashboard\home.html:197
+#: .\templates\dashboard\home.html:210
 msgid "View all"
 msgstr "View all"
 
-#: .\templates\dashboard\home.html:126
+#: .\templates\dashboard\home.html:186
 msgid "Open ticket"
 msgstr "Open ticket"
 
-#: .\templates\dashboard\home.html:130
+#: .\templates\dashboard\home.html:190
 msgid "You do not have upcoming event registrations yet."
 msgstr "You do not have upcoming event registrations yet."
 
-#: .\templates\dashboard\home.html:137
+#: .\templates\dashboard\home.html:197
 #: .\templates\dashboard\partials\sidebar_nav.html:34
 #: .\templates\dashboard\support\tickets.html:11
 msgid "Support"
 msgstr "Supporto"
 
-#: .\templates\dashboard\home.html:137
+#: .\templates\dashboard\home.html:197
 msgid "Recent support tickets"
 msgstr "Recent support tickets"
 
-#: .\templates\dashboard\home.html:145
+#: .\templates\dashboard\home.html:205
 msgid "You have not opened any support tickets yet."
 msgstr "You have not opened any support tickets yet."
 
-#: .\templates\dashboard\home.html:150
+#: .\templates\dashboard\home.html:210
 msgid "Suggested groups"
 msgstr "Suggested groups"
 
-#: .\templates\dashboard\home.html:158
+#: .\templates\dashboard\home.html:218
 msgid "No suggested groups are available right now."
 msgstr "No suggested groups are available right now."
 
 # Governance Translations
-#: .\templates\dashboard\home.html:165
+#: .\templates\dashboard\home.html:225
 msgid "Governance overview"
 msgstr "Governance overview"
 
-#: .\templates\dashboard\home.html:165
+#: .\templates\dashboard\home.html:225
 msgid "Association administration snapshot"
 msgstr "Association administration snapshot"
 
 # Governance Translations
-#: .\templates\dashboard\home.html:165
+#: .\templates\dashboard\home.html:225
 msgid "Open governance dashboard"
 msgstr "Open governance dashboard"
 
-#: .\templates\dashboard\home.html:169
+#: .\templates\dashboard\home.html:229
 #: .\templates\dashboard\partials\sidebar_nav.html:50
 msgid "Assemblies"
 msgstr "Assemblies"
 
-#: .\templates\dashboard\home.html:170
+#: .\templates\dashboard\home.html:230
 msgid "Pending dues"
 msgstr "Pending dues"
 
-#: .\templates\dashboard\home.html:171
+#: .\templates\dashboard\home.html:231
 msgid "Pending expenses"
 msgstr "Pending expenses"
 

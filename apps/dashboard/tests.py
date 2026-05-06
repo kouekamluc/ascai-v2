@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from datetime import date, timedelta, time
 
+from apps.core.models import ServicePartner
+
 from .models import SupportTicket, TicketReply, CommunityGroup, OrientationSession, StudentQuestion
 from .mixins import DashboardRequiredMixin
 
@@ -149,6 +151,32 @@ class DashboardViewsTest(TestCase):
         url = reverse('dashboard:home')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_dashboard_home_shows_only_verified_service_partners(self):
+        ServicePartner.objects.create(
+            name='Trusted Money Transfer',
+            category='money_transfer',
+            short_description='Verified remittance help for members.',
+            verification_status='verified',
+            is_active=True,
+            is_featured=True,
+        )
+        ServicePartner.objects.create(
+            name='Pending Provider',
+            category='money_transfer',
+            short_description='Still awaiting review.',
+            verification_status='pending',
+            is_active=True,
+            is_featured=True,
+        )
+
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(reverse('dashboard:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Trusted Money Transfer')
+        self.assertContains(response, 'Verified services')
+        self.assertNotContains(response, 'Pending Provider')
 
     def test_unprefixed_dashboard_works_with_non_default_language_cookie(self):
         """Bare dashboard URL should not 404 for members using French or Italian."""

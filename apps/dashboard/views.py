@@ -28,6 +28,7 @@ from .forms import (
     StorySubmissionForm, StudentQuestionForm, OrientationBookingForm, NotificationPreferencesForm
 )
 from apps.accounts.models import User, UserDocument
+from apps.core.models import ServicePartner
 from apps.universities.models import SavedUniversity
 from apps.scholarships.models import SavedScholarship
 from apps.diaspora.models import Event
@@ -186,6 +187,13 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         # Recent activity
         context['recent_tickets'] = SupportTicket.objects.filter(user=user).order_by('-created_at')[:5]
         context['recent_stories'] = UserStorySubmission.objects.filter(user=user).order_by('-submitted_at')[:3]
+        context['verified_service_partners'] = (
+            ServicePartner.objects.filter(
+                is_active=True,
+                verification_status='verified',
+            )
+            .order_by('-is_featured', 'display_order', 'name')[:6]
+        )
         
         # Upcoming events
         context['upcoming_events'] = Event.objects.filter(
