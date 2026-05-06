@@ -76,6 +76,17 @@ run_migrations() {
 # Run migrations with error handling
 run_migrations
 
+# Refresh scholarship opportunities from official public sources.
+# This keeps the scholarships page populated after deploys without relying on
+# manual admin entry. Set SYNC_SCHOLARSHIPS=false to disable.
+if [ "${SYNC_SCHOLARSHIPS:-true}" = "true" ]; then
+    echo "Syncing official scholarship sources..."
+    python manage.py sync_scholarships --timeout "${SYNC_SCHOLARSHIPS_TIMEOUT:-20}" || \
+        echo "âš  Warning: Scholarship sync failed, but continuing startup..."
+else
+    echo "â„¹ Scholarship sync skipped (set SYNC_SCHOLARSHIPS=true to enable)"
+fi
+
 # Ensure media directory exists (for Railway volume or local storage)
 echo "Setting up media directory..."
 # Check if Railway volume is mounted (default path is /data)
@@ -225,5 +236,4 @@ exec gunicorn config.wsgi:application \
     --error-logfile - \
     --log-level info \
     --capture-output
-
 
