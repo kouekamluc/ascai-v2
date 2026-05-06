@@ -4,7 +4,6 @@ This creates or updates the Google SocialApplication record in the database.
 """
 from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
-from allauth.socialaccount.models import SocialApp
 from django.conf import settings
 from decouple import config
 
@@ -28,6 +27,17 @@ class Command(BaseCommand):
                 )
             )
             return
+
+        if 'allauth.socialaccount' not in settings.INSTALLED_APPS:
+            self.stdout.write(
+                self.style.WARNING(
+                    'Google OAuth setup skipped: allauth.socialaccount is not installed. '
+                    'Social login is disabled for this deployment.'
+                )
+            )
+            return
+
+        from allauth.socialaccount.models import SocialApp
         
         # Get the current site
         try:
@@ -105,4 +115,3 @@ class Command(BaseCommand):
                 '\n🎉 Google login button should now be visible on login and signup pages!'
             )
         )
-

@@ -1,6 +1,10 @@
 """
 Tests for core app.
 """
+import os
+from io import StringIO
+
+from django.core.management import call_command
 from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -323,4 +327,30 @@ class CoreEmailUtilsTest(TestCase):
         self.assertEqual(context['site_url'], 'https://ascai.test')
         self.assertTrue(context['logo_url'].startswith('https://ascai.test/'))
         self.assertIn('web-app-manifest-512x512.png', context['logo_url'])
+
+
+class SetupGoogleOAuthCommandTest(TestCase):
+    """Test Google OAuth setup command startup behavior."""
+
+    def test_command_skips_when_socialaccount_is_not_installed(self):
+        previous_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        previous_client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+        os.environ['GOOGLE_CLIENT_ID'] = 'test-client-id'
+        os.environ['GOOGLE_CLIENT_SECRET'] = 'test-client-secret'
+        output = StringIO()
+
+        try:
+            call_command('setup_google_oauth', stdout=output)
+        finally:
+            if previous_client_id is None:
+                os.environ.pop('GOOGLE_CLIENT_ID', None)
+            else:
+                os.environ['GOOGLE_CLIENT_ID'] = previous_client_id
+
+            if previous_client_secret is None:
+                os.environ.pop('GOOGLE_CLIENT_SECRET', None)
+            else:
+                os.environ['GOOGLE_CLIENT_SECRET'] = previous_client_secret
+
+        self.assertIn('Google OAuth setup skipped', output.getvalue())
 
