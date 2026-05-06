@@ -19,12 +19,12 @@
     <section class="page-hero" style="background-image: linear-gradient(120deg, rgba(16, 57, 47, 0.9), rgba(13, 107, 82, 0.84) 48%, rgba(17, 35, 29, 0.78) 100%), url('https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center;">
         <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
-                <span class="eyebrow">{% trans 'Community. Opportunity. Belonging.' %}</span>
+                <span class="eyebrow">{% trans 'Student success. Trusted institutions. Diaspora impact.' %}</span>
                 <h1 class="mt-6 text-5xl md:text-6xl lg:text-7xl font-bold leading-[0.95]">
-                    {% trans 'A bold home for Cameroonians building their future in Lazio.' %}
+                    {% trans 'The platform Cameroonian students use to settle, study, belong, and advance in Lazio.' %}
                 </h1>
                 <p class="mt-6 max-w-2xl text-lg md:text-xl text-white/82 leading-8">
-                    {% trans 'Discover scholarships, universities, mentorship, events, and a strong support network designed for students, academics, and professionals across Rome and the wider Lazio region.' %}
+                    {% trans 'ASCAI Lazio turns confusing student life in Italy into guided steps: university choices, scholarship deadlines, mentorship, trusted resources, events, and a community institutions can confidently support.' %}
                 </p>
                 <div class="mt-8 flex flex-col sm:flex-row gap-4">
                     {% if user.is_authenticated %}
@@ -38,8 +38,8 @@
                     <a href="{% url 'account_signup' %}" class="surface-link justify-center sm:justify-start">
                         {% trans 'Join ASCAI Lazio' %}
                     </a>
-                    <a href="{% url 'students:index' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/8 px-6 py-3.5 font-semibold text-white hover:bg-white/14 transition">
-                        {% trans 'Start With the Student Guide' %}
+                    <a href="{% url 'core:sponsorship' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/8 px-6 py-3.5 font-semibold text-white hover:bg-white/14 transition">
+                        {% trans 'Sponsor Student Success' %}
                     </a>
                     {% endif %}
                 </div>
@@ -47,33 +47,33 @@
 
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
                 <div class="rounded-[1.75rem] border border-white/16 bg-white/12 p-6 backdrop-blur-md">
-                    <p class="text-sm uppercase tracking-[0.18em] text-white/64">{% trans 'Built for impact' %}</p>
+                    <p class="text-sm uppercase tracking-[0.18em] text-white/64">{% trans 'Why students come back' %}</p>
                     <div class="mt-4 grid grid-cols-2 gap-4">
                         <div>
-                            <div class="text-3xl font-bold">01</div>
-                            <p class="mt-1 text-sm text-white/72">{% trans 'Find opportunities faster' %}</p>
+                            <div class="text-3xl font-bold">{% trans 'Guide' %}</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Step-by-step arrival and student life support' %}</p>
                         </div>
                         <div>
-                            <div class="text-3xl font-bold">02</div>
-                            <p class="mt-1 text-sm text-white/72">{% trans 'Connect with mentors and peers' %}</p>
+                            <div class="text-3xl font-bold">{% trans 'Fund' %}</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Scholarships, deadlines, and practical documents' %}</p>
                         </div>
                         <div>
-                            <div class="text-3xl font-bold">03</div>
-                            <p class="mt-1 text-sm text-white/72">{% trans 'Stay visible in the community' %}</p>
+                            <div class="text-3xl font-bold">{% trans 'Meet' %}</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Mentors, peers, groups, and events' %}</p>
                         </div>
                         <div>
-                            <div class="text-3xl font-bold">04</div>
-                            <p class="mt-1 text-sm text-white/72">{% trans 'Access practical student resources' %}</p>
+                            <div class="text-3xl font-bold">{% trans 'Grow' %}</div>
+                            <p class="mt-1 text-sm text-white/72">{% trans 'Leadership, stories, visibility, and referrals' %}</p>
                         </div>
                     </div>
                 </div>
                 <div class="rounded-[1.75rem] border border-white/16 bg-[#0f2b23]/78 p-6 shadow-glow">
-                    <p class="text-sm uppercase tracking-[0.18em] text-cameroon-yellow">{% trans 'What ASCAI does' %}</p>
+                    <p class="text-sm uppercase tracking-[0.18em] text-cameroon-yellow">{% trans 'Why sponsors care' %}</p>
                     <ul class="mt-4 space-y-3 text-sm text-white/78">
-                        <li>{% trans 'Mentorship and orientation for new arrivals' %}</li>
-                        <li>{% trans 'Scholarship and university discovery' %}</li>
-                        <li>{% trans 'News, events, and diaspora storytelling' %}</li>
-                        <li>{% trans 'Community support and leadership visibility' %}</li>
+                        <li>{% trans 'Clear outreach channel to Cameroonian students' %}</li>
+                        <li>{% trans 'Integration support that Italian institutions can measure' %}</li>
+                        <li>{% trans 'Diaspora visibility for Cameroonian authorities' %}</li>
+                        <li>{% trans 'Trustworthy partner space for ethical service providers' %}</li>
                     </ul>
                 </div>
             </div>
@@ -107,6 +107,46 @@
                 <a href="{% url 'diaspora:index' %}" class="rounded-full bg-ascai-ink px-4 py-2.5 text-sm font-semibold text-white">{% trans 'Explore Diaspora' %}</a>
                 <a href="{% url 'core:leadership' %}" class="rounded-full bg-stone-100 px-4 py-2.5 text-sm font-semibold text-gray-700">{% trans 'Meet Leadership' %}</a>
             </div>
+        </div>
+    </section>
+
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Student success pathway' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Make membership feel like the smartest first payment after arrival.' %}</h2>
+                <p class="mt-3 max-w-3xl text-sm leading-7 text-gray-600">{% trans 'The strongest reason to pay is not a generic association card. It is a guided path that helps students avoid mistakes, find opportunities, meet people, and become visible to institutions.' %}</p>
+            </div>
+            <a href="{% url 'account_signup' %}" class="rounded-full bg-cameroon-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-cameroon-green/90">{% trans 'Start as a Student' %}</a>
+        </div>
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {% for step in student_success_pathway %}
+            <article class="content-card p-6">
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{{ step.step }}</p>
+                <h3 class="mt-3 text-2xl font-bold text-ascai-ink">{{ step.title }}</h3>
+                <p class="mt-3 text-sm leading-7 text-gray-600">{{ step.summary }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section-card p-7 md:p-10 pattern-grid">
+        <div class="section-heading">
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-red">{% trans 'Authority and sponsor map' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Give sponsors a reason to fund outcomes, not just events.' %}</h2>
+                <p class="mt-3 max-w-3xl text-sm leading-7 text-gray-600">{% trans 'ASCAI can present itself as the organized bridge between Cameroonian students, Italian institutions, Cameroonian authorities, families, and ethical service partners.' %}</p>
+            </div>
+            <a href="{% url 'core:sponsorship' %}" class="rounded-full bg-ascai-ink px-4 py-2.5 text-sm font-semibold text-white hover:bg-cameroon-green">{% trans 'View Sponsor Plan' %}</a>
+        </div>
+        <div class="grid gap-5 md:grid-cols-3">
+            {% for metric in sponsor_impact_metrics %}
+            <article class="rounded-[1.5rem] border border-black/5 bg-white/90 p-6">
+                <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ metric.label }}</p>
+                <h3 class="mt-2 text-3xl font-bold text-ascai-ink">{{ metric.value }}</h3>
+                <p class="mt-3 text-sm leading-7 text-gray-600">{{ metric.summary }}</p>
+            </article>
+            {% endfor %}
         </div>
     </section>
 

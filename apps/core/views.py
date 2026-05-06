@@ -25,6 +25,79 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+STUDENT_SUCCESS_PATHWAY = [
+    {
+        "step": _("Arrive"),
+        "title": _("Settle faster in Lazio"),
+        "summary": _("Residence, housing, university, health, and city-life guidance in one trusted student dashboard."),
+    },
+    {
+        "step": _("Study"),
+        "title": _("Find funding and academic options"),
+        "summary": _("Scholarship discovery, university comparisons, deadlines, documents, and peer advice from students who already passed through the process."),
+    },
+    {
+        "step": _("Belong"),
+        "title": _("Meet mentors and community"),
+        "summary": _("Practical mentorship, events, discussion groups, and a visible Cameroonian academic network across Rome and Lazio."),
+    },
+    {
+        "step": _("Advance"),
+        "title": _("Build a credible future"),
+        "summary": _("Stories, leadership opportunities, referrals, and institutional visibility that help students grow beyond survival mode."),
+    },
+]
+
+
+SPONSOR_IMPACT_METRICS = [
+    {
+        "label": _("Student retention"),
+        "value": _("Orientation"),
+        "summary": _("Help new arrivals understand the administrative steps that often decide whether they stay enrolled and stable."),
+    },
+    {
+        "label": _("Integration"),
+        "value": _("Community"),
+        "summary": _("Support bridge-building between Cameroonian students, Italian institutions, local services, and diaspora families."),
+    },
+    {
+        "label": _("Visibility"),
+        "value": _("Reporting"),
+        "summary": _("Give sponsors a clear, reportable view of activities, resource usage, events, and student support outcomes."),
+    },
+]
+
+
+SPONSOR_PACKAGES = [
+    {
+        "name": _("Student Success Sponsor"),
+        "audience": _("Universities, regional offices, foundations"),
+        "summary": _("Fund orientation sessions, scholarship guidance, and practical student support for Cameroonian newcomers in Lazio."),
+        "returns": _("Impact report, public recognition, event presence, and student-facing visibility."),
+    },
+    {
+        "name": _("Institutional Bridge Partner"),
+        "audience": _("Embassy, consular offices, integration services"),
+        "summary": _("Use ASCAI as an organized channel for communication, verified resources, and community feedback."),
+        "returns": _("Cleaner outreach, reduced misinformation, documented community needs, and trusted local coordination."),
+    },
+    {
+        "name": _("Diaspora Innovation Partner"),
+        "audience": _("Companies, service providers, banks, remittance operators"),
+        "summary": _("Reach Cameroonian students and families through verified, ethical, needs-based offers."),
+        "returns": _("Partner listing, targeted campaigns, feedback loops, and measurable referral opportunities."),
+    },
+]
+
+
+INSTITUTIONAL_PROOF_POINTS = [
+    _("A multilingual platform for English, French, and Italian audiences."),
+    _("Authenticated student dashboards for resources, requests, documents, events, and mentorship."),
+    _("Governance and dues features that show ASCAI is building an accountable association, not only a social page."),
+    _("A sponsorship story that connects student success, integration, community safety, and diaspora diplomacy."),
+]
+
+
 def get_premium_service_context():
     """Return services and partner opportunities, using DB content when available."""
     try:
@@ -147,6 +220,8 @@ class HomeView(ExecutiveBoardPublicContextMixin, TemplateView):
         context['membership_access'] = get_member_resource_access(self.request.user)
         context['membership_benefits'] = MEMBERSHIP_BENEFIT_PILLARS
         context['member_resource_collections'] = MEMBER_RESOURCE_COLLECTIONS
+        context['student_success_pathway'] = STUDENT_SUCCESS_PATHWAY
+        context['sponsor_impact_metrics'] = SPONSOR_IMPACT_METRICS
         context.update(get_premium_service_context())
 
         try:
@@ -173,6 +248,21 @@ class PremiumServicesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['membership_access'] = get_member_resource_access(self.request.user)
+        context.update(get_premium_service_context())
+        return context
+
+
+class SponsorshipView(TemplateView):
+    """Public impact page for institutions, authorities, and sponsors."""
+    template_name = 'core/sponsorship.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['student_success_pathway'] = STUDENT_SUCCESS_PATHWAY
+        context['sponsor_impact_metrics'] = SPONSOR_IMPACT_METRICS
+        context['sponsor_packages'] = SPONSOR_PACKAGES
+        context['institutional_proof_points'] = INSTITUTIONAL_PROOF_POINTS
+        context['membership_benefits'] = MEMBERSHIP_BENEFIT_PILLARS
         context.update(get_premium_service_context())
         return context
 

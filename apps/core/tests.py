@@ -93,6 +93,20 @@ class CoreViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Trusted Transfers')
 
+    def test_sponsorship_view_renders_student_and_sponsor_value(self):
+        response = self.client.get(reverse('core:sponsorship'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Sponsor the bridge')
+        self.assertContains(response, 'Student Success Sponsor')
+
+    def test_home_view_promotes_student_success_and_sponsorship(self):
+        response = self.client.get(reverse('core:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Student success pathway')
+        self.assertContains(response, 'View Sponsor Plan')
+
 
 class CoreContextProcessorsTest(TestCase):
     """Test core context processors."""
