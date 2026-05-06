@@ -150,6 +150,15 @@ class DashboardViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_unprefixed_dashboard_works_with_non_default_language_cookie(self):
+        """Bare dashboard URL should not 404 for members using French or Italian."""
+        self.client.login(username='testuser', password='testpass123')
+        self.client.cookies.load({'django_language': 'fr'})
+
+        response = self.client.get('/dashboard/')
+
+        self.assertEqual(response.status_code, 200)
+
     def test_dashboard_home_keeps_language_switcher_dropdown_visible(self):
         """Dashboard header should not clip the language dropdown."""
         self.client.login(username='testuser', password='testpass123')

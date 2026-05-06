@@ -202,6 +202,14 @@ class AccountsViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'Remember me')
 
+    def test_unprefixed_login_works_with_non_default_language_cookie(self):
+        """Bare login URL should remain reachable after a language switch."""
+        self.client.cookies.load({'django_language': 'fr'})
+
+        response = self.client.get('/accounts/login/')
+
+        self.assertEqual(response.status_code, 200)
+
     def test_signup_page_mentions_email_confirmation(self):
         response = self.client.get(reverse('account_signup'))
         self.assertEqual(response.status_code, 200)

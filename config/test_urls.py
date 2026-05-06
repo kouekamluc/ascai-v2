@@ -8,12 +8,14 @@ from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 from django.views.i18n import set_language
 
+from apps.accounts import urls as account_url_patterns
 from apps.accounts.views import (
     CustomConfirmEmailView,
     CustomEmailVerificationSentView,
     email_verification_required_view,
 )
 from apps.core.views import HealthCheckView
+from apps.dashboard import urls as dashboard_url_patterns
 
 
 urlpatterns = [
@@ -34,6 +36,9 @@ urlpatterns = [
         CustomEmailVerificationSentView.as_view(),
         name='account_email_verification_notice',
     ),
+    path('accounts/', include('allauth.urls')),
+    path('accounts/', include((account_url_patterns.urlpatterns, None))),
+    path('dashboard/', include((dashboard_url_patterns.urlpatterns, None))),
 ]
 
 urlpatterns += i18n_patterns(

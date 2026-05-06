@@ -11,6 +11,8 @@ from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import set_language
 from apps.core.views import HealthCheckView
 from apps.accounts.views import CustomConfirmEmailView, CustomEmailVerificationSentView, email_verification_required_view
+from apps.accounts import urls as account_url_patterns
+from apps.dashboard import urls as dashboard_url_patterns
 from config.sitemaps import sitemaps
 
 urlpatterns = [
@@ -28,6 +30,14 @@ urlpatterns = [
     path('accounts/confirm-email/', email_verification_required_view, name='account_email_verification_required'),
     # Branded email verification sent page
     path('accounts/email-verification-sent/', CustomEmailVerificationSentView.as_view(), name='account_email_verification_notice'),
+    # Stable unprefixed auth/dashboard routes.
+    #
+    # LocalePrefixPattern depends on the active language. If a member has a
+    # non-default language cookie, bare URLs such as /dashboard/ can otherwise
+    # miss the i18n route and return a production 404 after login.
+    path('accounts/', include('allauth.urls')),
+    path('accounts/', include((account_url_patterns.urlpatterns, None))),
+    path('dashboard/', include((dashboard_url_patterns.urlpatterns, None))),
 ]
 
 # Language-prefixed URLs
