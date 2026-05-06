@@ -35,24 +35,25 @@ class UserPreferredLocaleMiddleware:
             if candidate in self.supported_languages:
                 preferred_language = candidate
 
-        if preferred_language and preferred_language != current_language:
-            translation.activate(preferred_language)
-            request.LANGUAGE_CODE = preferred_language
-        elif current_language:
-            request.LANGUAGE_CODE = current_language
-
         if (
             preferred_language
             and preferred_language != settings.LANGUAGE_CODE
             and not path_language
             and request.method in {"GET", "HEAD"}
         ):
-            translated_url = translate_url(request.get_full_path(), preferred_language)
+            with translation.override(settings.LANGUAGE_CODE):
+                translated_url = translate_url(request.get_full_path(), preferred_language)
             if translated_url and translated_url != request.get_full_path():
                 response = HttpResponseRedirect(translated_url)
                 response = self._set_language_cookie(response, preferred_language)
                 self._restore_language(current_language)
                 return response
+
+        if preferred_language and preferred_language != current_language:
+            translation.activate(preferred_language)
+            request.LANGUAGE_CODE = preferred_language
+        elif current_language:
+            request.LANGUAGE_CODE = current_language
 
         response = self.get_response(request)
 

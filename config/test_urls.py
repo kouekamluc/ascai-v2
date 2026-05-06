@@ -5,6 +5,7 @@ This avoids optional integrations such as the admin and editor routes while
 still exercising the public pages and i18n behavior we care about in tests.
 """
 from django.conf.urls.i18n import i18n_patterns
+from django.http import HttpResponse
 from django.urls import include, path
 from django.views.i18n import set_language
 
@@ -18,8 +19,14 @@ from apps.core.views import HealthCheckView
 from apps.dashboard import urls as dashboard_url_patterns
 
 
+def test_admin_placeholder(request):
+    return HttpResponse("admin placeholder", status=403)
+
+
 urlpatterns = [
+    path('admin/', test_admin_placeholder),
     path('i18n/setlang/', set_language, name='set_language'),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('health/', HealthCheckView.as_view(), name='health'),
     path(
         'accounts/confirm-email/<str:key>/',
