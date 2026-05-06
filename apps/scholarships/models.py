@@ -1,6 +1,8 @@
 """
 Models for scholarships app.
 """
+from urllib.parse import urlparse
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
@@ -155,6 +157,28 @@ class Scholarship(models.Model):
         if delta.days == 1:
             return _('Checked yesterday')
         return _('Checked %(days)s days ago') % {'days': delta.days}
+
+    @property
+    def source_hostname(self):
+        if not self.source_url:
+            return ''
+        return urlparse(self.source_url).hostname or ''
+
+    @property
+    def provider_logo_url(self):
+        if not self.source_hostname:
+            return ''
+        return f'https://www.google.com/s2/favicons?domain={self.source_hostname}&sz=128'
+
+    @property
+    def provider_initials(self):
+        source = self.source_name or self.provider or self.title
+        words = [word for word in source.replace('-', ' ').split() if word]
+        if not words:
+            return 'AS'
+        if len(words) == 1:
+            return words[0][:2].upper()
+        return ''.join(word[0] for word in words[:2]).upper()
 
 
 class SavedScholarship(models.Model):

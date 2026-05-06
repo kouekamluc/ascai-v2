@@ -66,6 +66,9 @@ class ScholarshipModelTest(TestCase):
 
         self.assertTrue(scholarship.is_imported)
         self.assertEqual(str(scholarship.source_freshness_label), 'Manual entry')
+        self.assertEqual(scholarship.source_hostname, 'example.com')
+        self.assertIn('example.com', scholarship.provider_logo_url)
+        self.assertEqual(scholarship.provider_initials, 'OS')
 
 
 class SavedScholarshipModelTest(TestCase):
