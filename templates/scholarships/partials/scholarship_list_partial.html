@@ -1,10 +1,10 @@
 {% load i18n %}
 <section id="scholarship-results" class="space-y-6">
-    <div class="section-card p-6 md:p-7">
+    <div class="section-card p-5 md:p-6">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{% trans 'Results' %}</p>
-                <h3 class="mt-2 text-3xl font-bold text-ascai-ink">
+                <h3 class="mt-2 text-2xl font-bold text-ascai-ink md:text-3xl">
                     {% blocktrans count total=matching_scholarship_count %}{{ total }} scholarship available{% plural %}{{ total }} scholarships available{% endblocktrans %}
                 </h3>
                 <p class="mt-2 text-sm leading-7 text-gray-600">
@@ -34,58 +34,54 @@
 
     <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {% for scholarship in scholarships %}
-        <article class="content-card overflow-hidden">
-            <div class="border-b border-black/5 bg-gradient-to-r from-cameroon-green/8 via-white to-cameroon-yellow/14 p-6">
-                <div class="flex items-start justify-between gap-4">
-                    <div class="min-w-0">
-                        <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ scholarship.provider }}</p>
-                        <h3 class="mt-3 text-2xl font-bold leading-tight text-ascai-ink">
+        <article class="content-card flex h-full flex-col overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:border-cameroon-green/30 hover:shadow-xl">
+            <div class="flex flex-1 flex-col p-5">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <p class="max-w-full truncate text-[11px] font-extrabold uppercase tracking-[0.18em] text-cameroon-green">{{ scholarship.provider }}</p>
+                            {% if scholarship.source_url %}
+                            <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-blue-700">{% trans 'Verified source' %}</span>
+                            {% endif %}
+                        </div>
+                        <h3 class="mt-3 text-xl font-bold leading-snug text-ascai-ink md:text-[1.35rem]">
                             <a href="{% url 'scholarships:detail' scholarship.slug %}" class="hover:text-cameroon-green">{{ scholarship.title }}</a>
                         </h3>
                     </div>
                     {% if scholarship.is_disco_lazio %}
-                    <span class="rounded-full bg-cameroon-green px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.18em] text-white">DISCO</span>
+                    <span class="shrink-0 rounded-full bg-cameroon-green px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white">DISCO</span>
                     {% endif %}
                 </div>
+
                 <div class="mt-4 flex flex-wrap gap-2">
                     {% if scholarship.level != 'all' %}
-                    <span class="rounded-full bg-blue-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-blue-700">{{ scholarship.get_level_display }}</span>
+                    <span class="rounded-full bg-stone-100 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-gray-700">{{ scholarship.get_level_display }}</span>
                     {% endif %}
                     {% if scholarship.region != 'all' %}
-                    <span class="rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-emerald-700">{{ scholarship.get_region_display }}</span>
+                    <span class="rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-emerald-700">{{ scholarship.get_region_display }}</span>
                     {% endif %}
                     <span class="
-                        rounded-full px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em]
+                        rounded-full px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em]
                         {% if scholarship.deadline_state.tone == 'red' %}bg-red-50 text-red-700
                         {% elif scholarship.deadline_state.tone == 'amber' %}bg-amber-50 text-amber-700
                         {% elif scholarship.deadline_state.tone == 'green' %}bg-emerald-50 text-emerald-700
                         {% else %}bg-stone-100 text-gray-600{% endif %}
                     ">{{ scholarship.deadline_state.label }}</span>
                 </div>
-            </div>
 
-            <div class="p-6">
-                <div class="grid gap-3 sm:grid-cols-2">
-                    <div class="rounded-[1.2rem] bg-emerald-50 px-4 py-4">
-                        <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-700">{% trans 'Funding' %}</p>
-                        <p class="mt-2 text-xl font-bold text-ascai-ink">
-                            {% if scholarship.amount %}
-                                {{ scholarship.amount|floatformat:0 }} {{ scholarship.currency }}
-                            {% else %}
-                                {% trans 'Amount not listed' %}
-                            {% endif %}
+                <div class="mt-5 grid grid-cols-[minmax(0,1fr)_auto] gap-4 rounded-2xl border border-black/6 bg-stone-50 px-4 py-3">
+                    <div>
+                        <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Funding' %}</p>
+                        <p class="mt-1 text-base font-bold text-ascai-ink">
+                            {% if scholarship.amount %}{{ scholarship.amount|floatformat:0 }} {{ scholarship.currency }}{% else %}{% trans 'Amount not listed' %}{% endif %}
                         </p>
                     </div>
-                    <div class="rounded-[1.2rem] bg-stone-50 px-4 py-4">
-                        <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-gray-500">{% trans 'Deadline' %}</p>
-                        <p class="mt-2 text-base font-bold text-ascai-ink">
-                            {% if scholarship.application_deadline %}
-                                {{ scholarship.application_deadline|date:"d M Y" }}
-                            {% else %}
-                                {% trans 'No fixed date' %}
-                            {% endif %}
+                    <div class="border-l border-black/8 pl-4 text-right">
+                        <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Deadline' %}</p>
+                        <p class="mt-1 text-base font-bold text-ascai-ink">
+                            {% if scholarship.application_deadline %}{{ scholarship.application_deadline|date:"d M Y" }}{% else %}{% trans 'Rolling' %}{% endif %}
                         </p>
-                        <p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em]
+                        <p class="mt-0.5 text-[11px] font-extrabold uppercase tracking-[0.12em]
                             {% if scholarship.deadline_state.tone == 'red' %}text-red-600
                             {% elif scholarship.deadline_state.tone == 'amber' %}text-amber-600
                             {% elif scholarship.deadline_state.tone == 'green' %}text-emerald-600
@@ -94,18 +90,18 @@
                     </div>
                 </div>
 
-                <p class="mt-5 text-sm leading-7 text-gray-600">{{ scholarship.description|striptags|truncatewords:30 }}</p>
+                <p class="mt-5 text-sm leading-7 text-gray-600">{{ scholarship.description|striptags|truncatewords:24 }}</p>
                 {% if scholarship.source_url %}
-                <div class="mt-4 rounded-[1.15rem] bg-blue-50 px-4 py-3">
-                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-blue-700">
+                <div class="mt-4 rounded-2xl bg-blue-50 px-4 py-3">
+                    <p class="text-[11px] font-extrabold uppercase tracking-[0.14em] text-blue-700">
                         {% blocktrans with source=scholarship.source_name %}Imported from {{ source }}{% endblocktrans %}
                     </p>
                     <p class="mt-1 text-xs leading-6 text-blue-800">{{ scholarship.source_freshness_label }}</p>
                 </div>
                 {% endif %}
 
-                <div class="mt-6 flex items-center justify-between gap-3 border-t border-black/5 pt-5">
-                    <a href="{% url 'scholarships:detail' scholarship.slug %}" class="rounded-full bg-cameroon-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-cameroon-green/90">
+                <div class="mt-auto flex items-center justify-between gap-3 border-t border-black/5 pt-5">
+                    <a href="{% url 'scholarships:detail' scholarship.slug %}" class="rounded-full bg-cameroon-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-cameroon-green/90">
                         {% trans 'View details' %}
                     </a>
                     {% if user.is_authenticated %}
