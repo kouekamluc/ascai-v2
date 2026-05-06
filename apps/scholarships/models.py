@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from django.utils.text import slugify
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -83,6 +84,38 @@ class Scholarship(models.Model):
         null=True,
         verbose_name=_('Requirements Document')
     )
+    source_name = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_('Source Name'),
+        help_text=_('Official source this scholarship was imported from.'),
+    )
+    source_url = models.URLField(
+        blank=True,
+        verbose_name=_('Source URL'),
+        help_text=_('Official page where students should verify the latest information.'),
+    )
+    source_excerpt = models.TextField(
+        blank=True,
+        verbose_name=_('Source Excerpt'),
+        help_text=_('Short imported summary from the source page.'),
+    )
+    source_last_seen_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Source Last Seen At'),
+    )
+    source_imported_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Source Imported At'),
+    )
+    source_hash = models.CharField(
+        max_length=64,
+        blank=True,
+        verbose_name=_('Source Hash'),
+        help_text=_('Internal fingerprint used to detect source changes.'),
+    )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -107,6 +140,21 @@ class Scholarship(models.Model):
     
     def get_absolute_url(self):
         return reverse('scholarships:detail', kwargs={'slug': self.slug})
+
+    @property
+    def is_imported(self):
+        return bool(self.source_url)
+
+    @property
+    def source_freshness_label(self):
+        if not self.source_last_seen_at:
+            return _('Manual entry')
+        delta = timezone.now() - self.source_last_seen_at
+        if delta.days == 0:
+            return _('Checked today')
+        if delta.days == 1:
+            return _('Checked yesterday')
+        return _('Checked %(days)s days ago') % {'days': delta.days}
 
 
 class SavedScholarship(models.Model):
@@ -135,4 +183,3 @@ class SavedScholarship(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.scholarship.title}"
-

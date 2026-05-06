@@ -53,6 +53,20 @@ class ScholarshipModelTest(TestCase):
         )
         self.assertIsNotNone(scholarship.slug)
 
+    def test_imported_scholarship_source_metadata(self):
+        scholarship = Scholarship.objects.create(
+            title='Imported Scholarship',
+            provider='Official Provider',
+            description='Imported description',
+            eligibility_criteria='Verify official rules',
+            status='active',
+            source_name='Official Source',
+            source_url='https://example.com/scholarship',
+        )
+
+        self.assertTrue(scholarship.is_imported)
+        self.assertEqual(str(scholarship.source_freshness_label), 'Manual entry')
+
 
 class SavedScholarshipModelTest(TestCase):
     """Test SavedScholarship model."""
@@ -109,4 +123,15 @@ class ScholarshipsViewsTest(TestCase):
         url = reverse('scholarships:detail', kwargs={'slug': self.scholarship.slug})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_scholarship_detail_shows_official_source(self):
+        self.scholarship.source_name = 'Official Source'
+        self.scholarship.source_url = 'https://example.com/scholarship'
+        self.scholarship.save(update_fields=['source_name', 'source_url'])
+
+        response = self.client.get(reverse('scholarships:detail', kwargs={'slug': self.scholarship.slug}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Official source')
+        self.assertContains(response, 'https://example.com/scholarship')
 
