@@ -277,3 +277,40 @@ class CommunityService(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ConversionEvent(models.Model):
+    """Lightweight conversion tracking for sponsor and student intent."""
+
+    EVENT_CHOICES = [
+        ("sponsor_interest", _("Sponsor Interest")),
+        ("orientation_request", _("Orientation Request")),
+        ("one_pager_download", _("Sponsor One-Pager Download")),
+    ]
+
+    event_type = models.CharField(
+        max_length=40,
+        choices=EVENT_CHOICES,
+        verbose_name=_("Event Type"),
+    )
+    source_path = models.CharField(max_length=255, blank=True, verbose_name=_("Source Path"))
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="conversion_events",
+        verbose_name=_("User"),
+    )
+    session_key = models.CharField(max_length=80, blank=True, verbose_name=_("Session Key"))
+    ip_address = models.GenericIPAddressField(null=True, blank=True, verbose_name=_("IP Address"))
+    user_agent = models.TextField(blank=True, verbose_name=_("User Agent"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created At"))
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = _("Conversion Event")
+        verbose_name_plural = _("Conversion Events")
+
+    def __str__(self):
+        return f"{self.get_event_type_display()} - {self.created_at:%Y-%m-%d}"

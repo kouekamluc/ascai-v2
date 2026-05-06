@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from config.admin import BaseAdmin
 
-from .models import AssociationSettings, Collaborator, CommunityService, ServicePartner
+from .models import AssociationSettings, Collaborator, CommunityService, ConversionEvent, ServicePartner
 
 
 @admin.register(Collaborator)
@@ -200,3 +200,18 @@ class CommunityServiceAdmin(BaseAdmin):
             "classes": ("collapse",),
         }),
     )
+
+
+@admin.register(ConversionEvent)
+class ConversionEventAdmin(BaseAdmin):
+    list_display = ["event_type", "user", "source_path", "ip_address", "created_at"]
+    list_filter = ["event_type", "created_at"]
+    search_fields = ["source_path", "user__username", "user__email", "ip_address", "user_agent"]
+    readonly_fields = ["event_type", "user", "source_path", "session_key", "ip_address", "user_agent", "created_at"]
+    list_per_page = 50
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

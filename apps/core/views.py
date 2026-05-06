@@ -4,10 +4,14 @@ Views for core app.
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponse
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.contrib.auth import get_user_model
 from django.db import connection
-from apps.diaspora.models import News, Event
+from django.utils.html import strip_tags
+from apps.diaspora.models import News, Event, Testimonial, SuccessStory
 from apps.downloads.models import Document
-from apps.core.models import CommunityService, ServicePartner
+from apps.core.models import CommunityService, ConversionEvent, ServicePartner
 from apps.governance.services import get_member_resource_access
 from apps.core.membership_content import (
     MEMBER_RESOURCE_COLLECTIONS,
@@ -23,6 +27,7 @@ from django.utils import timezone
 import logging
 
 logger = logging.getLogger(__name__)
+User = get_user_model()
 
 
 STUDENT_SUCCESS_PATHWAY = [
@@ -158,6 +163,231 @@ def get_premium_service_context():
     }
 
 
+def get_impact_metrics():
+    """Aggregate sponsor-facing numbers from existing platform activity."""
+    from apps.dashboard.models import EventRegistration, OrientationSession
+    from apps.mentorship.models import MentorshipRequest
+    from apps.scholarships.models import SavedScholarship
+
+    try:
+        metrics = {
+            "active_members": User.objects.filter(is_active=True, is_approved=True).count(),
+            "orientation_requests": OrientationSession.objects.count(),
+            "mentorship_requests": MentorshipRequest.objects.count(),
+            "scholarship_saves": SavedScholarship.objects.count(),
+            "event_registrations": EventRegistration.objects.count(),
+        }
+    except Exception as e:
+        logger.error("Error loading impact metrics: %s", str(e), exc_info=True)
+        metrics = {
+            "active_members": 0,
+            "orientation_requests": 0,
+            "mentorship_requests": 0,
+            "scholarship_saves": 0,
+            "event_registrations": 0,
+        }
+
+    return [
+        {
+            "key": "active_members",
+            "label": _("Active members"),
+            "value": metrics["active_members"],
+            "summary": _("Approved members reachable through ASCAI channels."),
+        },
+        {
+            "key": "orientation_requests",
+            "label": _("Orientation requests"),
+            "value": metrics["orientation_requests"],
+            "summary": _("Students asking for practical settlement guidance."),
+        },
+        {
+            "key": "mentorship_requests",
+            "label": _("Mentorship requests"),
+            "value": metrics["mentorship_requests"],
+            "summary": _("Peer and mentor connections initiated through the platform."),
+        },
+        {
+            "key": "scholarship_saves",
+            "label": _("Scholarship saves"),
+            "value": metrics["scholarship_saves"],
+            "summary": _("Funding opportunities students marked for action."),
+        },
+        {
+            "key": "event_registrations",
+            "label": _("Event registrations"),
+            "value": metrics["event_registrations"],
+            "summary": _("Measurable participation in community activities."),
+        },
+    ]
+
+
+def get_sponsor_testimonials():
+    """Use real testimonial/story content when available, with honest fallback copy."""
+    testimonials = []
+    try:
+        for item in Testimonial.objects.filter(is_published=True).order_by("-is_featured", "-created_at")[:3]:
+            testimonials.append({
+                "name": item.name,
+                "role": item.title or item.location,
+                "quote": item.testimonial,
+            })
+    except Exception as e:
+        logger.error("Error loading testimonials: %s", str(e), exc_info=True)
+
+    if testimonials:
+        return testimonials
+
+    return [
+        {
+            "name": _("New student in Lazio"),
+            "role": _("Student support voice"),
+            "quote": _("What students need most is a trusted first place to ask practical questions before small mistakes become expensive problems."),
+        },
+        {
+            "name": _("Community collaborator"),
+            "role": _("Institutional partner voice"),
+            "quote": _("A structured student association makes outreach clearer, faster, and more accountable for everyone involved."),
+        },
+    ]
+
+
+def get_event_case_studies():
+    """Build sponsor-ready case-study cards from past published events."""
+    try:
+        events = (
+            Event.objects.filter(is_published=True, start_datetime__lt=timezone.now())
+            .prefetch_related("registrations")
+            .order_by("-start_datetime")[:3]
+        )
+        case_studies = []
+        for event in events:
+            registered_count = event.registrations.count()
+            attended_count = event.registrations.filter(attended=True).count()
+            case_studies.append({
+                "title": event.title,
+                "date": event.start_datetime,
+                "location": event.location,
+                "registered_count": registered_count,
+                "attended_count": attended_count,
+                "summary": strip_tags(event.description)[:220],
+            })
+        if case_studies:
+            return case_studies
+    except Exception as e:
+        logger.error("Error loading event case studies: %s", str(e), exc_info=True)
+
+    return [
+        {
+            "title": _("Orientation and integration cycle"),
+            "date": None,
+            "location": _("Rome and Lazio"),
+            "registered_count": 0,
+            "attended_count": 0,
+            "summary": _("Use each ASCAI event as a sponsor-ready case study: objective, audience, attendance, questions raised, follow-up resources, and next action."),
+        }
+    ]
+
+
+def _record_conversion(request, event_type):
+    """Persist a conversion event without disrupting the user's path."""
+    try:
+        session_key = request.session.session_key or ""
+        if not session_key:
+            request.session.save()
+            session_key = request.session.session_key or ""
+        forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+        ip_address = forwarded_for.split(",")[0].strip() or request.META.get("REMOTE_ADDR")
+        ConversionEvent.objects.create(
+            event_type=event_type,
+            source_path=request.META.get("HTTP_REFERER", "")[:255] or request.path[:255],
+            user=request.user if request.user.is_authenticated else None,
+            session_key=session_key,
+            ip_address=ip_address,
+            user_agent=request.META.get("HTTP_USER_AGENT", "")[:1000],
+        )
+    except Exception as e:
+        logger.error("Error recording conversion event: %s", str(e), exc_info=True)
+
+
+def track_conversion(request, event_type):
+    """Track conversion intent and redirect to the relevant action."""
+    target_map = {
+        "sponsor_interest": reverse("contact:index"),
+        "orientation_request": reverse("dashboard:orientation_booking"),
+        "one_pager_download": reverse("core:sponsor_one_pager"),
+    }
+    if event_type not in target_map:
+        return redirect("core:sponsorship")
+
+    _record_conversion(request, event_type)
+    return redirect(target_map[event_type])
+
+
+def _escape_pdf_text(value):
+    return str(value).replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+
+
+def _build_simple_pdf(lines):
+    """Create a dependency-free, one-page PDF with sponsor summary text."""
+    content = ["BT", "/F1 18 Tf", "72 760 Td", "22 TL"]
+    first = True
+    for line in lines:
+        if not first:
+            content.append("T*")
+        first = False
+        size = 18 if line.get("heading") else 10
+        content.append(f"/F1 {size} Tf")
+        content.append(f"({_escape_pdf_text(line['text'])}) Tj")
+    content.append("ET")
+    stream = "\n".join(content).encode("latin-1", errors="replace")
+    objects = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        b"<< /Length " + str(len(stream)).encode("ascii") + b" >>\nstream\n" + stream + b"\nendstream",
+    ]
+    pdf = bytearray(b"%PDF-1.4\n")
+    offsets = [0]
+    for index, obj in enumerate(objects, start=1):
+        offsets.append(len(pdf))
+        pdf.extend(f"{index} 0 obj\n".encode("ascii"))
+        pdf.extend(obj)
+        pdf.extend(b"\nendobj\n")
+    xref_offset = len(pdf)
+    pdf.extend(f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode("ascii"))
+    for offset in offsets[1:]:
+        pdf.extend(f"{offset:010d} 00000 n \n".encode("ascii"))
+    pdf.extend(
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF\n".encode("ascii")
+    )
+    return bytes(pdf)
+
+
+def sponsor_one_pager_pdf(request):
+    """Downloadable sponsor one-pager PDF with live impact metrics."""
+    _record_conversion(request, "one_pager_download")
+    metric_lines = [
+        f"{metric['label']}: {metric['value']} - {metric['summary']}"
+        for metric in get_impact_metrics()
+    ]
+    lines = [
+        {"text": "ASCAI Lazio Sponsor One-Pager", "heading": True},
+        {"text": "Trusted bridge for Cameroonian student success and Italian-Cameroonian cooperation."},
+        {"text": "Why sponsor: student retention, integration, diaspora visibility, and measurable outreach."},
+        {"text": "Current platform impact", "heading": True},
+        *[{"text": line} for line in metric_lines],
+        {"text": "Sponsor options", "heading": True},
+        {"text": "Student Success Sponsor: fund orientation, scholarship guidance, mentorship, and resources."},
+        {"text": "Institutional Bridge Partner: use ASCAI as a trusted communication and feedback channel."},
+        {"text": "Diaspora Innovation Partner: support ethical verified services for students and families."},
+        {"text": "Contact: info@ascai.org | ascai.org/impact-sponsorship/"},
+    ]
+    response = HttpResponse(_build_simple_pdf(lines), content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="ascai-lazio-sponsor-one-pager.pdf"'
+    return response
+
+
 class ExecutiveBoardPublicContextMixin:
     """Adds executive_board and executive_positions from governance data."""
 
@@ -222,6 +452,7 @@ class HomeView(ExecutiveBoardPublicContextMixin, TemplateView):
         context['member_resource_collections'] = MEMBER_RESOURCE_COLLECTIONS
         context['student_success_pathway'] = STUDENT_SUCCESS_PATHWAY
         context['sponsor_impact_metrics'] = SPONSOR_IMPACT_METRICS
+        context['impact_metric_cards'] = get_impact_metrics()
         context.update(get_premium_service_context())
 
         try:
@@ -260,9 +491,12 @@ class SponsorshipView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['student_success_pathway'] = STUDENT_SUCCESS_PATHWAY
         context['sponsor_impact_metrics'] = SPONSOR_IMPACT_METRICS
+        context['impact_metric_cards'] = get_impact_metrics()
         context['sponsor_packages'] = SPONSOR_PACKAGES
         context['institutional_proof_points'] = INSTITUTIONAL_PROOF_POINTS
         context['membership_benefits'] = MEMBERSHIP_BENEFIT_PILLARS
+        context['sponsor_testimonials'] = get_sponsor_testimonials()
+        context['event_case_studies'] = get_event_case_studies()
         context.update(get_premium_service_context())
         return context
 

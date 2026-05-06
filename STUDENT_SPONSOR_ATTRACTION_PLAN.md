@@ -63,10 +63,14 @@ Implemented now:
 - Home page reframed around student success and sponsor outcomes.
 - Navigation and footer link to sponsor page.
 - Shared context data for student pathway, sponsor metrics, and sponsor packages.
+- Live impact numbers from admin data: active members, orientation requests, mentorship requests, scholarship saves, and event registrations.
+- Downloadable sponsor one-pager at `/impact-sponsorship/one-pager.pdf`.
+- Conversion tracking for sponsor interest, orientation requests, and one-pager downloads.
+- Sponsor page testimonial and case-study sections using published testimonials and past event data when available.
 
 Next best execution steps:
-- Add real impact numbers from admin data: active members, orientation requests, mentorship requests, scholarship saves, event registrations.
-- Add a downloadable sponsor one-pager PDF.
-- Add “Request orientation” and “Become sponsor” conversion tracking.
-- Add testimonials from students and institutional collaborators.
-- Create sponsor-ready case studies after each event or orientation cycle.
+- Add richer admin-editable sponsor package amounts and benefits.
+- Add a designed PDF export with brand imagery and charts.
+- Add dashboard charts for conversion events and sponsor funnel performance.
+- Collect and publish more student/institutional testimonials from the admin.
+- Create a formal event case-study model with outcome notes, sponsor logos, and follow-up actions.

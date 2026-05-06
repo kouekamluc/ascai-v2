@@ -100,6 +100,48 @@ class CoreViewsTest(TestCase):
         self.assertContains(response, 'Sponsor the bridge')
         self.assertContains(response, 'Student Success Sponsor')
 
+    def test_sponsorship_view_renders_real_impact_numbers(self):
+        from datetime import date, time
+        from apps.dashboard.models import OrientationSession
+
+        user = User.objects.create_user(
+            username='impactmember',
+            email='impact@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        OrientationSession.objects.create(
+            user=user,
+            preferred_date=date.today(),
+            preferred_time=time(10, 0),
+            topics='Residence permit and university enrollment',
+        )
+
+        response = self.client.get(reverse('core:sponsorship'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Active members')
+        self.assertContains(response, 'Orientation requests')
+        self.assertContains(response, '>1<', html=False)
+
+    def test_sponsor_one_pager_pdf_downloads(self):
+        response = self.client.get(reverse('core:sponsor_one_pager'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/pdf')
+        self.assertTrue(response.content.startswith(b'%PDF'))
+
+    def test_conversion_tracking_records_sponsor_interest(self):
+        from apps.core.models import ConversionEvent
+
+        response = self.client.get(reverse('core:track_conversion', args=['sponsor_interest']))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('contact:index'))
+        self.assertTrue(
+            ConversionEvent.objects.filter(event_type='sponsor_interest').exists()
+        )
+
     def test_home_view_promotes_student_success_and_sponsorship(self):
         response = self.client.get(reverse('core:home'))
 
