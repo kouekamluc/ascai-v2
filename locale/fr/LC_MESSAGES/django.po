@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ASCAI Lazio 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 19:55+0200\n"
+"POT-Creation-Date: 2026-05-07 09:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,7 +103,7 @@ msgstr "Document Information"
 #: .\apps\dashboard\admin.py:315 .\apps\governance\admin.py:49
 #: .\apps\governance\admin.py:146
 msgid "Timestamps"
-msgstr "Timestamps"
+msgstr "Horodatages"
 
 #: .\apps\accounts\admin.py:315
 #, python-brace-format
@@ -348,7 +348,7 @@ msgstr "Rome"
 #: .\templates\students\universities_list.html:26
 #: .\templates\universities\university_list.html:87
 msgid "Latina"
-msgstr "Latina"
+msgstr "Latine"
 
 #: .\apps\accounts\models.py:89 .\apps\universities\models.py:22
 #: .\templates\students\universities_list.html:27
@@ -360,13 +360,13 @@ msgstr "Frosinone"
 #: .\templates\students\universities_list.html:28
 #: .\templates\universities\university_list.html:89
 msgid "Rieti"
-msgstr "Rieti"
+msgstr "Riéti"
 
 #: .\apps\accounts\models.py:91 .\apps\universities\models.py:20
 #: .\templates\students\universities_list.html:25
 #: .\templates\universities\university_list.html:86
 msgid "Viterbo"
-msgstr "Viterbo"
+msgstr "Viterbe"
 
 #: .\apps\accounts\models.py:99 .\templates\dashboard\profile\view.html:54
 msgid "City in Lazio"
@@ -471,12 +471,12 @@ msgstr "Autre"
 
 #: .\apps\accounts\models.py:224 .\apps\governance\models.py:2191
 msgid "Document Type"
-msgstr "Document Type"
+msgstr "Type de document"
 
 #: .\apps\accounts\models.py:229 .\apps\dashboard\models.py:401
 #: .\apps\downloads\models.py:24 .\apps\governance\models.py:2215
 msgid "File"
-msgstr "File"
+msgstr "Déposer"
 
 #: .\apps\accounts\models.py:234 .\apps\dashboard\models.py:417
 #: .\apps\dashboard\models.py:447
@@ -489,7 +489,7 @@ msgstr "Uploaded At"
 #: .\templates\governance\members\detail.html:76
 #: .\templates\governance\members\detail.html:87
 msgid "Verified"
-msgstr "V?rifi?"
+msgstr "Vérifié"
 
 #: .\apps\accounts\models.py:240
 msgid "Whether this document has been verified by an admin."
@@ -504,7 +504,7 @@ msgstr "Whether this document has been verified by an admin."
 #: .\templates\governance\elections\commission_detail.html:35
 #: .\templates\governance\executive_board\detail.html:44
 msgid "Notes"
-msgstr "Notes"
+msgstr "Remarques"
 
 #: .\apps\accounts\models.py:247
 msgid "Admin notes about this document."
@@ -618,7 +618,7 @@ msgstr "Ordre"
 #: .\templates\students\resource_detail.html:42
 #: .\templates\students\resources.html:57
 msgid "Category"
-msgstr "Category"
+msgstr "Catégorie"
 
 #: .\apps\community\models.py:22
 msgid "Categories"
@@ -657,7 +657,7 @@ msgstr "Author"
 #: .\templates\community\thread_create.html:46
 #: .\templates\community\thread_edit.html:46
 msgid "Content"
-msgstr "Content"
+msgstr "Contenu"
 
 #: .\apps\community\models.py:46 .\apps\dashboard\models.py:364
 #: .\templates\community\partials\thread_list_partial.html:10
@@ -709,7 +709,7 @@ msgstr "Thread is locked."
 #: .\apps\community\views.py:160 .\apps\dashboard\views.py:1286
 #: .\apps\mentorship\views.py:296
 msgid "Invalid form data."
-msgstr "Invalid form data."
+msgstr "Données de formulaire invalides."
 
 #: .\apps\community\views.py:235 .\apps\community\views.py:255
 #: .\apps\community\views.py:278 .\apps\community\views.py:301
@@ -735,11 +735,11 @@ msgstr "Post updated successfully."
 
 #: .\apps\community\views.py:479 .\apps\dashboard\views.py:545
 msgid "You have left the group."
-msgstr "You have left the group."
+msgstr "Vous avez quitté le groupe."
 
 #: .\apps\community\views.py:484 .\apps\dashboard\views.py:548
 msgid "You have joined the group."
-msgstr "You have joined the group."
+msgstr "Vous avez rejoint le groupe."
 
 #: .\apps\contact\admin.py:21 .\apps\universities\admin.py:30
 msgid "Contact Information"
@@ -904,7 +904,7 @@ msgstr "Branding"
 #: .\apps\core\admin.py:40 .\apps\core\admin.py:195 .\apps\core\views.py:69
 #: .\templates\diaspora\stories\submission_detail.html:65
 msgid "Visibility"
-msgstr "Visibility"
+msgstr "Visibilité"
 
 #: .\apps\core\admin.py:59 .\apps\core\models.py:32
 #: .\apps\universities\models.py:67
@@ -1319,7 +1319,7 @@ msgstr "Family and Community Life"
 
 #: .\apps\core\models.py:224 .\apps\governance\models.py:2264
 msgid "Public"
-msgstr "Public"
+msgstr "Publique"
 
 #: .\apps\core\models.py:225 .\apps\dashboard\admin.py:134
 #: .\apps\dashboard\admin.py:147 .\apps\dashboard\models.py:178
@@ -1329,7 +1329,7 @@ msgstr "Public"
 #: .\templates\downloads\document_list.html:133
 #: .\templates\downloads\document_list.html:150
 msgid "Members"
-msgstr "Members"
+msgstr "Membres"
 
 #: .\apps\core\models.py:226
 msgid "Members with Verified Referrals"
@@ -1432,7 +1432,7 @@ msgstr "Sponsor One-Pager Download"
 #: .\apps\governance\models.py:2047
 #: .\templates\governance\events\event_detail.html:15
 msgid "Event Type"
-msgstr "Event Type"
+msgstr "Type d'événement"
 
 #: .\apps\core\models.py:314
 msgid "Source Path"
@@ -1806,71 +1806,72 @@ msgstr "Inscription requise"
 
 #: .\apps\core\views.py:35
 msgid "Arrive"
-msgstr "Arrive"
+msgstr "Arriver"
 
 #: .\apps\core\views.py:36
 msgid "Settle faster in Lazio"
-msgstr "Settle faster in Lazio"
+msgstr "S'installer plus rapidement dans Lazio"
 
 #: .\apps\core\views.py:37
 msgid ""
 "Residence, housing, university, health, and city-life guidance in one "
 "trusted student dashboard."
 msgstr ""
-"Residence, housing, university, health, and city-life guidance in one "
-"trusted student dashboard."
+"Conseils en matière de résidence, de logement, d'université, de santé et de "
+"vie en ville dans un tableau de bord étudiant fiable."
 
 #: .\apps\core\views.py:40 .\templates\core\home.html:85
 msgid "Study"
-msgstr "Study"
+msgstr "Étude"
 
 #: .\apps\core\views.py:41
 msgid "Find funding and academic options"
-msgstr "Find funding and academic options"
+msgstr "Trouver des financements et des options académiques"
 
 #: .\apps\core\views.py:42
 msgid ""
 "Scholarship discovery, university comparisons, deadlines, documents, and "
 "peer advice from students who already passed through the process."
 msgstr ""
-"Scholarship discovery, university comparisons, deadlines, documents, and "
-"peer advice from students who already passed through the process."
+"Découverte des bourses, comparaisons universitaires, délais, documents et "
+"conseils des pairs d'étudiants ayant déjà suivi le processus."
 
 #: .\apps\core\views.py:45 .\templates\core\home.html:103
 msgid "Belong"
-msgstr "Belong"
+msgstr "Appartenir"
 
 #: .\apps\core\views.py:46
 msgid "Meet mentors and community"
-msgstr "Meet mentors and community"
+msgstr "Rencontrez des mentors et la communauté"
 
 #: .\apps\core\views.py:47
 msgid ""
 "Practical mentorship, events, discussion groups, and a visible Cameroonian "
 "academic network across Rome and Lazio."
 msgstr ""
-"Practical mentorship, events, discussion groups, and a visible Cameroonian "
-"academic network across Rome and Lazio."
+"Mentorat pratique, événements, groupes de discussion et réseau universitaire"
+" Cameroonien visible à travers Rome et Lazio."
 
 #: .\apps\core\views.py:50
 msgid "Advance"
-msgstr "Advance"
+msgstr "Avance"
 
 #: .\apps\core\views.py:51
 msgid "Build a credible future"
-msgstr "Build a credible future"
+msgstr "Construire un avenir crédible"
 
 #: .\apps\core\views.py:52
 msgid ""
 "Stories, leadership opportunities, referrals, and institutional visibility "
 "that help students grow beyond survival mode."
 msgstr ""
-"Stories, leadership opportunities, referrals, and institutional visibility "
-"that help students grow beyond survival mode."
+"Des histoires, des opportunités de leadership, des références et une "
+"visibilité institutionnelle qui aident les étudiants à dépasser le mode "
+"survie."
 
 #: .\apps\core\views.py:59
 msgid "Student retention"
-msgstr "Student retention"
+msgstr "Rétention des étudiants"
 
 #: .\apps\core\views.py:60 .\templates\dashboard\new_student\guide.html:72
 #: .\templates\dashboard\partials\sidebar_nav.html:23
@@ -1883,13 +1884,13 @@ msgid ""
 "Help new arrivals understand the administrative steps that often decide "
 "whether they stay enrolled and stable."
 msgstr ""
-"Help new arrivals understand the administrative steps that often decide "
-"whether they stay enrolled and stable."
+"Aidez les nouveaux arrivants à comprendre les étapes administratives qui "
+"déterminent souvent s’ils restent inscrits et stables."
 
 #: .\apps\core\views.py:64 .\apps\diaspora\models.py:40
 #: .\templates\diaspora\news_list.html:26
 msgid "Integration"
-msgstr "Integration"
+msgstr "Intégration"
 
 #: .\apps\core\views.py:65 .\templates\dashboard\home.html:210
 #: .\templates\includes\navbar.html:33 .\templates\includes\navbar.html:127
@@ -1901,210 +1902,218 @@ msgid ""
 "Support bridge-building between Cameroonian students, Italian institutions, "
 "local services, and diaspora families."
 msgstr ""
-"Support bridge-building between Cameroonian students, Italian institutions, "
-"local services, and diaspora families."
+"Soutenir la création de ponts entre les étudiants Camerooniens, les "
+"institutions Italian, les services locaux et les familles de la diaspora."
 
 #: .\apps\core\views.py:70
 msgid "Reporting"
-msgstr "Reporting"
+msgstr "Rapports"
 
 #: .\apps\core\views.py:71
 msgid ""
 "Give sponsors a clear, reportable view of activities, resource usage, "
 "events, and student support outcomes."
 msgstr ""
-"Give sponsors a clear, reportable view of activities, resource usage, "
-"events, and student support outcomes."
+"Donnez aux sponsors une vue claire et consultable des activités, de "
+"l’utilisation des ressources, des événements et des résultats du soutien aux"
+" étudiants."
 
 #: .\apps\core\views.py:78
 msgid "Student Success Sponsor"
-msgstr "Student Success Sponsor"
+msgstr "Parrain de la réussite des étudiants"
 
 #: .\apps\core\views.py:79
 msgid "Universities, regional offices, foundations"
-msgstr "Universities, regional offices, foundations"
+msgstr "Universités, bureaux régionaux, fondations"
 
 #: .\apps\core\views.py:80
 msgid ""
 "Fund orientation sessions, scholarship guidance, and practical student "
 "support for Cameroonian newcomers in Lazio."
 msgstr ""
-"Fund orientation sessions, scholarship guidance, and practical student "
-"support for Cameroonian newcomers in Lazio."
+"Financez des séances d’orientation, des conseils en matière de bourses et un"
+" soutien pratique aux étudiants pour les nouveaux arrivants Cameroonian en "
+"Lazio."
 
 #: .\apps\core\views.py:81
 msgid ""
 "Impact report, public recognition, event presence, and student-facing "
 "visibility."
 msgstr ""
-"Impact report, public recognition, event presence, and student-facing "
-"visibility."
+"Rapport d'impact, reconnaissance publique, présence à l'événement et "
+"visibilité auprès des étudiants."
 
 #: .\apps\core\views.py:84
 msgid "Institutional Bridge Partner"
-msgstr "Institutional Bridge Partner"
+msgstr "Partenaire pont institutionnel"
 
 #: .\apps\core\views.py:85
 msgid "Embassy, consular offices, integration services"
-msgstr "Embassy, consular offices, integration services"
+msgstr "Ambassade, bureaux consulaires, services d'intégration"
 
 #: .\apps\core\views.py:86
 msgid ""
 "Use ASCAI as an organized channel for communication, verified resources, and"
 " community feedback."
 msgstr ""
-"Use ASCAI as an organized channel for communication, verified resources, and"
-" community feedback."
+"Utilisez ASCAI comme canal organisé pour la communication, les ressources "
+"vérifiées et les commentaires de la communauté."
 
 #: .\apps\core\views.py:87
 msgid ""
 "Cleaner outreach, reduced misinformation, documented community needs, and "
 "trusted local coordination."
 msgstr ""
-"Cleaner outreach, reduced misinformation, documented community needs, and "
-"trusted local coordination."
+"Une sensibilisation plus propre, une réduction de la désinformation, des "
+"besoins communautaires documentés et une coordination locale fiable."
 
 #: .\apps\core\views.py:90
 msgid "Diaspora Innovation Partner"
-msgstr "Diaspora Innovation Partner"
+msgstr "Partenaire d'innovation de la diaspora"
 
 #: .\apps\core\views.py:91
 msgid "Companies, service providers, banks, remittance operators"
-msgstr "Companies, service providers, banks, remittance operators"
+msgstr ""
+"Entreprises, prestataires de services, banques, opérateurs de transfert de "
+"fonds"
 
 #: .\apps\core\views.py:92
 msgid ""
 "Reach Cameroonian students and families through verified, ethical, needs-"
 "based offers."
 msgstr ""
-"Reach Cameroonian students and families through verified, ethical, needs-"
-"based offers."
+"Atteignez les étudiants et les familles Cameroonian grâce à des offres "
+"vérifiées, éthiques et basées sur les besoins."
 
 #: .\apps\core\views.py:93
 msgid ""
 "Partner listing, targeted campaigns, feedback loops, and measurable referral"
 " opportunities."
 msgstr ""
-"Partner listing, targeted campaigns, feedback loops, and measurable referral"
-" opportunities."
+"Liste des partenaires, campagnes ciblées, boucles de rétroaction et "
+"opportunités de parrainage mesurables."
 
 #: .\apps\core\views.py:99
 msgid "A multilingual platform for English, French, and Italian audiences."
-msgstr "A multilingual platform for English, French, and Italian audiences."
+msgstr ""
+"Une plateforme multilingue pour le public anglais, français et Italian."
 
 #: .\apps\core\views.py:100
 msgid ""
 "Authenticated student dashboards for resources, requests, documents, events,"
 " and mentorship."
 msgstr ""
-"Authenticated student dashboards for resources, requests, documents, events,"
-" and mentorship."
+"Tableaux de bord des étudiants authentifiés pour les ressources, les "
+"demandes, les documents, les événements et le mentorat."
 
 #: .\apps\core\views.py:101
 msgid ""
 "Governance and dues features that show ASCAI is building an accountable "
 "association, not only a social page."
 msgstr ""
-"Governance and dues features that show ASCAI is building an accountable "
-"association, not only a social page."
+"Des fonctionnalités de gouvernance et de cotisation qui montrent que ASCAI "
+"construit une association responsable, et pas seulement une page sociale."
 
 #: .\apps\core\views.py:102
 msgid ""
 "A sponsorship story that connects student success, integration, community "
 "safety, and diaspora diplomacy."
 msgstr ""
-"A sponsorship story that connects student success, integration, community "
-"safety, and diaspora diplomacy."
+"Une histoire de parrainage qui relie la réussite des étudiants, "
+"l’intégration, la sécurité communautaire et la diplomatie de la diaspora."
 
 #: .\apps\core\views.py:193
 msgid "Active members"
-msgstr "Active members"
+msgstr "Membres actifs"
 
 #: .\apps\core\views.py:195
 msgid "Approved members reachable through ASCAI channels."
-msgstr "Approved members reachable through ASCAI channels."
+msgstr "Membres approuvés accessibles via les canaux ASCAI."
 
 #: .\apps\core\views.py:199
 msgid "Orientation requests"
-msgstr "Orientation requests"
+msgstr "Demandes d'orientation"
 
 #: .\apps\core\views.py:201
 msgid "Students asking for practical settlement guidance."
-msgstr "Students asking for practical settlement guidance."
+msgstr ""
+"Les étudiants demandent des conseils pratiques en matière d’installation."
 
 #: .\apps\core\views.py:205 .\templates\dashboard\home.html:108
 msgid "Mentorship requests"
-msgstr "Mentorship requests"
+msgstr "Demandes de mentorat"
 
 #: .\apps\core\views.py:207
 msgid "Peer and mentor connections initiated through the platform."
-msgstr "Peer and mentor connections initiated through the platform."
+msgstr "Connexions entre pairs et mentors initiées via la plateforme."
 
 #: .\apps\core\views.py:211
 msgid "Scholarship saves"
-msgstr "Scholarship saves"
+msgstr "Les bourses d’études sauvent"
 
 # Scholarship and University UX Refresh
 #: .\apps\core\views.py:213
 msgid "Funding opportunities students marked for action."
-msgstr "Funding opportunities students marked for action."
+msgstr "Possibilités de financement pour les étudiants marqués pour l'action."
 
 #: .\apps\core\views.py:217
 msgid "Event registrations"
-msgstr "Event registrations"
+msgstr "Inscriptions aux événements"
 
 #: .\apps\core\views.py:219
 msgid "Measurable participation in community activities."
-msgstr "Measurable participation in community activities."
+msgstr "Participation mesurable aux activités communautaires."
 
 #: .\apps\core\views.py:242
 msgid "New student in Lazio"
-msgstr "New student in Lazio"
+msgstr "Nouvel étudiant à Lazio"
 
 #: .\apps\core\views.py:243
 msgid "Student support voice"
-msgstr "Student support voice"
+msgstr "Voix de soutien des étudiants"
 
 #: .\apps\core\views.py:244
 msgid ""
 "What students need most is a trusted first place to ask practical questions "
 "before small mistakes become expensive problems."
 msgstr ""
-"What students need most is a trusted first place to ask practical questions "
-"before small mistakes become expensive problems."
+"Ce dont les étudiants ont le plus besoin, c'est d'un premier endroit fiable "
+"où poser des questions pratiques avant que de petites erreurs ne se "
+"transforment en problèmes coûteux."
 
 # Community Translations
 #: .\apps\core\views.py:247
 msgid "Community collaborator"
-msgstr "Community collaborator"
+msgstr "Collaborateur communautaire"
 
 #: .\apps\core\views.py:248
 msgid "Institutional partner voice"
-msgstr "Institutional partner voice"
+msgstr "La voix des partenaires institutionnels"
 
 #: .\apps\core\views.py:249
 msgid ""
 "A structured student association makes outreach clearer, faster, and more "
 "accountable for everyone involved."
 msgstr ""
-"A structured student association makes outreach clearer, faster, and more "
-"accountable for everyone involved."
+"Une association étudiante structurée rend la sensibilisation plus claire, "
+"plus rapide et plus responsable pour toutes les personnes impliquées."
 
 #: .\apps\core\views.py:281
 msgid "Orientation and integration cycle"
-msgstr "Orientation and integration cycle"
+msgstr "Cycle d'orientation et d'intégration"
 
 #: .\apps\core\views.py:283
 msgid "Rome and Lazio"
-msgstr "Rome and Lazio"
+msgstr "Rome et Lazio"
 
 #: .\apps\core\views.py:286
 msgid ""
 "Use each ASCAI event as a sponsor-ready case study: objective, audience, "
 "attendance, questions raised, follow-up resources, and next action."
 msgstr ""
-"Use each ASCAI event as a sponsor-ready case study: objective, audience, "
-"attendance, questions raised, follow-up resources, and next action."
+"Utilisez chaque événement ASCAI comme une étude de cas prête à être "
+"sponsorisée : objectif, public, participation, questions soulevées, "
+"ressources de suivi et action suivante."
 
 #: .\apps\dashboard\admin.py:48
 msgid "Ticket Information"
@@ -2372,7 +2381,7 @@ msgstr "Featured groups appear prominently on the groups directory."
 #: .\apps\dashboard\models.py:219 .\apps\gallery\models.py:37
 #: .\apps\gallery\models.py:115 .\apps\governance\models.py:1037
 msgid "Created By"
-msgstr "Created By"
+msgstr "Créé par"
 
 #: .\apps\dashboard\models.py:233
 msgid "Community Group"
@@ -2452,7 +2461,7 @@ msgstr "En examen"
 #: .\templates\governance\member_portal\assembly_participate.html:136
 #: .\templates\governance\member_portal\assembly_participate.html:235
 msgid "Published"
-msgstr "Published"
+msgstr "Publié"
 
 #: .\apps\dashboard\models.py:467
 msgid "Declined"
@@ -2546,7 +2555,7 @@ msgstr "Reviewed At"
 
 #: .\apps\dashboard\models.py:576 .\apps\governance\models.py:872
 msgid "Published Date"
-msgstr "Published Date"
+msgstr "Date de publication"
 
 #: .\apps\dashboard\models.py:577
 msgid ""
@@ -2568,7 +2577,7 @@ msgstr "Story Submissions"
 #: .\apps\governance\models.py:2137
 #: .\templates\dashboard\events\history.html:15
 msgid "Event"
-msgstr "Event"
+msgstr "Événement"
 
 #: .\apps\dashboard\models.py:624 .\templates\dashboard\events\history.html:24
 #: .\templates\dashboard\events\ticket.html:34
@@ -2591,7 +2600,7 @@ msgstr "Présent"
 
 #: .\apps\dashboard\models.py:635 .\apps\governance\models.py:775
 msgid "Registered At"
-msgstr "Registered At"
+msgstr "Inscrit à"
 
 #: .\apps\dashboard\models.py:639
 msgid "Event Registration"
@@ -2687,21 +2696,21 @@ msgstr "Pending Review"
 
 #: .\apps\dashboard\views.py:154
 msgid "Not generated"
-msgstr "Not generated"
+msgstr "Non généré"
 
 #: .\apps\dashboard\views.py:222
 #: .\templates\dashboard\mentorship\profile_update.html:54
 #: .\templates\mentorship\mentor_profile_update.html:56
 msgid "Update Profile"
-msgstr "Update Profile"
+msgstr "Mettre à jour le profil"
 
 #: .\apps\dashboard\views.py:223
 msgid "Book Orientation"
-msgstr "Book Orientation"
+msgstr "Orientation du livre"
 
 #: .\apps\dashboard\views.py:224
 msgid "Ask Student Question"
-msgstr "Ask Student Question"
+msgstr "Poser une question à l'étudiant"
 
 #: .\apps\dashboard\views.py:225
 #: .\templates\dashboard\partials\sidebar_nav.html:29
@@ -2716,12 +2725,12 @@ msgstr "Créer un ticket"
 
 #: .\apps\dashboard\views.py:227
 msgid "Browse Groups"
-msgstr "Browse Groups"
+msgstr "Parcourir les groupes"
 
 #: .\apps\dashboard\views.py:234
 #: .\templates\dashboard\partials\sidebar_nav.html:12
 msgid "My Membership"
-msgstr "My Membership"
+msgstr "Mon adhésion"
 
 # Governance Translations
 #: .\apps\dashboard\views.py:244
@@ -2738,51 +2747,51 @@ msgstr "Transactions financières"
 
 #: .\apps\dashboard\views.py:328 .\apps\dashboard\views.py:331
 msgid "Profile updated successfully."
-msgstr "Profile updated successfully."
+msgstr "Profil mis à jour avec succès."
 
 #: .\apps\dashboard\views.py:344
 msgid "Password changed successfully."
-msgstr "Password changed successfully."
+msgstr "Le mot de passe a été modifié avec succès."
 
 #: .\apps\dashboard\views.py:357
 msgid "Document uploaded successfully."
-msgstr "Document uploaded successfully."
+msgstr "Document téléchargé avec succès."
 
 #: .\apps\dashboard\views.py:375
 msgid "Document deleted successfully."
-msgstr "Document deleted successfully."
+msgstr "Document supprimé avec succès."
 
 #: .\apps\dashboard\views.py:397
 msgid "Notification preferences updated."
-msgstr "Notification preferences updated."
+msgstr "Préférences de notification mises à jour."
 
 #: .\apps\dashboard\views.py:422
 msgid "Support ticket created successfully."
-msgstr "Support ticket created successfully."
+msgstr "Ticket d'assistance créé avec succès."
 
 #: .\apps\dashboard\views.py:472
 msgid "Your reply has been sent."
-msgstr "Your reply has been sent."
+msgstr "Votre réponse a été envoyée."
 
 #: .\apps\dashboard\views.py:477
 msgid "Please correct the errors below."
-msgstr "Please correct the errors below."
+msgstr "Veuillez corriger les erreurs ci-dessous."
 
 #: .\apps\dashboard\views.py:539
 msgid "Your account must be approved to join groups."
-msgstr "Your account must be approved to join groups."
+msgstr "Votre compte doit être approuvé pour rejoindre des groupes."
 
 #: .\apps\dashboard\views.py:561
 msgid "You must be a member to create discussions."
-msgstr "You must be a member to create discussions."
+msgstr "Vous devez être membre pour créer des discussions."
 
 #: .\apps\dashboard\views.py:573
 msgid "Discussion created successfully."
-msgstr "Discussion created successfully."
+msgstr "Discussion créée avec succès."
 
 #: .\apps\dashboard\views.py:611
 msgid "Story submitted successfully. It will be reviewed by an admin."
-msgstr "Story submitted successfully. It will be reviewed by an admin."
+msgstr "Histoire soumise avec succès. Il sera examiné par un administrateur."
 
 #: .\apps\dashboard\views.py:658 .\apps\diaspora\views.py:400
 msgid "Your account must be approved to register for events."
@@ -2807,23 +2816,23 @@ msgstr "Inscription a l evenement reussie."
 
 #: .\apps\dashboard\views.py:764
 msgid "Your account must be approved to download documents."
-msgstr "Your account must be approved to download documents."
+msgstr "Votre compte doit être approuvé pour télécharger des documents."
 
 #: .\apps\dashboard\views.py:792
 msgid "Your account must be approved to save documents."
-msgstr "Your account must be approved to save documents."
+msgstr "Votre compte doit être approuvé pour enregistrer des documents."
 
 #: .\apps\dashboard\views.py:802
 msgid "Document removed from saved items."
-msgstr "Document removed from saved items."
+msgstr "Document supprimé des éléments enregistrés."
 
 #: .\apps\dashboard\views.py:804
 msgid "Document saved to your list."
-msgstr "Document saved to your list."
+msgstr "Document enregistré dans votre liste."
 
 #: .\apps\dashboard\views.py:830 .\apps\dashboard\views.py:878
 msgid "Residence Permit (Permesso di Soggiorno)"
-msgstr "Residence Permit (Permesso di Soggiorno)"
+msgstr "Permis de séjour (Permesso di Soggiorno)"
 
 #: .\apps\dashboard\views.py:831 .\apps\dashboard\views.py:879
 msgid ""
@@ -2831,13 +2840,14 @@ msgid ""
 " include passport, visa, proof of enrollment, and health insurance. Visit "
 "the local Questura (police station) to submit your application."
 msgstr ""
-"Apply for your residence permit within 8 days of arrival. Required documents"
-" include passport, visa, proof of enrollment, and health insurance. Visit "
-"the local Questura (police station) to submit your application."
+"Demandez votre permis de séjour dans les 8 jours suivant votre arrivée. Les "
+"documents requis comprennent le passeport, le visa, la preuve d'inscription "
+"et l'assurance maladie. Visitez la Questura (commissariat de police) locale "
+"pour soumettre votre demande."
 
 #: .\apps\dashboard\views.py:835 .\apps\dashboard\views.py:889
 msgid "Codice Fiscale"
-msgstr "Codice Fiscale"
+msgstr "Code Fiscal"
 
 #: .\apps\dashboard\views.py:836
 msgid ""
@@ -2846,15 +2856,15 @@ msgid ""
 "including opening a bank account, signing contracts, and accessing "
 "healthcare services."
 msgstr ""
-"Obtain your tax code (Codice Fiscale) from the local tax office (Agenzia "
-"delle Entrate). This is required for many administrative procedures "
-"including opening a bank account, signing contracts, and accessing "
-"healthcare services."
+"Obtenez votre code fiscal (Codice Fiscale) auprès du bureau des impôts local"
+" (Agenzia delle Entrate). Cela est nécessaire pour de nombreuses démarches "
+"administratives, notamment l’ouverture d’un compte bancaire, la signature de"
+" contrats et l’accès aux services de santé."
 
 #: .\apps\dashboard\views.py:840 .\apps\dashboard\views.py:899
 #: .\apps\students\models.py:115
 msgid "University Enrollment"
-msgstr "University Enrollment"
+msgstr "Inscription à l'université"
 
 #: .\apps\dashboard\views.py:841
 msgid ""
@@ -2862,13 +2872,14 @@ msgid ""
 "international office for specific requirements. You will typically need your"
 " diploma, transcript, passport, and residence permit."
 msgstr ""
-"Complete your university enrollment process. Contact your university's "
-"international office for specific requirements. You will typically need your"
-" diploma, transcript, passport, and residence permit."
+"Terminez votre processus d’inscription à l’université. Contactez le bureau "
+"international de votre université pour connaître les exigences spécifiques. "
+"Vous aurez généralement besoin de votre diplôme, de votre relevé de notes, "
+"de votre passeport et de votre permis de séjour."
 
 #: .\apps\dashboard\views.py:845 .\apps\dashboard\views.py:910
 msgid "Health Insurance (SSN)"
-msgstr "Health Insurance (SSN)"
+msgstr "Assurance Maladie (SSN)"
 
 #: .\apps\dashboard\views.py:846
 msgid ""
@@ -2876,15 +2887,15 @@ msgid ""
 "Nazionale) for healthcare coverage. This requires your residence permit, "
 "Codice Fiscale, and proof of enrollment."
 msgstr ""
-"Register with the Italian National Health Service (Servizio Sanitario "
-"Nazionale) for healthcare coverage. This requires your residence permit, "
-"Codice Fiscale, and proof of enrollment."
+"Inscrivez-vous auprès du service national de santé Italian (Servizio "
+"Sanitario Nazionale) pour bénéficier d'une couverture santé. Cela nécessite "
+"votre permis de séjour, Codice Fiscale, et une preuve d'inscription."
 
 #: .\apps\dashboard\views.py:850 .\apps\dashboard\views.py:920
 #: .\apps\diaspora\models.py:402
 #: .\templates\diaspora\life_in_italy_list.html:23
 msgid "Housing"
-msgstr "Housing"
+msgstr "Logement"
 
 #: .\apps\dashboard\views.py:851
 msgid ""
@@ -2892,218 +2903,219 @@ msgid ""
 "(Comune). You will need a rental contract and your residence permit for "
 "registration."
 msgstr ""
-"Find accommodation and register your address with the local municipality "
-"(Comune). You will need a rental contract and your residence permit for "
-"registration."
+"Trouvez un logement et enregistrez votre adresse auprès de la municipalité "
+"locale (Comune). Vous aurez besoin d'un contrat de location et de votre "
+"titre de séjour pour vous inscrire."
 
 #: .\apps\dashboard\views.py:881
 msgid ""
 "Gather required documents: passport, visa, proof of enrollment, health "
 "insurance, proof of accommodation"
 msgstr ""
-"Gather required documents: passport, visa, proof of enrollment, health "
-"insurance, proof of accommodation"
+"Rassemblez les documents requis : passeport, visa, justificatif "
+"d'inscription, assurance maladie, justificatif d'hébergement"
 
 #: .\apps\dashboard\views.py:882
 msgid "Book an appointment at the Questura (police station)"
-msgstr "Book an appointment at the Questura (police station)"
+msgstr "Prendre rendez-vous à la Questura (commissariat de police)"
 
 #: .\apps\dashboard\views.py:883
 msgid "Submit your application and pay the required fees"
-msgstr "Submit your application and pay the required fees"
+msgstr "Soumettez votre candidature et payez les frais requis"
 
 #: .\apps\dashboard\views.py:884
 msgid "Wait for processing (usually 30-60 days)"
-msgstr "Wait for processing (usually 30-60 days)"
+msgstr "Attendez le traitement (généralement 30 à 60 jours)"
 
 #: .\apps\dashboard\views.py:885
 msgid "Collect your residence permit when ready"
-msgstr "Collect your residence permit when ready"
+msgstr "Récupérez votre titre de séjour lorsque vous êtes prêt"
 
 #: .\apps\dashboard\views.py:890
 msgid ""
 "Obtain your tax code (Codice Fiscale) from the local tax office (Agenzia "
 "delle Entrate). This is required for many administrative procedures."
 msgstr ""
-"Obtain your tax code (Codice Fiscale) from the local tax office (Agenzia "
-"delle Entrate). This is required for many administrative procedures."
+"Obtenez votre code fiscal (Codice Fiscale) auprès du bureau des impôts local"
+" (Agenzia delle Entrate). Ceci est nécessaire pour de nombreuses démarches "
+"administratives."
 
 #: .\apps\dashboard\views.py:892
 msgid "Visit the Agenzia delle Entrate office"
-msgstr "Visit the Agenzia delle Entrate office"
+msgstr "Visitez le bureau de l'Agence delle Entrate"
 
 #: .\apps\dashboard\views.py:893
 msgid "Bring your passport and visa"
-msgstr "Bring your passport and visa"
+msgstr "Apportez votre passeport et votre visa"
 
 #: .\apps\dashboard\views.py:894
 msgid "Fill out the application form"
-msgstr "Fill out the application form"
+msgstr "Remplissez le formulaire de candidature"
 
 #: .\apps\dashboard\views.py:895
 msgid "Receive your Codice Fiscale immediately"
-msgstr "Receive your Codice Fiscale immediately"
+msgstr "Recevez immédiatement votre Codice Fiscale"
 
 #: .\apps\dashboard\views.py:900
 msgid ""
 "Complete your university enrollment process. Contact your university's "
 "international office for specific requirements."
 msgstr ""
-"Complete your university enrollment process. Contact your university's "
-"international office for specific requirements."
+"Terminez votre processus d’inscription à l’université. Contactez le bureau "
+"international de votre université pour connaître les exigences spécifiques."
 
 #: .\apps\dashboard\views.py:902
 msgid "Contact the international office of your university"
-msgstr "Contact the international office of your university"
+msgstr "Contactez le bureau international de votre université"
 
 #: .\apps\dashboard\views.py:903
 msgid "Submit required documents (diploma, transcript, passport)"
-msgstr "Submit required documents (diploma, transcript, passport)"
+msgstr "Soumettre les documents requis (diplôme, relevé de notes, passeport)"
 
 #: .\apps\dashboard\views.py:904
 msgid "Pay enrollment fees"
-msgstr "Pay enrollment fees"
+msgstr "Payer les frais d'inscription"
 
 #: .\apps\dashboard\views.py:905
 msgid "Complete any required language tests"
-msgstr "Complete any required language tests"
+msgstr "Effectuez tous les tests de langue requis"
 
 #: .\apps\dashboard\views.py:906
 msgid "Receive your student ID card"
-msgstr "Receive your student ID card"
+msgstr "Recevez votre carte d'étudiant"
 
 #: .\apps\dashboard\views.py:911
 msgid ""
 "Register with the Italian National Health Service (Servizio Sanitario "
 "Nazionale) for healthcare coverage."
 msgstr ""
-"Register with the Italian National Health Service (Servizio Sanitario "
-"Nazionale) for healthcare coverage."
+"Inscrivez-vous auprès du service national de santé Italian (Servizio "
+"Sanitario Nazionale) pour bénéficier d'une couverture santé."
 
 #: .\apps\dashboard\views.py:913
 msgid "Obtain your residence permit and Codice Fiscale"
-msgstr "Obtain your residence permit and Codice Fiscale"
+msgstr "Obtenez votre permis de séjour et votre Codice Fiscale"
 
 #: .\apps\dashboard\views.py:914
 msgid "Visit the local ASL (Azienda Sanitaria Locale) office"
-msgstr "Visit the local ASL (Azienda Sanitaria Locale) office"
+msgstr "Visitez le bureau local de l'ASL (Azienda Sanitaria Locale)"
 
 #: .\apps\dashboard\views.py:915
 msgid "Submit your application with required documents"
-msgstr "Submit your application with required documents"
+msgstr "Soumettez votre candidature avec les documents requis"
 
 #: .\apps\dashboard\views.py:916
 msgid "Receive your health insurance card"
-msgstr "Receive your health insurance card"
+msgstr "Recevez votre carte d'assurance maladie"
 
 #: .\apps\dashboard\views.py:921
 msgid ""
 "Find accommodation and register your address with the local municipality "
 "(Comune)."
 msgstr ""
-"Find accommodation and register your address with the local municipality "
-"(Comune)."
+"Trouvez un logement et enregistrez votre adresse auprès de la municipalité "
+"locale (Comune)."
 
 #: .\apps\dashboard\views.py:923
 msgid ""
 "Search for accommodation (university housing, private rentals, shared "
 "apartments)"
 msgstr ""
-"Search for accommodation (university housing, private rentals, shared "
-"apartments)"
+"Recherche de logement (logements universitaires, locations privées, "
+"colocations)"
 
 #: .\apps\dashboard\views.py:924
 msgid "Sign a rental contract"
-msgstr "Sign a rental contract"
+msgstr "Signer un contrat de location"
 
 #: .\apps\dashboard\views.py:925
 msgid "Register your address at the Comune"
-msgstr "Register your address at the Comune"
+msgstr "Enregistrez votre adresse à la Comune"
 
 #: .\apps\dashboard\views.py:926
 msgid "Set up utilities (electricity, gas, internet)"
-msgstr "Set up utilities (electricity, gas, internet)"
+msgstr "Mettre en place les services publics (électricité, gaz, internet)"
 
 #: .\apps\dashboard\views.py:932
 msgid "Guide Not Found"
-msgstr "Guide Not Found"
+msgstr "Guide introuvable"
 
 #: .\apps\dashboard\views.py:933
 msgid "The requested guide section was not found."
-msgstr "The requested guide section was not found."
+msgstr "La section du guide demandée n'a pas été trouvée."
 
 #: .\apps\dashboard\views.py:967
 msgid "Question submitted successfully."
-msgstr "Question submitted successfully."
+msgstr "Question soumise avec succès."
 
 #: .\apps\dashboard\views.py:1003
 msgid ""
 "You already have an active orientation request. We updated your dashboard so"
 " you can track it below."
 msgstr ""
-"You already have an active orientation request. We updated your dashboard so"
-" you can track it below."
+"Vous avez déjà une demande d'orientation active. Nous avons mis à jour votre"
+" tableau de bord afin que vous puissiez le suivre ci-dessous."
 
 #: .\apps\dashboard\views.py:1008
 msgid "Orientation session requested. You will be contacted soon."
-msgstr "Orientation session requested. You will be contacted soon."
+msgstr "Séance d'orientation demandée. Vous serez contacté prochainement."
 
 #: .\apps\dashboard\views.py:1066
 msgid "Only mentors can create mentor profiles."
-msgstr "Only mentors can create mentor profiles."
+msgstr "Seuls les mentors peuvent créer des profils de mentor."
 
 #: .\apps\dashboard\views.py:1071
 msgid "You already have a mentor profile."
-msgstr "You already have a mentor profile."
+msgstr "Vous avez déjà un profil de mentor."
 
 #: .\apps\dashboard\views.py:1081
 msgid ""
 "Mentor profile created! It will be reviewed by an admin before being "
 "published."
 msgstr ""
-"Mentor profile created! It will be reviewed by an admin before being "
-"published."
+"Profil de mentor créé ! Il sera examiné par un administrateur avant d'être "
+"publié."
 
 #: .\apps\dashboard\views.py:1096
 msgid "Only mentors can update mentor profiles."
-msgstr "Only mentors can update mentor profiles."
+msgstr "Seuls les mentors peuvent mettre à jour les profils de mentor."
 
 #: .\apps\dashboard\views.py:1110 .\apps\mentorship\views.py:379
 msgid "Mentor profile updated successfully!"
-msgstr "Mentor profile updated successfully!"
+msgstr "Profil de mentor mis à jour avec succès !"
 
 #: .\apps\dashboard\views.py:1121
 msgid "Only mentors can access this page."
-msgstr "Only mentors can access this page."
+msgstr "Seuls les mentors peuvent accéder à cette page."
 
 #: .\apps\dashboard\views.py:1261 .\apps\mentorship\services.py:63
 #: .\apps\mentorship\views.py:272
 msgid "Request must be accepted to send messages."
-msgstr "Request must be accepted to send messages."
+msgstr "La demande doit être acceptée pour envoyer des messages."
 
 #: .\apps\dashboard\views.py:1308
 msgid "Mentorship request accepted successfully!"
-msgstr "Mentorship request accepted successfully!"
+msgstr "Demande de mentorat acceptée avec succès !"
 
 #: .\apps\dashboard\views.py:1338
 msgid "Mentorship request rejected."
-msgstr "Mentorship request rejected."
+msgstr "Demande de mentorat rejetée."
 
 #: .\apps\dashboard\views.py:1368 .\apps\mentorship\views.py:398
 msgid "Mentorship request marked as completed."
-msgstr "Mentorship request marked as completed."
+msgstr "Demande de mentorat marquée comme complétée."
 
 #: .\apps\dashboard\views.py:1398
 msgid "Availability status updated successfully."
-msgstr "Availability status updated successfully."
+msgstr "État de disponibilité mis à jour avec succès."
 
 #: .\apps\dashboard\views.py:1497 .\apps\mentorship\services.py:40
 msgid "Only students can create mentorship requests."
-msgstr "Only students can create mentorship requests."
+msgstr "Seuls les étudiants peuvent créer des demandes de mentorat."
 
 #: .\apps\dashboard\views.py:1536 .\apps\mentorship\views.py:191
 msgid "Mentorship request sent successfully!"
-msgstr "Mentorship request sent successfully!"
+msgstr "Demande de mentorat envoyée avec succès !"
 
 #: .\apps\diaspora\admin.py:28 .\apps\diaspora\admin.py:104
 #: .\apps\diaspora\admin.py:151 .\apps\diaspora\admin.py:182
@@ -3248,7 +3260,7 @@ msgstr "Éducatif"
 #: .\apps\diaspora\models.py:122 .\apps\governance\models.py:2031
 #: .\templates\diaspora\event_list.html:40
 msgid "Social"
-msgstr "Social"
+msgstr "Sociale"
 
 #: .\apps\diaspora\models.py:123 .\templates\diaspora\event_list.html:41
 msgid "Networking"
@@ -3321,7 +3333,7 @@ msgstr "Allow users to join waitlist when event is full"
 #: .\templates\students\guide_section_detail.html:81
 #: .\templates\students\guide_step_detail.html:50
 msgid "Related Resources"
-msgstr "Related Resources"
+msgstr "Ressources connexes"
 
 #: .\apps\diaspora\models.py:202
 msgid "Documents related to this event"
@@ -3395,7 +3407,7 @@ msgstr "Bureaucracy"
 #: .\templates\diaspora\life_in_italy_list.html:21
 #: .\templates\students\living_guide.html:40
 msgid "Healthcare"
-msgstr "Healthcare"
+msgstr "Soins de santé"
 
 #: .\apps\diaspora\models.py:401
 #: .\templates\diaspora\life_in_italy_list.html:22
@@ -3416,7 +3428,7 @@ msgstr "Education"
 #: .\templates\diaspora\life_in_italy_list.html:26
 #: .\templates\students\living_guide.html:33
 msgid "Transportation"
-msgstr "Transportation"
+msgstr "Transport"
 
 #: .\apps\diaspora\models.py:433
 msgid "Featured articles appear on the main diaspora page."
@@ -3469,7 +3481,7 @@ msgstr "Upload Information"
 
 #: .\apps\downloads\admin.py:35 .\templates\students\resource_detail.html:53
 msgid "File Size"
-msgstr "File Size"
+msgstr "Taille du fichier"
 
 #: .\apps\downloads\forms.py:12 .\templates\community\groups\list.html:33
 #: .\templates\community\thread_list.html:33
@@ -3484,7 +3496,7 @@ msgstr "Tags (comma-separated)"
 
 #: .\apps\downloads\forms.py:29 .\templates\students\resources.html:69
 msgid "Search documents..."
-msgstr "Search documents..."
+msgstr "Rechercher des documents..."
 
 #: .\apps\downloads\forms.py:34 .\templates\downloads\document_list.html:115
 msgid "Most Recent"
@@ -3500,21 +3512,21 @@ msgstr "Name (A-Z)"
 
 #: .\apps\downloads\models.py:15 .\templates\students\resources.html:60
 msgid "Reddìto Forms"
-msgstr "Reddìto Forms"
+msgstr "Formulaires Reddìto"
 
 #: .\apps\downloads\models.py:16 .\templates\downloads\document_list.html:108
 #: .\templates\students\resources.html:61
 msgid "Enrollment Documents"
-msgstr "Enrollment Documents"
+msgstr "Documents d'inscription"
 
 #: .\apps\downloads\models.py:17 .\templates\downloads\document_list.html:109
 #: .\templates\students\resources.html:62
 msgid "Visa-Related Documents"
-msgstr "Visa-Related Documents"
+msgstr "Documents relatifs aux visas"
 
 #: .\apps\downloads\models.py:18 .\templates\students\resources.html:63
 msgid "ASCAI Lazio Guidelines"
-msgstr "ASCAI Lazio Guidelines"
+msgstr "ASCAI Lazio Lignes directrices"
 
 #: .\apps\downloads\models.py:29 .\apps\gallery\models.py:98
 msgid "Thumbnail"
@@ -3583,7 +3595,7 @@ msgstr "Date after which document is no longer available"
 
 #: .\apps\downloads\models.py:87 .\templates\students\resource_detail.html:47
 msgid "File Type"
-msgstr "File Type"
+msgstr "Type de fichier"
 
 #: .\apps\downloads\models.py:88
 msgid "Automatically detected from file extension."
@@ -3655,19 +3667,21 @@ msgstr "Gallery Videos"
 
 #: .\apps\governance\admin.py:32
 msgid "Search members by username, email, or full name."
-msgstr "Search members by username, email, or full name."
+msgstr "Recherchez des membres par nom d'utilisateur, e-mail ou nom complet."
 
 #: .\apps\governance\admin.py:37 .\templates\governance\members\detail.html:26
 msgid "Member Information"
-msgstr "Member Information"
+msgstr "Informations sur les membres"
 
 #: .\apps\governance\admin.py:40
 msgid "Verification"
-msgstr "Verification"
+msgstr "Vérification"
 
 #: .\apps\governance\admin.py:95
 msgid "Search by role title or board member name."
-msgstr "Search by role title or board member name."
+msgstr ""
+"Recherchez par titre de rôle ou par nom de membre du conseil "
+"d'administration."
 
 #: .\apps\governance\admin.py:102 .\apps\governance\models.py:313
 #: .\apps\governance\models.py:1569 .\apps\governance\models.py:1648
@@ -3677,15 +3691,15 @@ msgstr "Position"
 
 #: .\apps\governance\admin.py:134
 msgid "Assembly Information"
-msgstr "Assembly Information"
+msgstr "Informations sur l'assemblage"
 
 #: .\apps\governance\admin.py:137 .\apps\governance\models.py:509
 msgid "Minutes (English)"
-msgstr "Minutes (English)"
+msgstr "Procès-verbal (anglais)"
 
 #: .\apps\governance\admin.py:140 .\apps\governance\models.py:515
 msgid "Minutes (Français)"
-msgstr "Minutes (Français)"
+msgstr "Procès-verbal (Français)"
 
 #: .\apps\governance\admin.py:143 .\apps\governance\models.py:521
 msgid "Minutes (Italiano)"
@@ -3694,66 +3708,72 @@ msgstr "Minutes (Italiano)"
 #: .\apps\governance\forms.py:70 .\apps\governance\models.py:91
 #: .\templates\governance\members\detail.html:29
 msgid "Member Type"
-msgstr "Member Type"
+msgstr "Type de membre"
 
 #: .\apps\governance\forms.py:73
 msgid "Select your membership type"
-msgstr "Select your membership type"
+msgstr "Sélectionnez votre type d'adhésion"
 
 #: .\apps\governance\forms.py:105
 msgid ""
 "Convocation date must be at least 10 days before assembly date (Article 4)."
 msgstr ""
-"Convocation date must be at least 10 days before assembly date (Article 4)."
+"La date de convocation doit être au moins 10 jours avant la date de "
+"l'assemblée (article 4)."
 
 #: .\apps\governance\forms.py:138
 msgid ""
 "Proposal date must be at least 14 days before assembly date (Article 22)."
 msgstr ""
-"Proposal date must be at least 14 days before assembly date (Article 22)."
+"La date de proposition doit être au moins 14 jours avant la date de "
+"l’assemblée (article 22)."
 
 #: .\apps\governance\forms.py:168
 msgid "Either user or attendee name must be provided."
-msgstr "Either user or attendee name must be provided."
+msgstr "Le nom de l’utilisateur ou du participant doit être fourni."
 
 #: .\apps\governance\forms.py:200
 msgid "Elections must use secret ballot voting method (Article 36)."
-msgstr "Elections must use secret ballot voting method (Article 36)."
+msgstr "Les élections doivent avoir lieu au scrutin secret (article 36)."
 
 #: .\apps\governance\forms.py:288
 msgid "Executive board term must be exactly 2 years (730 days)."
-msgstr "Executive board term must be exactly 2 years (730 days)."
+msgstr ""
+"La durée du mandat du conseil d'administration doit être exactement de 2 ans"
+" (730 jours)."
 
 #: .\apps\governance\forms.py:302
 msgid "e.g. President, Welfare Officer, Events Coordinator"
-msgstr "e.g. President, Welfare Officer, Events Coordinator"
+msgstr "par ex. Président, agent de bien-être, coordonnateur d'événements"
 
 #: .\apps\governance\forms.py:313
 #, python-format
 msgid "Use a standard role like %(roles)s, or type a new custom role."
-msgstr "Use a standard role like %(roles)s, or type a new custom role."
+msgstr ""
+"Utilisez un rôle standard tel que %(roles)s ou saisissez un nouveau rôle "
+"personnalisé."
 
 #: .\apps\governance\forms.py:319
 msgid "Position is required."
-msgstr "Position is required."
+msgstr "Le poste est requis."
 
 #: .\apps\governance\forms.py:359
 msgid ""
 "Election must be completed within 90 days of commission formation (Article "
 "11)."
 msgstr ""
-"Election must be completed within 90 days of commission formation (Article "
-"11)."
+"L'élection doit être achevée dans les 90 jours suivant la formation de la "
+"commission (article 11)."
 
 #: .\apps\governance\forms.py:421
 msgid "Article Number (if applicable)"
-msgstr "Article Number (if applicable)"
+msgstr "Numéro d'article (le cas échéant)"
 
 #: .\apps\governance\forms.py:422 .\apps\governance\models.py:677
 #: .\templates\governance\amendments\amendment_detail.html:53
 #: .\templates\governance\amendments\amendment_list.html:32
 msgid "Target Assembly"
-msgstr "Target Assembly"
+msgstr "Assemblage cible"
 
 # Agenda Item Status
 #: .\apps\governance\forms.py:423 .\apps\governance\models.py:599
@@ -3761,27 +3781,28 @@ msgstr "Target Assembly"
 #: .\templates\governance\amendments\amendment_detail.html:43
 #: .\templates\governance\amendments\amendment_list.html:35
 msgid "Proposal Date"
-msgstr "Proposal Date"
+msgstr "Date de la proposition"
 
 #: .\apps\governance\forms.py:426 .\apps\governance\models.py:678
 msgid "Assembly where this amendment will be discussed"
-msgstr "Assembly where this amendment will be discussed"
+msgstr "Assemblée où cet amendement sera discuté"
 
 #: .\apps\governance\forms.py:427
 msgid "Must be at least 30 days before the target assembly (Article 47)"
-msgstr "Must be at least 30 days before the target assembly (Article 47)"
+msgstr ""
+"Doit avoir lieu au moins 30 jours avant le rassemblement cible (article 47)"
 
 #: .\apps\governance\forms.py:453
 msgid "The target assembly must have a date set."
-msgstr "The target assembly must have a date set."
+msgstr "L’assemblage cible doit avoir une date définie."
 
 #: .\apps\governance\forms.py:462
 msgid ""
 "Amendment proposals must be submitted at least 30 days before the assembly "
 "(Article 47). "
 msgstr ""
-"Amendment proposals must be submitted at least 30 days before the assembly "
-"(Article 47). "
+"Les propositions d'amendements doivent être soumises au moins 30 jours avant"
+" l'assemblée (article 47)."
 
 #: .\apps\governance\migrations\0006_alter_membershipstatus_status.py:19
 #: .\apps\governance\models.py:184 .\apps\scholarships\models.py:22
@@ -3859,56 +3880,57 @@ msgstr "Sympathisant"
 #: .\apps\governance\models.py:96
 #: .\templates\governance\members\detail.html:49
 msgid "Registration Date"
-msgstr "Registration Date"
+msgstr "Date d'inscription"
 
 #: .\apps\governance\models.py:102
 msgid "Membership Start Date"
-msgstr "Membership Start Date"
+msgstr "Date de début d'adhésion"
 
 #: .\apps\governance\models.py:108
 msgid "Membership End Date"
-msgstr "Membership End Date"
+msgstr "Date de fin d'adhésion"
 
 #: .\apps\governance\models.py:114 .\apps\governance\models.py:1593
 msgid "Lazio Residence Verified"
-msgstr "Lazio Residence Verified"
+msgstr "Lazio Résidence Vérifiée"
 
 #: .\apps\governance\models.py:115
 msgid "Verified that member lives in Lazio region"
-msgstr "Verified that member lives in Lazio region"
+msgstr "Vérifié que le membre habite dans la région Lazio"
 
 #: .\apps\governance\models.py:120 .\apps\governance\models.py:1598
 msgid "Cameroonian Origin Verified"
-msgstr "Cameroonian Origin Verified"
+msgstr "Cameroonian Origine vérifiée"
 
 #: .\apps\governance\models.py:121
 msgid "Verified that member is Cameroonian or of Cameroonian origin"
-msgstr "Verified that member is Cameroonian or of Cameroonian origin"
+msgstr "Vérifié que le membre est Cameroonian ou d'origine Cameroonian"
 
 #: .\apps\governance\models.py:128
 msgid "Regularly participates in General Assemblies and pays contributions"
-msgstr "Regularly participates in General Assemblies and pays contributions"
+msgstr ""
+"Participe régulièrement aux Assemblées Générales et verse des cotisations"
 
 #: .\apps\governance\models.py:134
 msgid "Last Assembly Attendance"
-msgstr "Last Assembly Attendance"
+msgstr "Présence à la dernière Assemblée"
 
 # Member Types
 #: .\apps\governance\models.py:139 .\apps\governance\models.py:1786
 msgid "Founding Member"
-msgstr "Founding Member"
+msgstr "Membre fondateur"
 
 #: .\apps\governance\models.py:140
 msgid ""
 "Founding member of ASCAI Association (automatically included in Board of "
 "Auditors per Article 8)"
 msgstr ""
-"Founding member of ASCAI Association (automatically included in Board of "
-"Auditors per Article 8)"
+"Membre fondateur de l'association ASCAI (automatiquement inclus dans le "
+"collège des commissaires aux comptes conformément à l'article 8)"
 
 #: .\apps\governance\models.py:147
 msgid "Internal notes about this member"
-msgstr "Internal notes about this member"
+msgstr "Notes internes sur ce membre"
 
 #: .\apps\governance\models.py:154 .\apps\governance\models.py:193
 #: .\apps\governance\models.py:731 .\apps\governance\models.py:1082
@@ -3919,31 +3941,31 @@ msgstr "Internal notes about this member"
 #: .\templates\governance\members\detail.html:4
 #: .\templates\governance\members\detail.html:9
 msgid "Member"
-msgstr "Member"
+msgstr "Membre"
 
 #: .\apps\governance\models.py:205
 msgid "Effective Date"
-msgstr "Effective Date"
+msgstr "Date d'entrée en vigueur"
 
 #: .\apps\governance\models.py:211
 msgid "Last Payment Date"
-msgstr "Last Payment Date"
+msgstr "Date du dernier paiement"
 
 #: .\apps\governance\models.py:217
 msgid "Reason"
-msgstr "Reason"
+msgstr "Raison"
 
 #: .\apps\governance\models.py:218
 msgid "Reason for status change"
-msgstr "Reason for status change"
+msgstr "Raison du changement de statut"
 
 #: .\apps\governance\models.py:224 .\config\admin.py:478
 msgid "Membership Status"
-msgstr "Membership Status"
+msgstr "Statut de membre"
 
 #: .\apps\governance\models.py:225
 msgid "Membership Statuses"
-msgstr "Membership Statuses"
+msgstr "Statuts d'adhésion"
 
 #: .\apps\governance\models.py:244
 msgid "Terminated"
@@ -3951,23 +3973,23 @@ msgstr "Résilié"
 
 #: .\apps\governance\models.py:248
 msgid "Term Start Date"
-msgstr "Term Start Date"
+msgstr "Date de début du trimestre"
 
 #: .\apps\governance\models.py:252
 msgid "Term End Date"
-msgstr "Term End Date"
+msgstr "Date de fin du mandat"
 
 #: .\apps\governance\models.py:253
 msgid "2 years from start date, renewable once"
-msgstr "2 years from start date, renewable once"
+msgstr "2 ans à compter de la date de début, renouvelable une fois"
 
 #: .\apps\governance\models.py:258 .\apps\governance\models.py:1698
 msgid "Renewed Term"
-msgstr "Renewed Term"
+msgstr "Durée renouvelée"
 
 #: .\apps\governance\models.py:259
 msgid "Whether this is a renewed term (max 1 renewal allowed)"
-msgstr "Whether this is a renewed term (max 1 renewal allowed)"
+msgstr "S'il s'agit d'un mandat renouvelé (max 1 renouvellement autorisé)"
 
 #: .\apps\governance\models.py:279 .\apps\governance\models.py:308
 #: .\apps\governance\models.py:408 .\apps\governance\models.py:1487
@@ -3981,7 +4003,7 @@ msgstr "Conseil exécutif"
 
 #: .\apps\governance\models.py:280
 msgid "Executive Boards"
-msgstr "Executive Boards"
+msgstr "Conseils d'administration"
 
 # Executive Position Status
 #: .\apps\governance\models.py:300
@@ -3994,7 +4016,9 @@ msgstr "Remplacé"
 
 #: .\apps\governance\models.py:314
 msgid "Enter an existing executive role or define a new one for this board."
-msgstr "Enter an existing executive role or define a new one for this board."
+msgstr ""
+"Saisissez un rôle de direction existant ou définissez-en un nouveau pour ce "
+"conseil d'administration."
 
 #: .\apps\governance\models.py:326 .\apps\governance\models.py:1395
 #: .\apps\governance\models.py:1507 .\apps\governance\models.py:2055
@@ -4002,7 +4026,7 @@ msgstr "Enter an existing executive role or define a new one for this board."
 #: .\templates\governance\elections\election_detail.html:21
 #: .\templates\governance\events\event_detail.html:19
 msgid "Start Date"
-msgstr "Start Date"
+msgstr "Date de début"
 
 #: .\apps\governance\models.py:332 .\apps\governance\models.py:1401
 #: .\apps\governance\models.py:1511 .\apps\governance\models.py:2061
@@ -4010,35 +4034,35 @@ msgstr "Start Date"
 #: .\templates\governance\elections\election_detail.html:25
 #: .\templates\governance\events\event_detail.html:24
 msgid "End Date"
-msgstr "End Date"
+msgstr "Date de fin"
 
 #: .\apps\governance\models.py:345
 msgid "Resignation Date"
-msgstr "Resignation Date"
+msgstr "Date de démission"
 
 #: .\apps\governance\models.py:351
 msgid "Resignation Reason"
-msgstr "Resignation Reason"
+msgstr "Raison de la démission"
 
 #: .\apps\governance\models.py:358
 msgid "Executive Position"
-msgstr "Executive Position"
+msgstr "Poste de direction"
 
 #: .\apps\governance\models.py:359 .\config\admin.py:488
 msgid "Executive Positions"
-msgstr "Executive Positions"
+msgstr "Postes de direction"
 
 #: .\apps\governance\models.py:392
 msgid "This board already has that executive position."
-msgstr "This board already has that executive position."
+msgstr "Ce conseil d'administration occupe déjà ce poste de direction."
 
 #: .\apps\governance\models.py:412
 msgid "Meeting Date"
-msgstr "Meeting Date"
+msgstr "Date de la réunion"
 
 #: .\apps\governance\models.py:423
 msgid "Agenda"
-msgstr "Agenda"
+msgstr "Ordre du jour"
 
 #: .\apps\governance\models.py:429 .\apps\governance\models.py:2175
 #: .\templates\governance\assemblies\detail.html:101
@@ -4047,19 +4071,19 @@ msgstr "Procès-verbal"
 
 #: .\apps\governance\models.py:435
 msgid "Decisions Made"
-msgstr "Decisions Made"
+msgstr "Décisions prises"
 
 #: .\apps\governance\models.py:442
 msgid "Attendees"
-msgstr "Attendees"
+msgstr "Participants"
 
 #: .\apps\governance\models.py:449
 msgid "Board Meeting"
-msgstr "Board Meeting"
+msgstr "Réunion du conseil d'administration"
 
 #: .\apps\governance\models.py:450 .\config\admin.py:493
 msgid "Board Meetings"
-msgstr "Board Meetings"
+msgstr "Réunions du conseil d'administration"
 
 # Assembly Types
 #: .\apps\governance\models.py:467
@@ -4087,11 +4111,11 @@ msgstr "Annulé"
 
 #: .\apps\governance\models.py:481
 msgid "Assembly Type"
-msgstr "Assembly Type"
+msgstr "Type d'assemblage"
 
 #: .\apps\governance\models.py:485
 msgid "Assembly Date"
-msgstr "Assembly Date"
+msgstr "Date d'assemblage"
 
 #: .\apps\governance\models.py:494
 #: .\templates\governance\assemblies\detail.html:22
@@ -4102,7 +4126,8 @@ msgstr "Date de convocation"
 msgid ""
 "Date when notice was published (must be at least 10 days before assembly)"
 msgstr ""
-"Date when notice was published (must be at least 10 days before assembly)"
+"Date de publication de l'avis (doit être au moins 10 jours avant "
+"l'assemblée)"
 
 #: .\apps\governance\models.py:528 .\apps\governance\models.py:571
 #: .\apps\governance\models.py:742 .\apps\governance\models.py:809
@@ -4151,27 +4176,27 @@ msgstr "Discuté"
 
 #: .\apps\governance\models.py:587
 msgid "Item Type"
-msgstr "Item Type"
+msgstr "Type d'article"
 
 #: .\apps\governance\models.py:595 .\apps\governance\models.py:665
 #: .\templates\governance\amendments\amendment_detail.html:38
 #: .\templates\governance\amendments\amendment_list.html:29
 msgid "Proposed By"
-msgstr "Proposed By"
+msgstr "Proposé par"
 
 #: .\apps\governance\models.py:600
 msgid "Must be at least 14 days before assembly"
-msgstr "Must be at least 14 days before assembly"
+msgstr "Doit être au moins 14 jours avant le montage"
 
 #: .\apps\governance\models.py:613
 msgid "Display order in agenda"
-msgstr "Display order in agenda"
+msgstr "Ordre d'affichage dans l'agenda"
 
 #: .\apps\governance\models.py:620 .\apps\governance\models.py:818
 #: .\templates\governance\assemblies\detail.html:161
 #: .\templates\governance\member_portal\assembly_participate.html:144
 msgid "Agenda Item"
-msgstr "Agenda Item"
+msgstr "Point de l'ordre du jour"
 
 #: .\apps\governance\models.py:621
 #: .\templates\governance\assemblies\detail.html:35
@@ -4206,49 +4231,49 @@ msgstr "Retiré"
 
 #: .\apps\governance\models.py:644
 msgid "Amendment Title"
-msgstr "Amendment Title"
+msgstr "Titre de l'amendement"
 
 #: .\apps\governance\models.py:648
 #: .\templates\governance\amendments\amendment_detail.html:65
 msgid "Amendment Description"
-msgstr "Amendment Description"
+msgstr "Description de la modification"
 
 #: .\apps\governance\models.py:649
 msgid "Detailed description of the proposed amendment"
-msgstr "Detailed description of the proposed amendment"
+msgstr "Description détaillée de la modification proposée"
 
 #: .\apps\governance\models.py:656
 #: .\templates\governance\amendments\amendment_detail.html:48
 msgid "Article Number"
-msgstr "Article Number"
+msgstr "Numéro d'article"
 
 #: .\apps\governance\models.py:657
 msgid "Article number being amended (if applicable)"
-msgstr "Article number being amended (if applicable)"
+msgstr "Numéro d'article en cours de modification (le cas échéant)"
 
 #: .\apps\governance\models.py:691
 #: .\templates\governance\amendments\amendment_detail.html:29
 msgid "Meets 30-Day Deadline"
-msgstr "Meets 30-Day Deadline"
+msgstr "Respecte le délai de 30 jours"
 
 #: .\apps\governance\models.py:692
 msgid "Proposed at least 30 days before assembly"
-msgstr "Proposed at least 30 days before assembly"
+msgstr "Proposé au moins 30 jours avant le montage"
 
 #: .\apps\governance\models.py:698
 #: .\templates\governance\amendments\amendment_detail.html:74
 msgid "Discussion Notes"
-msgstr "Discussion Notes"
+msgstr "Notes de discussion"
 
 #: .\apps\governance\models.py:705
 msgid "Rules of Procedure Amendment"
-msgstr "Rules of Procedure Amendment"
+msgstr "Modification du règlement intérieur"
 
 #: .\apps\governance\models.py:706
 #: .\templates\governance\amendments\amendment_list.html:4
 #: .\templates\governance\amendments\amendment_list.html:6
 msgid "Rules of Procedure Amendments"
-msgstr "Rules of Procedure Amendments"
+msgstr "Modifications du règlement intérieur"
 
 # Attendee Types
 #: .\apps\governance\models.py:734
@@ -4263,25 +4288,25 @@ msgstr "Autorité/Institution"
 
 #: .\apps\governance\models.py:758
 msgid "Attendee Name"
-msgstr "Attendee Name"
+msgstr "Nom du participant"
 
 #: .\apps\governance\models.py:759
 msgid "Name if not a registered user"
-msgstr "Name if not a registered user"
+msgstr "Nom si ce n'est pas un utilisateur enregistré"
 
 #: .\apps\governance\models.py:765
 #: .\templates\governance\member_portal\assembly_participate.html:55
 msgid "Attendee Type"
-msgstr "Attendee Type"
+msgstr "Type de participant"
 
 #: .\apps\governance\models.py:779
 msgid "Assembly Attendance"
-msgstr "Assembly Attendance"
+msgstr "Participation à l'Assemblée"
 
 #: .\apps\governance\models.py:780
 #: .\templates\governance\members\detail.html:119
 msgid "Assembly Attendances"
-msgstr "Assembly Attendances"
+msgstr "Présences à l'Assemblée"
 
 # Vote Types
 #: .\apps\governance\models.py:794
@@ -4305,32 +4330,33 @@ msgstr "Vote secret"
 
 #: .\apps\governance\models.py:824
 msgid "Vote Type"
-msgstr "Vote Type"
+msgstr "Type de vote"
 
 #: .\apps\governance\models.py:831
 msgid "Voting Method"
-msgstr "Voting Method"
+msgstr "Méthode de vote"
 
 #: .\apps\governance\models.py:832
 msgid "Article 36: Show of hands for resolutions, secret ballot for elections"
 msgstr ""
-"Article 36: Show of hands for resolutions, secret ballot for elections"
+"Article 36 : Levé de main pour les résolutions, scrutin secret pour les "
+"élections"
 
 #: .\apps\governance\models.py:836
 msgid "Question/Proposal"
-msgstr "Question/Proposal"
+msgstr "Question/Proposition"
 
 #: .\apps\governance\models.py:842
 msgid "Votes Yes"
-msgstr "Votes Yes"
+msgstr "Votes Oui"
 
 #: .\apps\governance\models.py:847
 msgid "Votes No"
-msgstr "Votes No"
+msgstr "Votes Non"
 
 #: .\apps\governance\models.py:852
 msgid "Votes Abstain"
-msgstr "Votes Abstain"
+msgstr "Votes Abstention"
 
 #: .\apps\governance\models.py:859
 #: .\templates\governance\assemblies\detail.html:199
@@ -4338,27 +4364,27 @@ msgstr "Votes Abstain"
 #: .\templates\governance\member_portal\assembly_participate.html:222
 #: .\templates\governance\member_portal\assembly_participate.html:275
 msgid "Result"
-msgstr "Result"
+msgstr "Résultat"
 
 #: .\apps\governance\models.py:860
 msgid "e.g., \"Approved\", \"Rejected\""
-msgstr "e.g., \"Approved\", \"Rejected\""
+msgstr "par exemple, \"Approuvé\", \"Rejeté\""
 
 #: .\apps\governance\models.py:866
 msgid "Published within 30 days as per Article 24"
-msgstr "Published within 30 days as per Article 24"
+msgstr "Publié dans les 30 jours conformément à l'article 24"
 
 #: .\apps\governance\models.py:879 .\apps\governance\models.py:927
 msgid "Assembly Vote"
-msgstr "Assembly Vote"
+msgstr "Vote de l'Assemblée"
 
 #: .\apps\governance\models.py:880
 msgid "Assembly Votes"
-msgstr "Assembly Votes"
+msgstr "Votes à l'Assemblée"
 
 #: .\apps\governance\models.py:934 .\apps\governance\models.py:1635
 msgid "Voter"
-msgstr "Voter"
+msgstr "Électeur"
 
 #: .\apps\governance\models.py:939
 #: .\templates\dashboard\events\history.html:53
@@ -4372,7 +4398,7 @@ msgstr "Voter"
 #: .\templates\governance\member_portal\assembly_participate.html:263
 #: .\templates\governance\members\detail.html:98
 msgid "Yes"
-msgstr "Yes"
+msgstr "Oui"
 
 #: .\apps\governance\models.py:939
 #: .\templates\dashboard\events\history.html:57
@@ -4386,7 +4412,7 @@ msgstr "Yes"
 #: .\templates\governance\member_portal\assembly_participate.html:267
 #: .\templates\governance\members\detail.html:100
 msgid "No"
-msgstr "No"
+msgstr "Non"
 
 #: .\apps\governance\models.py:939
 #: .\templates\governance\assemblies\detail.html:184
@@ -4397,23 +4423,23 @@ msgstr "No"
 #: .\templates\governance\member_portal\assembly_participate.html:254
 #: .\templates\governance\member_portal\assembly_participate.html:271
 msgid "Abstain"
-msgstr "Abstain"
+msgstr "Abstention"
 
 #: .\apps\governance\models.py:940
 msgid "Choice"
-msgstr "Choice"
+msgstr "Choix"
 
 #: .\apps\governance\models.py:945 .\apps\governance\models.py:1653
 msgid "Vote Timestamp"
-msgstr "Vote Timestamp"
+msgstr "Horodatage du vote"
 
 #: .\apps\governance\models.py:949
 msgid "Assembly Vote Record"
-msgstr "Assembly Vote Record"
+msgstr "Compte rendu des votes de l'Assemblée"
 
 #: .\apps\governance\models.py:950
 msgid "Assembly Vote Records"
-msgstr "Assembly Vote Records"
+msgstr "Registres des votes de l'Assemblée"
 
 # Transaction Types
 #: .\apps\governance\models.py:968
@@ -4448,15 +4474,15 @@ msgstr "Aide financière"
 
 #: .\apps\governance\models.py:978
 msgid "Operational Expenses"
-msgstr "Operational Expenses"
+msgstr "Dépenses opérationnelles"
 
 #: .\apps\governance\models.py:979
 msgid "Event Expenses"
-msgstr "Event Expenses"
+msgstr "Dépenses liées à l'événement"
 
 #: .\apps\governance\models.py:993
 msgid "Transaction Type"
-msgstr "Transaction Type"
+msgstr "Type de transaction"
 
 #: .\apps\governance\models.py:1006 .\apps\governance\models.py:1094
 #: .\apps\governance\models.py:1195 .\apps\scholarships\models.py:53
@@ -4468,7 +4494,7 @@ msgstr "Transaction Type"
 #: .\templates\governance\member_portal\my_dues.html:123
 #: .\templates\scholarships\scholarship_detail.html:67
 msgid "Amount"
-msgstr "Amount"
+msgstr "Montant"
 
 #: .\apps\governance\models.py:1011 .\apps\governance\models.py:1200
 #: .\templates\dashboard\events\history.html:18
@@ -4479,16 +4505,17 @@ msgstr "Date"
 
 #: .\apps\governance\models.py:1028
 msgid "Requires Approval"
-msgstr "Requires Approval"
+msgstr "Nécessite une approbation"
 
 #: .\apps\governance\models.py:1029
 msgid "Expenses require 3 signatures: President, Treasurer, Statutory Auditor"
 msgstr ""
-"Expenses require 3 signatures: President, Treasurer, Statutory Auditor"
+"Les dépenses nécessitent 3 signatures : Président, Trésorier, Commissaire "
+"aux comptes"
 
 #: .\apps\governance\models.py:1044
 msgid "Financial Transaction"
-msgstr "Financial Transaction"
+msgstr "Transaction financière"
 
 # Transaction Status
 #: .\apps\governance\models.py:1066
@@ -4533,7 +4560,7 @@ msgstr "Année"
 
 #: .\apps\governance\models.py:1095
 msgid "€10 for members, €5 for sympathizers"
-msgstr "€10 for members, €5 for sympathizers"
+msgstr "10 € pour les membres, 5 € pour les sympathisants"
 
 #: .\apps\governance\models.py:1099
 #: .\templates\governance\finances\dues.html:184
@@ -4546,7 +4573,7 @@ msgstr "Date d'échéance"
 
 #: .\apps\governance\models.py:1100
 msgid "March 31 of the year"
-msgstr "March 31 of the year"
+msgstr "31 mars de l'année"
 
 #: .\apps\governance\models.py:1106
 #: .\templates\governance\finances\dues.html:188
@@ -4558,31 +4585,31 @@ msgstr "Date de paiement"
 
 #: .\apps\governance\models.py:1114
 msgid "Payment Method"
-msgstr "Payment Method"
+msgstr "Mode de paiement"
 
 #: .\apps\governance\models.py:1133
 msgid "Valid From"
-msgstr "Valid From"
+msgstr "Valable à partir de"
 
 #: .\apps\governance\models.py:1134
 msgid ""
 "Membership validity start date (automatically set to January 1st when 10 EUR"
 " is paid)"
 msgstr ""
-"Membership validity start date (automatically set to January 1st when 10 EUR"
-" is paid)"
+"Date de début de validité de l'adhésion (fixée automatiquement au 1er "
+"janvier lorsque 10 EUR sont payés)"
 
 #: .\apps\governance\models.py:1140
 msgid "Valid Until"
-msgstr "Valid Until"
+msgstr "Valable jusqu'au"
 
 #: .\apps\governance\models.py:1141
 msgid ""
 "Membership validity end date (automatically set to December 31st when 10 EUR"
 " is paid)"
 msgstr ""
-"Membership validity end date (automatically set to December 31st when 10 EUR"
-" is paid)"
+"Date de fin de validité de l'adhésion (fixée automatiquement au 31 décembre "
+"lorsque 10 EUR sont payés)"
 
 #: .\apps\governance\models.py:1148 .\apps\governance\models.py:1149
 #: .\config\admin.py:513 .\templates\governance\finances\dues.html:4
@@ -4609,12 +4636,12 @@ msgstr "Don"
 
 #: .\apps\governance\models.py:1188
 msgid "Contribution Type"
-msgstr "Contribution Type"
+msgstr "Type de cotisation"
 
 # Agenda Item Status
 #: .\apps\governance\models.py:1206
 msgid "Purpose"
-msgstr "Purpose"
+msgstr "But"
 
 #: .\apps\governance\models.py:1212
 msgid "Contribution"
@@ -4624,7 +4651,7 @@ msgstr "Contribution"
 #: .\templates\governance\members\detail.html:115
 #: .\templates\governance\members\detail.html:163
 msgid "Contributions"
-msgstr "Contributions"
+msgstr "Cotisations"
 
 # Report Types
 #: .\apps\governance\models.py:1226
@@ -4641,7 +4668,7 @@ msgstr "Basé sur événement"
 
 #: .\apps\governance\models.py:1235
 msgid "Report Type"
-msgstr "Report Type"
+msgstr "Type de rapport"
 
 #: .\apps\governance\models.py:1239 .\apps\governance\models.py:1821
 msgid "Period Start"
@@ -5556,13 +5583,13 @@ msgstr "Voting is only available on or after the assembly date."
 #: .\apps\governance\views.py:465
 #: .\templates\governance\member_portal\assembly_participate.html:187
 msgid "Only active members can vote."
-msgstr "Only active members can vote."
+msgstr "Seuls les membres actifs peuvent voter."
 
 #: .\apps\governance\views.py:468 .\apps\governance\views.py:1589
 #: .\apps\governance\views.py:1645
 #: .\templates\governance\member_portal\assembly_participate.html:185
 msgid "You must be a registered member to vote."
-msgstr "You must be a registered member to vote."
+msgstr "Vous devez être membre inscrit pour voter."
 
 #: .\apps\governance\views.py:474
 msgid "You have already voted on this item."
@@ -5577,7 +5604,7 @@ msgstr "Invalid vote choice."
 #: .\templates\governance\assemblies\detail.html:205
 #: .\templates\governance\member_portal\assembly_participate.html:228
 msgid "Tied"
-msgstr "Tied"
+msgstr "Lié"
 
 #: .\apps\governance\views.py:507 .\apps\governance\views.py:1695
 msgid "Vote cast successfully!"
@@ -6551,16 +6578,16 @@ msgstr "Saisie manuelle"
 
 #: .\apps\scholarships\models.py:156
 msgid "Checked today"
-msgstr "V?rifi? aujourd?hui"
+msgstr "Vérifié aujourd’hui"
 
 #: .\apps\scholarships\models.py:158
 msgid "Checked yesterday"
-msgstr "V?rifi? hier"
+msgstr "Vérifié hier"
 
 #: .\apps\scholarships\models.py:159
 #, python-format
 msgid "Checked %(days)s days ago"
-msgstr "V?rifi? il y a %(days)s jours"
+msgstr "Vérifié il y a %(days)s jours"
 
 #: .\apps\scholarships\models.py:203
 msgid "Saved Scholarship"
@@ -6659,7 +6686,7 @@ msgstr "Arrival & First Steps"
 
 #: .\apps\students\models.py:116 .\templates\students\orientation.html:227
 msgid "Living in Lazio"
-msgstr "Living in Lazio"
+msgstr "Vivre à Lazio"
 
 #: .\apps\students\models.py:117
 msgid "ASCAI Membership"
@@ -6738,7 +6765,7 @@ msgstr "Tuition"
 #: .\templates\students\universities_list.html:24
 #: .\templates\universities\university_list.html:85
 msgid "Cassino"
-msgstr "Cassino"
+msgstr "Cassin"
 
 #: .\apps\universities\models.py:26
 msgid "University Name"
@@ -6809,7 +6836,7 @@ msgstr "Licence"
 #: .\apps\universities\models.py:95
 #: .\templates\students\universities_list.html:37
 msgid "Master"
-msgstr "Master"
+msgstr "Maître"
 
 #: .\apps\universities\models.py:104
 msgid "Bilingual"
@@ -8550,7 +8577,7 @@ msgstr ""
 #: .\templates\students\new_student_guide.html:90
 #: .\templates\students\orientation.html:254
 msgid "Find a Mentor"
-msgstr "Find a Mentor"
+msgstr "Trouver un mentor"
 
 #: .\templates\core\home.html:99
 msgid "Enter Community"
@@ -9043,7 +9070,7 @@ msgstr ""
 
 #: .\templates\core\sponsorship.html:4 .\templates\core\sponsorship.html:10
 msgid "Impact & Sponsorship | ASCAI Lazio"
-msgstr "Impact & Sponsorship | ASCAI Lazio"
+msgstr "Impact et parrainage | ASCAI Lazio"
 
 #: .\templates\core\sponsorship.html:5
 msgid ""
@@ -9051,34 +9078,36 @@ msgid ""
 "orientation, integration, mentorship, scholarship access, and measurable "
 "community impact."
 msgstr ""
-"Partner with ASCAI Lazio to support Cameroonian students in Italy through "
-"orientation, integration, mentorship, scholarship access, and measurable "
-"community impact."
+"Associez-vous à ASCAI Lazio pour soutenir les étudiants Cameroonian en Italy"
+" grâce à l'orientation, l'intégration, le mentorat, l'accès aux bourses et "
+"un impact communautaire mesurable."
 
 #: .\templates\core\sponsorship.html:6
 msgid ""
 "ASCAI sponsorship, Cameroonian students Italy, student integration Lazio, "
 "Cameroon Italy partnership, diaspora impact"
 msgstr ""
-"ASCAI sponsorship, Cameroonian students Italy, student integration Lazio, "
-"Cameroon Italy partnership, diaspora impact"
+"Parrainage ASCAI, étudiants Cameroonian Italy, intégration étudiante Lazio, "
+"Cameroon Italy partenariat, impact diaspora"
 
 #: .\templates\core\sponsorship.html:11
 msgid ""
 "A sponsor-ready platform connecting student success, integration, diaspora "
 "leadership, and institutional trust."
 msgstr ""
-"A sponsor-ready platform connecting student success, integration, diaspora "
-"leadership, and institutional trust."
+"Une plateforme prête à être sponsorisée reliant la réussite des étudiants, "
+"l'intégration, le leadership de la diaspora et la confiance "
+"institutionnelle."
 
 #: .\templates\core\sponsorship.html:19
 msgid "Impact & sponsorship"
-msgstr "Impact & sponsorship"
+msgstr "Impact et sponsoring"
 
 #: .\templates\core\sponsorship.html:21
 msgid "Sponsor the bridge between Cameroonian talent and Italian opportunity."
 msgstr ""
-"Sponsor the bridge between Cameroonian talent and Italian opportunity."
+"Parrainez le pont entre les talents camerounais et les opportunités "
+"italiennes."
 
 #: .\templates\core\sponsorship.html:24
 msgid ""
@@ -9086,47 +9115,50 @@ msgid ""
 " before they drop out, get isolated, or miss the opportunities that brought "
 "them to Italy."
 msgstr ""
-"ASCAI Lazio gives institutions a trusted, measurable way to support students"
-" before they drop out, get isolated, or miss the opportunities that brought "
-"them to Italy."
+"ASCAI Lazio offre aux établissements un moyen fiable et mesurable de "
+"soutenir les étudiants avant qu'ils n'abandonnent, ne soient isolés ou ne "
+"ratent les opportunités qui les ont amenés à Italy."
 
 #: .\templates\core\sponsorship.html:27
 msgid "Discuss Sponsorship"
-msgstr "Discuss Sponsorship"
+msgstr "Discutez du parrainage"
 
 #: .\templates\core\sponsorship.html:28
 msgid "Download One-Pager"
-msgstr "Download One-Pager"
+msgstr "Télécharger une page"
 
 #: .\templates\core\sponsorship.html:29
 msgid "Students Join Here"
-msgstr "Students Join Here"
+msgstr "Les étudiants rejoignent ici"
 
 #: .\templates\core\sponsorship.html:37
 msgid "Live impact numbers"
-msgstr "Live impact numbers"
+msgstr "Chiffres d'impact en direct"
 
 #: .\templates\core\sponsorship.html:38
 msgid "Real admin data sponsors can understand quickly."
-msgstr "Real admin data sponsors can understand quickly."
+msgstr ""
+"Les vrais sponsors des données administratives peuvent comprendre "
+"rapidement."
 
 #: .\templates\core\sponsorship.html:39
 msgid ""
 "These numbers come from current platform activity and can become the first "
 "page of every sponsor report."
 msgstr ""
-"These numbers come from current platform activity and can become the first "
-"page of every sponsor report."
+"Ces chiffres proviennent de l'activité actuelle de la plateforme et peuvent "
+"devenir la première page de chaque rapport de sponsor."
 
 #: .\templates\core\sponsorship.html:56
 msgid "Why students pay"
-msgstr "Why students pay"
+msgstr "Pourquoi les étudiants paient"
 
 #: .\templates\core\sponsorship.html:57
 msgid ""
 "Membership becomes valuable when it reduces fear and speeds up progress."
 msgstr ""
-"Membership becomes valuable when it reduces fear and speeds up progress."
+"L’adhésion devient précieuse lorsqu’elle réduit la peur et accélère les "
+"progrès."
 
 #: .\templates\core\sponsorship.html:58
 msgid ""
@@ -9134,17 +9166,17 @@ msgid ""
 "people, deadlines, practical documents, and a community that can help them "
 "avoid expensive mistakes."
 msgstr ""
-"Students are not paying for a logo. They are paying for clarity, trusted "
-"people, deadlines, practical documents, and a community that can help them "
-"avoid expensive mistakes."
+"Les étudiants ne paient pas pour un logo. Ils paient pour la clarté, des "
+"personnes de confiance, des délais, des documents pratiques et une "
+"communauté qui peut les aider à éviter des erreurs coûteuses."
 
 #: .\templates\core\sponsorship.html:74
 msgid "Why authorities sponsor"
-msgstr "Why authorities sponsor"
+msgstr "Pourquoi les autorités sponsorisent"
 
 #: .\templates\core\sponsorship.html:75
 msgid "ASCAI can become a trusted implementation partner."
-msgstr "ASCAI can become a trusted implementation partner."
+msgstr "ASCAI peut devenir un partenaire de mise en œuvre de confiance."
 
 #: .\templates\core\sponsorship.html:76
 msgid ""
@@ -9152,53 +9184,54 @@ msgid ""
 "is a cleaner channel for outreach, integration, student support, and "
 "community intelligence."
 msgstr ""
-"For Italian and Cameroonian authorities, the value is not only goodwill. It "
-"is a cleaner channel for outreach, integration, student support, and "
-"community intelligence."
+"Pour les autorités Italian et Cameroonian, la valeur n’est pas seulement la "
+"bonne volonté. Il s’agit d’un canal plus propre pour la sensibilisation, "
+"l’intégration, le soutien aux étudiants et l’intelligence communautaire."
 
 #: .\templates\core\sponsorship.html:85
 msgid "Measurable impact"
-msgstr "Measurable impact"
+msgstr "Impact mesurable"
 
 #: .\templates\core\sponsorship.html:86
 msgid "The story sponsors can report."
-msgstr "The story sponsors can report."
+msgstr "Les sponsors de l’histoire peuvent signaler."
 
 #: .\templates\core\sponsorship.html:102
 msgid "Sponsor offers"
-msgstr "Sponsor offers"
+msgstr "Offres des sponsors"
 
 #: .\templates\core\sponsorship.html:103
 msgid "Clear partnership packages for public and private sponsors."
-msgstr "Clear partnership packages for public and private sponsors."
+msgstr ""
+"Des packages de partenariat clairs pour les sponsors publics et privés."
 
 #: .\templates\core\sponsorship.html:105
 msgid "Request Partnership Call"
-msgstr "Request Partnership Call"
+msgstr "Demander un appel de partenariat"
 
 #: .\templates\core\sponsorship.html:121
 msgid "Student and collaborator voices"
-msgstr "Student and collaborator voices"
+msgstr "Voix d'étudiants et de collaborateurs"
 
 #: .\templates\core\sponsorship.html:122
 msgid "Testimonials sponsors can quote."
-msgstr "Testimonials sponsors can quote."
+msgstr "Témoignages que les sponsors peuvent citer."
 
 #: .\templates\core\sponsorship.html:135
 msgid "Case-study pipeline"
-msgstr "Case-study pipeline"
+msgstr "Pipeline d’études de cas"
 
 #: .\templates\core\sponsorship.html:136
 msgid "Every event becomes a sponsor report."
-msgstr "Every event becomes a sponsor report."
+msgstr "Chaque événement devient un reportage sponsor."
 
 #: .\templates\core\sponsorship.html:164
 msgid "Trust model"
-msgstr "Trust model"
+msgstr "Modèle de confiance"
 
 #: .\templates\core\sponsorship.html:165
 msgid "The platform should feel useful before it asks for money."
-msgstr "The platform should feel useful before it asks for money."
+msgstr "La plateforme doit se sentir utile avant de demander de l'argent."
 
 #: .\templates\core\sponsorship.html:166
 msgid ""
@@ -9206,26 +9239,27 @@ msgid ""
 "value. Sponsor pages show that the association can turn student needs into "
 "organized, fundable programs."
 msgstr ""
-"Free public pages prove ASCAI is active. Member dashboards create personal "
-"value. Sponsor pages show that the association can turn student needs into "
-"organized, fundable programs."
+"Les pages publiques gratuites prouvent que ASCAI est actif. Les tableaux de "
+"bord des membres créent de la valeur personnelle. Les pages de sponsoring "
+"montrent que l'association peut transformer les besoins des étudiants en "
+"programmes organisés et finançables."
 
 #: .\templates\core\sponsorship.html:168
 msgid "View Premium Services"
-msgstr "View Premium Services"
+msgstr "Voir les services haut de gamme"
 
 # Sanction Types
 #: .\templates\core\sponsorship.html:169
 msgid "Request Orientation"
-msgstr "Request Orientation"
+msgstr "Demander des orientations"
 
 #: .\templates\core\sponsorship.html:173
 msgid "Sponsor-ready promise"
-msgstr "Sponsor-ready promise"
+msgstr "Promesse prête à être sponsorisée"
 
 #: .\templates\core\sponsorship.html:174
 msgid "Fund outcomes, not decoration."
-msgstr "Fund outcomes, not decoration."
+msgstr "Des résultats financiers, pas une décoration."
 
 #: .\templates\core\sponsorship.html:175
 msgid ""
@@ -9233,9 +9267,10 @@ msgid ""
 "orientations delivered, resources improved, events hosted, students "
 "mentored, and partner channels built responsibly."
 msgstr ""
-"Every sponsor should be able to see what their support made possible: "
-"orientations delivered, resources improved, events hosted, students "
-"mentored, and partner channels built responsibly."
+"Chaque sponsor devrait être en mesure de voir ce que son soutien a rendu "
+"possible : orientations dispensées, ressources améliorées, événements "
+"organisés, étudiants encadrés et canaux de partenaires créés de manière "
+"responsable."
 
 #: .\templates\dashboard\base_dashboard.html:7
 msgid "ASCAI Lazio Reserved Area - Private Dashboard"
@@ -9309,7 +9344,7 @@ msgstr "Enregistrer"
 #: .\templates\universities\partials\university_list_partial.html:118
 #: .\templates\universities\university_detail.html:39
 msgid "Saved"
-msgstr "Enregistr?"
+msgstr "Enregistré"
 
 #: .\templates\dashboard\downloads\list.html:48
 msgid "No reserved documents are available right now."
@@ -9536,7 +9571,7 @@ msgstr "Open group"
 #: .\templates\dashboard\groups\list.html:73
 #: .\templates\dashboard\home.html:214
 msgid "View group"
-msgstr "View group"
+msgstr "Afficher le groupe"
 
 #: .\templates\dashboard\groups\list.html:82
 msgid "No groups are available for this category yet."
@@ -9559,8 +9594,8 @@ msgid ""
 "Your reserved workspace for membership, resources, support, and "
 "participation in ASCAI Lazio life."
 msgstr ""
-"Your reserved workspace for membership, resources, support, and "
-"participation in ASCAI Lazio life."
+"Votre espace de travail réservé pour l'adhésion, les ressources, le soutien "
+"et la participation à la vie de ASCAI Lazio."
 
 #: .\templates\dashboard\home.html:12
 #: .\templates\dashboard\partials\header.html:11
@@ -9587,19 +9622,19 @@ msgstr "Resume rapide"
 
 #: .\templates\dashboard\home.html:22 .\templates\dashboard\home.html:105
 msgid "Saved universities"
-msgstr "Saved universities"
+msgstr "Universités sauvées"
 
 #: .\templates\dashboard\home.html:23 .\templates\dashboard\home.html:106
 msgid "Saved scholarships"
-msgstr "Saved scholarships"
+msgstr "Bourses sauvegardées"
 
 #: .\templates\dashboard\home.html:24 .\templates\dashboard\home.html:107
 msgid "Open tickets"
-msgstr "Open tickets"
+msgstr "Billets ouverts"
 
 #: .\templates\dashboard\home.html:25
 msgid "Groups joined"
-msgstr "Groups joined"
+msgstr "Groupes rejoints"
 
 #: .\templates\dashboard\home.html:29
 msgid "Association rules"
@@ -9628,7 +9663,7 @@ msgstr "Votre situation au regard des regles de l association"
 #: .\templates\dashboard\home.html:48
 #: .\templates\dashboard\profile\view.html:39
 msgid "Member type"
-msgstr "Member type"
+msgstr "Type de membre"
 
 #: .\templates\dashboard\home.html:49
 msgid "Active member"
@@ -9642,17 +9677,17 @@ msgstr "Membre inactif"
 #: .\templates\dashboard\profile\view.html:41
 #: .\templates\governance\elections\candidacy_list.html:47
 msgid "Seniority"
-msgstr "Seniority"
+msgstr "Ancienneté"
 
 # Contribution Types
 #: .\templates\dashboard\home.html:51
 #: .\templates\dashboard\profile\view.html:42
 msgid "Annual dues"
-msgstr "Annual dues"
+msgstr "Cotisation annuelle"
 
 #: .\templates\dashboard\home.html:58
 msgid "Current dues record"
-msgstr "Current dues record"
+msgstr "Dossier de cotisation actuel"
 
 #: .\templates\dashboard\home.html:60
 msgid "Due by"
@@ -9671,8 +9706,9 @@ msgid ""
 "No dues record is visible yet for the current year. That may need attention "
 "if membership administration is underway."
 msgstr ""
-"No dues record is visible yet for the current year. That may need attention "
-"if membership administration is underway."
+"Aucun relevé de cotisation n'est encore visible pour l'année en cours. Il "
+"faudra peut-être y prêter attention si la gestion des adhésions est en "
+"cours."
 
 #: .\templates\dashboard\home.html:72
 msgid "Participation"
@@ -9684,22 +9720,22 @@ msgstr "Assemblees et vote"
 
 #: .\templates\dashboard\home.html:77
 msgid "Next assembly"
-msgstr "Next assembly"
+msgstr "Prochaine assemblée"
 
 #: .\templates\dashboard\home.html:83
 #, python-format
 msgid "Notice period looks compliant at %(days)s days."
-msgstr "Notice period looks compliant at %(days)s days."
+msgstr "Le délai de préavis semble conforme à %(days)s jours."
 
 #: .\templates\dashboard\home.html:85
 #, python-format
 msgid "Notice period appears short at %(days)s days."
-msgstr "Notice period appears short at %(days)s days."
+msgstr "Le délai de préavis semble court, à %(days)s jours."
 
 #: .\templates\dashboard\home.html:89
 #: .\templates\dashboard\profile\view.html:73
 msgid "Open member portal"
-msgstr "Open member portal"
+msgstr "Ouvrir le portail des membres"
 
 #: .\templates\dashboard\home.html:92
 msgid "No upcoming assembly is currently scheduled for you."
@@ -9708,27 +9744,27 @@ msgstr "Aucune assemblee a venir n est actuellement programmee pour vous."
 #: .\templates\dashboard\home.html:97
 #, python-format
 msgid "Last recorded assembly attendance: %(date)s."
-msgstr "Last recorded assembly attendance: %(date)s."
+msgstr "Dernière présence enregistrée à l'assemblée : %(date)s."
 
 #: .\templates\dashboard\home.html:105
 msgid "Study options you are tracking"
-msgstr "Study options you are tracking"
+msgstr "Options d'études que vous suivez"
 
 #: .\templates\dashboard\home.html:106
 msgid "Funding opportunities on your shortlist"
-msgstr "Funding opportunities on your shortlist"
+msgstr "Opportunités de financement sur votre liste restreinte"
 
 #: .\templates\dashboard\home.html:107
 msgid "Requests still awaiting closure"
-msgstr "Requests still awaiting closure"
+msgstr "Demandes toujours en attente de clôture"
 
 #: .\templates\dashboard\home.html:108
 msgid "Guidance requests in your history"
-msgstr "Guidance requests in your history"
+msgstr "Demandes d'orientation dans votre historique"
 
 #: .\templates\dashboard\home.html:115
 msgid "Verified services"
-msgstr "Services v?rifi?s"
+msgstr "Services vérifiés"
 
 #: .\templates\dashboard\home.html:116
 msgid "Trusted providers for practical needs"
@@ -9740,9 +9776,9 @@ msgid ""
 "association, including money transfer, documents, housing, logistics, and "
 "other community services."
 msgstr ""
-"ASCAI liste uniquement les prestataires actifs examin?s par l?association, "
-"notamment pour les transferts d?argent, les documents, le logement, la "
-"logistique et d?autres services communautaires."
+"ASCAI répertorie uniquement les prestataires actifs examinés par "
+"l’association, notamment pour les transferts d’argent, les documents, le "
+"logement, la logistique et d’autres services communautaires."
 
 #: .\templates\dashboard\home.html:121
 msgid "See service program"
@@ -9766,86 +9802,86 @@ msgid ""
 "No verified service providers are visible yet. ASCAI will publish partners "
 "here after review."
 msgstr ""
-"Aucun prestataire v?rifi? n?est encore visible. ASCAI publiera les "
-"partenaires ici apr?s examen."
+"Aucun prestataire vérifié n’est encore visible. ASCAI publiera les "
+"partenaires ici après examen."
 
 #: .\templates\dashboard\home.html:173
 msgid "Quick actions"
-msgstr "Quick actions"
+msgstr "Actions rapides"
 
 #: .\templates\dashboard\home.html:173
 msgid "Common next steps"
-msgstr "Common next steps"
+msgstr "Prochaines étapes communes"
 
 #: .\templates\dashboard\home.html:182 .\templates\diaspora\index.html:71
 msgid "Upcoming events"
-msgstr "Upcoming events"
+msgstr "Événements à venir"
 
 #: .\templates\dashboard\home.html:182
 msgid "Registrations and tickets"
-msgstr "Registrations and tickets"
+msgstr "Inscriptions et billets"
 
 #: .\templates\dashboard\home.html:182 .\templates\dashboard\home.html:197
 #: .\templates\dashboard\home.html:210
 msgid "View all"
-msgstr "View all"
+msgstr "Voir tout"
 
 #: .\templates\dashboard\home.html:186
 msgid "Open ticket"
-msgstr "Open ticket"
+msgstr "Billet ouvert"
 
 #: .\templates\dashboard\home.html:190
 msgid "You do not have upcoming event registrations yet."
-msgstr "You do not have upcoming event registrations yet."
+msgstr "Vous n'avez pas encore d'inscriptions aux événements à venir."
 
 #: .\templates\dashboard\home.html:197
 #: .\templates\dashboard\partials\sidebar_nav.html:34
 #: .\templates\dashboard\support\tickets.html:11
 msgid "Support"
-msgstr "Support"
+msgstr "Soutien"
 
 #: .\templates\dashboard\home.html:197
 msgid "Recent support tickets"
-msgstr "Recent support tickets"
+msgstr "Tickets d'assistance récents"
 
 #: .\templates\dashboard\home.html:205
 msgid "You have not opened any support tickets yet."
-msgstr "You have not opened any support tickets yet."
+msgstr "Vous n'avez pas encore ouvert de ticket d'assistance."
 
 #: .\templates\dashboard\home.html:210
 msgid "Suggested groups"
-msgstr "Suggested groups"
+msgstr "Groupes suggérés"
 
 #: .\templates\dashboard\home.html:218
 msgid "No suggested groups are available right now."
-msgstr "No suggested groups are available right now."
+msgstr "Aucun groupe suggéré n’est disponible pour le moment."
 
 # Governance Translations
 #: .\templates\dashboard\home.html:225
 msgid "Governance overview"
-msgstr "Governance overview"
+msgstr "Aperçu de la gouvernance"
 
 #: .\templates\dashboard\home.html:225
 msgid "Association administration snapshot"
-msgstr "Association administration snapshot"
+msgstr "Instantané de l’administration des associations"
 
 # Governance Translations
 #: .\templates\dashboard\home.html:225
 msgid "Open governance dashboard"
-msgstr "Open governance dashboard"
+msgstr "Tableau de bord de gouvernance ouvert"
 
 #: .\templates\dashboard\home.html:229
 #: .\templates\dashboard\partials\sidebar_nav.html:50
 msgid "Assemblies"
-msgstr "Assemblies"
+msgstr "Assemblées"
 
 #: .\templates\dashboard\home.html:230
 msgid "Pending dues"
-msgstr "Pending dues"
+msgstr "Cotisations en attente"
 
 #: .\templates\dashboard\home.html:231
 msgid "Pending expenses"
-msgstr "Pending expenses"
+msgstr "Dépenses en attente"
 
 # Mentorship Translations
 #: .\templates\dashboard\mentorship\dashboard.html:4
@@ -10039,7 +10075,7 @@ msgstr "Track your mentorship conversations"
 #: .\templates\dashboard\mentorship\dashboard.html:236
 #: .\templates\students\index.html:99
 msgid "Find a mentor"
-msgstr "Find a mentor"
+msgstr "Trouver un mentor"
 
 #: .\templates\dashboard\mentorship\dashboard.html:226
 #: .\templates\dashboard\support\tickets.html:32
@@ -10047,7 +10083,7 @@ msgstr "Find a mentor"
 #: .\templates\scholarships\partials\scholarship_list_partial.html:113
 #: .\templates\universities\partials\university_list_partial.html:110
 msgid "View details"
-msgstr "Voir les d?tails"
+msgstr "Voir les détails"
 
 #: .\templates\dashboard\mentorship\dashboard.html:234
 #: .\templates\mentorship\mentor_dashboard.html:96
@@ -10351,7 +10387,7 @@ msgstr "Try broadening the search or clearing the current filters."
 #: .\templates\scholarships\scholarship_list.html:121
 #: .\templates\universities\university_list.html:131
 msgid "Reset filters"
-msgstr "R?initialiser les filtres"
+msgstr "Réinitialiser les filtres"
 
 #: .\templates\dashboard\mentorship\mentor_list.html:124
 msgid "Mentor directory pagination"
@@ -10750,7 +10786,7 @@ msgstr ""
 #: .\templates\dashboard\new_student\guide_detail.html:14
 #: .\templates\students\guide_section_detail.html:134
 msgid "Back to Guide"
-msgstr "Back to Guide"
+msgstr "Retour au Guide"
 
 #: .\templates\dashboard\new_student\guide_detail.html:23
 msgid "Steps"
@@ -11020,7 +11056,7 @@ msgstr "Déconnexion"
 #: .\templates\dashboard\partials\sidebar_nav.html:13
 #: .\templates\governance\member_portal\index.html:272
 msgid "My Dues"
-msgstr "My Dues"
+msgstr "Mes cotisations"
 
 #: .\templates\dashboard\partials\sidebar_nav.html:14
 #: .\templates\governance\member_portal\directory.html:4
@@ -11112,7 +11148,7 @@ msgstr "View and manage your uploaded documents"
 #: .\templates\governance\member_portal\directory.html:78
 #: .\templates\governance\members\list.html:100
 msgid "Type"
-msgstr "Type"
+msgstr "Taper"
 
 #: .\templates\dashboard\profile\documents.html:76
 msgid "Uploaded"
@@ -12102,22 +12138,22 @@ msgstr "Download document"
 #: .\templates\downloads\document_detail.html:50
 #: .\templates\students\resource_detail.html:74
 msgid "Preview"
-msgstr "Preview"
+msgstr "Aperçu"
 
 #: .\templates\downloads\document_detail.html:57
 #: .\templates\students\resource_detail.html:82
 msgid "This document has expired and is no longer available for download."
-msgstr "This document has expired and is no longer available for download."
+msgstr "Ce document a expiré et n'est plus disponible en téléchargement."
 
 #: .\templates\downloads\document_detail.html:59
 #: .\templates\students\resource_detail.html:84
 msgid "This document is currently unavailable."
-msgstr "This document is currently unavailable."
+msgstr "Ce document est actuellement indisponible."
 
 #: .\templates\downloads\document_detail.html:61
 #: .\templates\students\resource_detail.html:86
 msgid "This document has reached its download limit."
-msgstr "This document has reached its download limit."
+msgstr "Ce document a atteint sa limite de téléchargement."
 
 #: .\templates\downloads\document_detail.html:68
 msgid "Details"
@@ -12298,7 +12334,7 @@ msgstr ""
 #: .\templates\governance\documents\list.html:51
 #: .\templates\students\partials\resources_list_partial.html:47
 msgid "No documents found"
-msgstr "No documents found"
+msgstr "Aucun document trouvé"
 
 #: .\templates\downloads\partials\document_list_partial.html:48
 msgid "Try another category, search term, or tag."
@@ -12470,7 +12506,7 @@ msgstr ""
 #: .\templates\gallery\video_list.html:89
 #: .\templates\students\guide_section_detail.html:74
 msgid "Watch Video"
-msgstr "Watch Video"
+msgstr "Regarder la vidéo"
 
 #: .\templates\gallery\video_list.html:125
 #, python-format
@@ -12519,7 +12555,7 @@ msgstr "Back to Amendments"
 #: .\templates\governance\amendments\amendment_list.html:14
 #: .\templates\governance\member_portal\index.html:234
 msgid "Propose Amendment"
-msgstr "Propose Amendment"
+msgstr "Proposer un amendement"
 
 #: .\templates\governance\amendments\amendment_form.html:6
 msgid "Propose Rules of Procedure Amendment"
@@ -12657,7 +12693,7 @@ msgstr "Publish"
 #: .\templates\governance\elections\election_detail.html:138
 #: .\templates\governance\member_portal\assembly_participate.html:218
 msgid "Total votes"
-msgstr "Total votes"
+msgstr "Total des voix"
 
 #: .\templates\governance\assemblies\detail.html:241
 msgid "No votes recorded"
@@ -13036,7 +13072,7 @@ msgstr "Official documents and reports"
 #: .\templates\governance\elections\candidacy_list.html:113
 #: .\templates\governance\member_portal\index.html:247
 msgid "Apply for Candidacy"
-msgstr "Apply for Candidacy"
+msgstr "Faire une demande de candidature"
 
 #: .\templates\governance\elections\candidacy_apply.html:11
 msgid "Eligibility Requirements"
@@ -13148,18 +13184,18 @@ msgstr "Your vote can still be reviewed"
 #: .\templates\governance\member_portal\elections.html:72
 #: .\templates\governance\member_portal\elections.html:95
 msgid "Election is open for voting"
-msgstr "Election is open for voting"
+msgstr "L'élection est ouverte au vote"
 
 #: .\templates\governance\elections\election_detail.html:46
 #: .\templates\governance\member_portal\elections.html:73
 #: .\templates\governance\member_portal\elections.html:96
 msgid "Cast your vote now"
-msgstr "Cast your vote now"
+msgstr "Votez maintenant"
 
 #: .\templates\governance\elections\election_detail.html:53
 #: .\templates\governance\member_portal\elections.html:80
 msgid "Review or Update Vote"
-msgstr "Review or Update Vote"
+msgstr "Vérifier ou mettre à jour le vote"
 
 #: .\templates\governance\elections\election_detail.html:53
 #: .\templates\governance\member_portal\elections.html:80
@@ -13167,7 +13203,7 @@ msgstr "Review or Update Vote"
 #: .\templates\governance\member_portal\elections.html:134
 #: .\templates\governance\member_portal\index.html:171
 msgid "Vote Now"
-msgstr "Vote Now"
+msgstr "Votez maintenant"
 
 #: .\templates\governance\elections\election_detail.html:93
 msgid "No candidacies yet"
@@ -13426,60 +13462,60 @@ msgstr "Enregistrer le paiement"
 
 #: .\templates\governance\finances\dues.html:41
 msgid "Total Owed"
-msgstr "Total Owed"
+msgstr "Total dû"
 
 #: .\templates\governance\finances\dues.html:60
 msgid "Total Collected"
-msgstr "Total Collected"
+msgstr "Total collecté"
 
 #: .\templates\governance\finances\dues.html:76
 msgid "Grand Total"
-msgstr "Grand Total"
+msgstr "Total"
 
 #: .\templates\governance\finances\dues.html:78
 msgid "All Dues"
-msgstr "All Dues"
+msgstr "Toutes les cotisations"
 
 #: .\templates\governance\finances\dues.html:92
 msgid "Overdue Amount"
-msgstr "Overdue Amount"
+msgstr "Montant en retard"
 
 #: .\templates\governance\finances\dues.html:94
 msgid "Count"
-msgstr "Count"
+msgstr "Compter"
 
 #: .\templates\governance\finances\dues.html:108
 msgid "Overall Financial Summary"
-msgstr "Overall Financial Summary"
+msgstr "Résumé financier global"
 
 #: .\templates\governance\finances\dues.html:111
 msgid "Total All Time Owed"
-msgstr "Total All Time Owed"
+msgstr "Total de tous les temps dus"
 
 #: .\templates\governance\finances\dues.html:115
 msgid "Total All Time Collected"
-msgstr "Total All Time Collected"
+msgstr "Total de tous les temps collectés"
 
 #: .\templates\governance\finances\dues.html:119
 msgid "Current Year"
-msgstr "Current Year"
+msgstr "Année en cours"
 
 #: .\templates\governance\finances\dues.html:121
 msgid "Owed this year"
-msgstr "Owed this year"
+msgstr "À payer cette année"
 
 #: .\templates\governance\finances\dues.html:130
 msgid "Breakdown by Status"
-msgstr "Breakdown by Status"
+msgstr "Répartition par statut"
 
 #: .\templates\governance\finances\dues.html:136
 #: .\templates\governance\finances\dues.html:152
 msgid "records"
-msgstr "records"
+msgstr "enregistrements"
 
 #: .\templates\governance\finances\dues.html:146
 msgid "Breakdown by Year"
-msgstr "Breakdown by Year"
+msgstr "Répartition par année"
 
 #: .\templates\governance\finances\dues.html:171
 #: .\templates\governance\finances\dues.html:234
@@ -13620,64 +13656,66 @@ msgid ""
 "You can attend this assembly as a guest, sympathizer, or authority (Article "
 "5)."
 msgstr ""
-"You can attend this assembly as a guest, sympathizer, or authority (Article "
-"5)."
+"Vous pouvez assister à cette assemblée en tant qu'invité, sympathisant ou "
+"autorité (article 5)."
 
 #: .\templates\governance\member_portal\assembly_participate.html:10
 msgid "Note: Only registered active members can vote."
-msgstr "Note: Only registered active members can vote."
+msgstr "Remarque : Seuls les membres actifs inscrits peuvent voter."
 
 #: .\templates\governance\member_portal\assembly_participate.html:12
 msgid "Register as Member"
-msgstr "Register as Member"
+msgstr "S'inscrire en tant que membre"
 
 #: .\templates\governance\member_portal\assembly_participate.html:42
 msgid "Register your attendance for this assembly"
-msgstr "Register your attendance for this assembly"
+msgstr "Enregistrez votre présence à cette assemblée"
 
 #: .\templates\governance\member_portal\assembly_participate.html:48
 msgid "Your Name"
-msgstr "Your Name"
+msgstr "Votre nom"
 
 #: .\templates\governance\member_portal\assembly_participate.html:68
 #: .\templates\governance\member_portal\assembly_participate.html:78
 msgid "Register Attendance"
-msgstr "Register Attendance"
+msgstr "S'inscrire"
 
 #: .\templates\governance\member_portal\assembly_participate.html:89
 msgid "You are registered for this assembly"
-msgstr "You are registered for this assembly"
+msgstr "Vous êtes inscrit à cette assemblée"
 
 #: .\templates\governance\member_portal\assembly_participate.html:120
 msgid "Voting"
-msgstr "Voting"
+msgstr "Vote"
 
 #: .\templates\governance\member_portal\assembly_participate.html:153
 msgid "Your vote"
-msgstr "Your vote"
+msgstr "Votre vote"
 
 #: .\templates\governance\member_portal\assembly_participate.html:167
 msgid "This is a secret ballot vote. Your choice will be kept confidential."
-msgstr "This is a secret ballot vote. Your choice will be kept confidential."
+msgstr ""
+"Il s'agit d'un vote à bulletin secret. Votre choix restera confidentiel."
 
 #: .\templates\governance\member_portal\assembly_participate.html:169
 msgid ""
 "This is a show of hands vote. Your choice will be visible to all members."
 msgstr ""
-"This is a show of hands vote. Your choice will be visible to all members."
+"Il s'agit d'un vote à main levée. Votre choix sera visible par tous les "
+"membres."
 
 #: .\templates\governance\member_portal\assembly_participate.html:171
 #: .\templates\governance\member_portal\assembly_participate.html:245
 msgid "Cast your vote:"
-msgstr "Cast your vote:"
+msgstr "Votez :"
 
 #: .\templates\governance\member_portal\directory.html:9
 msgid "ASCAI Member Directory"
-msgstr "ASCAI Member Directory"
+msgstr "ASCAI Annuaire des membres"
 
 #: .\templates\governance\member_portal\directory.html:10
 msgid "Browse active ASCAI members"
-msgstr "Browse active ASCAI members"
+msgstr "Parcourir les membres ASCAI actifs"
 
 #: .\templates\governance\member_portal\directory.html:16
 #: .\templates\governance\members\list.html:24
@@ -13694,7 +13732,7 @@ msgstr "Aucun utilisateur"
 # Transaction Categories
 #: .\templates\governance\member_portal\directory.html:53
 msgid "Member since"
-msgstr "Member since"
+msgstr "Membre depuis"
 
 #: .\templates\governance\member_portal\directory.html:64
 #: .\templates\governance\member_portal\directory.html:118
@@ -13712,62 +13750,62 @@ msgstr "Essayez d'ajuster vos filtres"
 
 #: .\templates\governance\member_portal\directory.html:79
 msgid "Member Since"
-msgstr "Member Since"
+msgstr "Membre depuis"
 
 # Additional Template Strings
 #: .\templates\governance\member_portal\elections.html:9
 msgid "ASCAI Elections"
-msgstr "ASCAI Elections"
+msgstr "ASCAI Élections"
 
 #: .\templates\governance\member_portal\elections.html:10
 msgid ""
 "Participate in association elections. Active members can vote for executive "
 "board positions."
 msgstr ""
-"Participate in association elections. Active members can vote for executive "
-"board positions."
+"Participez aux élections des associations. Les membres actifs peuvent voter "
+"pour les postes du conseil d'administration."
 
 #: .\templates\governance\member_portal\elections.html:21
 msgid "Membership Not Active"
-msgstr "Membership Not Active"
+msgstr "Adhésion non active"
 
 #: .\templates\governance\member_portal\elections.html:23
 msgid ""
 "Only active members can vote in elections. Please ensure your membership is "
 "active and your dues are paid."
 msgstr ""
-"Only active members can vote in elections. Please ensure your membership is "
-"active and your dues are paid."
+"Seuls les membres actifs peuvent voter aux élections. Veuillez vous assurer "
+"que votre adhésion est active et que vos cotisations sont payées."
 
 #: .\templates\governance\member_portal\elections.html:69
 msgid "Your vote has been recorded"
-msgstr "Your vote has been recorded"
+msgstr "Votre vote a été enregistré"
 
 #: .\templates\governance\member_portal\elections.html:111
 msgid "Upcoming Election"
-msgstr "Upcoming Election"
+msgstr "Élection à venir"
 
 #: .\templates\governance\member_portal\elections.html:111
 msgid "Voting will open on"
-msgstr "Voting will open on"
+msgstr "Le vote s'ouvrira le"
 
 # Executive Board Status
 #: .\templates\governance\member_portal\elections.html:118
 msgid "Election Completed"
-msgstr "Election Completed"
+msgstr "Élection terminée"
 
 #: .\templates\governance\member_portal\elections.html:119
 msgid "Final results are now available"
-msgstr "Final results are now available"
+msgstr "Les résultats finaux sont maintenant disponibles"
 
 #: .\templates\governance\member_portal\elections.html:122
 #: .\templates\governance\member_portal\elections.html:138
 msgid "View Results"
-msgstr "View Results"
+msgstr "Afficher les résultats"
 
 #: .\templates\governance\member_portal\elections.html:174
 msgid "No elections available at this time."
-msgstr "No elections available at this time."
+msgstr "Aucune élection disponible pour le moment."
 
 #: .\templates\governance\member_portal\index.html:4
 msgid "My ASCAI Membership"
@@ -13810,15 +13848,17 @@ msgstr "Aucune cotisation pour cette année"
 #: .\templates\governance\member_portal\index.html:103
 #: .\templates\governance\members\detail.html:140
 msgid "Due"
-msgstr "Due"
+msgstr "Exigible"
 
 #: .\templates\governance\member_portal\index.html:104
 msgid "Membership validity always runs until 31 Dec of the paid year."
-msgstr "Membership validity always runs until 31 Dec of the paid year."
+msgstr ""
+"La validité de l'adhésion court toujours jusqu'au 31 décembre de l'année "
+"payée."
 
 #: .\templates\governance\member_portal\index.html:109
 msgid "Request Payment"
-msgstr "Request Payment"
+msgstr "Demander un paiement"
 
 #: .\templates\governance\member_portal\index.html:116
 #: .\templates\governance\member_portal\my_dues.html:152
@@ -13828,27 +13868,27 @@ msgstr "Aucun enregistrement de cotisation"
 
 #: .\templates\governance\member_portal\index.html:139
 msgid "Participate"
-msgstr "Participate"
+msgstr "Participer"
 
 #: .\templates\governance\member_portal\index.html:145
 msgid "No upcoming assemblies"
-msgstr "No upcoming assemblies"
+msgstr "Aucune assemblée à venir"
 
 #: .\templates\governance\member_portal\index.html:167
 msgid "Ends"
-msgstr "Ends"
+msgstr "Se termine"
 
 #: .\templates\governance\member_portal\index.html:174
 msgid "Active members only"
-msgstr "Active members only"
+msgstr "Membres actifs uniquement"
 
 #: .\templates\governance\member_portal\index.html:190
 msgid "Starts"
-msgstr "Starts"
+msgstr "Commence"
 
 #: .\templates\governance\member_portal\index.html:196
 msgid "No active or upcoming elections"
-msgstr "No active or upcoming elections"
+msgstr "Aucune élection active ou à venir"
 
 #: .\templates\governance\member_portal\index.html:202
 msgid "Quick Actions"
@@ -13857,52 +13897,52 @@ msgstr "Actions rapides"
 # Additional Template Strings
 #: .\templates\governance\member_portal\index.html:210
 msgid "View Elections"
-msgstr "View Elections"
+msgstr "Voir les élections"
 
 #: .\templates\governance\member_portal\index.html:211
 msgid "See all elections and vote"
-msgstr "See all elections and vote"
+msgstr "Voir toutes les élections et voter"
 
 #: .\templates\governance\member_portal\index.html:222
 msgid "View Assemblies"
-msgstr "View Assemblies"
+msgstr "Afficher les assemblages"
 
 #: .\templates\governance\member_portal\index.html:223
 msgid "Participate in assemblies"
-msgstr "Participate in assemblies"
+msgstr "Participer aux assemblées"
 
 #: .\templates\governance\member_portal\index.html:235
 msgid "Propose Rules changes"
-msgstr "Propose Rules changes"
+msgstr "Proposer des modifications aux règles"
 
 #: .\templates\governance\member_portal\index.html:248
 msgid "Run for executive position"
-msgstr "Run for executive position"
+msgstr "Candidature à un poste de direction"
 
 #: .\templates\governance\member_portal\index.html:261
 msgid "Browse all members"
-msgstr "Browse all members"
+msgstr "Parcourez tous les membres"
 
 #: .\templates\governance\member_portal\index.html:273
 msgid "View and pay dues"
-msgstr "View and pay dues"
+msgstr "Consulter et payer les cotisations"
 
 #: .\templates\governance\member_portal\index.html:283
 msgid "Recent Assembly Attendances"
-msgstr "Recent Assembly Attendances"
+msgstr "Présences récentes à l’Assemblée"
 
 # Target Audience
 #: .\templates\governance\member_portal\index.html:306
 msgid "View All Members"
-msgstr "View All Members"
+msgstr "Afficher tous les membres"
 
 #: .\templates\governance\member_portal\index.html:309
 msgid "Browse and connect with other ASCAI members"
-msgstr "Browse and connect with other ASCAI members"
+msgstr "Parcourez et connectez-vous avec d'autres membres ASCAI"
 
 #: .\templates\governance\member_portal\index.html:314
 msgid "Browse Member Directory"
-msgstr "Browse Member Directory"
+msgstr "Parcourir le répertoire des membres"
 
 #: .\templates\governance\member_portal\my_dues.html:4
 msgid "My Membership Dues"
@@ -13918,7 +13958,8 @@ msgstr "Retour au portail"
 
 #: .\templates\governance\member_portal\my_dues.html:26
 msgid "Paid dues cover the calendar year and expire on 31 Dec."
-msgstr "Paid dues cover the calendar year and expire on 31 Dec."
+msgstr ""
+"Les cotisations payées couvrent l’année civile et expirent le 31 décembre."
 
 #: .\templates\governance\member_portal\my_dues.html:46
 msgid "Payment Instructions"
@@ -13955,51 +13996,52 @@ msgstr "Historique des cotisations"
 
 #: .\templates\governance\member_portal\register.html:4
 msgid "Register as ASCAI Member"
-msgstr "Register as ASCAI Member"
+msgstr "Inscrivez-vous en tant que membre ASCAI"
 
 #: .\templates\governance\member_portal\register.html:16
 msgid ""
 "Register as a member of the Association of Cameroonian Students in Italy "
 "(ASCAI)"
 msgstr ""
-"Register as a member of the Association of Cameroonian Students in Italy "
-"(ASCAI)"
+"Inscrivez-vous en tant que membre de l'Association des étudiants Cameroonian"
+" en Italy (ASCAI)"
 
 #: .\templates\governance\member_portal\register.html:25
 msgid "Step 1"
-msgstr "Step 1"
+msgstr "Étape 1"
 
 #: .\templates\governance\member_portal\register.html:27
 msgid "Complete registration form"
-msgstr "Complete registration form"
+msgstr "Formulaire d'inscription complet"
 
 #: .\templates\governance\member_portal\register.html:34
 msgid "Step 2"
-msgstr "Step 2"
+msgstr "Étape 2"
 
 #: .\templates\governance\member_portal\register.html:36
 msgid "Admin verification"
-msgstr "Admin verification"
+msgstr "Vérification de l'administrateur"
 
 #: .\templates\governance\member_portal\register.html:43
 msgid "Step 3"
-msgstr "Step 3"
+msgstr "Étape 3"
 
 #: .\templates\governance\member_portal\register.html:45
 msgid "Pay dues & activate"
-msgstr "Pay dues & activate"
+msgstr "Payer les cotisations et activer"
 
 #: .\templates\governance\member_portal\register.html:90
 msgid "Verification Required"
-msgstr "Verification Required"
+msgstr "Vérification requise"
 
 #: .\templates\governance\member_portal\register.html:91
 msgid ""
 "Your membership will be reviewed by an administrator. Once verified, you'll "
 "have full access to all member features including voting rights."
 msgstr ""
-"Your membership will be reviewed by an administrator. Once verified, you'll "
-"have full access to all member features including voting rights."
+"Votre adhésion sera examinée par un administrateur. Une fois vérifié, vous "
+"aurez un accès complet à toutes les fonctionnalités des membres, y compris "
+"les droits de vote."
 
 #: .\templates\governance\member_portal\register.html:92
 msgid ""
@@ -14007,13 +14049,13 @@ msgid ""
 "the platform use a separate partner listing channel, not the regular member "
 "dues."
 msgstr ""
-"Service providers who want to advertise or offer verified services through "
-"the platform use a separate partner listing channel, not the regular member "
-"dues."
+"Les fournisseurs de services qui souhaitent faire de la publicité ou offrir "
+"des services vérifiés via la plateforme utilisent un canal de liste de "
+"partenaires distinct, et non les cotisations des membres réguliers."
 
 #: .\templates\governance\member_portal\register.html:102
 msgid "Submit Registration"
-msgstr "Submit Registration"
+msgstr "Soumettre l'inscription"
 
 #: .\templates\governance\members\detail.html:19
 #: .\templates\governance\members\form.html:4
@@ -14129,7 +14171,7 @@ msgstr "Impact & Sponsorship"
 #: .\templates\includes\footer.html:61 .\templates\includes\navbar.html:35
 #: .\templates\includes\navbar.html:129 .\templates\students\index.html:12
 msgid "Student Guide"
-msgstr "Student Guide"
+msgstr "Guide de l'étudiant"
 
 #: .\templates\includes\footer.html:75
 msgid "Questions, support, partnership enquiries, and community outreach."
@@ -14522,7 +14564,7 @@ msgstr ""
 
 #: .\templates\scholarships\partials\scholarship_list_partial.html:51
 msgid "Verified source"
-msgstr "Source v?rifi?e"
+msgstr "Source vérifiée"
 
 #: .\templates\scholarships\partials\scholarship_list_partial.html:82
 #: .\templates\students\index.html:62
@@ -14531,7 +14573,7 @@ msgstr "Financement"
 
 #: .\templates\scholarships\partials\scholarship_list_partial.html:84
 msgid "Amount not listed"
-msgstr "Montant non indiqu?"
+msgstr "Montant non indiqué"
 
 #: .\templates\scholarships\partials\scholarship_list_partial.html:88
 #: .\templates\scholarships\scholarship_detail.html:73
@@ -14542,20 +14584,20 @@ msgstr "Date limite"
 #: .\templates\scholarships\partials\scholarship_list_partial.html:105
 #, python-format
 msgid "Imported from %(source)s"
-msgstr "Import? depuis %(source)s"
+msgstr "Importé depuis %(source)s"
 
 #: .\templates\scholarships\partials\scholarship_list_partial.html:134
 #: .\templates\students\partials\scholarship_list_partial.html:64
 msgid "No scholarships found"
-msgstr "Aucune bourse trouv?e"
+msgstr "Aucune bourse trouvée"
 
 #: .\templates\scholarships\partials\scholarship_list_partial.html:135
 msgid ""
 "Try adjusting your filters, broadening your level or region, or removing the"
 " deadline constraint to see more results."
 msgstr ""
-"Essayez d?ajuster vos filtres, d??largir le niveau ou la r?gion, ou de "
-"retirer la contrainte de date limite pour voir plus de r?sultats."
+"Essayez d’ajuster vos filtres, d’élargir le niveau ou la région, ou de "
+"retirer la contrainte de date limite pour voir plus de résultats."
 
 #: .\templates\scholarships\scholarship_detail.html:5
 msgid "Scholarship opportunity for students in Lazio."
@@ -14578,12 +14620,12 @@ msgstr "Save this scholarship"
 #: .\templates\scholarships\scholarship_detail.html:53
 #: .\templates\universities\university_detail.html:52
 msgid "Quick view"
-msgstr "Aper?u rapide"
+msgstr "Aperçu rapide"
 
 #: .\templates\scholarships\scholarship_detail.html:96
 #: .\templates\students\erasmus_exchange.html:40
 msgid "Eligibility"
-msgstr "Eligibility"
+msgstr "Admissibilité"
 
 #: .\templates\scholarships\scholarship_detail.html:106
 msgid "Download the supporting document"
@@ -14615,8 +14657,8 @@ msgid ""
 "the final deadline, eligibility rules, and documents on the source page "
 "before applying."
 msgstr ""
-"Cette opportunit? a ?t? import?e depuis une source publique officielle. "
-"V?rifiez la date limite finale, les r?gles d??ligibilit? et les documents "
+"Cette opportunité a été importée depuis une source publique officielle. "
+"Vérifiez la date limite finale, les règles d’éligibilité et les documents "
 "sur la page source avant de postuler."
 
 #: .\templates\scholarships\scholarship_detail.html:140
@@ -14687,23 +14729,23 @@ msgstr "Filter scholarships"
 
 #: .\templates\scholarships\scholarship_list.html:54
 msgid "Narrow the opportunities that matter"
-msgstr "Affinez les opportunit?s importantes"
+msgstr "Affinez les opportunités importantes"
 
 #: .\templates\scholarships\scholarship_list.html:56
 msgid ""
 "Search by provider or title, then reduce the list by level, region, urgency,"
 " or DISCO Lazio support."
 msgstr ""
-"Recherchez par organisme ou par titre, puis filtrez par niveau, r?gion, "
+"Recherchez par organisme ou par titre, puis filtrez par niveau, région, "
 "urgence ou soutien DISCO Lazio."
 
 #: .\templates\scholarships\scholarship_list.html:61
 msgid "Results now"
-msgstr "R?sultats actuels"
+msgstr "Résultats actuels"
 
 #: .\templates\scholarships\scholarship_list.html:65
 msgid "Upcoming deadlines"
-msgstr "Dates limites ? venir"
+msgstr "Dates limites à venir"
 
 #: .\templates\scholarships\scholarship_list.html:69
 msgid "Best for Lazio"
@@ -14711,15 +14753,15 @@ msgstr "Meilleur pour le Latium"
 
 #: .\templates\scholarships\scholarship_list.html:84
 msgid "Search by title, provider, or keyword"
-msgstr "Rechercher par titre, organisme ou mot-cl?"
+msgstr "Rechercher par titre, organisme ou mot-clé"
 
 #: .\templates\scholarships\scholarship_list.html:89
 msgid "All education levels"
-msgstr "Tous les niveaux d??tudes"
+msgstr "Tous les niveaux d’études"
 
 #: .\templates\scholarships\scholarship_list.html:98
 msgid "All regions"
-msgstr "Toutes les r?gions"
+msgstr "Toutes les régions"
 
 #: .\templates\scholarships\scholarship_list.html:106
 msgid "All deadlines"
@@ -14731,7 +14773,7 @@ msgstr "This month"
 
 #: .\templates\scholarships\scholarship_list.html:109
 msgid "Past deadlines"
-msgstr "Dates limites pass?es"
+msgstr "Dates limites passées"
 
 #: .\templates\scholarships\scholarship_list.html:113
 msgid "Priority lane"
@@ -14743,7 +14785,7 @@ msgstr "Uniquement DISCO Lazio"
 
 #: .\templates\scholarships\scholarship_list.html:125
 msgid "Refreshing results"
-msgstr "Actualisation des r?sultats"
+msgstr "Actualisation des résultats"
 
 #: .\templates\socialaccount\login.html:4
 msgid "Signing in with Google"
@@ -14836,31 +14878,31 @@ msgstr "Lettres de recommandation"
 
 #: .\templates\students\enrollment_process.html:35
 msgid "Step 3: Prepare Required Documents"
-msgstr "Step 3: Prepare Required Documents"
+msgstr "Étape 3 : Préparez les documents requis"
 
 #: .\templates\students\enrollment_process.html:37
 msgid ""
 "Gather all necessary documents and have them translated and certified if "
 "required. Download necessary forms from our"
 msgstr ""
-"Gather all necessary documents and have them translated and certified if "
-"required. Download necessary forms from our"
+"Rassemblez tous les documents nécessaires et faites-les traduire et "
+"certifier si nécessaire. Téléchargez les formulaires nécessaires sur notre"
 
 #: .\templates\students\enrollment_process.html:38
 msgid "Downloads section"
-msgstr "Downloads section"
+msgstr "Section téléchargements"
 
 #: .\templates\students\enrollment_process.html:43
 msgid "Step 4: Submit Application"
-msgstr "Step 4: Submit Application"
+msgstr "Étape 4 : Soumettre la candidature"
 
 #: .\templates\students\enrollment_process.html:45
 msgid "Submit your application through the university\\"
-msgstr "Submit your application through the university\\"
+msgstr "Soumettez votre candidature via l'université\\"
 
 #: .\templates\students\enrollment_process.html:50
 msgid "Step 5: Visa and Residence Permit"
-msgstr "Step 5: Visa and Residence Permit"
+msgstr "Étape 5 : Visa et permis de séjour"
 
 #: .\templates\students\enrollment_process.html:52
 msgid ""
@@ -14868,222 +14910,228 @@ msgid ""
 "country. After arriving in Italy, apply for a residence permit (permesso di "
 "soggiorno) within 8 days."
 msgstr ""
-"Once accepted, apply for a student visa at the Italian consulate in your "
-"country. After arriving in Italy, apply for a residence permit (permesso di "
-"soggiorno) within 8 days."
+"Une fois accepté, demandez un visa étudiant au consulat Italian de votre "
+"pays. Après votre arrivée à Italy, demandez un permis de séjour (permesso di"
+" soggiorno) dans les 8 jours."
 
 #: .\templates\students\enrollment_process.html:57
 msgid "Step 6: Finalize Enrollment"
-msgstr "Step 6: Finalize Enrollment"
+msgstr "Étape 6 : finaliser l'inscription"
 
 #: .\templates\students\enrollment_process.html:59
 msgid ""
 "Complete the final enrollment procedures at your university, including "
 "paying tuition fees and registering for courses."
 msgstr ""
-"Complete the final enrollment procedures at your university, including "
-"paying tuition fees and registering for courses."
+"Effectuez les procédures d'inscription finales dans votre université, y "
+"compris le paiement des frais de scolarité et l'inscription aux cours."
 
 #: .\templates\students\erasmus_exchange.html:4
 #: .\templates\students\erasmus_exchange.html:9
 msgid "Erasmus & Exchange Programs"
-msgstr "Erasmus & Exchange Programs"
+msgstr "Programmes Erasmus et d'échange"
 
 #: .\templates\students\erasmus_exchange.html:11
 msgid ""
 "Information about Erasmus+ and international exchange programs available to "
 "students in Lazio universities."
 msgstr ""
-"Information about Erasmus+ and international exchange programs available to "
-"students in Lazio universities."
+"Informations sur Erasmus+ et les programmes d'échanges internationaux "
+"proposés aux étudiants des universités Lazio."
 
 #: .\templates\students\erasmus_exchange.html:23
 msgid "Erasmus+ Program"
-msgstr "Erasmus+ Program"
+msgstr "Programme Erasmus+"
 
 #: .\templates\students\erasmus_exchange.html:26
 msgid "Erasmus+ is the European Union\\"
-msgstr "Erasmus+ is the European Union\\"
+msgstr "Erasmus+ est l'Union européenne\\"
 
 #: .\templates\students\erasmus_exchange.html:30
 msgid "Benefits"
-msgstr "Benefits"
+msgstr "Avantages"
 
 #: .\templates\students\erasmus_exchange.html:32
 msgid "Study abroad for 3-12 months"
-msgstr "Study abroad for 3-12 months"
+msgstr "Étudier à l'étranger pendant 3 à 12 mois"
 
 #: .\templates\students\erasmus_exchange.html:33
 msgid "Monthly grant to cover living costs"
-msgstr "Monthly grant to cover living costs"
+msgstr "Subvention mensuelle pour couvrir les frais de subsistance"
 
 #: .\templates\students\erasmus_exchange.html:34
 msgid "Tuition fees waived at host university"
-msgstr "Tuition fees waived at host university"
+msgstr "Frais de scolarité supprimés à l'université d'accueil"
 
 #: .\templates\students\erasmus_exchange.html:35
 msgid "Academic recognition of studies abroad"
-msgstr "Academic recognition of studies abroad"
+msgstr "Reconnaissance académique des études à l'étranger"
 
 #: .\templates\students\erasmus_exchange.html:36
 msgid "Language support and cultural integration"
-msgstr "Language support and cultural integration"
+msgstr "Soutien linguistique et intégration culturelle"
 
 #: .\templates\students\erasmus_exchange.html:42
 msgid "Enrolled in a higher education institution"
-msgstr "Enrolled in a higher education institution"
+msgstr "Inscrit dans un établissement d'enseignement supérieur"
 
 #: .\templates\students\erasmus_exchange.html:43
 msgid "At least in second year of studies"
-msgstr "At least in second year of studies"
+msgstr "Au moins en deuxième année d'études"
 
 #: .\templates\students\erasmus_exchange.html:44
 msgid "Your university must have an Erasmus+ agreement"
-msgstr "Your university must have an Erasmus+ agreement"
+msgstr "Votre université doit avoir un accord Erasmus+"
 
 #: .\templates\students\erasmus_exchange.html:45
 msgid "Meet academic requirements set by your university"
-msgstr "Meet academic requirements set by your university"
+msgstr "Répondre aux exigences académiques fixées par votre université"
 
 #: .\templates\students\erasmus_exchange.html:53
 msgid "International Exchange Programs"
-msgstr "International Exchange Programs"
+msgstr "Programmes d'échange internationaux"
 
 #: .\templates\students\erasmus_exchange.html:55
 msgid ""
 "Many universities in Lazio participate in bilateral exchange agreements with"
 " universities worldwide, offering students opportunities to study abroad."
 msgstr ""
-"Many universities in Lazio participate in bilateral exchange agreements with"
-" universities worldwide, offering students opportunities to study abroad."
+"De nombreuses universités de Lazio participent à des accords d'échange "
+"bilatéraux avec des universités du monde entier, offrant aux étudiants la "
+"possibilité d'étudier à l'étranger."
 
 #: .\templates\students\erasmus_exchange.html:60
 msgid "Bilateral Agreements"
-msgstr "Bilateral Agreements"
+msgstr "Accords bilatéraux"
 
 #: .\templates\students\erasmus_exchange.html:62
 msgid ""
 "Direct exchange agreements between Lazio universities and partner "
 "institutions worldwide."
 msgstr ""
-"Direct exchange agreements between Lazio universities and partner "
-"institutions worldwide."
+"Accords d'échange direct entre les universités Lazio et les institutions "
+"partenaires du monde entier."
 
 #: .\templates\students\erasmus_exchange.html:65
 msgid "Semester or full-year exchanges"
-msgstr "Semester or full-year exchanges"
+msgstr "Echanges semestriels ou annuels"
 
 #: .\templates\students\erasmus_exchange.html:66
 msgid "Tuition fee waivers"
-msgstr "Tuition fee waivers"
+msgstr "Dispenses de frais de scolarité"
 
 #: .\templates\students\erasmus_exchange.html:67
 msgid "Credit transfer arrangements"
-msgstr "Credit transfer arrangements"
+msgstr "Modalités de transfert de crédits"
 
 #: .\templates\students\erasmus_exchange.html:72
 msgid "Summer Programs"
-msgstr "Summer Programs"
+msgstr "Programmes d'été"
 
 #: .\templates\students\erasmus_exchange.html:74
 msgid "Short-term study abroad opportunities during summer months."
-msgstr "Short-term study abroad opportunities during summer months."
+msgstr ""
+"Possibilités d'études à court terme à l'étranger pendant les mois d'été."
 
 #: .\templates\students\erasmus_exchange.html:77
 msgid "4-8 week programs"
-msgstr "4-8 week programs"
+msgstr "Programmes de 4 à 8 semaines"
 
 #: .\templates\students\erasmus_exchange.html:78
 msgid "Intensive language courses"
-msgstr "Intensive language courses"
+msgstr "Cours de langue intensifs"
 
 #: .\templates\students\erasmus_exchange.html:79
 msgid "Cultural immersion experiences"
-msgstr "Cultural immersion experiences"
+msgstr "Expériences d'immersion culturelle"
 
 #: .\templates\students\erasmus_exchange.html:87
 msgid "How to Apply"
-msgstr "How to Apply"
+msgstr "Comment postuler"
 
 #: .\templates\students\erasmus_exchange.html:92
 msgid "Check Your University\\"
-msgstr "Check Your University\\"
+msgstr "Vérifiez votre université\\"
 
 #: .\templates\students\erasmus_exchange.html:94
 msgid "Contact your university\\"
-msgstr "Contact your university\\"
+msgstr "Contactez votre université\\"
 
 #: .\templates\students\erasmus_exchange.html:102
 msgid "Review Eligibility Requirements"
-msgstr "Review Eligibility Requirements"
+msgstr "Examiner les conditions d'éligibilité"
 
 #: .\templates\students\erasmus_exchange.html:104
 msgid ""
 "Each program has specific requirements including GPA, language proficiency, "
 "and academic standing. Ensure you meet all criteria."
 msgstr ""
-"Each program has specific requirements including GPA, language proficiency, "
-"and academic standing. Ensure you meet all criteria."
+"Chaque programme comporte des exigences spécifiques, notamment la moyenne "
+"cumulative, la maîtrise de la langue et le niveau académique. Assurez-vous "
+"de répondre à tous les critères."
 
 #: .\templates\students\erasmus_exchange.html:112
 msgid "Prepare Application Documents"
-msgstr "Prepare Application Documents"
+msgstr "Préparer les documents de candidature"
 
 #: .\templates\students\erasmus_exchange.html:114
 msgid ""
 "Gather transcripts, language certificates, motivation letter, and letters of"
 " recommendation. Check specific requirements for each program."
 msgstr ""
-"Gather transcripts, language certificates, motivation letter, and letters of"
-" recommendation. Check specific requirements for each program."
+"Rassemblez les relevés de notes, les certificats de langue, les lettres de "
+"motivation et les lettres de recommandation. Vérifiez les exigences "
+"spécifiques pour chaque programme."
 
 #: .\templates\students\erasmus_exchange.html:122
 msgid "Submit Application Before Deadline"
-msgstr "Submit Application Before Deadline"
+msgstr "Soumettre la candidature avant la date limite"
 
 #: .\templates\students\erasmus_exchange.html:124
 msgid ""
 "Exchange programs typically have early application deadlines. Submit your "
 "complete application well in advance."
 msgstr ""
-"Exchange programs typically have early application deadlines. Submit your "
-"complete application well in advance."
+"Les programmes d'échange ont généralement des dates limites de candidature "
+"anticipées. Soumettez votre candidature complète bien à l’avance."
 
 #: .\templates\students\erasmus_exchange.html:132
 msgid "Prepare for Your Exchange"
-msgstr "Prepare for Your Exchange"
+msgstr "Préparez votre échange"
 
 #: .\templates\students\erasmus_exchange.html:134
 msgid ""
 "Once accepted, complete visa requirements, arrange accommodation, and attend"
 " pre-departure orientation sessions."
 msgstr ""
-"Once accepted, complete visa requirements, arrange accommodation, and attend"
-" pre-departure orientation sessions."
+"Une fois accepté, remplissez les conditions de visa, organisez l'hébergement"
+" et assistez aux séances d'orientation avant le départ."
 
 #: .\templates\students\erasmus_exchange.html:143
 msgid "Useful Links & Resources"
-msgstr "Useful Links & Resources"
+msgstr "Liens et ressources utiles"
 
 #: .\templates\students\erasmus_exchange.html:146
 msgid "Erasmus+ Official Website"
-msgstr "Erasmus+ Official Website"
+msgstr "Site officiel Erasmus+"
 
 #: .\templates\students\erasmus_exchange.html:147
 msgid "Official information about the Erasmus+ program"
-msgstr "Official information about the Erasmus+ program"
+msgstr "Informations officielles sur le programme Erasmus+"
 
 #: .\templates\students\erasmus_exchange.html:150
 msgid "Study in Italy"
-msgstr "Study in Italy"
+msgstr "Étudier en Italy"
 
 #: .\templates\students\erasmus_exchange.html:151
 msgid "Information for international students in Italy"
-msgstr "Information for international students in Italy"
+msgstr "Informations pour les étudiants internationaux en Italy"
 
 #: .\templates\students\erasmus_exchange.html:160
 msgid "For questions about exchange programs, contact your university\\"
-msgstr "For questions about exchange programs, contact your university\\"
+msgstr ""
+"Pour toute question sur les programmes d'échange, contactez votre "
+"université\\"
 
 # Contact Page Translations
 #: .\templates\students\erasmus_exchange.html:164
@@ -15093,7 +15141,7 @@ msgstr "Contactez-nous"
 
 #: .\templates\students\erasmus_exchange.html:167
 msgid "Ask in Forum"
-msgstr "Ask in Forum"
+msgstr "Demander sur le forum"
 
 #: .\templates\students\erasmus_exchange.html:175
 #: .\templates\students\orientation.html:270
@@ -15102,55 +15150,55 @@ msgstr "Ask in Forum"
 #: .\templates\students\study_programs.html:173
 #: .\templates\students\universities_list.html:73
 msgid "← Back to Complete Guide"
-msgstr "← Back to Complete Guide"
+msgstr "← Retour au guide complet"
 
 # Election Status
 #: .\templates\students\guide_section_detail.html:41
 #: .\templates\students\new_student_guide.html:24
 msgid "Your Progress"
-msgstr "Your Progress"
+msgstr "Votre progression"
 
 #: .\templates\students\guide_section_detail.html:53
 msgid "Step-by-Step Guide"
-msgstr "Step-by-Step Guide"
+msgstr "Guide étape par étape"
 
 #: .\templates\students\guide_section_detail.html:109
 msgid "Mark as Complete"
-msgstr "Mark as Complete"
+msgstr "Marquer comme terminé"
 
 #: .\templates\students\guide_step_detail.html:43
 msgid "Watch Video Tutorial"
-msgstr "Watch Video Tutorial"
+msgstr "Regarder le didacticiel vidéo"
 
 # Executive Board Status
 #: .\templates\students\guide_step_detail.html:69
 msgid "Step Completed"
-msgstr "Step Completed"
+msgstr "Étape terminée"
 
 #: .\templates\students\guide_step_detail.html:79
 msgid "Mark Step as Complete"
-msgstr "Mark Step as Complete"
+msgstr "Marquer l'étape comme terminée"
 
 #: .\templates\students\guide_step_detail.html:100
 #: .\templates\students\guide_step_detail.html:113
 msgid "Back to Section"
-msgstr "Back to Section"
+msgstr "Retour à la rubrique"
 
 #: .\templates\students\index.html:4
 msgid "Studying in Lazio - Complete Guide"
-msgstr "Studying in Lazio - Complete Guide"
+msgstr "Étudier à Lazio - Guide complet"
 
 #: .\templates\students\index.html:5
 msgid ""
 "A practical and inspiring guide for Cameroonian students preparing to study,"
 " settle, and thrive in Lazio."
 msgstr ""
-"A practical and inspiring guide for Cameroonian students preparing to study,"
-" settle, and thrive in Lazio."
+"Un guide pratique et inspirant pour les étudiants Cameroonian qui se "
+"préparent à étudier, à s'installer et à s'épanouir en Lazio."
 
 #: .\templates\students\index.html:14
 msgid "A sharper path for studying and living well in Lazio."
-msgstr "A sharper path for studying and living well in Lazio."
+msgstr "Un chemin plus précis pour étudier et bien vivre en Lazio."
 
 #: .\templates\students\index.html:17
 msgid ""
@@ -15158,151 +15206,151 @@ msgid ""
 "scholarships, documents, orientation, and practical support designed around "
 "the real student journey."
 msgstr ""
-"Use this guide to move from uncertainty to clarity with universities, "
-"scholarships, documents, orientation, and practical support designed around "
-"the real student journey."
+"Utilisez ce guide pour passer de l'incertitude à la clarté avec des "
+"universités, des bourses, des documents, des orientations et un soutien "
+"pratique conçus autour du véritable parcours étudiant."
 
 #: .\templates\students\index.html:20
 msgid "Open the step-by-step guide"
-msgstr "Open the step-by-step guide"
+msgstr "Ouvrez le guide étape par étape"
 
 #: .\templates\students\index.html:21
 msgid "See resources"
-msgstr "See resources"
+msgstr "Voir les ressources"
 
 #: .\templates\students\index.html:26
 msgid "At a glance"
-msgstr "At a glance"
+msgstr "En un coup d'œil"
 
 #: .\templates\students\index.html:43
 msgid "What this section covers"
-msgstr "What this section covers"
+msgstr "Ce que couvre cette section"
 
 #: .\templates\students\index.html:45
 msgid "Choosing a university and degree path"
-msgstr "Choosing a university and degree path"
+msgstr "Choisir une université et un parcours universitaire"
 
 #: .\templates\students\index.html:46
 msgid "Funding and scholarship preparation"
-msgstr "Funding and scholarship preparation"
+msgstr "Financement et préparation des bourses"
 
 #: .\templates\students\index.html:47
 msgid "Enrollment, arrival, and orientation"
-msgstr "Enrollment, arrival, and orientation"
+msgstr "Inscription, arrivée et orientation"
 
 #: .\templates\students\index.html:48
 msgid "Living advice for Rome and Lazio"
-msgstr "Living advice for Rome and Lazio"
+msgstr "Conseils de vie pour Rome et Lazio"
 
 #: .\templates\students\index.html:58
 msgid "Compare where to study"
-msgstr "Compare where to study"
+msgstr "Comparez où étudier"
 
 #: .\templates\students\index.html:59
 msgid ""
 "Explore universities across Lazio with a cleaner view of location, program "
 "fit, and tuition range."
 msgstr ""
-"Explore universities across Lazio with a cleaner view of location, program "
-"fit, and tuition range."
+"Explorez les universités de Lazio avec une vue plus claire de l'emplacement,"
+" de l'adéquation des programmes et de l'éventail des frais de scolarité."
 
 #: .\templates\students\index.html:63
 msgid "Track the right scholarships"
-msgstr "Track the right scholarships"
+msgstr "Suivez les bonnes bourses"
 
 #: .\templates\students\index.html:64
 msgid ""
 "Find DISCO Lazio and other scholarship opportunities without digging through"
 " scattered information."
 msgstr ""
-"Find DISCO Lazio and other scholarship opportunities without digging through"
-" scattered information."
+"Trouvez DISCO Lazio et d’autres opportunités de bourses sans fouiller dans "
+"des informations éparses."
 
 #: .\templates\students\index.html:67
 msgid "Enrollment"
-msgstr "Enrollment"
+msgstr "Inscription"
 
 #: .\templates\students\index.html:68
 msgid "Understand the process early"
-msgstr "Understand the process early"
+msgstr "Comprendre le processus dès le début"
 
 #: .\templates\students\index.html:69
 msgid ""
 "Follow a clearer route through applications, documents, visa steps, and "
 "arrival planning."
 msgstr ""
-"Follow a clearer route through applications, documents, visa steps, and "
-"arrival planning."
+"Suivez un itinéraire plus clair à travers les demandes, les documents, les "
+"étapes de visa et la planification de l'arrivée."
 
 #: .\templates\students\index.html:73
 msgid "Arrive with more confidence"
-msgstr "Arrive with more confidence"
+msgstr "Arrivez avec plus de confiance"
 
 #: .\templates\students\index.html:74
 msgid ""
 "Get support around settling in, academic rhythm, and adapting to life in "
 "Italy."
 msgstr ""
-"Get support around settling in, academic rhythm, and adapting to life in "
-"Italy."
+"Obtenez du soutien pour vous installer, suivre votre rythme académique et "
+"vous adapter à la vie en Italy."
 
 #: .\templates\students\index.html:77
 msgid "Living Guide"
-msgstr "Living Guide"
+msgstr "Guide de vie"
 
 #: .\templates\students\index.html:78
 msgid "Handle everyday life better"
-msgstr "Handle everyday life better"
+msgstr "Mieux gérer le quotidien"
 
 #: .\templates\students\index.html:79
 msgid ""
 "Accommodation, transport, healthcare, and practical city life tips for "
 "Lazio."
 msgstr ""
-"Accommodation, transport, healthcare, and practical city life tips for "
-"Lazio."
+"Conseils pratiques en matière d'hébergement, de transport, de soins de santé"
+" et de vie urbaine pour Lazio."
 
 #: .\templates\students\index.html:83
 msgid "Keep the useful documents close"
-msgstr "Keep the useful documents close"
+msgstr "Gardez les documents utiles à portée de main"
 
 #: .\templates\students\index.html:84
 msgid ""
 "Access forms, guides, and resource files that matter during your student "
 "journey."
 msgstr ""
-"Access forms, guides, and resource files that matter during your student "
-"journey."
+"Accédez aux formulaires, guides et fichiers de ressources qui comptent tout "
+"au long de votre parcours étudiant."
 
 #: .\templates\students\index.html:91
 msgid "Quick routes"
-msgstr "Quick routes"
+msgstr "Itinéraires rapides"
 
 #: .\templates\students\index.html:92
 msgid "Start from where you are right now"
-msgstr "Start from where you are right now"
+msgstr "Commencez là où vous êtes actuellement"
 
 #: .\templates\students\index.html:96
 msgid "Full university directory"
-msgstr "Full university directory"
+msgstr "Annuaire complet des universités"
 
 #: .\templates\students\index.html:97
 msgid "All scholarships"
-msgstr "All scholarships"
+msgstr "Toutes les bourses"
 
 # Community Translations
 #: .\templates\students\index.html:98
 msgid "Community forum"
-msgstr "Community forum"
+msgstr "Forum communautaire"
 
 #: .\templates\students\living_guide.html:4
 #: .\templates\students\living_guide.html:8
 msgid "Living & Studying in Lazio"
-msgstr "Living & Studying in Lazio"
+msgstr "Vivre et étudier à Lazio"
 
 #: .\templates\students\living_guide.html:12
 msgid "Welcome to Lazio"
-msgstr "Welcome to Lazio"
+msgstr "Bienvenue à Lazio"
 
 #: .\templates\students\living_guide.html:14
 msgid ""
@@ -15310,13 +15358,13 @@ msgid ""
 "universities and offers a rich cultural experience for international "
 "students."
 msgstr ""
-"The Lazio region, centered around Rome, is home to numerous prestigious "
-"universities and offers a rich cultural experience for international "
-"students."
+"La région Lazio, centrée autour de Rome, abrite de nombreuses universités "
+"prestigieuses et offre une riche expérience culturelle aux étudiants "
+"internationaux."
 
 #: .\templates\students\living_guide.html:19
 msgid "Finding Accommodation"
-msgstr "Finding Accommodation"
+msgstr "Trouver un logement"
 
 #: .\templates\students\living_guide.html:21
 msgid ""
@@ -15324,13 +15372,13 @@ msgid ""
 "apartments, and shared housing. Start your search early and consider "
 "proximity to your university."
 msgstr ""
-"Accommodation options in Lazio include university dormitories, private "
-"apartments, and shared housing. Start your search early and consider "
-"proximity to your university."
+"Les options d'hébergement à Lazio comprennent des dortoirs universitaires, "
+"des appartements privés et des logements partagés. Commencez votre recherche"
+" tôt et tenez compte de la proximité de votre université."
 
 #: .\templates\students\living_guide.html:26
 msgid "Cost of Living"
-msgstr "Cost of Living"
+msgstr "Coût de la vie"
 
 #: .\templates\students\living_guide.html:28
 msgid ""
@@ -15338,17 +15386,18 @@ msgid ""
 " while smaller cities like Cassino and Viterbo offer more affordable "
 "options."
 msgstr ""
-"The cost of living in Lazio varies by city. Rome tends to be more expensive,"
-" while smaller cities like Cassino and Viterbo offer more affordable "
-"options."
+"Le coût de la vie à Lazio varie selon la ville. Rome a tendance à être plus "
+"chère, tandis que les petites villes comme Cassino et Viterbe offrent des "
+"options plus abordables."
 
 #: .\templates\students\living_guide.html:35
 msgid ""
 "Public transportation in Lazio includes buses, trains, and metro systems (in"
 " Rome). Students often qualify for discounted transportation passes."
 msgstr ""
-"Public transportation in Lazio includes buses, trains, and metro systems (in"
-" Rome). Students often qualify for discounted transportation passes."
+"Les transports publics à Lazio comprennent les bus, les trains et les métros"
+" (à Rome). Les étudiants ont souvent droit à des laissez-passer de transport"
+" à prix réduit."
 
 #: .\templates\students\living_guide.html:42
 msgid ""
@@ -15356,262 +15405,270 @@ msgid ""
 "(SSN) or obtain private health insurance. Emergency services are available "
 "24/7."
 msgstr ""
-"International students should register with the Italian healthcare system "
-"(SSN) or obtain private health insurance. Emergency services are available "
-"24/7."
+"Les étudiants internationaux doivent s'inscrire auprès du système de santé "
+"Italian (SSN) ou souscrire une assurance maladie privée. Les services "
+"d'urgence sont disponibles 24h/24 et 7j/7."
 
 #: .\templates\students\living_guide.html:47
 msgid "Cultural Integration"
-msgstr "Cultural Integration"
+msgstr "Intégration culturelle"
 
 #: .\templates\students\living_guide.html:49
 msgid ""
 "ASCAI Lazio organizes cultural events, networking opportunities, and "
 "integration support to help Cameroonian students adapt to life in Italy."
 msgstr ""
-"ASCAI Lazio organizes cultural events, networking opportunities, and "
-"integration support to help Cameroonian students adapt to life in Italy."
+"ASCAI Lazio organise des événements culturels, des opportunités de "
+"réseautage et un soutien à l'intégration pour aider les étudiants "
+"Cameroonian à s'adapter à la vie en Italy."
 
 #: .\templates\students\new_student_guide.html:16
 msgid ""
 "Your complete guide to studying and living in Lazio, Italy. Everything you "
 "need to know as a new student from Cameroon."
 msgstr ""
-"Your complete guide to studying and living in Lazio, Italy. Everything you "
-"need to know as a new student from Cameroon."
+"Votre guide complet pour étudier et vivre à Lazio, Italy. Tout ce que vous "
+"devez savoir en tant que nouvel étudiant de Cameroon."
 
 #: .\templates\students\new_student_guide.html:31
 msgid "Complete all sections to unlock your full student guide!"
-msgstr "Complete all sections to unlock your full student guide!"
+msgstr ""
+"Remplissez toutes les sections pour débloquer votre guide étudiant complet !"
 
 # Executive Board Status
 #: .\templates\students\new_student_guide.html:62
 msgid "Complete"
-msgstr "Complete"
+msgstr "Complet"
 
 #: .\templates\students\new_student_guide.html:65
 msgid "Continue"
-msgstr "Continue"
+msgstr "Continuer"
 
 #: .\templates\students\new_student_guide.html:69
 msgid "Not started"
-msgstr "Not started"
+msgstr "Pas commencé"
 
 #: .\templates\students\new_student_guide.html:72
 msgid "Get Started"
-msgstr "Get Started"
+msgstr "Commencer"
 
 #: .\templates\students\new_student_guide.html:81
 msgid ""
 "Have questions? Our community is here to help you every step of the way."
 msgstr ""
-"Have questions? Our community is here to help you every step of the way."
+"Vous avez des questions ? Notre communauté est là pour vous aider à chaque "
+"étape du processus."
 
 # Community Translations
 #: .\templates\students\new_student_guide.html:87
 msgid "Visit Forum"
-msgstr "Visit Forum"
+msgstr "Visiter le forum"
 
 #: .\templates\students\orientation.html:4
 #: .\templates\students\orientation.html:9
 msgid "Orientation & Advice for New Students"
-msgstr "Orientation & Advice for New Students"
+msgstr "Orientation et conseils pour les nouveaux étudiants"
 
 #: .\templates\students\orientation.html:11
 msgid ""
 "Essential guidance and tips for Cameroonian students arriving in Lazio to "
 "help you succeed academically and integrate smoothly into Italian life."
 msgstr ""
-"Essential guidance and tips for Cameroonian students arriving in Lazio to "
-"help you succeed academically and integrate smoothly into Italian life."
+"Des conseils et des conseils essentiels pour les étudiants Cameroonian "
+"arrivant en Lazio pour vous aider à réussir vos études et à vous intégrer en"
+" douceur dans la vie de Italian."
 
 #: .\templates\students\orientation.html:26
 msgid "First Steps Upon Arrival"
-msgstr "First Steps Upon Arrival"
+msgstr "Premiers pas à l'arrivée"
 
 #: .\templates\students\orientation.html:30
 msgid "1. Residence Permit (Permesso di Soggiorno)"
-msgstr "1. Residence Permit (Permesso di Soggiorno)"
+msgstr "1. Permis de séjour (Permesso di Soggiorno)"
 
 #: .\templates\students\orientation.html:32
 msgid ""
 "Apply within 8 days of arrival at the local Questura (police station). "
 "Required documents include:"
 msgstr ""
-"Apply within 8 days of arrival at the local Questura (police station). "
-"Required documents include:"
+"Faites votre demande dans les 8 jours suivant votre arrivée à la Questura "
+"locale (commissariat de police). Les documents requis comprennent :"
 
 #: .\templates\students\orientation.html:35
 msgid "Valid passport and visa"
-msgstr "Valid passport and visa"
+msgstr "Passeport et visa valides"
 
 #: .\templates\students\orientation.html:36
 msgid "University enrollment certificate"
-msgstr "University enrollment certificate"
+msgstr "Certificat d'inscription à l'université"
 
 #: .\templates\students\orientation.html:37
 msgid "Health insurance proof"
-msgstr "Health insurance proof"
+msgstr "Preuve d'assurance maladie"
 
 #: .\templates\students\orientation.html:38
 msgid "Proof of financial means"
-msgstr "Proof of financial means"
+msgstr "Preuve de moyens financiers"
 
 #: .\templates\students\orientation.html:39
 msgid "Accommodation certificate"
-msgstr "Accommodation certificate"
+msgstr "Attestation d'hébergement"
 
 #: .\templates\students\orientation.html:43
 msgid "2. Health Insurance Registration"
-msgstr "2. Health Insurance Registration"
+msgstr "2. Inscription à l'assurance maladie"
 
 #: .\templates\students\orientation.html:45
 msgid ""
 "Register with the Italian National Health Service (SSN) or obtain private "
 "health insurance. This is essential for accessing healthcare services."
 msgstr ""
-"Register with the Italian National Health Service (SSN) or obtain private "
-"health insurance. This is essential for accessing healthcare services."
+"Inscrivez-vous auprès du Service national de santé (SSN) Italian ou "
+"souscrivez une assurance maladie privée. Ceci est essentiel pour accéder aux"
+" services de santé."
 
 #: .\templates\students\orientation.html:49
 msgid "3. Tax Code (Codice Fiscale)"
-msgstr "3. Tax Code (Codice Fiscale)"
+msgstr "3. Code des impôts (Codice Fiscale)"
 
 #: .\templates\students\orientation.html:51
 msgid ""
 "Obtain your Italian tax code (codice fiscale) from the Agenzia delle "
 "Entrate. This is required for many administrative procedures."
 msgstr ""
-"Obtain your Italian tax code (codice fiscale) from the Agenzia delle "
-"Entrate. This is required for many administrative procedures."
+"Obtenez votre code fiscal Italian (codice fiscale) auprès de l'Agenzia delle"
+" Entrate. Ceci est nécessaire pour de nombreuses démarches administratives."
 
 #: .\templates\students\orientation.html:55
 msgid "4. Bank Account"
-msgstr "4. Bank Account"
+msgstr "4. Compte bancaire"
 
 #: .\templates\students\orientation.html:57
 msgid ""
 "Open a bank account to receive scholarships, pay bills, and manage finances."
 " Bring your passport, residence permit, and tax code."
 msgstr ""
-"Open a bank account to receive scholarships, pay bills, and manage finances."
-" Bring your passport, residence permit, and tax code."
+"Ouvrez un compte bancaire pour recevoir des bourses, payer vos factures et "
+"gérer vos finances. Apportez votre passeport, votre permis de séjour et "
+"votre code fiscal."
 
 #: .\templates\students\orientation.html:71
 msgid "Academic Success Tips"
-msgstr "Academic Success Tips"
+msgstr "Conseils pour la réussite scolaire"
 
 #: .\templates\students\orientation.html:75
 msgid "Class Attendance"
-msgstr "Class Attendance"
+msgstr "Présence aux cours"
 
 #: .\templates\students\orientation.html:77
 msgid "Attend classes regularly"
-msgstr "Attend classes regularly"
+msgstr "Assister régulièrement aux cours"
 
 #: .\templates\students\orientation.html:78
 msgid "Take detailed notes"
-msgstr "Take detailed notes"
+msgstr "Prendre des notes détaillées"
 
 #: .\templates\students\orientation.html:79
 msgid "Participate in discussions"
-msgstr "Participate in discussions"
+msgstr "Participer aux discussions"
 
 #: .\templates\students\orientation.html:80
 msgid "Ask questions when needed"
-msgstr "Ask questions when needed"
+msgstr "Posez des questions en cas de besoin"
 
 #: .\templates\students\orientation.html:84
 msgid "Study Resources"
-msgstr "Study Resources"
+msgstr "Ressources d'étude"
 
 #: .\templates\students\orientation.html:86
 msgid "Utilize university libraries"
-msgstr "Utilize university libraries"
+msgstr "Utiliser les bibliothèques universitaires"
 
 #: .\templates\students\orientation.html:87
 msgid "Access online learning platforms"
-msgstr "Access online learning platforms"
+msgstr "Accéder aux plateformes d'apprentissage en ligne"
 
 #: .\templates\students\orientation.html:88
 msgid "Join study groups"
-msgstr "Join study groups"
+msgstr "Rejoignez des groupes d'étude"
 
 #: .\templates\students\orientation.html:89
 msgid "Use academic support services"
-msgstr "Use academic support services"
+msgstr "Utiliser les services de soutien académique"
 
 #: .\templates\students\orientation.html:93
 msgid "Building Relationships"
-msgstr "Building Relationships"
+msgstr "Établir des relations"
 
 #: .\templates\students\orientation.html:95
 msgid "Connect with professors during office hours"
-msgstr "Connect with professors during office hours"
+msgstr "Connectez-vous avec les professeurs pendant les heures de bureau"
 
 #: .\templates\students\orientation.html:96
 msgid "Build friendships with classmates"
-msgstr "Build friendships with classmates"
+msgstr "Nouez des amitiés avec vos camarades de classe"
 
 #: .\templates\students\orientation.html:97
 msgid "Join academic clubs and societies"
-msgstr "Join academic clubs and societies"
+msgstr "Rejoignez des clubs et sociétés académiques"
 
 #: .\templates\students\orientation.html:98
 msgid "Network with international students"
-msgstr "Network with international students"
+msgstr "Réseauter avec des étudiants internationaux"
 
 #: .\templates\students\orientation.html:102
 msgid "Seeking Help"
-msgstr "Seeking Help"
+msgstr "Demander de l'aide"
 
 #: .\templates\students\orientation.html:104
 msgid "Don\\"
-msgstr "Don\\"
+msgstr "Enfiler\\"
 
 #: .\templates\students\orientation.html:105
 msgid "Use tutoring services if available"
-msgstr "Use tutoring services if available"
+msgstr "Utiliser les services de tutorat si disponibles"
 
 #: .\templates\students\orientation.html:106
 msgid "Contact student support services"
-msgstr "Contact student support services"
+msgstr "Contacter les services d'aide aux étudiants"
 
 #: .\templates\students\orientation.html:107
 msgid "Reach out to ASCAI Lazio community"
-msgstr "Reach out to ASCAI Lazio community"
+msgstr "Contactez la communauté ASCAI Lazio"
 
 #: .\templates\students\orientation.html:121
 msgid "Language Learning"
-msgstr "Language Learning"
+msgstr "Apprentissage des langues"
 
 #: .\templates\students\orientation.html:124
 msgid ""
 "Improving your Italian language skills is crucial for academic success and "
 "daily life integration. Here are some strategies:"
 msgstr ""
-"Improving your Italian language skills is crucial for academic success and "
-"daily life integration. Here are some strategies:"
+"Améliorer vos compétences linguistiques Italian est crucial pour la réussite"
+" scolaire et l'intégration dans la vie quotidienne. Voici quelques "
+"stratégies :"
 
 #: .\templates\students\orientation.html:128
 msgid "Formal Learning"
-msgstr "Formal Learning"
+msgstr "Apprentissage formel"
 
 #: .\templates\students\orientation.html:130
 msgid "Take Italian language courses at your university"
-msgstr "Take Italian language courses at your university"
+msgstr "Suivez des cours de langue Italian dans votre université"
 
 #: .\templates\students\orientation.html:131
 msgid "Enroll in intensive language programs"
-msgstr "Enroll in intensive language programs"
+msgstr "Inscrivez-vous à des programmes de langue intensifs"
 
 #: .\templates\students\orientation.html:132
 msgid "Use language learning apps (Duolingo, Babbel)"
-msgstr "Use language learning apps (Duolingo, Babbel)"
+msgstr ""
+"Utiliser des applications d'apprentissage des langues (Duolingo, Babbel)"
 
 #: .\templates\students\orientation.html:133
 msgid "Attend language exchange meetups"
-msgstr "Attend language exchange meetups"
+msgstr "Assister à des rencontres d'échange linguistique"
 
 #: .\templates\students\orientation.html:137
 msgid "Immersion"
@@ -15619,107 +15676,110 @@ msgstr "Immersion"
 
 #: .\templates\students\orientation.html:139
 msgid "Practice with Italian speakers daily"
-msgstr "Practice with Italian speakers daily"
+msgstr "Entraînez-vous quotidiennement avec les enceintes Italian"
 
 #: .\templates\students\orientation.html:140
 msgid "Watch Italian TV shows and movies"
-msgstr "Watch Italian TV shows and movies"
+msgstr "Regarder des émissions de télévision et des films Italian"
 
 #: .\templates\students\orientation.html:141
 msgid "Read Italian newspapers and books"
-msgstr "Read Italian newspapers and books"
+msgstr "Lire les journaux et les livres de Italian"
 
 #: .\templates\students\orientation.html:142
 msgid "Join conversation groups"
-msgstr "Join conversation groups"
+msgstr "Rejoignez des groupes de conversation"
 
 #: .\templates\students\orientation.html:156
 msgid "Financial Planning"
-msgstr "Financial Planning"
+msgstr "Planification financière"
 
 #: .\templates\students\orientation.html:160
 msgid "Create a Budget"
-msgstr "Create a Budget"
+msgstr "Créer un budget"
 
 #: .\templates\students\orientation.html:162
 msgid "Track your income and expenses. Typical monthly costs include:"
-msgstr "Track your income and expenses. Typical monthly costs include:"
+msgstr ""
+"Suivez vos revenus et dépenses. Les coûts mensuels typiques comprennent :"
 
 #: .\templates\students\orientation.html:165
 msgid "Accommodation: €300-600"
-msgstr "Accommodation: €300-600"
+msgstr "Hébergement : 300-600 €"
 
 #: .\templates\students\orientation.html:166
 msgid "Food: €200-300"
-msgstr "Food: €200-300"
+msgstr "Nourriture : 200-300 €"
 
 #: .\templates\students\orientation.html:167
 msgid "Transportation: €30-50"
-msgstr "Transportation: €30-50"
+msgstr "Transport : 30-50 €"
 
 #: .\templates\students\orientation.html:168
 msgid "Utilities: €50-100"
-msgstr "Utilities: €50-100"
+msgstr "Charges : 50-100 €"
 
 #: .\templates\students\orientation.html:169
 msgid "Personal expenses: €100-200"
-msgstr "Personal expenses: €100-200"
+msgstr "Dépenses personnelles : 100-200 €"
 
 #: .\templates\students\orientation.html:173
 msgid "Funding Sources"
-msgstr "Funding Sources"
+msgstr "Sources de financement"
 
 #: .\templates\students\orientation.html:175
 msgid "Apply for DISCO Lazio and other funding"
-msgstr "Apply for DISCO Lazio and other funding"
+msgstr "Faire une demande de DISCO Lazio et d'autres financements"
 
 #: .\templates\students\orientation.html:176
 msgid "Part-time work (up to 20 hours/week for non-EU students)"
-msgstr "Part-time work (up to 20 hours/week for non-EU students)"
+msgstr ""
+"Travail à temps partiel (jusqu'à 20 heures/semaine pour les étudiants non "
+"européens)"
 
 #: .\templates\students\orientation.html:177
 msgid "Family support"
-msgstr "Family support"
+msgstr "Soutien familial"
 
 #: .\templates\students\orientation.html:178
 msgid "Student loans (if eligible)"
-msgstr "Student loans (if eligible)"
+msgstr "Prêts étudiants (si éligible)"
 
 #: .\templates\students\orientation.html:192
 msgid "Time Management"
-msgstr "Time Management"
+msgstr "Gestion du temps"
 
 #: .\templates\students\orientation.html:195
 msgid ""
 "Balancing academic work, part-time jobs, and personal life requires "
 "effective time management:"
 msgstr ""
-"Balancing academic work, part-time jobs, and personal life requires "
-"effective time management:"
+"Concilier travail universitaire, emplois à temps partiel et vie personnelle "
+"nécessite une gestion efficace du temps :"
 
 #: .\templates\students\orientation.html:198
 msgid "Create a weekly schedule with all commitments"
-msgstr "Create a weekly schedule with all commitments"
+msgstr "Créez un planning hebdomadaire avec tous les engagements"
 
 #: .\templates\students\orientation.html:199
 msgid "Prioritize tasks by importance and deadlines"
-msgstr "Prioritize tasks by importance and deadlines"
+msgstr "Hiérarchiser les tâches par importance et délais"
 
 #: .\templates\students\orientation.html:200
 msgid "Set aside dedicated study time each day"
-msgstr "Set aside dedicated study time each day"
+msgstr "Réservez du temps d’étude dédié chaque jour"
 
 #: .\templates\students\orientation.html:201
 msgid "Use productivity apps to track tasks"
-msgstr "Use productivity apps to track tasks"
+msgstr "Utilisez des applications de productivité pour suivre les tâches"
 
 #: .\templates\students\orientation.html:202
 msgid "Take regular breaks to avoid burnout"
-msgstr "Take regular breaks to avoid burnout"
+msgstr "Faites des pauses régulières pour éviter le burn-out"
 
 #: .\templates\students\orientation.html:203
 msgid "Learn to say no to non-essential activities"
-msgstr "Learn to say no to non-essential activities"
+msgstr "Apprenez à dire non aux activités non essentielles"
 
 #: .\templates\students\orientation.html:212
 msgid "Quick Links"
@@ -15729,30 +15789,30 @@ msgstr "Liens rapides"
 #: .\templates\students\resources.html:4
 #: .\templates\students\resources.html:13
 msgid "Resources & Downloads"
-msgstr "Resources & Downloads"
+msgstr "Ressources et téléchargements"
 
 #: .\templates\students\orientation.html:251
 msgid "Get Support"
-msgstr "Get Support"
+msgstr "Obtenir de l'aide"
 
 #: .\templates\students\partials\resources_list_partial.html:27
 msgid "Downloads:"
-msgstr "Downloads:"
+msgstr "Téléchargements :"
 
 #: .\templates\students\partials\resources_list_partial.html:48
 #: .\templates\students\partials\scholarship_list_partial.html:65
 #: .\templates\students\partials\university_list_partial.html:69
 msgid "Try adjusting your filters to see more results."
-msgstr "Try adjusting your filters to see more results."
+msgstr "Essayez d'ajuster vos filtres pour voir plus de résultats."
 
 #: .\templates\students\partials\scholarship_list_partial.html:17
 msgid "Provider:"
-msgstr "Provider:"
+msgstr "Fournisseur:"
 
 #: .\templates\students\partials\scholarship_list_partial.html:37
 #: .\templates\students\partials\university_list_partial.html:40
 msgid "View Details →"
-msgstr "View Details →"
+msgstr "Afficher les détails →"
 
 #: .\templates\students\partials\university_list_partial.html:68
 #: .\templates\universities\partials\university_list_partial.html:133
@@ -15762,68 +15822,68 @@ msgstr "Aucune université trouvée"
 
 #: .\templates\students\resource_detail.html:70
 msgid "Download Document"
-msgstr "Download Document"
+msgstr "Télécharger le document"
 
 #: .\templates\students\resource_detail.html:96
 msgid "Related Documents"
-msgstr "Related Documents"
+msgstr "Documents connexes"
 
 #: .\templates\students\resource_detail.html:119
 msgid "Back to Resources"
-msgstr "Back to Resources"
+msgstr "Retour aux ressources"
 
 #: .\templates\students\resources.html:15
 msgid ""
 "Access PDF documents, forms, guidelines, and useful links for students "
 "studying in Lazio."
 msgstr ""
-"Access PDF documents, forms, guidelines, and useful links for students "
-"studying in Lazio."
+"Accédez aux documents PDF, aux formulaires, aux directives et aux liens "
+"utiles pour les étudiants qui étudient en Lazio."
 
 #: .\templates\students\resources.html:22
 msgid "Featured Resources"
-msgstr "Featured Resources"
+msgstr "Ressources en vedette"
 
 #: .\templates\students\resources.html:40
 msgid "Browse by Category"
-msgstr "Browse by Category"
+msgstr "Parcourir par catégorie"
 
 #: .\templates\students\resources.html:78
 msgid "Popular Resources"
-msgstr "Popular Resources"
+msgstr "Ressources populaires"
 
 #: .\templates\students\resources.html:89
 msgid "All Resources"
-msgstr "All Resources"
+msgstr "Toutes les ressources"
 
 #: .\templates\students\resources.html:103
 msgid "External Resources & Links"
-msgstr "External Resources & Links"
+msgstr "Ressources externes et liens"
 
 #: .\templates\students\scholarships_list.html:4
 #: .\templates\students\scholarships_list.html:9
 msgid "Scholarships Available to Students"
-msgstr "Scholarships Available to Students"
+msgstr "Bourses disponibles pour les étudiants"
 
 #: .\templates\students\scholarships_list.html:11
 msgid ""
 "Find funding opportunities including DISCO Lazio and other scholarships to "
 "support your studies in Lazio."
 msgstr ""
-"Find funding opportunities including DISCO Lazio and other scholarships to "
-"support your studies in Lazio."
+"Trouvez des opportunités de financement, notamment DISCO Lazio et d'autres "
+"bourses pour soutenir vos études en Lazio."
 
 #: .\templates\students\scholarships_list.html:20
 msgid "Filter by Type"
-msgstr "Filter by Type"
+msgstr "Filtrer par type"
 
 #: .\templates\students\scholarships_list.html:22
 msgid "All Scholarships"
-msgstr "All Scholarships"
+msgstr "Toutes les bourses"
 
 #: .\templates\students\scholarships_list.html:23
 msgid "DISCO Lazio Only"
-msgstr "DISCO Lazio Only"
+msgstr "DISCO Lazio uniquement"
 
 #: .\templates\students\scholarships_list.html:28
 msgid "Search scholarships..."
@@ -15833,207 +15893,210 @@ msgstr "Rechercher des bourses..."
 msgid ""
 "Special regional scholarships for students in Lazio. Check out our dedicated"
 msgstr ""
-"Special regional scholarships for students in Lazio. Check out our dedicated"
+"Bourses régionales spéciales pour les étudiants de Lazio. Découvrez notre "
+"dédié"
 
 #: .\templates\students\scholarships_list.html:41
 msgid "DISCO Lazio section"
-msgstr "DISCO Lazio section"
+msgstr "Rubrique DISCO Lazio"
 
 #: .\templates\students\scholarships_list.html:42
 msgid "for more information."
-msgstr "for more information."
+msgstr "pour plus d'informations."
 
 #: .\templates\students\scholarships_list.html:46
 msgid "Learn More →"
-msgstr "Learn More →"
+msgstr "En savoir plus →"
 
 #: .\templates\students\scholarships_list.html:63
 msgid "Scholarship Application Tips"
-msgstr "Scholarship Application Tips"
+msgstr "Conseils pour postuler à une bourse"
 
 #: .\templates\students\scholarships_list.html:66
 msgid "Before Applying"
-msgstr "Before Applying"
+msgstr "Avant de postuler"
 
 #: .\templates\students\scholarships_list.html:68
 msgid "Read eligibility criteria carefully"
-msgstr "Read eligibility criteria carefully"
+msgstr "Lisez attentivement les critères d’éligibilité"
 
 #: .\templates\students\scholarships_list.html:69
 msgid "Check application deadlines"
-msgstr "Check application deadlines"
+msgstr "Vérifier les dates limites de candidature"
 
 #: .\templates\students\scholarships_list.html:70
 msgid "Gather required documents early"
-msgstr "Gather required documents early"
+msgstr "Rassemblez tôt les documents requis"
 
 #: .\templates\students\scholarships_list.html:71
 msgid "Prepare a strong motivation letter"
-msgstr "Prepare a strong motivation letter"
+msgstr "Préparez une lettre de motivation solide"
 
 #: .\templates\students\scholarships_list.html:75
 #: .\templates\students\study_programs.html:159
 msgid "Application Process"
-msgstr "Application Process"
+msgstr "Processus de candidature"
 
 #: .\templates\students\scholarships_list.html:77
 msgid "Submit complete applications"
-msgstr "Submit complete applications"
+msgstr "Déposer des candidatures complètes"
 
 #: .\templates\students\scholarships_list.html:78
 msgid "Follow all instructions precisely"
-msgstr "Follow all instructions precisely"
+msgstr "Suivez toutes les instructions avec précision"
 
 #: .\templates\students\scholarships_list.html:79
 msgid "Keep copies of all documents"
-msgstr "Keep copies of all documents"
+msgstr "Conservez des copies de tous les documents"
 
 #: .\templates\students\scholarships_list.html:80
 msgid "Track application status"
-msgstr "Track application status"
+msgstr "Suivre l'état de la demande"
 
 #: .\templates\students\study_programs.html:4
 #: .\templates\students\study_programs.html:9
 msgid "Study Programs Overview"
-msgstr "Study Programs Overview"
+msgstr "Aperçu des programmes d'études"
 
 #: .\templates\students\study_programs.html:11
 msgid ""
 "Discover the wide range of Bachelor, Master, and PhD programs available "
 "across universities in the Lazio region."
 msgstr ""
-"Discover the wide range of Bachelor, Master, and PhD programs available "
-"across universities in the Lazio region."
+"Découvrez le large éventail de programmes de licence, de master et de "
+"doctorat disponibles dans les universités de la région Lazio."
 
 #: .\templates\students\study_programs.html:19
 #: .\templates\students\study_programs.html:37
 #: .\templates\students\study_programs.html:132
 msgid "Bachelor Programs"
-msgstr "Bachelor Programs"
+msgstr "Programmes de licence"
 
 #: .\templates\students\study_programs.html:20
 msgid "Undergraduate degree programs typically lasting 3 years"
-msgstr "Undergraduate degree programs typically lasting 3 years"
+msgstr ""
+"Programmes d'études de premier cycle d'une durée généralement de 3 ans"
 
 #: .\templates\students\study_programs.html:24
 #: .\templates\students\study_programs.html:68
 #: .\templates\students\study_programs.html:141
 msgid "Master Programs"
-msgstr "Master Programs"
+msgstr "Programmes de Master"
 
 #: .\templates\students\study_programs.html:25
 msgid "Graduate degree programs typically lasting 2 years"
-msgstr "Graduate degree programs typically lasting 2 years"
+msgstr "Programmes d'études supérieures d'une durée généralement de 2 ans"
 
 #: .\templates\students\study_programs.html:29
 #: .\templates\students\study_programs.html:99
 #: .\templates\students\study_programs.html:150
 msgid "PhD Programs"
-msgstr "PhD Programs"
+msgstr "Programmes de doctorat"
 
 #: .\templates\students\study_programs.html:30
 msgid "Doctoral research programs typically lasting 3-4 years"
-msgstr "Doctoral research programs typically lasting 3-4 years"
+msgstr ""
+"Programmes de recherche doctoraux d'une durée généralement de 3 à 4 ans"
 
 #: .\templates\students\study_programs.html:39
 #: .\templates\students\study_programs.html:70
 #: .\templates\students\study_programs.html:101
 msgid "View All →"
-msgstr "View All →"
+msgstr "Afficher tout →"
 
 #: .\templates\students\study_programs.html:54
 #: .\templates\students\study_programs.html:85
 #: .\templates\students\study_programs.html:116
 msgid "View University →"
-msgstr "View University →"
+msgstr "Voir l'université →"
 
 #: .\templates\students\study_programs.html:59
 msgid "No bachelor programs available at this time."
-msgstr "No bachelor programs available at this time."
+msgstr "Aucun programme de licence disponible pour le moment."
 
 #: .\templates\students\study_programs.html:90
 msgid "No master programs available at this time."
-msgstr "No master programs available at this time."
+msgstr "Aucun programme de master disponible pour le moment."
 
 #: .\templates\students\study_programs.html:121
 msgid "No PhD programs available at this time."
-msgstr "No PhD programs available at this time."
+msgstr "Aucun programme de doctorat disponible pour le moment."
 
 #: .\templates\students\study_programs.html:129
 msgid "Program Information"
-msgstr "Program Information"
+msgstr "Informations sur le programme"
 
 #: .\templates\students\study_programs.html:134
 msgid "Typically 3 years duration"
-msgstr "Typically 3 years duration"
+msgstr "Durée généralement de 3 ans"
 
 #: .\templates\students\study_programs.html:135
 msgid "Entry requirements: High school diploma or equivalent"
-msgstr "Entry requirements: High school diploma or equivalent"
+msgstr "Conditions d'entrée : Diplôme d'études secondaires ou équivalent"
 
 #: .\templates\students\study_programs.html:136
 msgid "Language requirements vary by program"
-msgstr "Language requirements vary by program"
+msgstr "Les exigences linguistiques varient selon le programme"
 
 #: .\templates\students\study_programs.html:137
 msgid "May require entrance exams for competitive programs"
-msgstr "May require entrance exams for competitive programs"
+msgstr "Peut nécessiter des examens d'entrée pour les programmes compétitifs"
 
 #: .\templates\students\study_programs.html:143
 msgid "Typically 2 years duration"
-msgstr "Typically 2 years duration"
+msgstr "Durée généralement de 2 ans"
 
 #: .\templates\students\study_programs.html:144
 msgid "Entry requirements: Bachelor degree or equivalent"
-msgstr "Entry requirements: Bachelor degree or equivalent"
+msgstr "Conditions d'entrée : Baccalauréat ou équivalent"
 
 #: .\templates\students\study_programs.html:145
 msgid "May require specific prerequisites"
-msgstr "May require specific prerequisites"
+msgstr "Peut nécessiter des prérequis spécifiques"
 
 #: .\templates\students\study_programs.html:146
 msgid "Thesis or final project required"
-msgstr "Thesis or final project required"
+msgstr "Thèse ou projet final requis"
 
 #: .\templates\students\study_programs.html:152
 msgid "Typically 3-4 years duration"
-msgstr "Typically 3-4 years duration"
+msgstr "Durée généralement de 3 à 4 ans"
 
 #: .\templates\students\study_programs.html:153
 msgid "Entry requirements: Master degree or equivalent"
-msgstr "Entry requirements: Master degree or equivalent"
+msgstr "Conditions d'entrée : Master ou équivalent"
 
 #: .\templates\students\study_programs.html:154
 msgid "Research-focused programs"
-msgstr "Research-focused programs"
+msgstr "Programmes axés sur la recherche"
 
 #: .\templates\students\study_programs.html:155
 msgid "Dissertation defense required"
-msgstr "Dissertation defense required"
+msgstr "Soutenance de thèse obligatoire"
 
 #: .\templates\students\study_programs.html:161
 msgid "Check university-specific deadlines"
-msgstr "Check university-specific deadlines"
+msgstr "Vérifiez les délais spécifiques à l'université"
 
 #: .\templates\students\study_programs.html:162
 msgid "Prepare required documents"
-msgstr "Prepare required documents"
+msgstr "Préparer les documents requis"
 
 #: .\templates\students\study_programs.html:163
 msgid "Submit application through university portal"
-msgstr "Submit application through university portal"
+msgstr "Soumettre votre candidature via le portail universitaire"
 
 #: .\templates\students\study_programs.html:164
 msgid "See our"
-msgstr "See our"
+msgstr "Voir notre"
 
 #: .\templates\students\study_programs.html:164
 msgid "Enrollment Guide"
-msgstr "Enrollment Guide"
+msgstr "Guide d'inscription"
 
 #: .\templates\students\study_programs.html:164
 msgid "for details"
-msgstr "for details"
+msgstr "pour plus de détails"
 
 #: .\templates\students\universities_list.html:4
 #: .\templates\students\universities_list.html:9
@@ -16045,8 +16108,8 @@ msgid ""
 "Explore universities in Rome, Viterbo, Cassino, Latina, Frosinone, and other"
 " cities in the Lazio region."
 msgstr ""
-"Explore universities in Rome, Viterbo, Cassino, Latina, Frosinone, and other"
-" cities in the Lazio region."
+"Explorez les universités de Rome, Viterbe, Cassino, Latina, Frosinone et "
+"d'autres villes de la région Lazio."
 
 #: .\templates\students\universities_list.html:22
 msgid "All Cities"
@@ -16058,7 +16121,7 @@ msgstr "Tous les diplômes"
 
 #: .\templates\students\universities_list.html:54
 msgid "Search universities..."
-msgstr "Search universities..."
+msgstr "Rechercher des universités..."
 
 #: .\templates\universities\partials\save_button.html:11
 msgid "Remove from Favorites"
@@ -16290,6 +16353,645 @@ msgstr ""
 msgid "Loading universities..."
 msgstr "Loading universities..."
 
+#, fuzzy
+#~ msgid "Search files"
+#~ msgstr "Search and filter"
+
+#, fuzzy
+#~ msgid "Images in: "
+#~ msgstr "Images"
+
+#, fuzzy
+#~ msgid "Embed Image"
+#~ msgstr "Event Image"
+
+#, fuzzy
+#~ msgid "Site Maps"
+#~ msgstr "Site Name"
+
+#, fuzzy
+#~ msgid "Static Files"
+#~ msgstr "Shared Files"
+
+#, fuzzy
+#~ msgid "Syndication"
+#~ msgstr "Education"
+
+#, fuzzy
+#~ msgid "Enter a valid email address."
+#~ msgstr "Enter your email address"
+
+#, fuzzy, python-format
+#~ msgid "Enter a valid %(protocol)s address."
+#~ msgstr "Enter your email address"
+
+#, fuzzy
+#~ msgid "Enter a number."
+#~ msgstr "S'inscrire en tant que membre"
+
+#, fuzzy
+#~ msgid "and"
+#~ msgstr "Brand"
+
+#, fuzzy
+#~ msgid "This field cannot be null."
+#~ msgstr "Cet evenement est complet."
+
+#, fuzzy
+#~ msgid "Comma-separated integers"
+#~ msgstr "Tags (comma-separated)"
+
+#, fuzzy
+#~ msgid "Date (without time)"
+#~ msgstr "Date et heure"
+
+#, fuzzy
+#~ msgid "Date (with time)"
+#~ msgstr "Date et heure"
+
+#, fuzzy
+#~ msgid "Decimal number"
+#~ msgstr "Chiffres d'impact en direct"
+
+#, fuzzy
+#~ msgid "File path"
+#~ msgstr "Type de fichier"
+
+#, fuzzy
+#~ msgid "Integer"
+#~ msgstr "Intégration"
+
+#, fuzzy
+#~ msgid "IPv4 address"
+#~ msgstr "IP Address"
+
+#, fuzzy
+#~ msgid "IP address"
+#~ msgstr "IP Address"
+
+#, fuzzy
+#~ msgid "A JSON object"
+#~ msgstr "Sujet"
+
+#, fuzzy
+#~ msgid "One-to-one relationship"
+#~ msgstr "Book a one-to-one orientation session"
+
+#, fuzzy
+#~ msgid "This field is required."
+#~ msgstr "Le poste est requis."
+
+#, fuzzy
+#~ msgid "Enter a valid duration."
+#~ msgstr "Invalid action."
+
+#, fuzzy, python-format
+#~ msgid "Please correct the duplicate data for %(field)s."
+#~ msgstr "Veuillez corriger les erreurs ci-dessous."
+
+#, fuzzy
+#~ msgid "Please correct the duplicate values below."
+#~ msgstr "Veuillez corriger les erreurs ci-dessous."
+
+#, fuzzy
+#~ msgid "Currently"
+#~ msgstr "Actuel"
+
+#, fuzzy
+#~ msgid "Change"
+#~ msgstr "Enregistrer les modifications"
+
+#, fuzzy
+#~ msgid "Saturday"
+#~ msgstr "Featured"
+
+#, fuzzy
+#~ msgid "January"
+#~ msgstr "Saisie manuelle"
+
+#, fuzzy
+#~ msgid "March"
+#~ msgstr "Recherche"
+
+#, fuzzy
+#~ msgid "May"
+#~ msgstr "Map"
+
+#, fuzzy
+#~ msgid "September"
+#~ msgstr "Save Member"
+
+#, fuzzy
+#~ msgid "November"
+#~ msgstr "Membre"
+
+#, fuzzy
+#~ msgid "December"
+#~ msgstr "December 31"
+
+#, fuzzy
+#~ msgid "mar"
+#~ msgstr "Summary"
+
+#, fuzzy
+#~ msgid "apr"
+#~ msgstr "Map"
+
+#, fuzzy
+#~ msgid "may"
+#~ msgstr "Summary"
+
+#, fuzzy
+#~ msgid "jun"
+#~ msgstr "Sun"
+
+#, fuzzy
+#~ msgid "aug"
+#~ msgstr "ago"
+
+#, fuzzy
+#~ msgid "oct"
+#~ msgstr "Connect"
+
+#, fuzzy
+#~ msgctxt "abbrev. month"
+#~ msgid "March"
+#~ msgstr "Recherche"
+
+#, fuzzy
+#~ msgctxt "abbrev. month"
+#~ msgid "May"
+#~ msgstr "Map"
+
+#, fuzzy
+#~ msgctxt "alt. month"
+#~ msgid "January"
+#~ msgstr "Saisie manuelle"
+
+#, fuzzy
+#~ msgctxt "alt. month"
+#~ msgid "March"
+#~ msgstr "Recherche"
+
+#, fuzzy
+#~ msgctxt "alt. month"
+#~ msgid "May"
+#~ msgstr "Map"
+
+#, fuzzy
+#~ msgctxt "alt. month"
+#~ msgid "September"
+#~ msgstr "Save Member"
+
+#, fuzzy
+#~ msgctxt "alt. month"
+#~ msgid "November"
+#~ msgstr "Membre"
+
+#, fuzzy
+#~ msgctxt "alt. month"
+#~ msgid "December"
+#~ msgstr "December 31"
+
+#, fuzzy, python-format
+#~ msgid "%(num)d year"
+#~ msgid_plural "%(num)d years"
+#~ msgstr[0] "%(count)d an"
+#~ msgstr[1] "%(count)d ans"
+
+#, fuzzy, python-format
+#~ msgid "%(num)d month"
+#~ msgid_plural "%(num)d months"
+#~ msgstr[0] "%(count)d mois"
+#~ msgstr[1] "%(count)d mois"
+
+#, fuzzy, python-format
+#~ msgid "%(num)d minute"
+#~ msgid_plural "%(num)d minutes"
+#~ msgstr[0] "%(count)d mois"
+#~ msgstr[1] "%(count)d mois"
+
+#, fuzzy
+#~ msgid "CSRF verification failed. Request aborted."
+#~ msgstr "Vérification requise"
+
+#, fuzzy
+#~ msgid "No year specified"
+#~ msgstr "Non précisé"
+
+#, fuzzy
+#~ msgid "Date out of range"
+#~ msgstr "Date de naissance"
+
+#, fuzzy
+#~ msgid "No month specified"
+#~ msgstr "Non précisé"
+
+#, fuzzy
+#~ msgid "No day specified"
+#~ msgstr "Non précisé"
+
+#, fuzzy
+#~ msgid "No week specified"
+#~ msgstr "Non précisé"
+
+#, fuzzy, python-format
+#~ msgid "No %(verbose_name_plural)s available"
+#~ msgstr "No results available yet"
+
+#, fuzzy, python-format
+#~ msgid "Index of %(directory)s"
+#~ msgstr "View mentor directory"
+
+#, fuzzy
+#~ msgid "Django Documentation"
+#~ msgstr "Documentation"
+
+#, fuzzy
+#~ msgid "Django Community"
+#~ msgstr "Communauté"
+
+#, fuzzy
+#~ msgid "You do not have permission to upload files."
+#~ msgstr "You do not have permission to approve candidacies."
+
+#, fuzzy
+#~ msgid "You must be logged in to upload files."
+#~ msgstr "You must be logged in to vote."
+
+#, fuzzy
+#~ msgid "Invalid form data"
+#~ msgstr "Données de formulaire invalides."
+
+#, fuzzy
+#~ msgid "Select record"
+#~ msgstr "Delete record"
+
+#, fuzzy
+#~ msgid "Select action"
+#~ msgstr "Section"
+
+#, fuzzy
+#~ msgid "Current file"
+#~ msgstr "Current dues"
+
+#, fuzzy
+#~ msgid "Reset to default"
+#~ msgstr "R?initialiser les filtres"
+
+#, fuzzy
+#~ msgid "Date from"
+#~ msgstr "Date de naissance"
+
+#, fuzzy
+#~ msgid "Date to"
+#~ msgstr "Date"
+
+#, fuzzy
+#~ msgid "Add new item"
+#~ msgstr "Ajouter un point"
+
+#, fuzzy
+#~ msgid "Underlined"
+#~ msgstr "Declined"
+
+#, fuzzy
+#~ msgid "Italic"
+#~ msgstr "Italian"
+
+#, fuzzy
+#~ msgid "Heading"
+#~ msgstr "En attente"
+
+#, fuzzy
+#~ msgid "Unordered list"
+#~ msgstr "Universités listées"
+
+#, fuzzy
+#~ msgid "Enter an URL"
+#~ msgstr "Instagram URL"
+
+#, fuzzy
+#~ msgid "Object permissions"
+#~ msgstr "Electoral Commissions"
+
+#, fuzzy
+#~ msgid "Object"
+#~ msgstr "Sujet"
+
+#, fuzzy
+#~ msgid "Group permissions"
+#~ msgstr "Group Discussions"
+
+#, fuzzy
+#~ msgid "Action"
+#~ msgstr "Actions"
+
+#, fuzzy
+#~ msgid "Manage group"
+#~ msgstr "Leave group"
+
+#, fuzzy
+#~ msgid "User permissions"
+#~ msgstr "Story Submissions"
+
+#, fuzzy
+#~ msgid "Manage user"
+#~ msgstr "Gérer les documents"
+
+#, fuzzy
+#~ msgid "Select format"
+#~ msgstr "Selected Mentor"
+
+#, fuzzy
+#~ msgid "Export"
+#~ msgstr "Sports"
+
+#, fuzzy
+#~ msgid "Import"
+#~ msgstr "Important"
+
+#, fuzzy, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                    Export %(len)s selected item.\n"
+#~ "                "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                    Export %(len)s selected items.\n"
+#~ "                "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                    The confirmed meeting time is %(confirmed)s.\n"
+#~ "                    "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                    The confirmed meeting time is %(confirmed)s.\n"
+#~ "                    "
+
+#, fuzzy
+#~ msgid "Submit"
+#~ msgstr "Soumis"
+
+#, fuzzy
+#~ msgid "Confirm import"
+#~ msgstr "Confirmation"
+
+# Model field translations
+#, fuzzy
+#~ msgid "Line number"
+#~ msgstr "Numéro de téléphone"
+
+#, fuzzy
+#~ msgid "Update"
+#~ msgstr "Updated"
+
+#, fuzzy
+#~ msgid "Non field specific"
+#~ msgstr "Non précisé"
+
+#, fuzzy
+#~ msgid "Date/time"
+#~ msgstr "Date et heure"
+
+#, fuzzy
+#~ msgid "Change reason"
+#~ msgstr "Changer le mot de passe"
+
+#, fuzzy
+#~ msgid "Changes"
+#~ msgstr "Enregistrer les modifications"
+
+#, fuzzy
+#~ msgid "Revert"
+#~ msgstr "Revenue"
+
+#, fuzzy
+#~ msgid "Change History"
+#~ msgstr "Historique des cotisations"
+
+#, fuzzy
+#~ msgid "Select action to run"
+#~ msgstr "Aucune élection trouvée"
+
+#, fuzzy
+#~ msgid "Select value"
+#~ msgstr "Student value"
+
+#, fuzzy
+#~ msgid "Run the selected action"
+#~ msgstr "Candidature à un poste de direction"
+
+#, fuzzy
+#~ msgid "Run"
+#~ msgstr "Sun"
+
+#, fuzzy
+#~ msgid "Clear selection"
+#~ msgstr "Créer une élection"
+
+#, fuzzy
+#~ msgid "You don’t have permission to view or edit anything."
+#~ msgstr "You do not have permission to approve candidacies."
+
+#, fuzzy
+#~ msgid "History"
+#~ msgstr "Historique des cotisations"
+
+#, fuzzy
+#~ msgid "View on site"
+#~ msgstr "Voir sur la carte"
+
+#, fuzzy
+#~ msgid "Filters"
+#~ msgstr "Filtrer"
+
+#, fuzzy
+#~ msgid "Objects"
+#~ msgstr "Sujet"
+
+# Account/Auth Translations
+#, fuzzy
+#~ msgid "Welcome back to"
+#~ msgstr "Bon retour"
+
+#, fuzzy
+#~ msgid "Forgotten your password or username?"
+#~ msgstr "Mot de passe oublié ?"
+
+#, fuzzy
+#~ msgid "Show all"
+#~ msgstr "Voir tout"
+
+#, fuzzy
+#~ msgid "Save and view"
+#~ msgstr "Enregistrer les modifications"
+
+#, fuzzy
+#~ msgid "Save as new"
+#~ msgstr "Enregistrer les modifications"
+
+#, fuzzy
+#~ msgid "Log in again"
+#~ msgstr "Log in to join"
+
+#, fuzzy
+#~ msgid "Your password was changed."
+#~ msgstr "Your password has been changed successfully."
+
+#, fuzzy
+#~ msgid "No data"
+#~ msgstr "Aucune date fixe"
+
+#, fuzzy
+#~ msgid "View site"
+#~ msgstr "Views"
+
+#, fuzzy
+#~ msgid "Log out"
+#~ msgstr "Se connecter"
+
+#, fuzzy
+#~ msgid "More actions"
+#~ msgstr "Mentor Actions"
+
+# Contribution Types
+#, fuzzy, python-format
+#~ msgid "Add %(name)s"
+#~ msgstr "Add Dues"
+
+#, fuzzy
+#~ msgid "All applications"
+#~ msgstr "Application"
+
+#, fuzzy
+#~ msgid "Add"
+#~ msgstr "Adopté"
+
+#, fuzzy
+#~ msgid "Apply Filters"
+#~ msgstr "Apply filters"
+
+#, fuzzy
+#~ msgid "Hide counts"
+#~ msgstr "Guide Sections"
+
+# Voting Methods
+#, fuzzy
+#~ msgid "Show counts"
+#~ msgstr "À main levée"
+
+#, fuzzy
+#~ msgid "Clear all filters"
+#~ msgstr "Clear filters"
+
+#, fuzzy
+#~ msgid "Toggle sorting"
+#~ msgstr "Rapports"
+
+#, fuzzy
+#~ msgid "Remove from sorting"
+#~ msgstr "Remove from your shortlist"
+
+#, fuzzy
+#~ msgid "Recent searches"
+#~ msgstr "Chercheur"
+
+#, fuzzy
+#~ msgid "Loading more results..."
+#~ msgstr "Loading more events..."
+
+#, fuzzy, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                Found %(counter)s result in %(time)s seconds\n"
+#~ "            "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                Found %(counter)s results in %(time)s seconds\n"
+#~ "            "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                    The confirmed meeting time is %(confirmed)s.\n"
+#~ "                    "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                    The confirmed meeting time is %(confirmed)s.\n"
+#~ "                    "
+
+#, fuzzy
+#~ msgid "Record picture"
+#~ msgstr "Record Vote"
+
+#, fuzzy
+#~ msgid "Click to cancel"
+#~ msgstr "Click to Vote"
+
+#, fuzzy
+#~ msgid "No results found"
+#~ msgstr "No events found"
+
+#, fuzzy
+#~ msgid "Image preview"
+#~ msgstr "Logo Preview"
+
+#, fuzzy
+#~ msgid "Click to download"
+#~ msgstr "Back to all downloads"
+
+#, fuzzy
+#~ msgid "Recent actions"
+#~ msgstr "Transactions récentes"
+
+#, fuzzy
+#~ msgid "Unknown content"
+#~ msgstr "Inconnu"
+
+#, fuzzy
+#~ msgid "Please correct the error below."
+#~ msgid_plural "Please correct the errors below."
+#~ msgstr[0] "Veuillez corriger les erreurs ci-dessous."
+#~ msgstr[1] "Veuillez corriger les erreurs ci-dessous."
+
+#, fuzzy
+#~ msgid "Search apps and models..."
+#~ msgstr "Rechercher des documents..."
+
+#, fuzzy
+#~ msgid "Django administration"
+#~ msgstr "Administration"
+
+#, fuzzy
+#~ msgid "Return to site"
+#~ msgstr "Retour à l'accueil"
+
+#, fuzzy, python-format
+#~ msgid "%(counter)s result"
+#~ msgid_plural "%(counter)s results"
+#~ msgstr[0] "%(count)d an"
+#~ msgstr[1] "%(count)d ans"
+
+#, fuzzy, python-format
+#~ msgid "Change selected %(model)s"
+#~ msgstr "Decline selected stories"
+
+#, fuzzy, python-format
+#~ msgid "View selected %(model)s"
+#~ msgstr "Decline selected stories"
+
+#, fuzzy, python-format
+#~ msgid "Delete selected %(model)s"
+#~ msgstr "Decline selected stories"
+
+# Account/Auth Translations
+#, fuzzy
+#~ msgid "Welcome"
+#~ msgstr "Bon retour"
+
+#, fuzzy
+#~ msgid "Select currency"
+#~ msgstr "Currency"
+
 #~ msgid ""
 #~ "We would love to hear from you. Send us a message and we will respond as "
 #~ "soon as possible."
@@ -16305,9 +17007,6 @@ msgstr "Loading universities..."
 
 #~ msgid "Monday - Friday"
 #~ msgstr "Lundi - Vendredi"
-
-#~ msgid "No fixed date"
-#~ msgstr "Aucune date fixe"
 
 #~ msgid "Message Sent!"
 #~ msgstr "Message envoyé !"

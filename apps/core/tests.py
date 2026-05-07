@@ -288,6 +288,34 @@ class UserPreferredLocaleMiddlewareTest(TestCase):
         self.assertFalse(response.get('Location', '').startswith('/fr/admin/'))
 
 
+class TranslationCatalogSmokeTest(TestCase):
+    """Guard key production pages against untranslated catalog regressions."""
+
+    def test_key_public_and_dashboard_strings_have_fr_and_it_translations(self):
+        strings = [
+            'Student Guide',
+            'Sponsor the bridge between Cameroonian talent and Italian opportunity.',
+            'My ASCAI Membership',
+            'My Membership Dues',
+            'Trusted providers for practical needs',
+            (
+                'ASCAI lists only active providers that have been reviewed by the '
+                'association, including money transfer, documents, housing, '
+                'logistics, and other community services.'
+            ),
+        ]
+
+        for language in ['fr', 'it']:
+            with translation.override(language):
+                for value in strings:
+                    translated = translation.gettext(value)
+                    self.assertNotEqual(
+                        translated,
+                        value,
+                        msg=f'{language}: {value}',
+                    )
+
+
 class TranslateCurrentUrlTemplateTagTest(TestCase):
     """Ensure translated redirect targets stay stable across languages."""
 
