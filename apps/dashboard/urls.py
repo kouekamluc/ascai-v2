@@ -17,6 +17,11 @@ urlpatterns = [
     path('profile/documents/', views.DocumentUploadView.as_view(), name='profile_documents'),
     path('profile/documents/<int:pk>/delete/', views.DocumentDeleteView.as_view(), name='document_delete'),
     path('profile/notifications/', views.NotificationPreferencesView.as_view(), name='profile_notifications'),
+
+    # Bureau Messages
+    path('messages/', views.BureauMessageListView.as_view(), name='messages_list'),
+    path('messages/<int:pk>/', views.BureauMessageDetailView.as_view(), name='message_detail'),
+    path('messages/<int:pk>/reply/', views.BureauMessageReplyView.as_view(), name='message_reply'),
     
     # Support Tickets
     path('support/tickets/', views.TicketListView.as_view(), name='tickets_list'),

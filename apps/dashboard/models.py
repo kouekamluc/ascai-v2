@@ -138,6 +138,106 @@ class TicketReply(models.Model):
         return f"Reply to {self.ticket.subject} by {self.author.username}"
 
 
+class BureauMessage(models.Model):
+    """
+    Direct message from bureau/admin members to a platform user.
+    """
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='sent_bureau_messages',
+        verbose_name=_('Sender')
+    )
+    recipient = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bureau_messages',
+        verbose_name=_('Recipient')
+    )
+    subject = models.CharField(
+        max_length=200,
+        verbose_name=_('Subject')
+    )
+    body = models.TextField(
+        verbose_name=_('Message')
+    )
+    allow_reply = models.BooleanField(
+        default=True,
+        verbose_name=_('Allow Reply')
+    )
+    is_read = models.BooleanField(
+        default=False,
+        verbose_name=_('Read')
+    )
+    read_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Read At')
+    )
+    email_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Email Sent At')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created At')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated At')
+    )
+
+    class Meta:
+        verbose_name = _('Bureau Message')
+        verbose_name_plural = _('Bureau Messages')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.recipient.username} - {self.subject}"
+
+    def mark_read(self):
+        if not self.is_read:
+            self.is_read = True
+            self.read_at = timezone.now()
+            self.save(update_fields=['is_read', 'read_at', 'updated_at'])
+
+
+class BureauMessageReply(models.Model):
+    """
+    Reply inside a bureau direct message thread.
+    """
+    message = models.ForeignKey(
+        BureauMessage,
+        on_delete=models.CASCADE,
+        related_name='replies',
+        verbose_name=_('Message')
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bureau_message_replies',
+        verbose_name=_('Author')
+    )
+    body = models.TextField(
+        verbose_name=_('Reply')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created At')
+    )
+
+    class Meta:
+        verbose_name = _('Bureau Message Reply')
+        verbose_name_plural = _('Bureau Message Replies')
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"Reply to {self.message.subject} by {self.author.username}"
+
+
 class CommunityGroup(models.Model):
     """
     Community group model for internal groups.

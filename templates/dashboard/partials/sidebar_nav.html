@@ -43,6 +43,7 @@
         <div>
             <p class="px-4 text-xs font-extrabold uppercase tracking-[0.2em] text-gray-500">{% trans 'Support' %}</p>
             <div class="mt-2 space-y-1">
+                <a href="{% url 'dashboard:messages_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'message' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Messages' %}</a>
                 <a href="{% url 'dashboard:tickets_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'ticket' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Support Tickets' %}</a>
                 <a href="{% url 'dashboard:saved_items' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'saved' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Saved Items' %}</a>
             </div>

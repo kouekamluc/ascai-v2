@@ -88,7 +88,7 @@ def dashboard_callback(request, context):
     from apps.universities.models import University
     from apps.scholarships.models import Scholarship
     from apps.downloads.models import Document
-    from apps.dashboard.models import SupportTicket, EventWaitlistEntry
+    from apps.dashboard.models import SupportTicket, EventWaitlistEntry, BureauMessage
     from apps.governance.models import Member, Candidacy
     
     # Calculate statistics
@@ -178,6 +178,7 @@ def dashboard_callback(request, context):
             is_resolved=False
         ).count(),
         'waiting_event_waitlist': EventWaitlistEntry.objects.filter(status='waiting').count(),
+        'unread_bureau_messages': BureauMessage.objects.filter(is_read=False).count(),
         'pending_candidacies': Candidacy.objects.filter(status='pending').count(),
     }
     
@@ -270,6 +271,14 @@ def dashboard_callback(request, context):
             'priority': 3,
         },
         {
+            'title': _('Review unread bureau messages'),
+            'description': _('Track direct messages users have not opened yet.'),
+            'count': notification_counts['unread_bureau_messages'],
+            'url': reverse('admin:dashboard_bureaumessage_changelist') + '?is_read__exact=0',
+            'icon': 'mark_email_unread',
+            'priority': 3,
+        },
+        {
             'title': _('Review election candidacies'),
             'description': _('Check eligibility before voting opens.'),
             'count': notification_counts['pending_candidacies'],
@@ -322,7 +331,7 @@ def get_notification_counts():
         from apps.contact.models import ContactSubmission
         from apps.accounts.models import User, UserDocument
         from apps.mentorship.models import MentorProfile, MentorshipRequest
-        from apps.dashboard.models import OrientationSession, StudentQuestion, SupportTicket, EventWaitlistEntry
+        from apps.dashboard.models import OrientationSession, StudentQuestion, SupportTicket, EventWaitlistEntry, BureauMessage
         from apps.governance.models import Member, Candidacy
         
         counts = {
@@ -338,6 +347,7 @@ def get_notification_counts():
             'tickets': SupportTicket.objects.filter(status__in=['open', 'pending']).count(),
             'questions': StudentQuestion.objects.filter(is_resolved=False).count(),
             'waitlist': EventWaitlistEntry.objects.filter(status='waiting').count(),
+            'bureau_messages': BureauMessage.objects.filter(is_read=False).count(),
             'candidacies': Candidacy.objects.filter(status='pending').count(),
         }
         counts['total'] = sum(counts.values())
@@ -355,6 +365,7 @@ def get_notification_counts():
             'tickets': 0,
             'questions': 0,
             'waitlist': 0,
+            'bureau_messages': 0,
             'candidacies': 0,
             'total': 0,
         }
@@ -441,6 +452,11 @@ def get_notification_navigation(request):
                     "title": format_with_badge(_("Event Waitlist"), counts['waitlist']),
                     "icon": "event_seat",
                     "link": "/admin/dashboard/eventwaitlistentry/?status__exact=waiting",
+                },
+                {
+                    "title": format_with_badge(_("Bureau Messages"), counts['bureau_messages']),
+                    "icon": "mark_email_unread",
+                    "link": "/admin/dashboard/bureaumessage/",
                 },
                 {
                     "title": format_with_badge(_("Election Candidacies"), counts['candidacies']),
@@ -710,7 +726,6 @@ admin_site = admin.site
 # Export Unfold admin classes for use in app admin.py files
 # This allows apps to use: from config.admin import BaseAdmin, ModelAdmin, TabularInline, StackedInline
 __all__ = ['admin_site', 'BaseAdmin', 'ModelAdmin', 'TabularInline', 'StackedInline', 'dashboard_callback']
-
 
 
 

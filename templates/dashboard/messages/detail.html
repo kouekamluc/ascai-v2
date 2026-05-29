@@ -1,0 +1,81 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{{ bureau_message.subject }}{% endblock %}
+
+{% block extra_css %}
+{% if reply_form %}{{ reply_form.media.css }}{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="dashboard-card p-7">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p class="dashboard-kicker text-cameroon-green">{% trans 'Bureau Message' %}</p>
+                <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{{ bureau_message.subject }}</h2>
+                <p class="mt-2 text-sm text-gray-500">
+                    {% trans 'From' %} {% if bureau_message.sender %}{{ bureau_message.sender.get_display_name }}{% else %}{% trans 'ASCAI Lazio Bureau' %}{% endif %} · {{ bureau_message.created_at|date:"F d, Y H:i" }}
+                </p>
+            </div>
+            <span class="badge {% if bureau_message.is_read %}badge-success{% else %}badge-warning{% endif %}">
+                {% if bureau_message.is_read %}{% trans 'Read' %}{% else %}{% trans 'Unread' %}{% endif %}
+            </span>
+        </div>
+
+        <div class="mt-6 rounded-xl border-l-4 border-cameroon-green bg-cameroon-green/5 p-5">
+            <div class="prose prose-sm max-w-none text-gray-800">{{ bureau_message.body|safe }}</div>
+        </div>
+    </div>
+
+    {% if replies %}
+    <div class="dashboard-card p-7">
+        <h3 class="text-xl font-bold text-gray-900">{% trans 'Conversation' %}</h3>
+        <div class="mt-5 space-y-4">
+            {% for reply in replies %}
+            <div class="rounded-r-xl border-l-4 {% if reply.author.is_staff %}border-blue-500 bg-blue-50/70{% else %}border-cameroon-green bg-cameroon-green/5{% endif %} px-5 py-4">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <span class="font-semibold text-gray-900">
+                        {% if reply.author.is_staff %}{% trans 'Bureau' %}{% else %}{{ reply.author.get_display_name }}{% endif %}
+                    </span>
+                    <span class="text-sm text-gray-500">{{ reply.created_at|date:"F d, Y H:i" }}</span>
+                </div>
+                <div class="prose prose-sm mt-3 max-w-none text-gray-700">{{ reply.body|safe }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if bureau_message.allow_reply %}
+    <div class="dashboard-card p-7">
+        <h3 class="text-xl font-bold text-gray-900">{% trans 'Reply to bureau' %}</h3>
+        <form method="post" action="{% url 'dashboard:message_reply' bureau_message.pk %}" class="dashboard-form mt-5 space-y-6">
+            {% csrf_token %}
+            <div class="field-shell">
+                <label for="{{ reply_form.body.id_for_label }}">
+                    {{ reply_form.body.label }}
+                    {% if reply_form.body.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ reply_form.body }}
+                {% if reply_form.body.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ reply_form.body.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <div class="flex justify-end gap-4">
+                <a href="{% url 'dashboard:messages_list' %}" class="btn-secondary">{% trans 'Back to messages' %}</a>
+                <button type="submit" class="btn-primary">{% trans 'Send reply' %}</button>
+            </div>
+        </form>
+    </div>
+    {% else %}
+    <div class="flex justify-end">
+        <a href="{% url 'dashboard:messages_list' %}" class="btn-secondary">{% trans 'Back to messages' %}</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if reply_form %}{{ reply_form.media.js }}{% endif %}
+{% endblock %}

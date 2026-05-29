@@ -21,11 +21,13 @@ from django.core.files.base import ContentFile
 from .mixins import DashboardRequiredMixin
 from .models import (
     SupportTicket, TicketReply, CommunityGroup, GroupDiscussion, GroupAnnouncement, GroupFile,
-    UserStorySubmission, EventRegistration, SavedDocument, StudentQuestion, OrientationSession
+    UserStorySubmission, EventRegistration, SavedDocument, StudentQuestion, OrientationSession,
+    BureauMessage, BureauMessageReply
 )
 from .forms import (
     ProfileUpdateForm, DocumentUploadForm, SupportTicketForm, TicketReplyForm, GroupDiscussionForm,
-    StorySubmissionForm, StudentQuestionForm, OrientationBookingForm, NotificationPreferencesForm
+    StorySubmissionForm, StudentQuestionForm, OrientationBookingForm, NotificationPreferencesForm,
+    BureauMessageReplyForm
 )
 from apps.accounts.models import User, UserDocument
 from apps.core.models import ServicePartner
@@ -124,6 +126,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             'saved_scholarships': SavedScholarship.objects.filter(user=user).count(),
             'saved_documents': SavedDocument.objects.filter(user=user).count(),
             'open_tickets': SupportTicket.objects.filter(user=user, status__in=['open', 'pending']).count(),
+            'unread_messages': BureauMessage.objects.filter(recipient=user, is_read=False).count(),
             'mentorship_requests': MentorshipRequest.objects.filter(student=user).count() if hasattr(user, 'is_student') and user.is_student else 0,
             'group_memberships': CommunityGroup.objects.filter(members=user).count(),
         }
@@ -248,6 +251,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         
         # Recent activity
         context['recent_tickets'] = SupportTicket.objects.filter(user=user).order_by('-created_at')[:5]
+        context['recent_bureau_messages'] = BureauMessage.objects.filter(recipient=user).select_related('sender').order_by('-created_at')[:5]
         context['recent_stories'] = UserStorySubmission.objects.filter(user=user).order_by('-submitted_at')[:3]
         context['verified_service_partners'] = (
             ServicePartner.objects.filter(
@@ -309,6 +313,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                 quick_actions.append({'title': _('Review Mentorship Requests'), 'url': reverse_lazy('dashboard:mentorship_mentor_management'), 'icon': 'mentor'})
 
         quick_actions.extend([
+            {'title': _('My Messages'), 'url': reverse_lazy('dashboard:messages_list'), 'icon': 'messages'},
             {'title': _('Browse Groups'), 'url': reverse_lazy('dashboard:groups_list'), 'icon': 'users'},
             {'title': _('Create Ticket'), 'url': reverse_lazy('dashboard:tickets_create'), 'icon': 'support'},
             {'title': _('Saved Items'), 'url': reverse_lazy('dashboard:saved_items'), 'icon': 'saved'},
@@ -322,6 +327,79 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         context['quick_actions'] = quick_actions
         
         return context
+
+
+class BureauMessageListView(DashboardRequiredMixin, ListView):
+    """List direct messages sent to the logged-in user by bureau members."""
+    model = BureauMessage
+    template_name = 'dashboard/messages/list.html'
+    context_object_name = 'messages_list'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return (
+            BureauMessage.objects.filter(recipient=self.request.user)
+            .select_related('sender')
+            .prefetch_related('replies')
+            .order_by('-created_at')
+        )
+
+
+class BureauMessageDetailView(DashboardRequiredMixin, DetailView):
+    """Read and reply to a bureau direct message."""
+    model = BureauMessage
+    template_name = 'dashboard/messages/detail.html'
+    context_object_name = 'bureau_message'
+
+    def get_queryset(self):
+        return BureauMessage.objects.filter(recipient=self.request.user).select_related('sender')
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        obj.mark_read()
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['replies'] = BureauMessageReply.objects.filter(message=self.object).select_related('author')
+        context['reply_form'] = BureauMessageReplyForm()
+        return context
+
+
+class BureauMessageReplyView(DashboardRequiredMixin, CreateView):
+    """Reply to a bureau direct message when replies are enabled."""
+    model = BureauMessageReply
+    form_class = BureauMessageReplyForm
+    template_name = 'dashboard/messages/detail.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.bureau_message = get_object_or_404(
+            BureauMessage,
+            pk=kwargs['pk'],
+            recipient=request.user,
+            allow_reply=True,
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['bureau_message'] = self.bureau_message
+        context['replies'] = BureauMessageReply.objects.filter(message=self.bureau_message).select_related('author')
+        context['reply_form'] = context.get('form') or self.get_form()
+        return context
+
+    def form_valid(self, form):
+        form.instance.message = self.bureau_message
+        form.instance.author = self.request.user
+        messages.success(self.request, _('Your reply has been sent to the bureau.'))
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('Please correct the errors below.'))
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard:message_detail', kwargs={'pk': self.bureau_message.pk})
 
 
 # Profile Management Views

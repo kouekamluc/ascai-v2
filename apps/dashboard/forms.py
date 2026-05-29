@@ -5,7 +5,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import (
     SupportTicket, TicketReply, GroupDiscussion, UserStorySubmission,
-    StudentQuestion, OrientationSession, StoryImage
+    StudentQuestion, OrientationSession, StoryImage, BureauMessageReply
 )
 from apps.accounts.models import User, UserDocument
 from apps.universities.models import University
@@ -230,6 +230,21 @@ class TicketReplyForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
                 'rows': 6,
                 'placeholder': _('Type your reply here...')
+            }),
+        }
+
+
+class BureauMessageReplyForm(forms.ModelForm):
+    """Form for replying to bureau direct messages."""
+
+    class Meta:
+        model = BureauMessageReply
+        fields = ['body']
+        widgets = {
+            'body': CKEditor5Widget(config_name='default') if CKEditor5Widget else forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cameroon-green focus:border-cameroon-green',
+                'rows': 5,
+                'placeholder': _('Type your reply to the bureau...')
             }),
         }
 

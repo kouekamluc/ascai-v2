@@ -10,7 +10,10 @@ from apps.core.models import ServicePartner
 from apps.governance.models import Member, MembershipDues
 from apps.mentorship.models import MentorProfile
 
-from .models import SupportTicket, TicketReply, CommunityGroup, OrientationSession, StudentQuestion
+from .models import (
+    SupportTicket, TicketReply, CommunityGroup, OrientationSession, StudentQuestion,
+    BureauMessage, BureauMessageReply
+)
 from .mixins import DashboardRequiredMixin
 
 User = get_user_model()
@@ -335,6 +338,83 @@ class DashboardViewsTest(TestCase):
         self.assertEqual(response.json()['availability_status'], 'busy')
         mentor.mentor_profile.refresh_from_db()
         self.assertEqual(mentor.mentor_profile.availability_status, 'busy')
+
+    def test_bureau_message_inbox_marks_message_read(self):
+        sender = User.objects.create_user(
+            username='bureau',
+            email='bureau@example.com',
+            password='testpass123',
+            is_staff=True,
+            is_approved=True,
+        )
+        message = BureauMessage.objects.create(
+            sender=sender,
+            recipient=self.user,
+            subject='Membership verification',
+            body='Please review your membership documents.',
+        )
+        self.client.login(username='testuser', password='testpass123')
+
+        list_response = self.client.get(reverse('dashboard:messages_list'))
+        self.assertEqual(list_response.status_code, 200)
+        self.assertContains(list_response, 'Membership verification')
+        self.assertContains(list_response, 'Unread')
+
+        detail_response = self.client.get(reverse('dashboard:message_detail', kwargs={'pk': message.pk}))
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, 'Please review your membership documents.')
+        message.refresh_from_db()
+        self.assertTrue(message.is_read)
+        self.assertIsNotNone(message.read_at)
+
+    def test_user_can_reply_to_bureau_message(self):
+        sender = User.objects.create_user(
+            username='bureau2',
+            email='bureau2@example.com',
+            password='testpass123',
+            is_staff=True,
+            is_approved=True,
+        )
+        message = BureauMessage.objects.create(
+            sender=sender,
+            recipient=self.user,
+            subject='Orientation follow-up',
+            body='Can you confirm your preferred appointment?',
+            allow_reply=True,
+        )
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.post(
+            reverse('dashboard:message_reply', kwargs={'pk': message.pk}),
+            {'body': 'Yes, I confirm the appointment.'},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            BureauMessageReply.objects.filter(
+                message=message,
+                author=self.user,
+                body='Yes, I confirm the appointment.',
+            ).exists()
+        )
+
+    def test_user_cannot_read_another_users_bureau_message(self):
+        other_user = User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        message = BureauMessage.objects.create(
+            recipient=other_user,
+            subject='Private note',
+            body='Only the other user should see this.',
+        )
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.get(reverse('dashboard:message_detail', kwargs={'pk': message.pk}))
+
+        self.assertEqual(response.status_code, 404)
 
 
 class DashboardMixinsTest(TestCase):
