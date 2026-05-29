@@ -16,6 +16,7 @@ class ContactSubmissionAdmin(ModelAdmin):
     search_fields = ['name', 'email', 'subject', 'message']
     readonly_fields = ['name', 'email', 'phone', 'subject', 'message', 'created_at']
     list_display_links = ['name', 'email']
+    actions = ['mark_read', 'mark_replied', 'mark_new']
     
     fieldsets = (
         (_('Contact Information'), {
@@ -62,6 +63,20 @@ class ContactSubmissionAdmin(ModelAdmin):
             extra_context['notification_message'] = _('{} new contact submission(s)').format(new_count)
         return super().changelist_view(request, extra_context)
 
+    def mark_read(self, request, queryset):
+        updated = queryset.update(status='read')
+        self.message_user(request, _('{} message(s) marked read.').format(updated))
+    mark_read.short_description = _('Mark selected messages read')
+
+    def mark_replied(self, request, queryset):
+        updated = queryset.update(status='replied')
+        self.message_user(request, _('{} message(s) marked replied.').format(updated))
+    mark_replied.short_description = _('Mark selected messages replied')
+
+    def mark_new(self, request, queryset):
+        updated = queryset.update(status='new')
+        self.message_user(request, _('{} message(s) moved back to new.').format(updated))
+    mark_new.short_description = _('Move selected messages back to new')
 
 
 

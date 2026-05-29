@@ -1,7 +1,10 @@
 """
 Admin configuration for dashboard app.
 """
+from datetime import datetime
+
 from django.contrib import admin
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from config.admin import BaseAdmin, ModelAdmin, TabularInline
 from .models import (
@@ -44,6 +47,7 @@ class SupportTicketAdmin(BaseAdmin):
     readonly_fields = ['user', 'created_at', 'updated_at']
     inlines = [TicketReplyInline]
     list_display_links = ['user', 'subject']
+    actions = ['mark_pending', 'mark_resolved', 'mark_closed']
     fieldsets = (
         (_('Ticket Information'), {
             'fields': ('user', 'subject', 'message', 'status')
@@ -80,9 +84,23 @@ class SupportTicketAdmin(BaseAdmin):
     
     def save_model(self, request, obj, form, change):
         if change and 'status' in form.changed_data and obj.status == 'resolved':
-            from django.utils import timezone
             obj.resolved_at = timezone.now()
         super().save_model(request, obj, form, change)
+
+    def mark_pending(self, request, queryset):
+        updated = queryset.update(status='pending')
+        self.message_user(request, _('{} ticket(s) marked pending.').format(updated))
+    mark_pending.short_description = _('Mark selected tickets as pending')
+
+    def mark_resolved(self, request, queryset):
+        updated = queryset.update(status='resolved', resolved_at=timezone.now())
+        self.message_user(request, _('{} ticket(s) marked resolved.').format(updated))
+    mark_resolved.short_description = _('Mark selected tickets as resolved')
+
+    def mark_closed(self, request, queryset):
+        updated = queryset.update(status='closed', resolved_at=timezone.now())
+        self.message_user(request, _('{} ticket(s) closed.').format(updated))
+    mark_closed.short_description = _('Close selected tickets')
     
     def save_formset(self, request, form, formset, change):
         """Handle formset saving - author is set in formset's save_new method."""
@@ -232,21 +250,63 @@ class EventRegistrationAdmin(ModelAdmin):
     list_filter = ['attended', 'registered_at', 'event']
     search_fields = ['user__username', 'event__title', 'registration_code']
     readonly_fields = ['registration_code', 'registered_at']
+    actions = ['mark_attended', 'mark_not_attended']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user', 'event')
+
+    def mark_attended(self, request, queryset):
+        updated = queryset.update(attended=True)
+        self.message_user(request, _('{} registration(s) marked attended.').format(updated))
+    mark_attended.short_description = _('Mark selected registrations attended')
+
+    def mark_not_attended(self, request, queryset):
+        updated = queryset.update(attended=False)
+        self.message_user(request, _('{} registration(s) marked not attended.').format(updated))
+    mark_not_attended.short_description = _('Mark selected registrations not attended')
 
 
 @admin.register(EventWaitlistEntry)
 class EventWaitlistEntryAdmin(ModelAdmin):
-    list_display = ['user', 'event', 'status', 'joined_at', 'promoted_at']
+    list_display = ['user', 'event', 'status', 'event_capacity', 'joined_at', 'promoted_at']
     list_filter = ['status', 'joined_at', 'promoted_at', 'event']
     search_fields = ['user__username', 'user__email', 'event__title', 'notes']
     readonly_fields = ['joined_at', 'promoted_at']
     list_display_links = ['user', 'event']
+    actions = ['promote_to_registration', 'mark_cancelled']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user', 'event')
+
+    def event_capacity(self, obj):
+        capacity = obj.event.capacity
+        if not capacity:
+            return _('Unlimited')
+        return _('{} left').format(obj.event.spots_remaining())
+    event_capacity.short_description = _('Capacity')
+
+    def promote_to_registration(self, request, queryset):
+        promoted = 0
+        skipped = 0
+        for entry in queryset.select_related('user', 'event').filter(status='waiting').order_by('joined_at'):
+            if entry.event.is_full():
+                skipped += 1
+                continue
+            EventRegistration.objects.get_or_create(user=entry.user, event=entry.event)
+            entry.status = 'promoted'
+            entry.promoted_at = timezone.now()
+            entry.save(update_fields=['status', 'promoted_at'])
+            promoted += 1
+        message = _('{} waitlist entry/entries promoted to registration.').format(promoted)
+        if skipped:
+            message = '{} {}'.format(message, _('{} skipped because the event is full.').format(skipped))
+        self.message_user(request, message)
+    promote_to_registration.short_description = _('Promote selected waiting users to registration')
+
+    def mark_cancelled(self, request, queryset):
+        updated = queryset.update(status='cancelled')
+        self.message_user(request, _('{} waitlist entry/entries cancelled.').format(updated))
+    mark_cancelled.short_description = _('Cancel selected waitlist entries')
 
 
 @admin.register(SavedDocument)
@@ -264,6 +324,7 @@ class StudentQuestionAdmin(BaseAdmin):
     search_fields = ['subject', 'question', 'user__username']
     readonly_fields = ['user', 'created_at', 'resolved_at']
     list_display_links = ['subject', 'user']
+    actions = ['mark_resolved', 'mark_unresolved']
     fieldsets = (
         (_('Question'), {
             'fields': ('user', 'subject', 'question', 'category')
@@ -295,9 +356,18 @@ class StudentQuestionAdmin(BaseAdmin):
     
     def save_model(self, request, obj, form, change):
         if change and 'is_resolved' in form.changed_data and obj.is_resolved:
-            from django.utils import timezone
             obj.resolved_at = timezone.now()
         super().save_model(request, obj, form, change)
+
+    def mark_resolved(self, request, queryset):
+        updated = queryset.update(is_resolved=True, resolved_at=timezone.now())
+        self.message_user(request, _('{} student question(s) marked resolved.').format(updated))
+    mark_resolved.short_description = _('Mark selected questions resolved')
+
+    def mark_unresolved(self, request, queryset):
+        updated = queryset.update(is_resolved=False, resolved_at=None)
+        self.message_user(request, _('{} student question(s) reopened.').format(updated))
+    mark_unresolved.short_description = _('Reopen selected questions')
     
     def changelist_view(self, request, extra_context=None):
         """Add notification count to changelist context."""
@@ -317,6 +387,7 @@ class OrientationSessionAdmin(ModelAdmin):
     readonly_fields = ['user', 'created_at']
     autocomplete_fields = ['user']
     list_display_links = ['user', 'preferred_date']
+    actions = ['confirm_for_preferred_slot', 'mark_unconfirmed']
     fieldsets = (
         (_('Session Request'), {
             'fields': ('user', 'preferred_date', 'preferred_time', 'topics')
@@ -347,13 +418,29 @@ class OrientationSessionAdmin(ModelAdmin):
     confirmation_badge.admin_order_field = 'is_confirmed'
 
     def save_model(self, request, obj, form, change):
-        from django.utils import timezone
-
         if obj.is_confirmed and not obj.confirmed_date:
             obj.confirmed_date = timezone.now()
         elif not obj.is_confirmed:
             obj.confirmed_date = None
         super().save_model(request, obj, form, change)
+
+    def confirm_for_preferred_slot(self, request, queryset):
+        confirmed = 0
+        for session in queryset:
+            preferred_dt = datetime.combine(session.preferred_date, session.preferred_time)
+            if timezone.is_naive(preferred_dt):
+                preferred_dt = timezone.make_aware(preferred_dt, timezone.get_current_timezone())
+            session.is_confirmed = True
+            session.confirmed_date = preferred_dt
+            session.save(update_fields=['is_confirmed', 'confirmed_date'])
+            confirmed += 1
+        self.message_user(request, _('{} orientation session(s) confirmed.').format(confirmed))
+    confirm_for_preferred_slot.short_description = _('Confirm selected sessions for preferred slot')
+
+    def mark_unconfirmed(self, request, queryset):
+        updated = queryset.update(is_confirmed=False, confirmed_date=None)
+        self.message_user(request, _('{} orientation session(s) marked unconfirmed.').format(updated))
+    mark_unconfirmed.short_description = _('Mark selected sessions unconfirmed')
     
     def changelist_view(self, request, extra_context=None):
         """Add notification count to changelist context."""

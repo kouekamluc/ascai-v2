@@ -4,6 +4,7 @@ Admin configuration for accounts app.
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.sites.models import Site
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from allauth.account.models import EmailAddress
@@ -23,7 +24,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     """
     Custom admin interface for User model.
     """
-    list_display = ['username', 'email', 'full_name', 'role', 'is_approved', 'email_verified', 'is_active', 'date_joined']
+    list_display = ['username', 'email', 'full_name', 'role', 'approval_badge', 'email_verified', 'is_active', 'date_joined']
     list_filter = ['role', 'is_approved', 'email_verified', 'is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'full_name']
     search_help_text = _('Search by username, email, or full name.')
@@ -48,7 +49,23 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         }),
     )
     
-    actions = ['approve_users', 'reject_users', 'verify_emails', 'mark_emails_unverified', 'resend_verification_emails']
+    actions = ['approve_users', 'approve_and_verify_users', 'reject_users', 'verify_emails', 'mark_emails_unverified', 'resend_verification_emails']
+
+    def approval_badge(self, obj):
+        """Show the account review state in plain language for bureau members."""
+        if obj.is_approved:
+            return format_html(
+                '<span style="background:#166534;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">APPROVED</span>'
+            )
+        if not obj.is_active:
+            return format_html(
+                '<span style="background:#6b7280;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">INACTIVE</span>'
+            )
+        return format_html(
+            '<span style="background:#b91c1c;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">NEEDS REVIEW</span>'
+        )
+    approval_badge.short_description = _('Approval')
+    approval_badge.admin_order_field = 'is_approved'
     
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """Override to use CKEditor 5 for bio TextField."""
@@ -121,6 +138,12 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
             message += f' {emails_sent} approval email(s) sent.'
         self.message_user(request, message)
     approve_users.short_description = _('Approve selected users')
+
+    def approve_and_verify_users(self, request, queryset):
+        """Approve accounts and mark their current email addresses as verified."""
+        self.approve_users(request, queryset)
+        self.verify_emails(request, queryset)
+    approve_and_verify_users.short_description = _('Approve and verify selected users')
     
     def _send_approval_email(self, user):
         """Helper method to send approval email to a user."""
@@ -288,11 +311,19 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         self.message_user(request, message)
     resend_verification_emails.short_description = _('Resend verification emails to selected users (unlimited resends)')
 
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        pending_count = User.objects.filter(is_approved=False, is_active=True).count()
+        if pending_count:
+            extra_context['notification_count'] = pending_count
+            extra_context['notification_message'] = _('{} account(s) waiting for approval').format(pending_count)
+        return super().changelist_view(request, extra_context)
+
 
 @admin.register(UserDocument)
 class UserDocumentAdmin(ModelAdmin):
     """Admin interface for user documents."""
-    list_display = ['user', 'document_type', 'is_verified', 'uploaded_at']
+    list_display = ['user', 'document_type', 'verification_badge', 'open_file', 'uploaded_at']
     list_filter = ['document_type', 'is_verified', 'uploaded_at']
     search_fields = ['user__username', 'user__email']
     readonly_fields = ['user', 'uploaded_at']
@@ -309,6 +340,23 @@ class UserDocumentAdmin(ModelAdmin):
     )
     
     actions = ['verify_documents', 'unverify_documents']
+
+    def verification_badge(self, obj):
+        if obj.is_verified:
+            return format_html(
+                '<span style="background:#166534;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">VERIFIED</span>'
+            )
+        return format_html(
+            '<span style="background:#b91c1c;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">CHECK DOCUMENT</span>'
+        )
+    verification_badge.short_description = _('Verification')
+    verification_badge.admin_order_field = 'is_verified'
+
+    def open_file(self, obj):
+        if not obj.file:
+            return '-'
+        return format_html('<a href="{}" target="_blank" rel="noopener">Open document</a>', obj.file.url)
+    open_file.short_description = _('File')
     
     def verify_documents(self, request, queryset):
         updated = queryset.update(is_verified=True)
@@ -319,3 +367,11 @@ class UserDocumentAdmin(ModelAdmin):
         updated = queryset.update(is_verified=False)
         self.message_user(request, _('{} documents unverified.').format(updated))
     unverify_documents.short_description = _('Unverify selected documents')
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        pending_count = UserDocument.objects.filter(is_verified=False).count()
+        if pending_count:
+            extra_context['notification_count'] = pending_count
+            extra_context['notification_message'] = _('{} document(s) waiting for verification').format(pending_count)
+        return super().changelist_view(request, extra_context)

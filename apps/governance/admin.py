@@ -2,6 +2,9 @@
 Admin configuration for governance app.
 """
 from django.contrib import admin
+from django.db.models import Q
+from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from config.admin import BaseAdmin, ModelAdmin, TabularInline
 from .forms import ExecutivePositionForm
@@ -24,7 +27,7 @@ from .models import (
 
 @admin.register(Member)
 class MemberAdmin(BaseAdmin):
-    list_display = ['user', 'member_type', 'is_active_member', 'lazio_residence_verified', 
+    list_display = ['user', 'member_type', 'verification_badge', 'is_active_member', 'lazio_residence_verified',
                     'cameroonian_origin_verified', 'registration_date']
     list_filter = ['member_type', 'is_active_member', 'lazio_residence_verified', 
                    'cameroonian_origin_verified', 'registration_date']
@@ -33,6 +36,7 @@ class MemberAdmin(BaseAdmin):
     readonly_fields = ['registration_date', 'created_at', 'updated_at']
     autocomplete_fields = ['user']
     list_per_page = 25
+    actions = ['verify_eligibility', 'activate_members', 'deactivate_members']
     fieldsets = (
         (_('Member Information'), {
             'fields': ('user', 'member_type', 'is_active_member')
@@ -51,6 +55,42 @@ class MemberAdmin(BaseAdmin):
             'classes': ('collapse',)
         }),
     )
+
+    def verification_badge(self, obj):
+        if obj.lazio_residence_verified and obj.cameroonian_origin_verified:
+            return format_html(
+                '<span style="background:#166534;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">VERIFIED</span>'
+            )
+        return format_html(
+            '<span style="background:#b91c1c;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">CHECK ELIGIBILITY</span>'
+        )
+    verification_badge.short_description = _('Eligibility')
+    verification_badge.admin_order_field = 'lazio_residence_verified'
+
+    def verify_eligibility(self, request, queryset):
+        updated = queryset.update(lazio_residence_verified=True, cameroonian_origin_verified=True)
+        self.message_user(request, _('{} member(s) marked eligibility verified.').format(updated))
+    verify_eligibility.short_description = _('Verify Lazio residence and Cameroonian origin')
+
+    def activate_members(self, request, queryset):
+        updated = queryset.update(is_active_member=True, membership_start_date=timezone.now().date())
+        self.message_user(request, _('{} member(s) activated.').format(updated))
+    activate_members.short_description = _('Activate selected members')
+
+    def deactivate_members(self, request, queryset):
+        updated = queryset.update(is_active_member=False, membership_end_date=timezone.now().date())
+        self.message_user(request, _('{} member(s) deactivated.').format(updated))
+    deactivate_members.short_description = _('Deactivate selected members')
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        pending_count = Member.objects.filter(
+            Q(lazio_residence_verified=False) | Q(cameroonian_origin_verified=False)
+        ).count()
+        if pending_count:
+            extra_context['notification_count'] = pending_count
+            extra_context['notification_message'] = _('{} member(s) need eligibility review').format(pending_count)
+        return super().changelist_view(request, extra_context)
 
 
 @admin.register(MembershipStatus)
@@ -269,11 +309,27 @@ class ElectionAdmin(BaseAdmin):
     search_fields = ['notes']
     readonly_fields = ['created_at', 'updated_at']
     date_hierarchy = 'start_date'
+    actions = ['mark_in_progress', 'mark_completed', 'mark_cancelled']
+
+    def mark_in_progress(self, request, queryset):
+        updated = queryset.update(status='in_progress')
+        self.message_user(request, _('{} election(s) marked in progress.').format(updated))
+    mark_in_progress.short_description = _('Mark selected elections in progress')
+
+    def mark_completed(self, request, queryset):
+        updated = queryset.update(status='completed')
+        self.message_user(request, _('{} election(s) completed.').format(updated))
+    mark_completed.short_description = _('Mark selected elections completed')
+
+    def mark_cancelled(self, request, queryset):
+        updated = queryset.update(status='cancelled')
+        self.message_user(request, _('{} election(s) cancelled.').format(updated))
+    mark_cancelled.short_description = _('Cancel selected elections')
 
 
 @admin.register(Candidacy)
 class CandidacyAdmin(BaseAdmin):
-    list_display = ['candidate', 'election', 'position', 'status', 
+    list_display = ['candidate', 'election', 'position', 'status_badge',
                     'seniority_verified', 'lazio_residence_verified', 'cameroonian_origin_verified']
     list_filter = ['position', 'status', 'election', 'seniority_verified', 
                    'lazio_residence_verified', 'cameroonian_origin_verified']
@@ -281,6 +337,49 @@ class CandidacyAdmin(BaseAdmin):
     readonly_fields = ['created_at', 'updated_at']
     autocomplete_fields = ['candidate', 'election']
     list_per_page = 25
+    actions = ['verify_eligibility', 'approve_candidacies', 'reject_candidacies']
+
+    def status_badge(self, obj):
+        colors = {
+            'approved': '#166534',
+            'rejected': '#b91c1c',
+            'withdrawn': '#6b7280',
+            'pending': '#b45309',
+        }
+        return format_html(
+            '<span style="background:{};color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">{}</span>',
+            colors.get(obj.status, '#374151'),
+            obj.get_status_display().upper(),
+        )
+    status_badge.short_description = _('Status')
+    status_badge.admin_order_field = 'status'
+
+    def verify_eligibility(self, request, queryset):
+        updated = queryset.update(
+            seniority_verified=True,
+            lazio_residence_verified=True,
+            cameroonian_origin_verified=True,
+        )
+        self.message_user(request, _('{} candidacy record(s) marked eligible.').format(updated))
+    verify_eligibility.short_description = _('Verify selected candidacy eligibility')
+
+    def approve_candidacies(self, request, queryset):
+        updated = queryset.update(status='approved')
+        self.message_user(request, _('{} candidacy record(s) approved.').format(updated))
+    approve_candidacies.short_description = _('Approve selected candidacies')
+
+    def reject_candidacies(self, request, queryset):
+        updated = queryset.update(status='rejected')
+        self.message_user(request, _('{} candidacy record(s) rejected.').format(updated))
+    reject_candidacies.short_description = _('Reject selected candidacies')
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        pending_count = Candidacy.objects.filter(status='pending').count()
+        if pending_count:
+            extra_context['notification_count'] = pending_count
+            extra_context['notification_message'] = _('{} candidacy record(s) need review').format(pending_count)
+        return super().changelist_view(request, extra_context)
 
 
 @admin.register(ElectionVote)

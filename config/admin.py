@@ -3,6 +3,7 @@ Custom admin site configuration for ASCAI Lazio.
 """
 from django.contrib import admin
 from django.db.models import Count, Q
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
@@ -80,14 +81,15 @@ def dashboard_callback(request, context):
     Returns:
         dict: Additional context data to merge with the admin index context
     """
-    from apps.accounts.models import User
+    from apps.accounts.models import User, UserDocument
     from apps.diaspora.models import News, Event, SuccessStory
     from apps.community.models import ForumPost, ForumThread
     from apps.mentorship.models import MentorshipRequest
     from apps.universities.models import University
     from apps.scholarships.models import Scholarship
     from apps.downloads.models import Document
-    from apps.dashboard.models import SupportTicket
+    from apps.dashboard.models import SupportTicket, EventWaitlistEntry
+    from apps.governance.models import Member, Candidacy
     
     # Calculate statistics
     stats = {
@@ -151,11 +153,18 @@ def dashboard_callback(request, context):
     # Notification counts - items that need admin attention
     from apps.contact.models import ContactSubmission
     from apps.dashboard.models import OrientationSession, StudentQuestion
+    from apps.mentorship.models import MentorProfile
     
     notification_counts = {
+        'pending_user_approvals': User.objects.filter(is_approved=False, is_active=True).count(),
+        'unverified_user_documents': UserDocument.objects.filter(is_verified=False).count(),
+        'pending_member_verifications': Member.objects.filter(
+            Q(lazio_residence_verified=False) | Q(cameroonian_origin_verified=False)
+        ).count(),
         'new_contact_submissions': ContactSubmission.objects.filter(
             status='new'
         ).count(),
+        'pending_mentor_profiles': MentorProfile.objects.filter(is_approved=False).count(),
         'pending_mentorship_requests': MentorshipRequest.objects.filter(
             status='pending'
         ).count(),
@@ -168,6 +177,8 @@ def dashboard_callback(request, context):
         'unresolved_student_questions': StudentQuestion.objects.filter(
             is_resolved=False
         ).count(),
+        'waiting_event_waitlist': EventWaitlistEntry.objects.filter(status='waiting').count(),
+        'pending_candidacies': Candidacy.objects.filter(status='pending').count(),
     }
     
     # Total notifications count
@@ -193,6 +204,90 @@ def dashboard_callback(request, context):
         is_confirmed=False
     ).order_by('-created_at')[:5]
     
+    bureau_tasks = [
+        {
+            'title': _('Approve new accounts'),
+            'description': _('Review recent signups and activate access.'),
+            'count': notification_counts['pending_user_approvals'],
+            'url': reverse('admin:accounts_user_changelist') + '?is_approved__exact=0',
+            'icon': 'person_add',
+            'priority': 1,
+        },
+        {
+            'title': _('Verify uploaded documents'),
+            'description': _('Check IDs, residence permits, and student cards.'),
+            'count': notification_counts['unverified_user_documents'],
+            'url': reverse('admin:accounts_userdocument_changelist') + '?is_verified__exact=0',
+            'icon': 'fact_check',
+            'priority': 1,
+        },
+        {
+            'title': _('Confirm member eligibility'),
+            'description': _('Validate Lazio residence and Cameroonian origin.'),
+            'count': notification_counts['pending_member_verifications'],
+            'url': reverse('admin:governance_member_changelist'),
+            'icon': 'verified_user',
+            'priority': 1,
+        },
+        {
+            'title': _('Handle orientation bookings'),
+            'description': _('Confirm or reschedule new student sessions.'),
+            'count': notification_counts['unconfirmed_orientation_sessions'],
+            'url': reverse('admin:dashboard_orientationsession_changelist') + '?is_confirmed__exact=0',
+            'icon': 'event_available',
+            'priority': 2,
+        },
+        {
+            'title': _('Answer student questions'),
+            'description': _('Resolve onboarding and administrative questions.'),
+            'count': notification_counts['unresolved_student_questions'],
+            'url': reverse('admin:dashboard_studentquestion_changelist') + '?is_resolved__exact=0',
+            'icon': 'help_center',
+            'priority': 2,
+        },
+        {
+            'title': _('Work support tickets'),
+            'description': _('Follow up open and pending support requests.'),
+            'count': notification_counts['open_support_tickets'],
+            'url': reverse('admin:dashboard_supportticket_changelist'),
+            'icon': 'support_agent',
+            'priority': 2,
+        },
+        {
+            'title': _('Review mentor profiles'),
+            'description': _('Approve mentors before they are visible.'),
+            'count': notification_counts['pending_mentor_profiles'],
+            'url': reverse('admin:mentorship_mentorprofile_changelist') + '?is_approved__exact=0',
+            'icon': 'school',
+            'priority': 3,
+        },
+        {
+            'title': _('Promote event waitlist'),
+            'description': _('Move waiting members into available event seats.'),
+            'count': notification_counts['waiting_event_waitlist'],
+            'url': reverse('admin:dashboard_eventwaitlistentry_changelist') + '?status__exact=waiting',
+            'icon': 'event_seat',
+            'priority': 3,
+        },
+        {
+            'title': _('Review election candidacies'),
+            'description': _('Check eligibility before voting opens.'),
+            'count': notification_counts['pending_candidacies'],
+            'url': reverse('admin:governance_candidacy_changelist') + '?status__exact=pending',
+            'icon': 'how_to_vote',
+            'priority': 3,
+        },
+    ]
+
+    bureau_quick_links = [
+        {'title': _('Users'), 'url': reverse('admin:accounts_user_changelist'), 'icon': 'people'},
+        {'title': _('Members'), 'url': reverse('admin:governance_member_changelist'), 'icon': 'badge'},
+        {'title': _('Events'), 'url': reverse('admin:diaspora_event_changelist'), 'icon': 'event'},
+        {'title': _('Elections'), 'url': reverse('admin:governance_election_changelist'), 'icon': 'how_to_vote'},
+        {'title': _('Communications'), 'url': reverse('admin:governance_communication_changelist'), 'icon': 'campaign'},
+        {'title': _('Documents'), 'url': reverse('admin:downloads_document_changelist'), 'icon': 'description'},
+    ]
+
     # Add all statistics to context
     context.update({
         'dashboard_stats': stats,
@@ -209,6 +304,8 @@ def dashboard_callback(request, context):
         'recent_contact_submissions': recent_contact_submissions,
         'recent_mentorship_requests': recent_mentorship_requests,
         'recent_orientation_sessions': recent_orientation_sessions,
+        'bureau_tasks': sorted(bureau_tasks, key=lambda item: (-item['count'], item['priority'], item['title'])),
+        'bureau_quick_links': bureau_quick_links,
     })
     
     return context
@@ -223,15 +320,25 @@ def get_notification_counts():
     """
     try:
         from apps.contact.models import ContactSubmission
-        from apps.mentorship.models import MentorshipRequest
-        from apps.dashboard.models import OrientationSession, StudentQuestion, SupportTicket
+        from apps.accounts.models import User, UserDocument
+        from apps.mentorship.models import MentorProfile, MentorshipRequest
+        from apps.dashboard.models import OrientationSession, StudentQuestion, SupportTicket, EventWaitlistEntry
+        from apps.governance.models import Member, Candidacy
         
         counts = {
+            'users': User.objects.filter(is_approved=False, is_active=True).count(),
+            'documents': UserDocument.objects.filter(is_verified=False).count(),
+            'members': Member.objects.filter(
+                Q(lazio_residence_verified=False) | Q(cameroonian_origin_verified=False)
+            ).count(),
             'contact': ContactSubmission.objects.filter(status='new').count(),
+            'mentor_profiles': MentorProfile.objects.filter(is_approved=False).count(),
             'mentorship': MentorshipRequest.objects.filter(status='pending').count(),
             'orientation': OrientationSession.objects.filter(is_confirmed=False).count(),
             'tickets': SupportTicket.objects.filter(status__in=['open', 'pending']).count(),
             'questions': StudentQuestion.objects.filter(is_resolved=False).count(),
+            'waitlist': EventWaitlistEntry.objects.filter(status='waiting').count(),
+            'candidacies': Candidacy.objects.filter(status='pending').count(),
         }
         counts['total'] = sum(counts.values())
         return counts
@@ -239,10 +346,16 @@ def get_notification_counts():
         # Return zeros if models aren't available (e.g., during migrations)
         return {
             'contact': 0,
+            'users': 0,
+            'documents': 0,
+            'members': 0,
+            'mentor_profiles': 0,
             'mentorship': 0,
             'orientation': 0,
             'tickets': 0,
             'questions': 0,
+            'waitlist': 0,
+            'candidacies': 0,
             'total': 0,
         }
 
@@ -271,17 +384,42 @@ def get_notification_navigation(request):
     # Return full navigation with notification counts
     return [
         {
-            "title": format_with_badge(_("Inbox & Actions"), counts['total']),
-            "icon": "notifications_active",
+            "title": format_with_badge(_("Bureau Workbench"), counts['total']),
+            "icon": "dashboard_customize",
             "items": [
+                {
+                    "title": _("Action Center"),
+                    "icon": "dashboard",
+                    "link": "/admin/",
+                },
+                {
+                    "title": format_with_badge(_("Account Approvals"), counts['users']),
+                    "icon": "person_add",
+                    "link": "/admin/accounts/user/?is_approved__exact=0",
+                },
+                {
+                    "title": format_with_badge(_("Document Verification"), counts['documents']),
+                    "icon": "fact_check",
+                    "link": "/admin/accounts/userdocument/?is_verified__exact=0",
+                },
+                {
+                    "title": format_with_badge(_("Member Eligibility"), counts['members']),
+                    "icon": "verified_user",
+                    "link": "/admin/governance/member/",
+                },
                 {
                     "title": format_with_badge(_("Contact Messages"), counts['contact']),
                     "icon": "mail",
                     "link": "/admin/contact/contactsubmission/",
                 },
                 {
-                    "title": format_with_badge(_("Mentorship Requests"), counts['mentorship']),
+                    "title": format_with_badge(_("Mentor Profiles"), counts['mentor_profiles']),
                     "icon": "school",
+                    "link": "/admin/mentorship/mentorprofile/?is_approved__exact=0",
+                },
+                {
+                    "title": format_with_badge(_("Mentorship Requests"), counts['mentorship']),
+                    "icon": "handshake",
                     "link": "/admin/mentorship/mentorshiprequest/",
                 },
                 {
@@ -298,6 +436,16 @@ def get_notification_navigation(request):
                     "title": format_with_badge(_("Student Questions"), counts['questions']),
                     "icon": "help",
                     "link": "/admin/dashboard/studentquestion/",
+                },
+                {
+                    "title": format_with_badge(_("Event Waitlist"), counts['waitlist']),
+                    "icon": "event_seat",
+                    "link": "/admin/dashboard/eventwaitlistentry/?status__exact=waiting",
+                },
+                {
+                    "title": format_with_badge(_("Election Candidacies"), counts['candidacies']),
+                    "icon": "how_to_vote",
+                    "link": "/admin/governance/candidacy/?status__exact=pending",
                 },
             ],
         },
@@ -562,9 +710,6 @@ admin_site = admin.site
 # Export Unfold admin classes for use in app admin.py files
 # This allows apps to use: from config.admin import BaseAdmin, ModelAdmin, TabularInline, StackedInline
 __all__ = ['admin_site', 'BaseAdmin', 'ModelAdmin', 'TabularInline', 'StackedInline', 'dashboard_callback']
-
-
-
 
 
 
