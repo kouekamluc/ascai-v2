@@ -7,6 +7,8 @@ from django.contrib.auth import get_user_model
 from datetime import date, timedelta, time
 
 from apps.core.models import ServicePartner
+from apps.governance.models import Member, MembershipDues
+from apps.mentorship.models import MentorProfile
 
 from .models import SupportTicket, TicketReply, CommunityGroup, OrientationSession, StudentQuestion
 from .mixins import DashboardRequiredMixin
@@ -151,6 +153,7 @@ class DashboardViewsTest(TestCase):
         url = reverse('dashboard:home')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Your start-to-end checklist')
 
     def test_dashboard_home_shows_only_verified_service_partners(self):
         ServicePartner.objects.create(
@@ -253,6 +256,85 @@ class DashboardViewsTest(TestCase):
         response = self.client.get(reverse('dashboard:student_questions'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Orientation follow-up')
+
+    def test_non_member_dashboard_shows_membership_registration_not_member_tools(self):
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.get(reverse('dashboard:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Register Membership')
+        self.assertNotContains(response, 'My Dues')
+        self.assertNotContains(response, 'Member Directory')
+
+    def test_active_member_dashboard_shows_member_tools(self):
+        member = Member.objects.create(
+            user=self.user,
+            member_type='student',
+            is_active_member=True,
+            cameroonian_origin_verified=True,
+            lazio_residence_verified=True,
+        )
+        today = date.today()
+        MembershipDues.objects.create(
+            member=member,
+            year=today.year,
+            amount='10.00',
+            due_date=date(today.year, 3, 31),
+            status='paid',
+        )
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.get(reverse('dashboard:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'My Dues')
+        self.assertContains(response, 'Member Directory')
+        self.assertContains(response, 'Elections')
+
+    def test_mentor_dashboard_hides_student_only_links(self):
+        mentor = User.objects.create_user(
+            username='mentoruser',
+            email='mentor@example.com',
+            password='testpass123',
+            role='mentor',
+            is_approved=True,
+        )
+        self.client.login(username='mentoruser', password='testpass123')
+
+        response = self.client.get(reverse('dashboard:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Create Mentor Profile')
+        self.assertNotContains(response, 'Student Questions')
+        self.assertNotContains(response, 'Orientation')
+
+    def test_mentor_availability_update_returns_new_status(self):
+        mentor = User.objects.create_user(
+            username='availablementor',
+            email='availablementor@example.com',
+            password='testpass123',
+            role='mentor',
+            is_approved=True,
+        )
+        MentorProfile.objects.create(
+            user=mentor,
+            specialization='University applications',
+            years_experience=3,
+            bio='I help students navigate applications.',
+            is_approved=True,
+        )
+        self.client.login(username='availablementor', password='testpass123')
+
+        response = self.client.post(
+            reverse('dashboard:mentorship_update_availability'),
+            {'availability_status': 'busy'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['availability_status'], 'busy')
+        mentor.mentor_profile.refresh_from_db()
+        self.assertEqual(mentor.mentor_profile.availability_status, 'busy')
 
 
 class DashboardMixinsTest(TestCase):

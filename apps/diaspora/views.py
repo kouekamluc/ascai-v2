@@ -14,7 +14,7 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from .models import News, Event, Testimonial, SuccessStory, LifeInItaly
 from .forms import StorySubmissionForm
-from apps.dashboard.models import UserStorySubmission, StoryImage, EventRegistration
+from apps.dashboard.models import UserStorySubmission, EventRegistration, EventWaitlistEntry
 
 
 class DiasporaIndexView(TemplateView):
@@ -197,9 +197,26 @@ class EventDetailView(DetailView):
                     user=self.request.user
                 ).first()
                 context['is_registered'] = context['registration'] is not None
+                context['waitlist_entry'] = EventWaitlistEntry.objects.filter(
+                    event=self.object,
+                    user=self.request.user,
+                    status='waiting',
+                ).first()
+                context['is_waitlisted'] = context['waitlist_entry'] is not None
             else:
                 context['registration'] = None
                 context['is_registered'] = False
+                context['waitlist_entry'] = None
+                context['is_waitlisted'] = False
+            context['waitlist_count'] = self.object.waitlist_entries.filter(status='waiting').count()
+            context['can_join_waitlist'] = (
+                context['is_full'] and
+                context['waitlist_enabled'] and
+                not context['is_registered'] and
+                not context['is_waitlisted'] and
+                not context['is_past'] and
+                (not self.object.registration_deadline or self.object.registration_deadline > timezone.now())
+            )
         
         # Add absolute image URL for meta tags
         if self.object.image:
@@ -248,6 +265,11 @@ class MyEventsView(LoginRequiredMixin, ListView):
             reg for reg in self.get_queryset()
             if reg.event.end_datetime < now
         ]
+        context['waitlist_entries'] = EventWaitlistEntry.objects.filter(
+            user=self.request.user,
+            status='waiting',
+            event__end_datetime__gte=now,
+        ).select_related('event').order_by('event__start_datetime')
         
         return context
 
@@ -424,6 +446,10 @@ def event_register(request, slug):
     capacity = event.capacity or event.max_participants
     if capacity and event.get_registered_count() > capacity:
         registration.delete()
+        if event.waitlist_enabled:
+            create_or_reactivate_waitlist_entry(event, request.user)
+            messages.info(request, _('This event is full, so you have been added to the waitlist.'))
+            return redirect(event.get_absolute_url())
         messages.error(request, _('This event is full.'))
         return redirect(event.get_absolute_url())
 
@@ -443,5 +469,110 @@ def event_unregister(request, slug):
         return redirect(event.get_absolute_url())
 
     registration.delete()
-    messages.success(request, _('Your event registration has been canceled.'))
+    promoted_entry = promote_next_waitlisted_user(event)
+    if promoted_entry:
+        messages.success(
+            request,
+            _('Your registration has been canceled. The first person on the waitlist has been promoted.')
+        )
+    else:
+        messages.success(request, _('Your event registration has been canceled.'))
     return redirect(event.get_absolute_url())
+
+
+@login_required
+@require_http_methods(["POST"])
+def event_join_waitlist(request, slug):
+    """Join the waitlist for a full event."""
+    event = get_object_or_404(Event, slug=slug, is_published=True)
+
+    if not getattr(request.user, 'is_approved', True) and not request.user.is_superuser:
+        messages.error(request, _('Your account must be approved to join event waitlists.'))
+        return redirect(event.get_absolute_url())
+
+    if not event.registration_required or not event.waitlist_enabled:
+        messages.info(request, _('Waitlist is not available for this event.'))
+        return redirect(event.get_absolute_url())
+
+    if event.end_datetime <= timezone.now():
+        messages.error(request, _('This event has already ended.'))
+        return redirect(event.get_absolute_url())
+
+    if event.registration_deadline and event.registration_deadline <= timezone.now():
+        messages.error(request, _('Registration deadline has passed.'))
+        return redirect(event.get_absolute_url())
+
+    if EventRegistration.objects.filter(event=event, user=request.user).exists():
+        messages.info(request, _('You are already registered for this event.'))
+        return redirect(event.get_absolute_url())
+
+    if not event.is_full():
+        EventRegistration.objects.create(event=event, user=request.user)
+        messages.success(request, _('A spot was available, so you have been registered for the event.'))
+        return redirect(event.get_absolute_url())
+
+    entry, created = create_or_reactivate_waitlist_entry(event, request.user)
+    if created:
+        messages.success(request, _('You have joined the waitlist for this event.'))
+    else:
+        messages.info(request, _('You are already on the waitlist for this event.'))
+    return redirect(event.get_absolute_url())
+
+
+@login_required
+@require_http_methods(["POST"])
+def event_leave_waitlist(request, slug):
+    """Cancel the current user's waitlist entry."""
+    event = get_object_or_404(Event, slug=slug, is_published=True)
+    entry = get_object_or_404(
+        EventWaitlistEntry,
+        event=event,
+        user=request.user,
+        status='waiting',
+    )
+    entry.status = 'cancelled'
+    entry.save(update_fields=['status'])
+    messages.success(request, _('You have left the waitlist for this event.'))
+    return redirect(event.get_absolute_url())
+
+
+def promote_next_waitlisted_user(event):
+    """Promote the oldest waitlisted user if a spot is available."""
+    if event.is_full():
+        return None
+
+    entry = event.waitlist_entries.filter(status='waiting').select_related('user').first()
+    if not entry:
+        return None
+
+    registration, created = EventRegistration.objects.get_or_create(
+        event=event,
+        user=entry.user,
+    )
+    if created:
+        entry.status = 'promoted'
+        entry.promoted_at = timezone.now()
+        entry.save(update_fields=['status', 'promoted_at'])
+        return entry
+
+    entry.status = 'cancelled'
+    entry.save(update_fields=['status'])
+    return promote_next_waitlisted_user(event)
+
+
+def create_or_reactivate_waitlist_entry(event, user):
+    """Create a waitlist entry or reactivate it at the back of the queue."""
+    entry, created = EventWaitlistEntry.objects.get_or_create(
+        event=event,
+        user=user,
+        defaults={'status': 'waiting'},
+    )
+    if created:
+        return entry, True
+
+    if entry.status != 'waiting':
+        entry.status = 'waiting'
+        entry.promoted_at = None
+        entry.joined_at = timezone.now()
+        entry.save(update_fields=['status', 'promoted_at', 'joined_at'])
+    return entry, False

@@ -9,7 +9,7 @@ from django.utils.translation import override
 from datetime import timedelta
 from django.core.files.uploadedfile import SimpleUploadedFile
 from .models import News, Event
-from apps.dashboard.models import EventRegistration, UserStorySubmission
+from apps.dashboard.models import EventRegistration, EventWaitlistEntry, UserStorySubmission
 
 User = get_user_model()
 
@@ -229,6 +229,93 @@ class DiasporaViewsTest(TestCase):
         )
         self.assertEqual(unregister_response.status_code, 200)
         self.assertFalse(EventRegistration.objects.filter(event=event, user=self.user).exists())
+
+    def test_full_event_waitlist_join_and_leave_flow(self):
+        event = Event.objects.create(
+            title='Waitlist Event',
+            description='Test description',
+            start_datetime=timezone.now() + timedelta(days=4),
+            end_datetime=timezone.now() + timedelta(days=4, hours=2),
+            location='Rome',
+            is_published=True,
+            registration_required=True,
+            capacity=1,
+            waitlist_enabled=True,
+        )
+        other_user = User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        EventRegistration.objects.create(event=event, user=other_user)
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse('diaspora:event_join_waitlist', kwargs={'slug': event.slug}),
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            EventWaitlistEntry.objects.filter(
+                event=event,
+                user=self.user,
+                status='waiting',
+            ).exists()
+        )
+        self.assertContains(response, 'You are on the waitlist')
+
+        response = self.client.post(
+            reverse('diaspora:event_leave_waitlist', kwargs={'slug': event.slug}),
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            EventWaitlistEntry.objects.filter(
+                event=event,
+                user=self.user,
+                status='waiting',
+            ).exists()
+        )
+
+    def test_waitlist_user_is_promoted_when_registration_is_cancelled(self):
+        event = Event.objects.create(
+            title='Promotion Event',
+            description='Test description',
+            start_datetime=timezone.now() + timedelta(days=4),
+            end_datetime=timezone.now() + timedelta(days=4, hours=2),
+            location='Rome',
+            is_published=True,
+            registration_required=True,
+            capacity=1,
+            waitlist_enabled=True,
+        )
+        registered_user = User.objects.create_user(
+            username='registereduser',
+            email='registered@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        EventRegistration.objects.create(event=event, user=registered_user)
+        EventWaitlistEntry.objects.create(event=event, user=self.user)
+
+        self.client.force_login(registered_user)
+        response = self.client.post(
+            reverse('diaspora:event_unregister', kwargs={'slug': event.slug}),
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(EventRegistration.objects.filter(event=event, user=self.user).exists())
+        self.assertTrue(
+            EventWaitlistEntry.objects.filter(
+                event=event,
+                user=self.user,
+                status='promoted',
+            ).exists()
+        )
 
     def test_story_submission_detail_with_tags_renders(self):
         """Tagged story details should render without template method calls."""

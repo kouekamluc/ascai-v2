@@ -77,6 +77,10 @@ class AssociationSettingsAdmin(BaseAdmin):
         (_("Brand"), {
             "fields": ("site_name", "tagline", "public_email"),
         }),
+        (_("Public Location"), {
+            "fields": ("public_location", "map_embed_url", "map_link_url"),
+            "description": _("Control the location and map shown on the public contact page."),
+        }),
         (_("Social Media Links"), {
             "fields": (
                 "facebook_url",

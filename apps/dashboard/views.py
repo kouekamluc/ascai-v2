@@ -34,6 +34,7 @@ from apps.scholarships.models import SavedScholarship
 from apps.diaspora.models import Event
 from apps.downloads.models import Document
 from apps.mentorship.models import MentorshipRequest
+from apps.core.workflow import get_user_workflow_state
 from apps.mentorship.services import (
     accept_request as accept_mentorship_request,
     complete_request as complete_mentorship_request,
@@ -50,11 +51,72 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
     Main dashboard homepage with personalized content.
     """
     template_name = 'dashboard/home.html'
+
+    def get_workflow_checklist(self, user, workflow):
+        checklist = [
+            {
+                'title': _('Complete your profile'),
+                'status': 'done' if not workflow.needs_profile_completion else 'todo',
+                'url': reverse_lazy('dashboard:profile_edit'),
+            },
+            {
+                'title': _('Register ASCAI membership'),
+                'status': 'done' if workflow.has_member_profile else 'todo',
+                'url': reverse_lazy('governance:member_portal') if workflow.has_member_profile else reverse_lazy('governance:member_register'),
+            },
+        ]
+
+        if workflow.has_member_profile:
+            checklist.append({
+                'title': _('Keep dues and membership active'),
+                'status': 'done' if workflow.member_active and not workflow.dues_due else 'todo',
+                'url': reverse_lazy('governance:my_dues'),
+            })
+
+        if workflow.is_student:
+            checklist.extend([
+                {
+                    'title': _('Book orientation if you need arrival support'),
+                    'status': 'todo',
+                    'url': reverse_lazy('dashboard:orientation_booking'),
+                },
+                {
+                    'title': _('Use mentorship for academic or settlement guidance'),
+                    'status': 'todo',
+                    'url': reverse_lazy('dashboard:mentorship_browse_mentors'),
+                },
+            ])
+
+        if workflow.is_mentor:
+            checklist.append({
+                'title': _('Set up and maintain your mentor profile'),
+                'status': 'done' if workflow.mentor_profile_approved else 'todo',
+                'url': reverse_lazy('dashboard:mentorship_profile_update') if workflow.has_mentor_profile else reverse_lazy('dashboard:mentorship_profile_create'),
+            })
+
+        if workflow.member_active:
+            checklist.append({
+                'title': _('Review open elections and association votes'),
+                'status': 'todo',
+                'url': reverse_lazy('governance:member_elections'),
+            })
+
+        if workflow.is_governance_staff:
+            checklist.append({
+                'title': _('Review governance operations'),
+                'status': 'todo',
+                'url': reverse_lazy('governance:dashboard'),
+            })
+
+        return checklist
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         today = timezone.now().date()
+        workflow = get_user_workflow_state(user)
+        context['workflow'] = workflow
+        context['workflow_checklist'] = self.get_workflow_checklist(user, workflow)
         
         # Statistics
         context['stats'] = {
@@ -218,35 +280,46 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         context['suggested_groups'] = suggested_groups[:3]
         
         # Quick actions
-        context['quick_actions'] = [
-            {'title': _('Update Profile'), 'url': reverse_lazy('dashboard:profile_edit'), 'icon': 'user'},
-            {'title': _('Book Orientation'), 'url': reverse_lazy('dashboard:orientation_booking'), 'icon': 'orientation'},
-            {'title': _('Ask Student Question'), 'url': reverse_lazy('dashboard:student_question_create'), 'icon': 'question'},
-            {'title': _('Submit Story'), 'url': reverse_lazy('dashboard:stories_submit'), 'icon': 'edit'},
-            {'title': _('Create Ticket'), 'url': reverse_lazy('dashboard:tickets_create'), 'icon': 'support'},
+        quick_actions = []
+        if workflow.needs_profile_completion:
+            quick_actions.append({'title': _('Complete Profile'), 'url': reverse_lazy('dashboard:profile_edit'), 'icon': 'user'})
+
+        if workflow.has_member_profile:
+            quick_actions.append({'title': _('My Membership'), 'url': reverse_lazy('governance:member_portal'), 'icon': 'membership'})
+            if workflow.dues_due:
+                quick_actions.append({'title': _('Review My Dues'), 'url': reverse_lazy('governance:my_dues'), 'icon': 'finance'})
+            if workflow.member_active:
+                quick_actions.append({'title': _('Member Elections'), 'url': reverse_lazy('governance:member_elections'), 'icon': 'vote'})
+        else:
+            quick_actions.append({'title': _('Register Membership'), 'url': reverse_lazy('governance:member_register'), 'icon': 'membership'})
+
+        if workflow.is_student:
+            quick_actions.extend([
+                {'title': _('Browse Mentors'), 'url': reverse_lazy('dashboard:mentorship_browse_mentors'), 'icon': 'mentor'},
+                {'title': _('Book Orientation'), 'url': reverse_lazy('dashboard:orientation_booking'), 'icon': 'orientation'},
+                {'title': _('Ask Student Question'), 'url': reverse_lazy('dashboard:student_question_create'), 'icon': 'question'},
+            ])
+
+        if workflow.is_mentor:
+            if not workflow.has_mentor_profile:
+                quick_actions.append({'title': _('Create Mentor Profile'), 'url': reverse_lazy('dashboard:mentorship_profile_create'), 'icon': 'mentor'})
+            elif workflow.mentor_profile_pending:
+                quick_actions.append({'title': _('Update Mentor Profile'), 'url': reverse_lazy('dashboard:mentorship_profile_update'), 'icon': 'mentor'})
+            else:
+                quick_actions.append({'title': _('Review Mentorship Requests'), 'url': reverse_lazy('dashboard:mentorship_mentor_management'), 'icon': 'mentor'})
+
+        quick_actions.extend([
             {'title': _('Browse Groups'), 'url': reverse_lazy('dashboard:groups_list'), 'icon': 'users'},
-        ]
-        
-        # Add member portal link if user is a member
-        try:
-            if hasattr(user, 'member_profile'):
-                context['quick_actions'].insert(0, {
-                    'title': _('My Membership'), 
-                    'url': reverse_lazy('governance:member_portal'), 
-                    'icon': 'membership'
-                })
-        except Exception:
-            pass
-        
-        # Add governance quick actions if user has permissions
-        if user.has_perm('governance.view_member') or user.is_staff:
-            context['quick_actions'].append(
-                {'title': _('Governance Dashboard'), 'url': reverse_lazy('governance:dashboard'), 'icon': 'governance'}
-            )
-        if user.has_perm('governance.manage_finances') or user.is_staff:
-            context['quick_actions'].append(
-                {'title': _('Financial Transactions'), 'url': reverse_lazy('governance:financial_transactions'), 'icon': 'finance'}
-            )
+            {'title': _('Create Ticket'), 'url': reverse_lazy('dashboard:tickets_create'), 'icon': 'support'},
+            {'title': _('Saved Items'), 'url': reverse_lazy('dashboard:saved_items'), 'icon': 'saved'},
+        ])
+
+        if workflow.is_governance_staff:
+            quick_actions.append({'title': _('Governance Dashboard'), 'url': reverse_lazy('governance:dashboard'), 'icon': 'governance'})
+            if user.has_perm('governance.manage_finances') or user.is_staff:
+                quick_actions.append({'title': _('Financial Transactions'), 'url': reverse_lazy('governance:financial_transactions'), 'icon': 'finance'})
+
+        context['quick_actions'] = quick_actions
         
         return context
 
@@ -1384,11 +1457,12 @@ def dashboard_update_availability(request):
     from django.core.exceptions import PermissionDenied, ValidationError
 
     mentor_profile = get_object_or_404(MentorProfile, user=request.user)
+    new_status = request.POST.get('availability_status')
     try:
         update_mentor_availability(
             mentor_profile=mentor_profile,
             actor=request.user,
-            new_status=request.POST.get('availability_status'),
+            new_status=new_status,
         )
     except PermissionDenied as exc:
         return JsonResponse({'error': str(exc)}, status=403)

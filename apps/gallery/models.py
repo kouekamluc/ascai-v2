@@ -97,6 +97,11 @@ class GalleryVideo(models.Model):
         null=True,
         verbose_name=_('Thumbnail')
     )
+    external_thumbnail_url = models.URLField(
+        blank=True,
+        verbose_name=_('External Thumbnail URL'),
+        help_text=_('Optional thumbnail URL for Vimeo or externally hosted video images.')
+    )
     event = models.ForeignKey(
         Event,
         on_delete=models.SET_NULL,
@@ -135,9 +140,8 @@ class GalleryVideo(models.Model):
         """Get thumbnail URL from video service if not uploaded."""
         if self.thumbnail:
             return self.thumbnail.url
+        if self.external_thumbnail_url:
+            return self.external_thumbnail_url
         if self.video_type == 'youtube':
             return f"https://img.youtube.com/vi/{self.video_id}/maxresdefault.jpg"
-        elif self.video_type == 'vimeo':
-            # Vimeo requires API call for thumbnail, so we'll use a placeholder
-            return None
         return None

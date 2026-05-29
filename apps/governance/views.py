@@ -1634,6 +1634,10 @@ def cast_election_vote(request, election_id):
     """Cast a vote in an election."""
     election = get_object_or_404(Election, pk=election_id, status='in_progress')
     user = request.user
+    eligibility = check_voting_eligibility(user, election=election)
+    if not eligibility.get('eligible'):
+        messages.error(request, eligibility.get('reason') or _('You are not eligible to vote in this election.'))
+        return redirect('governance:election_detail', pk=election_id)
     
     # Check if user is an active member
     try:
