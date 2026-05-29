@@ -36,7 +36,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 "language_preference", "en"
             )
 
-        user.is_approved = True
+        user.is_approved = False
         user.is_active = True
 
         if commit:

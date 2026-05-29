@@ -250,6 +250,13 @@ def check_voting_eligibility(user, assembly=None, election=None):
         if election.status != 'in_progress':
             eligibility['reason'] = _('This election is not currently open for voting')
             return eligibility
+        today = timezone.now().date()
+        if election.start_date and today < election.start_date:
+            eligibility['reason'] = _('Voting has not opened yet for this election')
+            return eligibility
+        if election.end_date and today > election.end_date:
+            eligibility['reason'] = _('Voting has closed for this election')
+            return eligibility
 
         # Check if user already voted for any position in this election
         existing_votes = ElectionVote.objects.filter(

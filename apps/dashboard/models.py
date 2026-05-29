@@ -650,6 +650,67 @@ class EventRegistration(models.Model):
         super().save(*args, **kwargs)
 
 
+class EventWaitlistEntry(models.Model):
+    """
+    Waitlist entry for full events.
+    """
+    STATUS_CHOICES = [
+        ('waiting', _('Waiting')),
+        ('promoted', _('Promoted')),
+        ('cancelled', _('Cancelled')),
+    ]
+
+    event = models.ForeignKey(
+        'diaspora.Event',
+        on_delete=models.CASCADE,
+        related_name='waitlist_entries',
+        verbose_name=_('Event')
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='event_waitlist_entries',
+        verbose_name=_('User')
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='waiting',
+        verbose_name=_('Status')
+    )
+
+    joined_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Joined At')
+    )
+
+    promoted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Promoted At')
+    )
+
+    notes = models.TextField(
+        blank=True,
+        verbose_name=_('Notes')
+    )
+
+    class Meta:
+        verbose_name = _('Event Waitlist Entry')
+        verbose_name_plural = _('Event Waitlist Entries')
+        unique_together = ['event', 'user']
+        ordering = ['joined_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.event.title} ({self.get_status_display()})"
+
+    @property
+    def is_active(self):
+        return self.status == 'waiting'
+
+
 class SavedDocument(models.Model):
     """
     User's saved documents from the reserved downloads section.

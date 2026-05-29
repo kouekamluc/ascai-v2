@@ -9,21 +9,31 @@
         <div>
             <p class="px-4 text-xs font-extrabold uppercase tracking-[0.2em] text-gray-500">{% trans 'Membership' %}</p>
             <div class="mt-2 space-y-1">
+                {% if workflow.has_member_profile %}
                 <a href="{% url 'governance:member_portal' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and request.resolver_match.url_name == 'member_portal' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'My Membership' %}</a>
                 <a href="{% url 'governance:my_dues' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and request.resolver_match.url_name == 'my_dues' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'My Dues' %}</a>
+                {% if workflow.member_active %}
                 <a href="{% url 'governance:member_directory' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and request.resolver_match.url_name == 'member_directory' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Member Directory' %}</a>
                 <a href="{% url 'governance:member_elections' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and request.resolver_match.url_name == 'member_elections' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Elections' %}</a>
+                {% endif %}
+                {% else %}
+                <a href="{% url 'governance:member_register' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and request.resolver_match.url_name == 'member_register' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Register Membership' %}</a>
+                {% endif %}
             </div>
         </div>
 
         <div>
             <p class="px-4 text-xs font-extrabold uppercase tracking-[0.2em] text-gray-500">{% trans 'Resources' %}</p>
             <div class="mt-2 space-y-1">
+                {% if workflow.is_student %}
                 <a href="{% url 'dashboard:new_student_guide' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'new_student' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'New Student Guide' %}</a>
                 <a href="{% url 'dashboard:orientation_booking' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.url_name == 'orientation_booking' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Orientation' %}</a>
                 <a href="{% url 'dashboard:student_questions' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'student_question' in request.resolver_match.url_name or request.resolver_match.url_name == 'student_questions' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Student Questions' %}</a>
+                {% endif %}
                 <a href="{% url 'dashboard:groups_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'group' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Community Groups' %}</a>
+                {% if workflow.is_student or workflow.is_mentor %}
                 <a href="{% url 'dashboard:mentorship_dashboard' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'mentorship' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Mentorship' %}</a>
+                {% endif %}
                 <a href="{% url 'dashboard:events_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'event' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Events' %}</a>
                 <a href="{% url 'dashboard:downloads_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'download' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Downloads' %}</a>
                 <a href="{% url 'dashboard:stories_submit' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'story' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Submit Story' %}</a>
@@ -38,21 +48,21 @@
             </div>
         </div>
 
-        {% if user.is_staff or perms.governance.view_member or perms.governance.manage_executive_board %}
+        {% if workflow.is_governance_staff %}
         <div>
             <p class="px-4 text-xs font-extrabold uppercase tracking-[0.2em] text-gray-500">{% trans 'Governance' %}</p>
             <div class="mt-2 space-y-1">
                 <a href="{% url 'governance:dashboard' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and request.resolver_match.url_name == 'dashboard' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Governance Dashboard' %}</a>
-                {% if perms.governance.view_member %}
+                {% if perms.governance.view_member or user.is_staff %}
                 <a href="{% url 'governance:member_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and 'member' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Members' %}</a>
                 {% endif %}
-                {% if perms.governance.manage_assembly %}
+                {% if perms.governance.manage_assembly or user.is_staff %}
                 <a href="{% url 'governance:assembly_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and 'assembly' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Assemblies' %}</a>
                 {% endif %}
                 {% if perms.governance.manage_elections or user.is_staff %}
                 <a href="{% url 'governance:election_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and 'election' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Elections' %}</a>
                 {% endif %}
-                {% if perms.governance.manage_finances %}
+                {% if perms.governance.manage_finances or user.is_staff %}
                 <a href="{% url 'governance:financial_transactions' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and 'financial' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Finances' %}</a>
                 {% endif %}
             </div>

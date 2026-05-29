@@ -81,6 +81,22 @@ class AssociationSettings(models.Model):
         blank=True,
         verbose_name=_("Public Email"),
     )
+    public_location = models.CharField(
+        max_length=255,
+        blank=True,
+        default="Rome and the Lazio region, Italy",
+        verbose_name=_("Public Location"),
+    )
+    map_embed_url = models.URLField(
+        blank=True,
+        verbose_name=_("Map Embed URL"),
+        help_text=_("Paste a Google Maps embed URL for the public contact page."),
+    )
+    map_link_url = models.URLField(
+        blank=True,
+        verbose_name=_("Map Link URL"),
+        help_text=_("Optional public map link opened in a new tab."),
+    )
     facebook_url = models.URLField(blank=True, verbose_name=_("Facebook URL"))
     instagram_url = models.URLField(blank=True, verbose_name=_("Instagram URL"))
     linkedin_url = models.URLField(blank=True, verbose_name=_("LinkedIn URL"))

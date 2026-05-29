@@ -45,10 +45,9 @@ class GalleryVideoAdmin(ModelAdmin):
     list_filter = ['video_type', 'created_at', 'event']
     search_fields = ['title', 'description']
     raw_id_fields = ['event', 'created_by']
-    fields = ['title', 'description', 'video_type', 'video_id', 'thumbnail', 'event', 'order', 'created_by']
+    fields = ['title', 'description', 'video_type', 'video_id', 'thumbnail', 'external_thumbnail_url', 'event', 'order', 'created_by']
     
     def save_model(self, request, obj, form, change):
         if not change:  # Only set created_by on creation
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
-

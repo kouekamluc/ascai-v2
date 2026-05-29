@@ -143,8 +143,8 @@ class AccountsViewsTest(TestCase):
             is_approved=True
         )
     
-    def test_signup_flow_creates_approved_user(self):
-        """The public signup flow should create an immediately approved user."""
+    def test_signup_flow_creates_pending_user(self):
+        """The public signup flow should create a user pending admin approval."""
         response = self.client.post(
             reverse('account_signup'),
             {
@@ -162,7 +162,7 @@ class AccountsViewsTest(TestCase):
         self.assertTrue(response.url.startswith(verification_sent_url))
         self.assertIn('email=newmember%40example.com', response.url)
         created_user = User.objects.get(username='newmember')
-        self.assertTrue(created_user.is_approved)
+        self.assertFalse(created_user.is_approved)
         self.assertTrue(created_user.is_active)
         self.assertEqual(created_user.emailaddress_set.count(), 1)
         self.assertFalse(created_user.emailaddress_set.first().verified)

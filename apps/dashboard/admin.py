@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from config.admin import BaseAdmin, ModelAdmin, TabularInline
 from .models import (
     SupportTicket, TicketReply, CommunityGroup, GroupDiscussion, GroupAnnouncement, GroupFile,
-    UserStorySubmission, StoryImage, EventRegistration, SavedDocument,
+    UserStorySubmission, StoryImage, EventRegistration, EventWaitlistEntry, SavedDocument,
     StudentQuestion, OrientationSession
 )
 
@@ -232,6 +232,18 @@ class EventRegistrationAdmin(ModelAdmin):
     list_filter = ['attended', 'registered_at', 'event']
     search_fields = ['user__username', 'event__title', 'registration_code']
     readonly_fields = ['registration_code', 'registered_at']
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'event')
+
+
+@admin.register(EventWaitlistEntry)
+class EventWaitlistEntryAdmin(ModelAdmin):
+    list_display = ['user', 'event', 'status', 'joined_at', 'promoted_at']
+    list_filter = ['status', 'joined_at', 'promoted_at', 'event']
+    search_fields = ['user__username', 'user__email', 'event__title', 'notes']
+    readonly_fields = ['joined_at', 'promoted_at']
+    list_display_links = ['user', 'event']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user', 'event')

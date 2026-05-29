@@ -100,6 +100,7 @@ TEMPLATES = [
                 'apps.core.context_processors.site_url',
                 'apps.core.context_processors.public_collaborators',
                 'apps.core.context_processors.association_settings',
+                'apps.core.workflow.workflow_state',
             ],
         },
     },

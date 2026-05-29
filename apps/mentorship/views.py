@@ -408,12 +408,13 @@ def complete_request(request, request_id):
 def update_availability(request):
     """Update mentor availability status (HTMX endpoint)."""
     mentor_profile = get_object_or_404(MentorProfile, user=request.user)
+    new_status = request.POST.get('availability_status')
 
     try:
         update_mentor_availability(
             mentor_profile=mentor_profile,
             actor=request.user,
-            new_status=request.POST.get('availability_status'),
+            new_status=new_status,
         )
     except PermissionDenied as exc:
         return JsonResponse({'error': str(exc)}, status=403)

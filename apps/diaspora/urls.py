@@ -8,7 +8,7 @@ from .views import (
     TestimonialListView,
     SuccessStoryListView, SuccessStoryDetailView,
     LifeInItalyListView, LifeInItalyDetailView,
-    event_register, event_unregister,
+    event_register, event_unregister, event_join_waitlist, event_leave_waitlist,
     PublicStorySubmissionView, StorySubmissionSuccessView,
     MyStoriesView, StorySubmissionDetailView
 )
@@ -24,6 +24,8 @@ urlpatterns = [
     path('events/my-events/', MyEventsView.as_view(), name='my_events'),
     path('events/<slug:slug>/register/', event_register, name='event_register'),
     path('events/<slug:slug>/unregister/', event_unregister, name='event_unregister'),
+    path('events/<slug:slug>/waitlist/join/', event_join_waitlist, name='event_join_waitlist'),
+    path('events/<slug:slug>/waitlist/leave/', event_leave_waitlist, name='event_leave_waitlist'),
     path('events/<slug:slug>/', EventDetailView.as_view(), name='event_detail'),
     path('testimonials/', TestimonialListView.as_view(), name='testimonial_list'),
     path('success-stories/', SuccessStoryListView.as_view(), name='success_story_list'),
