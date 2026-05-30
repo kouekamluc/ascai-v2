@@ -4,17 +4,15 @@ Admin configuration for dashboard app.
 from datetime import datetime
 
 from django.contrib import admin
-from django.conf import settings
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from config.admin import BaseAdmin, ModelAdmin, TabularInline
-from apps.core.email_utils import get_site_url, send_branded_email
 from .models import (
     SupportTicket, TicketReply, CommunityGroup, GroupDiscussion, GroupAnnouncement, GroupFile,
     UserStorySubmission, StoryImage, EventRegistration, EventWaitlistEntry, SavedDocument,
     StudentQuestion, OrientationSession, BureauMessage, BureauMessageReply
 )
+from .services import send_bureau_message_notification
 
 
 class TicketReplyInline(TabularInline):
@@ -57,20 +55,23 @@ class BureauMessageReplyInline(TabularInline):
 @admin.register(BureauMessage)
 class BureauMessageAdmin(BaseAdmin):
     """Admin interface for direct bureau-to-user messages."""
-    list_display = ['recipient', 'subject', 'sender', 'read_badge', 'allow_reply', 'reply_count', 'created_at']
-    list_filter = ['is_read', 'allow_reply', 'created_at']
+    list_display = ['recipient', 'subject', 'sender', 'read_badge', 'email_status_badge', 'allow_reply', 'reply_count', 'created_at']
+    list_filter = ['is_read', 'email_delivery_status', 'allow_reply', 'created_at']
     search_fields = ['subject', 'body', 'recipient__username', 'recipient__email', 'recipient__full_name']
     autocomplete_fields = ['recipient', 'sender']
-    readonly_fields = ['is_read', 'read_at', 'email_sent_at', 'created_at', 'updated_at']
+    readonly_fields = [
+        'is_read', 'read_at', 'email_sent_at', 'email_delivery_status',
+        'email_delivery_error', 'created_at', 'updated_at'
+    ]
     list_display_links = ['recipient', 'subject']
     inlines = [BureauMessageReplyInline]
-    actions = ['mark_unread', 'mark_read']
+    actions = ['resend_email_notifications', 'mark_unread', 'mark_read']
     fieldsets = (
         (_('Message'), {
             'fields': ('sender', 'recipient', 'subject', 'body', 'allow_reply')
         }),
         (_('Delivery & Read Status'), {
-            'fields': ('is_read', 'read_at', 'email_sent_at')
+            'fields': ('is_read', 'read_at', 'email_sent_at', 'email_delivery_status', 'email_delivery_error')
         }),
         (_('Timestamps'), {
             'fields': ('created_at', 'updated_at'),
@@ -94,59 +95,26 @@ class BureauMessageAdmin(BaseAdmin):
         return obj.replies.count()
     reply_count.short_description = _('Replies')
 
+    def email_status_badge(self, obj):
+        from django.utils.html import format_html
+        colors = {
+            'sent': '#166534',
+            'failed': '#b91c1c',
+            'skipped': '#6b7280',
+            'pending': '#b45309',
+        }
+        return format_html(
+            '<span style="background:{};color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">{}</span>',
+            colors.get(obj.email_delivery_status, '#374151'),
+            obj.get_email_delivery_status_display().upper(),
+        )
+    email_status_badge.short_description = _('Email')
+    email_status_badge.admin_order_field = 'email_delivery_status'
+
     def save_model(self, request, obj, form, change):
         if not obj.sender_id:
             obj.sender = request.user
         super().save_model(request, obj, form, change)
-        if not change and obj.recipient.email:
-            self._send_message_email(request, obj)
-
-    def _send_message_email(self, request, obj):
-        site_url = get_site_url(request=request)
-        message_url = request.build_absolute_uri(
-            reverse('dashboard:message_detail', kwargs={'pk': obj.pk})
-        )
-        text_body = _(
-            'Hello {name},\n\n'
-            'You have received a new message from the ASCAI Lazio bureau.\n\n'
-            'Subject: {subject}\n\n'
-            '{body}\n\n'
-            'Open it here: {url}\n\n'
-            'ASCAI Lazio'
-        ).format(
-            name=obj.recipient.get_display_name(),
-            subject=obj.subject,
-            body=obj.body,
-            url=message_url,
-        )
-        send_branded_email(
-            subject=_('New message from ASCAI Lazio bureau: {}').format(obj.subject),
-            text_body=text_body,
-            template_name='email/generic_message.html',
-            context={
-                'email_title': _('New message from ASCAI Lazio bureau'),
-                'greeting': _('Hello {}').format(obj.recipient.get_display_name()),
-                'body_paragraphs': [
-                    _('You have received a new direct message from the ASCAI Lazio bureau.'),
-                    _('You can read it and reply from your dashboard.'),
-                ],
-                'detail_rows': [
-                    {'label': _('Subject'), 'value': obj.subject},
-                    {'label': _('From'), 'value': obj.sender.get_display_name() if obj.sender else _('ASCAI Lazio Bureau')},
-                ],
-                'message_body': obj.body,
-                'button_url': message_url,
-                'button_label': _('Open message'),
-                'closing_paragraphs': [_('Thank you, ASCAI Lazio')],
-            },
-            recipient_list=[obj.recipient.email],
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            fail_silently=False,
-            request=request,
-            site_url=site_url,
-        )
-        obj.email_sent_at = timezone.now()
-        obj.save(update_fields=['email_sent_at'])
 
     def mark_unread(self, request, queryset):
         updated = queryset.update(is_read=False, read_at=None)
@@ -157,6 +125,24 @@ class BureauMessageAdmin(BaseAdmin):
         updated = queryset.update(is_read=True, read_at=timezone.now())
         self.message_user(request, _('{} message(s) marked read.').format(updated))
     mark_read.short_description = _('Mark selected messages read')
+
+    def resend_email_notifications(self, request, queryset):
+        sent = 0
+        failed = 0
+        for message in queryset.select_related('recipient', 'sender'):
+            try:
+                sent += send_bureau_message_notification(message, request=request)
+            except Exception:
+                failed += 1
+        if failed:
+            self.message_user(
+                request,
+                _('{} email notification(s) sent, {} failed. Open failed records to see the delivery error.').format(sent, failed),
+                level='ERROR',
+            )
+        else:
+            self.message_user(request, _('{} email notification(s) sent.').format(sent))
+    resend_email_notifications.short_description = _('Resend email notification for selected messages')
 
 
 @admin.register(BureauMessageReply)

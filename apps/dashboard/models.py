@@ -181,6 +181,21 @@ class BureauMessage(models.Model):
         blank=True,
         verbose_name=_('Email Sent At')
     )
+    email_delivery_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', _('Pending')),
+            ('sent', _('Sent')),
+            ('failed', _('Failed')),
+            ('skipped', _('Skipped')),
+        ],
+        default='pending',
+        verbose_name=_('Email Delivery Status')
+    )
+    email_delivery_error = models.TextField(
+        blank=True,
+        verbose_name=_('Email Delivery Error')
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_('Created At')

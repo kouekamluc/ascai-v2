@@ -4,6 +4,7 @@ Tests for dashboard app.
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.core import mail
 from datetime import date, timedelta, time
 
 from apps.core.models import ServicePartner
@@ -366,6 +367,8 @@ class DashboardViewsTest(TestCase):
         message.refresh_from_db()
         self.assertTrue(message.is_read)
         self.assertIsNotNone(message.read_at)
+        self.assertEqual(message.email_delivery_status, 'sent')
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_user_can_reply_to_bureau_message(self):
         sender = User.objects.create_user(
@@ -397,6 +400,24 @@ class DashboardViewsTest(TestCase):
                 body='Yes, I confirm the appointment.',
             ).exists()
         )
+
+    def test_bureau_message_without_recipient_email_is_marked_skipped(self):
+        no_email_user = User.objects.create_user(
+            username='noemail',
+            email='',
+            password='testpass123',
+            is_approved=True,
+        )
+
+        message = BureauMessage.objects.create(
+            recipient=no_email_user,
+            subject='No email test',
+            body='This message should remain in-platform only.',
+        )
+
+        message.refresh_from_db()
+        self.assertEqual(message.email_delivery_status, 'skipped')
+        self.assertIn('no email', message.email_delivery_error.lower())
 
     def test_user_cannot_read_another_users_bureau_message(self):
         other_user = User.objects.create_user(
