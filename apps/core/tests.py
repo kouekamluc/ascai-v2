@@ -151,6 +151,8 @@ class CoreViewsTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Student success pathway')
+        self.assertContains(response, 'Built for adoption')
+        self.assertContains(response, 'Every stakeholder gets a reason to come back.')
         self.assertContains(response, 'View Sponsor Plan')
 
 

@@ -160,6 +160,59 @@ class DashboardViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Your start-to-end checklist')
+        self.assertContains(response, 'Your best next moves')
+        self.assertContains(response, 'Personalize dashboard')
+
+    def test_onboarding_personalizes_dashboard_preferences(self):
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.post(
+            reverse('dashboard:onboarding'),
+            {
+                'primary_goal': 'new_student',
+                'city_in_lazio': 'rome',
+                'field_of_study': 'Computer science',
+                'arrival_year': '2026',
+                'support_needs': ['orientation', 'scholarships'],
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('dashboard:home'))
+        self.user.refresh_from_db()
+        onboarding = self.user.notification_preferences['onboarding']
+        self.assertTrue(onboarding['completed'])
+        self.assertEqual(onboarding['primary_goal'], 'new_student')
+        self.assertEqual(onboarding['support_needs'], ['orientation', 'scholarships'])
+        self.assertEqual(self.user.city_in_lazio, 'rome')
+        self.assertEqual(self.user.field_of_study, 'Computer science')
+        self.assertEqual(self.user.arrival_year, 2026)
+        self.assertEqual(self.user.occupation, 'student')
+
+    def test_notification_preferences_preserve_onboarding_state(self):
+        self.user.notification_preferences = {
+            'onboarding': {
+                'completed': True,
+                'primary_goal': 'current_student',
+                'support_needs': ['mentorship'],
+            }
+        }
+        self.user.save(update_fields=['notification_preferences'])
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.post(
+            reverse('dashboard:profile_notifications'),
+            {
+                'email_notifications': 'on',
+                'ticket_updates': 'on',
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.notification_preferences['onboarding']['completed'])
+        self.assertTrue(self.user.notification_preferences['email_notifications'])
+        self.assertTrue(self.user.notification_preferences['ticket_updates'])
 
     def test_dashboard_home_shows_only_verified_service_partners(self):
         ServicePartner.objects.create(

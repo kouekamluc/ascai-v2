@@ -37,6 +37,35 @@
         </div>
     </section>
 
+    {% if personal_opportunity_feed %}
+    <section class="dashboard-card p-7">
+        <div class="dashboard-card-header">
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                    <p class="dashboard-kicker text-cameroon-green">{% trans 'Recommended for you' %}</p>
+                    <h3 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Your best next moves' %}</h3>
+                    <p class="mt-3 max-w-3xl text-sm leading-7 text-gray-600">
+                        {% trans 'A short, personal feed of actions that make ASCAI useful now: setup, messages, membership, funding, mentorship, and events.' %}
+                    </p>
+                </div>
+                {% if not onboarding_completed %}
+                <a href="{% url 'dashboard:onboarding' %}" class="btn-primary">{% trans 'Personalize' %}</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {% for item in personal_opportunity_feed %}
+            <article class="flex h-full flex-col rounded-[1.25rem] border border-black/5 bg-white p-5 shadow-sm">
+                <p class="dashboard-kicker {% if item.tone == 'red' %}text-cameroon-red{% elif item.tone == 'yellow' %}text-cameroon-yellow{% else %}text-cameroon-green{% endif %}">{{ item.kicker }}</p>
+                <h4 class="mt-3 text-2xl font-bold leading-tight text-ascai-ink">{{ item.title }}</h4>
+                <p class="mt-3 flex-1 text-sm leading-7 text-gray-600">{{ item.summary }}</p>
+                <a href="{{ item.url }}" class="mt-5 inline-flex text-sm font-semibold text-cameroon-green">{{ item.cta }}</a>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
     {% if is_member and governance_health %}
     <section class="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
         <div class="dashboard-card p-7">

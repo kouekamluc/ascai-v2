@@ -27,7 +27,7 @@ from .models import (
 from .forms import (
     ProfileUpdateForm, DocumentUploadForm, SupportTicketForm, TicketReplyForm, GroupDiscussionForm,
     StorySubmissionForm, StudentQuestionForm, OrientationBookingForm, NotificationPreferencesForm,
-    BureauMessageReplyForm
+    BureauMessageReplyForm, OnboardingPreferenceForm
 )
 from apps.accounts.models import User, UserDocument
 from apps.core.models import ServicePartner
@@ -111,6 +111,112 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             })
 
         return checklist
+
+    def get_personal_opportunity_feed(self, user, workflow, stats, bureau_messages):
+        """Build a small set of high-signal next actions for the user's dashboard."""
+        feed = []
+        preferences = user.notification_preferences or {}
+        onboarding = preferences.get('onboarding', {})
+        primary_goal = onboarding.get('primary_goal')
+
+        unread_message = bureau_messages.filter(is_read=False).first()
+        if unread_message:
+            feed.append({
+                'kicker': _('Bureau message'),
+                'title': unread_message.subject,
+                'summary': _('A message from ASCAI is waiting in your inbox.'),
+                'url': reverse_lazy('dashboard:message_detail', kwargs={'pk': unread_message.pk}),
+                'cta': _('Read message'),
+                'tone': 'red',
+            })
+
+        if not onboarding.get('completed'):
+            feed.append({
+                'kicker': _('Personal setup'),
+                'title': _('Tell ASCAI what you need first'),
+                'summary': _('Finish a short onboarding step so your dashboard can prioritize the right resources, people, and actions.'),
+                'url': reverse_lazy('dashboard:onboarding'),
+                'cta': _('Personalize dashboard'),
+                'tone': 'green',
+            })
+
+        if workflow.is_student or primary_goal in ('new_student', 'current_student'):
+            has_active_orientation = any(
+                session.is_active_request
+                for session in OrientationSession.objects.filter(user=user)
+            )
+            if not has_active_orientation:
+                feed.append({
+                    'kicker': _('New student support'),
+                    'title': _('Book an orientation conversation'),
+                    'summary': _('Get help with residence, enrollment, services, and the first steps that are easiest to miss.'),
+                    'url': reverse_lazy('dashboard:orientation_booking'),
+                    'cta': _('Book orientation'),
+                    'tone': 'yellow',
+                })
+            if stats['saved_scholarships'] == 0:
+                feed.append({
+                    'kicker': _('Funding'),
+                    'title': _('Save your first scholarship'),
+                    'summary': _('Start a funding shortlist so you can track opportunities and return to them quickly.'),
+                    'url': reverse_lazy('scholarships:index'),
+                    'cta': _('Find scholarships'),
+                    'tone': 'green',
+                })
+            if not MentorshipRequest.objects.filter(student=user).exists():
+                feed.append({
+                    'kicker': _('Mentorship'),
+                    'title': _('Ask a mentor for guidance'),
+                    'summary': _('Connect with people who already know the academic and settlement path in Lazio.'),
+                    'url': reverse_lazy('dashboard:mentorship_browse_mentors'),
+                    'cta': _('Browse mentors'),
+                    'tone': 'red',
+                })
+
+        if workflow.has_member_profile and workflow.dues_due:
+            feed.append({
+                'kicker': _('Membership'),
+                'title': _('Keep your dues current'),
+                'summary': _('Active membership protects access to member resources, voting, and association services.'),
+                'url': reverse_lazy('governance:my_dues'),
+                'cta': _('Review dues'),
+                'tone': 'yellow',
+            })
+        elif not workflow.has_member_profile:
+            feed.append({
+                'kicker': _('Membership'),
+                'title': _('Unlock the member experience'),
+                'summary': _('Register membership to access dues tracking, association participation, and member-only resources.'),
+                'url': reverse_lazy('governance:member_register'),
+                'cta': _('Register membership'),
+                'tone': 'green',
+            })
+
+        next_event = Event.objects.filter(
+            is_published=True,
+            start_datetime__gte=timezone.now(),
+        ).order_by('start_datetime').first()
+        if next_event and not EventRegistration.objects.filter(event=next_event, user=user).exists():
+            feed.append({
+                'kicker': _('Community calendar'),
+                'title': next_event.title,
+                'summary': _('The next ASCAI event is open to discover from your dashboard.'),
+                'url': reverse_lazy('dashboard:events_list'),
+                'cta': _('View events'),
+                'tone': 'red',
+            })
+
+        if workflow.is_mentor and not workflow.has_mentor_profile:
+            feed.insert(0, {
+                'kicker': _('Mentor setup'),
+                'title': _('Create your mentor profile'),
+                'summary': _('Let students understand how you can help before they request guidance.'),
+                'url': reverse_lazy('dashboard:mentorship_profile_create'),
+                'cta': _('Create profile'),
+                'tone': 'green',
+            })
+
+        return feed[:5]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -119,6 +225,10 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         workflow = get_user_workflow_state(user)
         context['workflow'] = workflow
         context['workflow_checklist'] = self.get_workflow_checklist(user, workflow)
+        preferences = user.notification_preferences or {}
+        onboarding = preferences.get('onboarding', {})
+        context['onboarding'] = onboarding
+        context['onboarding_completed'] = bool(onboarding.get('completed'))
         bureau_messages = (
             BureauMessage.objects.filter(recipient=user)
             .select_related('sender')
@@ -258,6 +368,12 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         # Recent activity
         context['recent_tickets'] = SupportTicket.objects.filter(user=user).order_by('-created_at')[:5]
         context['recent_bureau_messages'] = bureau_messages[:5]
+        context['personal_opportunity_feed'] = self.get_personal_opportunity_feed(
+            user,
+            workflow,
+            context['stats'],
+            bureau_messages,
+        )
         context['recent_stories'] = UserStorySubmission.objects.filter(user=user).order_by('-submitted_at')[:3]
         context['verified_service_partners'] = (
             ServicePartner.objects.filter(
@@ -291,6 +407,8 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         
         # Quick actions
         quick_actions = []
+        if not context['onboarding_completed']:
+            quick_actions.append({'title': _('Personalize Dashboard'), 'url': reverse_lazy('dashboard:onboarding'), 'icon': 'spark'})
         if workflow.needs_profile_completion:
             quick_actions.append({'title': _('Complete Profile'), 'url': reverse_lazy('dashboard:profile_edit'), 'icon': 'user'})
 
@@ -490,6 +608,64 @@ class ProfileUpdateView(DashboardRequiredMixin, UpdateView):
         return response
 
 
+class DashboardOnboardingView(DashboardRequiredMixin, FormView):
+    """Short role-aware setup flow that makes the dashboard useful faster."""
+    form_class = OnboardingPreferenceForm
+    template_name = 'dashboard/onboarding.html'
+    success_url = reverse_lazy('dashboard:home')
+
+    def get_initial(self):
+        user = self.request.user
+        onboarding = (user.notification_preferences or {}).get('onboarding', {})
+        return {
+            'primary_goal': onboarding.get('primary_goal') or (
+                'mentor' if user.is_mentor else 'new_student'
+            ),
+            'city_in_lazio': user.city_in_lazio or '',
+            'field_of_study': user.field_of_study or user.profession or '',
+            'arrival_year': user.arrival_year,
+            'support_needs': onboarding.get('support_needs', []),
+        }
+
+    def form_valid(self, form):
+        user = self.request.user
+        primary_goal = form.cleaned_data['primary_goal']
+        support_needs = form.cleaned_data.get('support_needs') or []
+        preferences = user.notification_preferences or {}
+        preferences['onboarding'] = {
+            'completed': True,
+            'primary_goal': primary_goal,
+            'support_needs': support_needs,
+            'completed_at': timezone.now().isoformat(),
+        }
+
+        user.notification_preferences = preferences
+        user.city_in_lazio = form.cleaned_data.get('city_in_lazio') or None
+        user.arrival_year = form.cleaned_data.get('arrival_year')
+        field_or_profession = form.cleaned_data.get('field_of_study') or ''
+        if primary_goal in ('professional', 'partner'):
+            user.profession = field_or_profession
+            user.occupation = 'worker' if primary_goal == 'professional' else user.occupation
+        else:
+            user.field_of_study = field_or_profession
+            if primary_goal in ('new_student', 'current_student'):
+                user.occupation = 'student'
+        if primary_goal == 'mentor' and not user.is_superuser:
+            user.role = 'mentor'
+
+        user.save(update_fields=[
+            'notification_preferences',
+            'city_in_lazio',
+            'arrival_year',
+            'field_of_study',
+            'profession',
+            'occupation',
+            'role',
+        ])
+        messages.success(self.request, _('Your dashboard has been personalized.'))
+        return super().form_valid(form)
+
+
 class PasswordChangeView(DashboardRequiredMixin, DjangoPasswordChangeView):
     """Change user password."""
     template_name = 'dashboard/profile/password_change.html'
@@ -549,7 +725,9 @@ class NotificationPreferencesView(DashboardRequiredMixin, FormView):
         }
     
     def form_valid(self, form):
-        self.request.user.notification_preferences = form.cleaned_data
+        preferences = self.request.user.notification_preferences or {}
+        preferences.update(form.cleaned_data)
+        self.request.user.notification_preferences = preferences
         self.request.user.save()
         messages.success(self.request, _('Notification preferences updated.'))
         return super().form_valid(form)

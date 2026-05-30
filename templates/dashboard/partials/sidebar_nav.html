@@ -3,6 +3,7 @@
     <nav class="flex-1 space-y-6 overflow-y-auto px-4 py-5">
         <div class="space-y-1">
             <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.url_name == 'home' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Dashboard' %}</a>
+            <a href="{% url 'dashboard:onboarding' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.url_name == 'onboarding' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Personalize' %}</a>
             <a href="{% url 'dashboard:profile_view' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if 'profile' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'My Profile' %}</a>
         </div>
 

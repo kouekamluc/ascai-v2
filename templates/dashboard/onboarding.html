@@ -1,0 +1,84 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block page_heading %}{% trans 'Personalize your dashboard' %}{% endblock %}
+{% block page_description %}{% trans 'Tell ASCAI what matters first so your dashboard can prioritize the right next steps.' %}{% endblock %}
+
+{% block content %}
+<div class="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+    <section class="dashboard-hero">
+        <div class="max-w-2xl">
+            <p class="dashboard-kicker text-white/70">{% trans 'First useful minute' %}</p>
+            <h2 class="mt-4 text-4xl font-bold leading-tight md:text-5xl">{% trans 'Make the platform feel built around your situation.' %}</h2>
+            <p class="mt-4 text-sm leading-8 text-white/82">
+                {% trans 'ASCAI can guide a newcomer, support an active student, surface mentor actions, or help a professional plug into the community. This short setup decides what appears first.' %}
+            </p>
+            <div class="mt-7 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-[1.25rem] border border-white/15 bg-white/10 p-4">
+                    <p class="text-2xl font-bold">{% trans '1 min' %}</p>
+                    <p class="mt-1 text-sm text-white/72">{% trans 'Enough to personalize your next actions' %}</p>
+                </div>
+                <div class="rounded-[1.25rem] border border-white/15 bg-white/10 p-4">
+                    <p class="text-2xl font-bold">{% trans 'Live' %}</p>
+                    <p class="mt-1 text-sm text-white/72">{% trans 'Your dashboard updates immediately' %}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-card p-6 md:p-8">
+        <form method="post" class="dashboard-form space-y-8">
+            {% csrf_token %}
+
+            <div>
+                <p class="dashboard-kicker text-cameroon-green">{% trans 'Your role' %}</p>
+                <h3 class="mt-3 text-3xl font-bold text-ascai-ink">{{ form.primary_goal.label }}</h3>
+                {% if form.primary_goal.errors %}<p class="mt-2 text-sm text-cameroon-red">{{ form.primary_goal.errors|striptags }}</p>{% endif %}
+                <div class="mt-5 grid gap-3">
+                    {% for choice in form.primary_goal %}
+                    <label class="flex cursor-pointer items-start gap-3 rounded-[1.25rem] border border-black/5 bg-white p-4 text-sm font-semibold text-gray-700 transition hover:border-cameroon-green/30 hover:bg-green-50/40">
+                        {{ choice.tag }}
+                        <span>{{ choice.choice_label }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="grid gap-5 md:grid-cols-3">
+                <div>
+                    <label for="{{ form.city_in_lazio.id_for_label }}" class="mb-2 block text-sm font-bold text-ascai-ink">{{ form.city_in_lazio.label }}</label>
+                    {{ form.city_in_lazio }}
+                    {% if form.city_in_lazio.errors %}<p class="mt-2 text-sm text-cameroon-red">{{ form.city_in_lazio.errors|striptags }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.field_of_study.id_for_label }}" class="mb-2 block text-sm font-bold text-ascai-ink">{{ form.field_of_study.label }}</label>
+                    {{ form.field_of_study }}
+                    {% if form.field_of_study.errors %}<p class="mt-2 text-sm text-cameroon-red">{{ form.field_of_study.errors|striptags }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.arrival_year.id_for_label }}" class="mb-2 block text-sm font-bold text-ascai-ink">{{ form.arrival_year.label }}</label>
+                    {{ form.arrival_year }}
+                    {% if form.arrival_year.errors %}<p class="mt-2 text-sm text-cameroon-red">{{ form.arrival_year.errors|striptags }}</p>{% endif %}
+                </div>
+            </div>
+
+            <div>
+                <p class="dashboard-kicker text-cameroon-yellow">{{ form.support_needs.label }}</p>
+                <div class="mt-5 grid gap-3 md:grid-cols-2">
+                    {% for choice in form.support_needs %}
+                    <label class="flex cursor-pointer items-start gap-3 rounded-[1.25rem] border border-black/5 bg-stone-50 p-4 text-sm font-semibold text-gray-700 transition hover:border-cameroon-green/30 hover:bg-white">
+                        {{ choice.tag }}
+                        <span>{{ choice.choice_label }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 border-t border-black/5 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <a href="{% url 'dashboard:home' %}" class="btn-secondary">{% trans 'Skip for now' %}</a>
+                <button type="submit" class="btn-primary">{% trans 'Personalize dashboard' %}</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

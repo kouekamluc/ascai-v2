@@ -279,3 +279,62 @@ class NotificationPreferencesForm(forms.Form):
             'class': 'w-4 h-4 text-cameroon-green border-gray-300 rounded focus:ring-cameroon-green'
         })
     )
+
+
+class OnboardingPreferenceForm(forms.Form):
+    """Capture enough intent to make the dashboard feel personal from day one."""
+
+    INTENT_CHOICES = [
+        ('new_student', _('I am arriving or newly arrived in Lazio')),
+        ('current_student', _('I am already studying in Lazio')),
+        ('mentor', _('I want to mentor or support students')),
+        ('professional', _('I am a professional or community member')),
+        ('partner', _('I represent a partner or service provider')),
+    ]
+    SUPPORT_CHOICES = [
+        ('orientation', _('Arrival and residence guidance')),
+        ('scholarships', _('Scholarships and funding')),
+        ('universities', _('University choices and enrollment')),
+        ('mentorship', _('Mentorship and career guidance')),
+        ('events', _('Events and community participation')),
+        ('services', _('Trusted practical services')),
+    ]
+
+    primary_goal = forms.ChoiceField(
+        choices=INTENT_CHOICES,
+        label=_('What brings you to ASCAI right now?'),
+        widget=forms.RadioSelect(attrs={'class': 'onboarding-radio'}),
+    )
+    city_in_lazio = forms.ChoiceField(
+        choices=[('', _('Choose your city'))] + list(User.CITY_CHOICES),
+        required=False,
+        label=_('City in Lazio'),
+        widget=forms.Select(attrs={
+            'class': 'w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green'
+        }),
+    )
+    field_of_study = forms.CharField(
+        required=False,
+        max_length=200,
+        label=_('Field of study or profession'),
+        widget=forms.TextInput(attrs={
+            'class': 'w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green',
+            'placeholder': _('e.g. Computer science, medicine, logistics, design'),
+        }),
+    )
+    arrival_year = forms.IntegerField(
+        required=False,
+        min_value=1900,
+        max_value=2100,
+        label=_('Arrival year in Italy'),
+        widget=forms.NumberInput(attrs={
+            'class': 'w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-cameroon-green focus:ring-2 focus:ring-cameroon-green',
+            'placeholder': _('2026'),
+        }),
+    )
+    support_needs = forms.MultipleChoiceField(
+        choices=SUPPORT_CHOICES,
+        required=False,
+        label=_('What should ASCAI help you with first?'),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'onboarding-checkbox'}),
+    )

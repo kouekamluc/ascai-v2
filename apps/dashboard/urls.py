@@ -12,6 +12,7 @@ urlpatterns = [
     
     # Profile Management
     path('profile/', views.ProfileView.as_view(), name='profile_view'),
+    path('onboarding/', views.DashboardOnboardingView.as_view(), name='onboarding'),
     path('profile/edit/', views.ProfileUpdateView.as_view(), name='profile_edit'),
     path('profile/password/', views.PasswordChangeView.as_view(), name='profile_password'),
     path('profile/documents/', views.DocumentUploadView.as_view(), name='profile_documents'),

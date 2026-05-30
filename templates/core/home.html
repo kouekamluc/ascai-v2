@@ -113,6 +113,29 @@
     <section class="section-card p-7 md:p-10">
         <div class="section-heading">
             <div>
+                <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Built for adoption' %}</p>
+                <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Every stakeholder gets a reason to come back.' %}</h2>
+                <p class="mt-3 max-w-3xl text-sm leading-7 text-gray-600">
+                    {% trans 'The app is not only a website. It is a role-aware operating space for students, members, mentors, bureau leaders, partners, and sponsors.' %}
+                </p>
+            </div>
+            <a href="{% url 'core:sponsorship' %}" class="rounded-full bg-ascai-ink px-4 py-2.5 text-sm font-semibold text-white hover:bg-cameroon-green">{% trans 'Pitch the platform' %}</a>
+        </div>
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {% for card in platform_audience_cards %}
+            <article class="content-card flex h-full flex-col p-6">
+                <p class="text-xs font-extrabold uppercase tracking-[0.18em] {% if forloop.counter == 2 %}text-cameroon-red{% elif forloop.counter == 3 %}text-cameroon-yellow{% else %}text-cameroon-green{% endif %}">{{ card.audience }}</p>
+                <h3 class="mt-3 text-2xl font-bold leading-tight text-ascai-ink">{{ card.promise }}</h3>
+                <p class="mt-3 flex-1 text-sm leading-7 text-gray-600">{{ card.summary }}</p>
+                <a href="{% url card.url_name %}" class="mt-5 inline-flex text-sm font-semibold text-cameroon-green">{{ card.cta }}</a>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section-card p-7 md:p-10">
+        <div class="section-heading">
+            <div>
                 <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-cameroon-green">{% trans 'Student success pathway' %}</p>
                 <h2 class="mt-3 text-4xl font-bold text-ascai-ink">{% trans 'Make membership feel like the smartest first payment after arrival.' %}</h2>
                 <p class="mt-3 max-w-3xl text-sm leading-7 text-gray-600">{% trans 'The strongest reason to pay is not a generic association card. It is a guided path that helps students avoid mistakes, find opportunities, meet people, and become visible to institutions.' %}</p>

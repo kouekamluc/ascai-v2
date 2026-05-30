@@ -73,6 +73,38 @@ SPONSOR_IMPACT_METRICS = [
 ]
 
 
+PLATFORM_AUDIENCE_CARDS = [
+    {
+        "audience": _("New students"),
+        "promise": _("Know what to do next after arrival"),
+        "summary": _("Orientation, residence guidance, scholarships, universities, documents, and trusted first contacts in one guided dashboard."),
+        "cta": _("Start student journey"),
+        "url_name": "account_signup",
+    },
+    {
+        "audience": _("Members"),
+        "promise": _("Turn membership into visible value"),
+        "summary": _("Dues, elections, assemblies, member resources, bureau messages, events, and community groups are connected to one member space."),
+        "cta": _("Join ASCAI"),
+        "url_name": "account_signup",
+    },
+    {
+        "audience": _("Mentors"),
+        "promise": _("Help students without losing structure"),
+        "summary": _("Mentor profiles, requests, messaging, and availability tools make support easier to offer and easier to track."),
+        "cta": _("Become a mentor"),
+        "url_name": "mentorship:index",
+    },
+    {
+        "audience": _("Sponsors and partners"),
+        "promise": _("Support outcomes people can measure"),
+        "summary": _("Impact metrics, verified services, events, and sponsor-ready reporting make ASCAI easier to trust and fund."),
+        "cta": _("See impact plan"),
+        "url_name": "core:sponsorship",
+    },
+]
+
+
 SPONSOR_PACKAGES = [
     {
         "name": _("Student Success Sponsor"),
@@ -452,6 +484,7 @@ class HomeView(ExecutiveBoardPublicContextMixin, TemplateView):
         context['member_resource_collections'] = MEMBER_RESOURCE_COLLECTIONS
         context['student_success_pathway'] = STUDENT_SUCCESS_PATHWAY
         context['sponsor_impact_metrics'] = SPONSOR_IMPACT_METRICS
+        context['platform_audience_cards'] = PLATFORM_AUDIENCE_CARDS
         context['impact_metric_cards'] = get_impact_metrics()
         context.update(get_premium_service_context())
 
