@@ -19,7 +19,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.utils.text import slugify
 
-from apps.scholarships.models import Scholarship
+from apps.scholarships.models import Scholarship, ScholarshipSyncRun
 
 
 KEYWORDS = (
@@ -204,13 +204,21 @@ class Command(BaseCommand):
         created = 0
         updated = 0
         skipped = 0
+        errors = []
+        sync_run = ScholarshipSyncRun.objects.create(
+            status="dry_run" if dry_run else "running",
+            dry_run=dry_run,
+            source_count=len(SOURCES),
+        )
 
         for source in SOURCES:
             try:
                 payload = self._build_payload(source, timeout)
             except Exception as exc:
                 skipped += 1
-                self.stderr.write(self.style.WARNING(f"Skipped {source.name}: {exc}"))
+                message = f"Skipped {source.name}: {exc}"
+                errors.append(message)
+                self.stderr.write(self.style.WARNING(message))
                 continue
 
             if dry_run:
@@ -227,6 +235,28 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Dry run complete."))
         else:
             self.stdout.write(self.style.SUCCESS(f"Sync complete: {created} created, {updated} updated, {skipped} skipped."))
+
+        sync_run.created_count = created
+        sync_run.updated_count = updated
+        sync_run.skipped_count = skipped
+        sync_run.error_log = "\n".join(errors)
+        sync_run.finished_at = timezone.now()
+        if dry_run:
+            sync_run.status = "dry_run"
+        elif skipped and (created or updated):
+            sync_run.status = "partial"
+        elif skipped and not (created or updated):
+            sync_run.status = "failed"
+        else:
+            sync_run.status = "success"
+        sync_run.save(update_fields=[
+            "created_count",
+            "updated_count",
+            "skipped_count",
+            "error_log",
+            "finished_at",
+            "status",
+        ])
 
     def _build_payload(self, source, timeout):
         response = requests.get(

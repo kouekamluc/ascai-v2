@@ -25,6 +25,7 @@ from .mixins import (
 from .models import (
     Member, MembershipStatus, ExecutiveBoard, ExecutivePosition, BoardMeeting,
     GeneralAssembly, AgendaItem, AssemblyAttendance, AssemblyVote, AssemblyVoteRecord,
+    ExtraordinaryAssemblyRequest,
     FinancialTransaction, MembershipDues, Contribution, FinancialReport, ExpenseApproval,
     ElectoralCommission, CommissionMember, Election, Candidacy, ElectionVote,
     BoardOfAuditors, AuditorMember, AuditReport,
@@ -2431,13 +2432,30 @@ def request_extraordinary_assembly(request):
     quorum_status = check_extraordinary_assembly_quorum()
     
     if request.method == 'POST':
-        # In production, you'd create a request record here
-        messages.info(
-            request,
-            _('Extraordinary assembly request submitted. {required} active members must request it (1/4 of members).').format(
-                required=quorum_status['required']
-            )
+        _request_record, created = ExtraordinaryAssemblyRequest.objects.get_or_create(
+            member=member,
+            status='active',
+            defaults={
+                'reason': request.POST.get('reason', '').strip(),
+            },
         )
+        if not created:
+            messages.info(request, _('You already have an active extraordinary assembly request.'))
+            return redirect('governance:member_portal')
+
+        quorum_status = check_extraordinary_assembly_quorum()
+        if quorum_status['quorum_met']:
+            messages.success(
+                request,
+                _('Your request has been submitted and the required quorum has been reached. The bureau can now schedule the extraordinary assembly.')
+            )
+        else:
+            messages.success(
+                request,
+                _('Extraordinary assembly request submitted. %(remaining)s more request(s) are needed to reach quorum.') % {
+                    'remaining': quorum_status['remaining_requests'],
+                }
+            )
         return redirect('governance:member_portal')
     
     return render(request, 'governance/assemblies/request_extraordinary.html', {

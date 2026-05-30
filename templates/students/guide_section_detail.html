@@ -44,6 +44,12 @@
             <div class="w-full bg-gray-200 rounded-full h-2">
                 <div class="bg-cameroon-green h-2 rounded-full transition-all duration-300" style="width: {{ completion_percentage }}%"></div>
             </div>
+            {% if completed_step_ids %}
+            <form method="post" action="{% url 'students:reset_guide_section_progress' section.slug %}" class="mt-4">
+                {% csrf_token %}
+                <button type="submit" class="text-sm font-semibold text-red-600 hover:text-red-700">{% trans 'Reset this section' %}</button>
+            </form>
+            {% endif %}
         </div>
         {% endif %}
     </div>
@@ -92,16 +98,19 @@
                     {% if user.is_authenticated %}
                     <div class="mt-4">
                         {% if step.id in completed_step_ids %}
-                        <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded text-sm">
+                        <button
+                            hx-post="{% url 'students:save_guide_progress' step.id %}"
+                            hx-swap="none"
+                            class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded text-sm hover:bg-green-200">
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                             </svg>
-                            {% trans 'Completed' %}
-                        </span>
+                            {% trans 'Completed - Undo' %}
+                        </button>
                         {% else %}
                         <button 
                             hx-post="{% url 'students:save_guide_progress' step.id %}"
-                            hx-swap="outerHTML"
+                            hx-swap="none"
                             class="inline-flex items-center px-4 py-2 bg-cameroon-green text-white rounded-lg hover:bg-cameroon-green/90">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>

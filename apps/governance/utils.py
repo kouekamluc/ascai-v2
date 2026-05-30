@@ -714,17 +714,22 @@ def check_extraordinary_assembly_quorum():
     Check if 1/4 of members have requested extraordinary assembly (Article 6, 11).
     Returns dict with quorum status.
     """
+    from .models import ExtraordinaryAssemblyRequest
+
     active_members = Member.objects.filter(is_active_member=True)
     total_active = active_members.count()
     required = (total_active + 3) // 4  # 1/4 rounded up
-    
-    # In a real implementation, you'd track requests
-    # For now, return the requirement
+    current_requests = ExtraordinaryAssemblyRequest.objects.filter(
+        status='active',
+        member__is_active_member=True,
+    ).values('member_id').distinct().count()
+
     return {
         'total_active_members': total_active,
         'required': required,
-        'current_requests': 0,  # Would be tracked in a model
-        'quorum_met': False  # Would check actual requests
+        'current_requests': current_requests,
+        'remaining_requests': max(required - current_requests, 0),
+        'quorum_met': bool(required and current_requests >= required),
     }
 
 

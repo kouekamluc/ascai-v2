@@ -23,10 +23,15 @@ from .models import (
     AuditorMember,
     AssociationEvent,
     MembershipDues,
+    ExtraordinaryAssemblyRequest,
 )
 from .services import ensure_current_year_dues, user_has_governance_access
 from .services import get_member_resource_access
-from .utils import calculate_member_seniority, check_general_report_requirement
+from .utils import (
+    calculate_member_seniority,
+    check_extraordinary_assembly_quorum,
+    check_general_report_requirement,
+)
 
 User = get_user_model()
 
@@ -242,6 +247,51 @@ class GovernanceViewsTest(TestCase):
         except:
             # If URL doesn't exist, that's okay
             pass
+
+    def test_extraordinary_assembly_request_is_persisted_once(self):
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.post(
+            reverse('governance:request_extraordinary_assembly'),
+            {'reason': 'We need to discuss an urgent community matter.'},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            ExtraordinaryAssemblyRequest.objects.filter(member=self.member, status='active').count(),
+            1,
+        )
+
+        second_response = self.client.post(
+            reverse('governance:request_extraordinary_assembly'),
+            {'reason': 'Duplicate request'},
+        )
+        self.assertEqual(second_response.status_code, 302)
+        self.assertEqual(
+            ExtraordinaryAssemblyRequest.objects.filter(member=self.member, status='active').count(),
+            1,
+        )
+
+    def test_extraordinary_assembly_quorum_counts_active_requests(self):
+        second_user = User.objects.create_user(
+            username='second_member',
+            email='second@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        second_member = Member.objects.create(
+            user=second_user,
+            member_type='student',
+            is_active_member=True,
+        )
+        ExtraordinaryAssemblyRequest.objects.create(member=self.member)
+        ExtraordinaryAssemblyRequest.objects.create(member=second_member)
+
+        quorum = check_extraordinary_assembly_quorum()
+
+        self.assertEqual(quorum['total_active_members'], 2)
+        self.assertEqual(quorum['required'], 1)
+        self.assertEqual(quorum['current_requests'], 2)
+        self.assertTrue(quorum['quorum_met'])
 
 
 class GovernanceRuntimeRegressionTest(TestCase):

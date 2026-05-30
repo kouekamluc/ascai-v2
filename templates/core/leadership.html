@@ -36,11 +36,16 @@
     </section>
     {% else %}
     <section class="section-card p-10 text-center">
-        <h2 class="text-4xl font-bold text-ascai-ink">{% trans 'Leadership details are coming soon' %}</h2>
+        <h2 class="text-4xl font-bold text-ascai-ink">{% trans 'Executive board information is being prepared' %}</h2>
         <p class="mt-4 max-w-2xl mx-auto text-sm leading-7 text-gray-600">
-            {% trans 'Executive board information will be published here once the current team details are available for public display.' %}
+            {% trans 'ASCAI Lazio publishes leadership information from verified governance records. The current board profile will appear here as soon as the bureau activates the board term and assigns public positions.' %}
         </p>
-        <a href="{% url 'core:home' %}" class="mt-8 inline-flex rounded-full bg-cameroon-green px-5 py-3 text-sm font-semibold text-white">{% trans 'Back to Home' %}</a>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+            <a href="{% url 'contact:index' %}" class="inline-flex rounded-full bg-cameroon-green px-5 py-3 text-sm font-semibold text-white">{% trans 'Contact ASCAI' %}</a>
+            {% if request.user.is_staff %}
+            <a href="{% url 'governance:executive_board_list' %}" class="inline-flex rounded-full bg-stone-100 px-5 py-3 text-sm font-semibold text-gray-700">{% trans 'Manage Executive Board' %}</a>
+            {% endif %}
+        </div>
     </section>
     {% endif %}
     </div>

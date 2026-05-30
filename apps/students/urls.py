@@ -16,7 +16,8 @@ from .views import (
     NewStudentGuideView,
     GuideSectionDetailView,
     GuideStepDetailView,
-    save_guide_progress
+    save_guide_progress,
+    reset_guide_section_progress
 )
 
 app_name = 'students'
@@ -36,5 +37,5 @@ urlpatterns = [
     path('new-student-guide/<slug:slug>/', GuideSectionDetailView.as_view(), name='guide_section_detail'),
     path('new-student-guide/step/<int:pk>/', GuideStepDetailView.as_view(), name='guide_step_detail'),
     path('new-student-guide/progress/<int:step_id>/save/', save_guide_progress, name='save_guide_progress'),
+    path('new-student-guide/<slug:slug>/progress/reset/', reset_guide_section_progress, name='reset_guide_section_progress'),
 ]
-

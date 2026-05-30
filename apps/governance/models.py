@@ -544,6 +544,58 @@ class GeneralAssembly(models.Model):
         return None
 
 
+class ExtraordinaryAssemblyRequest(models.Model):
+    """
+    Active member request toward the 1/4 quorum for an extraordinary assembly.
+    """
+    STATUS_CHOICES = [
+        ('active', _('Active')),
+        ('withdrawn', _('Withdrawn')),
+        ('converted', _('Converted to Assembly')),
+    ]
+
+    member = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        related_name='extraordinary_assembly_requests',
+        verbose_name=_('Member')
+    )
+    reason = models.TextField(
+        blank=True,
+        verbose_name=_('Reason'),
+        help_text=_('Optional reason or proposed agenda for the extraordinary assembly.')
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='active',
+        verbose_name=_('Status')
+    )
+    requested_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Requested At')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated At')
+    )
+
+    class Meta:
+        verbose_name = _('Extraordinary Assembly Request')
+        verbose_name_plural = _('Extraordinary Assembly Requests')
+        ordering = ['-requested_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['member'],
+                condition=models.Q(status='active'),
+                name='unique_active_extraordinary_request_per_member',
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.member} - {self.get_status_display()}"
+
+
 class AgendaItem(models.Model):
     """
     Agenda items for General Assemblies (Article 20, 21, 22).

@@ -6,7 +6,11 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from decimal import Decimal
 from datetime import date, timedelta
-from .models import Scholarship, SavedScholarship
+from django.core.management import call_command
+from io import StringIO
+from unittest.mock import Mock, patch
+
+from .models import Scholarship, SavedScholarship, ScholarshipSyncRun
 
 User = get_user_model()
 
@@ -69,6 +73,22 @@ class ScholarshipModelTest(TestCase):
         self.assertEqual(scholarship.source_hostname, 'example.com')
         self.assertIn('example.com', scholarship.provider_logo_url)
         self.assertEqual(scholarship.provider_initials, 'OS')
+
+    @patch('apps.scholarships.management.commands.sync_scholarships.requests.get')
+    def test_scholarship_sync_records_audit_run(self, mock_get):
+        response = Mock()
+        response.text = '<html><h1>Borse di studio 2026</h1><p>Scholarship deadline 31/12/2026.</p></html>'
+        response.raise_for_status.return_value = None
+        mock_get.return_value = response
+
+        call_command('sync_scholarships', '--dry-run', stdout=StringIO(), stderr=StringIO())
+
+        sync_run = ScholarshipSyncRun.objects.latest('started_at')
+        self.assertEqual(sync_run.status, 'dry_run')
+        self.assertTrue(sync_run.dry_run)
+        self.assertEqual(sync_run.source_count, 6)
+        self.assertEqual(sync_run.skipped_count, 0)
+        self.assertIsNotNone(sync_run.finished_at)
 
 
 class SavedScholarshipModelTest(TestCase):

@@ -23,6 +23,7 @@ class UserWorkflowState:
     is_governance_staff: bool = False
     needs_profile_completion: bool = False
     needs_membership_registration: bool = False
+    unread_bureau_messages: int = 0
 
 
 def get_user_workflow_state(user):
@@ -64,6 +65,16 @@ def get_user_workflow_state(user):
     except ObjectDoesNotExist:
         pass
 
+    unread_bureau_messages = 0
+    try:
+        from apps.dashboard.models import BureauMessage
+        unread_bureau_messages = BureauMessage.objects.filter(
+            recipient=user,
+            is_read=False,
+        ).count()
+    except Exception:
+        unread_bureau_messages = 0
+
     has_governance_permission = False
     try:
         has_governance_permission = any(
@@ -94,6 +105,7 @@ def get_user_workflow_state(user):
         is_governance_staff=bool(is_staff or is_superuser or has_governance_permission),
         needs_profile_completion=not bool(getattr(user, "full_name", "")),
         needs_membership_registration=is_approved and not has_member_profile,
+        unread_bureau_messages=unread_bureau_messages,
     )
 
 

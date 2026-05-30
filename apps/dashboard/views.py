@@ -119,6 +119,12 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         workflow = get_user_workflow_state(user)
         context['workflow'] = workflow
         context['workflow_checklist'] = self.get_workflow_checklist(user, workflow)
+        bureau_messages = (
+            BureauMessage.objects.filter(recipient=user)
+            .select_related('sender')
+            .order_by('is_read', '-created_at')
+        )
+        unread_bureau_messages = bureau_messages.filter(is_read=False).count()
         
         # Statistics
         context['stats'] = {
@@ -126,7 +132,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             'saved_scholarships': SavedScholarship.objects.filter(user=user).count(),
             'saved_documents': SavedDocument.objects.filter(user=user).count(),
             'open_tickets': SupportTicket.objects.filter(user=user, status__in=['open', 'pending']).count(),
-            'unread_messages': BureauMessage.objects.filter(recipient=user, is_read=False).count(),
+            'unread_messages': unread_bureau_messages,
             'mentorship_requests': MentorshipRequest.objects.filter(student=user).count() if hasattr(user, 'is_student') and user.is_student else 0,
             'group_memberships': CommunityGroup.objects.filter(members=user).count(),
         }
@@ -251,7 +257,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
         
         # Recent activity
         context['recent_tickets'] = SupportTicket.objects.filter(user=user).order_by('-created_at')[:5]
-        context['recent_bureau_messages'] = BureauMessage.objects.filter(recipient=user).select_related('sender').order_by('-created_at')[:5]
+        context['recent_bureau_messages'] = bureau_messages[:5]
         context['recent_stories'] = UserStorySubmission.objects.filter(user=user).order_by('-submitted_at')[:3]
         context['verified_service_partners'] = (
             ServicePartner.objects.filter(
@@ -803,7 +809,6 @@ class EventListView(DashboardRequiredMixin, ListView):
 @login_required
 def event_register(request, pk):
     """Register for an event."""
-    from .mixins import DashboardRequiredMixin
     # Check if user is approved
     if not request.user.is_approved and not request.user.is_superuser:
         messages.error(request, _('Your account must be approved to register for events.'))
@@ -814,21 +819,33 @@ def event_register(request, pk):
     if not event.registration_required:
         messages.info(request, _('Registration is not required for this event.'))
         return redirect('dashboard:events_list')
+
+    if event.end_datetime <= timezone.now():
+        messages.error(request, _('This event has already ended.'))
+        return redirect('dashboard:events_list')
+
+    if event.registration_deadline and event.registration_deadline <= timezone.now():
+        messages.error(request, _('Registration deadline has passed.'))
+        return redirect('dashboard:events_list')
     
     # Check if already registered
     if EventRegistration.objects.filter(event=event, user=request.user).exists():
         messages.info(request, _('You are already registered for this event.'))
         return redirect('dashboard:events_list')
     
-    # Check capacity
-    if event.max_participants:
-        current_registrations = EventRegistration.objects.filter(event=event).count()
-        if current_registrations >= event.max_participants:
-            messages.error(request, _('This event is full.'))
-            return redirect('dashboard:events_list')
-    
     # Create registration
     registration = EventRegistration.objects.create(event=event, user=request.user)
+    capacity = event.capacity or event.max_participants
+    if capacity and event.get_registered_count() > capacity:
+        registration.delete()
+        if event.waitlist_enabled:
+            from apps.diaspora.views import create_or_reactivate_waitlist_entry
+            create_or_reactivate_waitlist_entry(event, request.user)
+            messages.info(request, _('This event is full, so you have been added to the waitlist.'))
+            return redirect('dashboard:events_list')
+        messages.error(request, _('This event is full.'))
+        return redirect('dashboard:events_list')
+
     messages.success(request, _('Successfully registered for the event.'))
     return redirect('dashboard:event_ticket', pk=registration.id)
 

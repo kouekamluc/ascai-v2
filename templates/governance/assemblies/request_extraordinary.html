@@ -17,7 +17,8 @@
                 <strong>{% trans "Current Status" %}:</strong><br>
                 {% trans "Active Members" %}: {{ quorum_status.total_active_members }}<br>
                 {% trans "Required Requests" %}: {{ quorum_status.required }}<br>
-                {% trans "Current Requests" %}: {{ quorum_status.current_requests }}
+                {% trans "Current Requests" %}: {{ quorum_status.current_requests }}<br>
+                {% trans "Remaining Requests" %}: {{ quorum_status.remaining_requests }}
             </p>
         </div>
     </div>
@@ -28,6 +29,10 @@
             <p class="text-sm text-gray-700">
                 {% trans "By submitting this request, you are adding your name to the list of members requesting an Extraordinary General Assembly." %}
             </p>
+        </div>
+        <div class="mb-6">
+            <label for="reason" class="block text-sm font-semibold text-gray-800 mb-2">{% trans "Reason or proposed agenda" %}</label>
+            <textarea id="reason" name="reason" rows="5" class="form-textarea" placeholder="{% trans 'Briefly explain why you are requesting this assembly.' %}"></textarea>
         </div>
         <div class="flex items-center justify-end space-x-4">
             <a href="{% url 'governance:member_portal' %}" class="btn-secondary">{% trans "Cancel" %}</a>

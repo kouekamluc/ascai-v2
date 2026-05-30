@@ -11,7 +11,7 @@ from .forms import ExecutivePositionForm
 from .models import (
     Member, MembershipStatus,
     ExecutiveBoard, ExecutivePosition, BoardMeeting,
-    GeneralAssembly, AgendaItem, AssemblyAttendance, AssemblyVote,
+    GeneralAssembly, ExtraordinaryAssemblyRequest, AgendaItem, AssemblyAttendance, AssemblyVote,
     FinancialTransaction, MembershipDues, Contribution, FinancialReport, ExpenseApproval,
     ElectoralCommission, CommissionMember, Election, Candidacy, ElectionVote,
     BoardOfAuditors, AuditorMember, AuditReport,
@@ -188,6 +188,26 @@ class GeneralAssemblyAdmin(BaseAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(ExtraordinaryAssemblyRequest)
+class ExtraordinaryAssemblyRequestAdmin(ModelAdmin):
+    list_display = ['member', 'status', 'requested_at', 'updated_at']
+    list_filter = ['status', 'requested_at']
+    search_fields = ['member__user__username', 'member__user__email', 'member__user__full_name', 'reason']
+    autocomplete_fields = ['member']
+    readonly_fields = ['requested_at', 'updated_at']
+    actions = ['mark_withdrawn', 'mark_converted']
+
+    def mark_withdrawn(self, request, queryset):
+        updated = queryset.update(status='withdrawn')
+        self.message_user(request, _('{} request(s) marked withdrawn.').format(updated))
+    mark_withdrawn.short_description = _('Mark selected requests withdrawn')
+
+    def mark_converted(self, request, queryset):
+        updated = queryset.update(status='converted')
+        self.message_user(request, _('{} request(s) marked converted.').format(updated))
+    mark_converted.short_description = _('Mark selected requests converted to assembly')
 
 
 @admin.register(AgendaItem)

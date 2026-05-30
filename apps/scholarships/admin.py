@@ -4,7 +4,7 @@ Admin configuration for scholarships app.
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from config.admin import BaseAdmin, ModelAdmin
-from .models import Scholarship, SavedScholarship
+from .models import Scholarship, SavedScholarship, ScholarshipSyncRun
 
 
 @admin.register(Scholarship)
@@ -51,3 +51,11 @@ class SavedScholarshipAdmin(ModelAdmin):
     list_filter = ['saved_at']
     search_fields = ['user__username', 'scholarship__title']
     raw_id_fields = ['user', 'scholarship']
+
+
+@admin.register(ScholarshipSyncRun)
+class ScholarshipSyncRunAdmin(ModelAdmin):
+    list_display = ['status', 'started_at', 'finished_at', 'source_count', 'created_count', 'updated_count', 'skipped_count', 'dry_run']
+    list_filter = ['status', 'dry_run', 'started_at']
+    search_fields = ['error_log']
+    readonly_fields = ['status', 'started_at', 'finished_at', 'source_count', 'created_count', 'updated_count', 'skipped_count', 'error_log', 'dry_run']

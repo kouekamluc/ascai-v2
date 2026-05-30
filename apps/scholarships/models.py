@@ -207,3 +207,39 @@ class SavedScholarship(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.scholarship.title}"
+
+
+class ScholarshipSyncRun(models.Model):
+    """
+    Audit log for automated scholarship source synchronization.
+    """
+    STATUS_CHOICES = [
+        ('running', _('Running')),
+        ('success', _('Success')),
+        ('partial', _('Partial Success')),
+        ('failed', _('Failed')),
+        ('dry_run', _('Dry Run')),
+    ]
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='running',
+        verbose_name=_('Status')
+    )
+    started_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Started At'))
+    finished_at = models.DateTimeField(null=True, blank=True, verbose_name=_('Finished At'))
+    created_count = models.PositiveIntegerField(default=0, verbose_name=_('Created Count'))
+    updated_count = models.PositiveIntegerField(default=0, verbose_name=_('Updated Count'))
+    skipped_count = models.PositiveIntegerField(default=0, verbose_name=_('Skipped Count'))
+    source_count = models.PositiveIntegerField(default=0, verbose_name=_('Source Count'))
+    error_log = models.TextField(blank=True, verbose_name=_('Error Log'))
+    dry_run = models.BooleanField(default=False, verbose_name=_('Dry Run'))
+
+    class Meta:
+        verbose_name = _('Scholarship Sync Run')
+        verbose_name_plural = _('Scholarship Sync Runs')
+        ordering = ['-started_at']
+
+    def __str__(self):
+        return f"{self.get_status_display()} - {self.started_at:%Y-%m-%d %H:%M}"

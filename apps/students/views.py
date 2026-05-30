@@ -3,7 +3,7 @@ Views for students app.
 """
 from django.views.generic import TemplateView, ListView, DetailView
 from django.db.models import Q, Count
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -274,7 +274,7 @@ class NewStudentGuideView(TemplateView):
                     user=self.request.user,
                     section=section
                 )
-                progress_dict[section.id] = {
+                progress_dict[str(section.id)] = {
                     'progress': progress,
                     'completion_percentage': progress.get_completion_percentage(),
                     'is_completed': progress.is_completed
@@ -374,7 +374,7 @@ class GuideStepDetailView(DetailView):
 @login_required
 @require_http_methods(["POST"])
 def save_guide_progress(request, step_id):
-    """Save user progress for a guide step (AJAX endpoint)."""
+    """Toggle user progress for a guide step."""
     step = get_object_or_404(StudentGuideStep, pk=step_id)
     
     # Get or create progress for this section
@@ -383,20 +383,42 @@ def save_guide_progress(request, step_id):
         section=step.section
     )
     
-    # Add step to completed steps
-    progress.completed_steps.add(step)
+    was_completed = progress.completed_steps.filter(pk=step.pk).exists()
+    if was_completed:
+        progress.completed_steps.remove(step)
+        progress.is_completed = False
+    else:
+        progress.completed_steps.add(step)
     
     # Check if all steps are completed
     total_steps = step.section.steps.count()
     completed_count = progress.completed_steps.count()
     
-    if completed_count >= total_steps:
-        progress.is_completed = True
-        progress.save()
+    progress.is_completed = total_steps > 0 and completed_count >= total_steps
+    progress.save(update_fields=['is_completed', 'last_accessed'])
     
-    return JsonResponse({
+    response = JsonResponse({
         'success': True,
+        'is_step_completed': not was_completed,
         'completion_percentage': progress.get_completion_percentage(),
         'is_section_completed': progress.is_completed
     })
+    if request.headers.get('HX-Request'):
+        response['HX-Refresh'] = 'true'
+    return response
 
+
+@login_required
+@require_http_methods(["POST"])
+def reset_guide_section_progress(request, slug):
+    """Reset all progress for one guide section."""
+    section = get_object_or_404(StudentGuideSection, slug=slug, is_active=True)
+    progress, _created = StudentGuideProgress.objects.get_or_create(
+        user=request.user,
+        section=section
+    )
+    progress.completed_steps.clear()
+    progress.is_completed = False
+    progress.save(update_fields=['is_completed', 'last_accessed'])
+    messages.success(request, _('Progress for this section has been reset.'))
+    return redirect('students:guide_section_detail', slug=section.slug)

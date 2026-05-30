@@ -5,15 +5,17 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.utils import timezone
 from datetime import date, timedelta, time
 
 from apps.core.models import ServicePartner
+from apps.diaspora.models import Event
 from apps.governance.models import Member, MembershipDues
 from apps.mentorship.models import MentorProfile
 
 from .models import (
     SupportTicket, TicketReply, CommunityGroup, OrientationSession, StudentQuestion,
-    BureauMessage, BureauMessageReply
+    BureauMessage, BureauMessageReply, EventRegistration, EventWaitlistEntry
 )
 from .mixins import DashboardRequiredMixin
 
@@ -203,6 +205,58 @@ class DashboardViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'overflow-visible')
         self.assertNotContains(response, 'max-w-[8rem] overflow-hidden md:block')
+
+    def test_dashboard_event_registration_uses_capacity_waitlist_flow(self):
+        other_user = User.objects.create_user(
+            username='other_event_user',
+            email='other-event@example.com',
+            password='testpass123',
+            is_approved=True,
+        )
+        event = Event.objects.create(
+            title='Capacity Event',
+            description='Event with a waitlist',
+            location='Rome',
+            start_datetime=timezone.now() + timedelta(days=7),
+            end_datetime=timezone.now() + timedelta(days=7, hours=2),
+            is_published=True,
+            registration_required=True,
+            capacity=1,
+            waitlist_enabled=True,
+        )
+        EventRegistration.objects.create(event=event, user=other_user)
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.get(reverse('dashboard:event_register', args=[event.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(EventRegistration.objects.filter(event=event, user=self.user).exists())
+        self.assertTrue(
+            EventWaitlistEntry.objects.filter(
+                event=event,
+                user=self.user,
+                status='waiting',
+            ).exists()
+        )
+
+    def test_dashboard_event_registration_respects_deadline(self):
+        event = Event.objects.create(
+            title='Closed Event',
+            description='Registration deadline has passed',
+            location='Rome',
+            start_datetime=timezone.now() + timedelta(days=7),
+            end_datetime=timezone.now() + timedelta(days=7, hours=2),
+            is_published=True,
+            registration_required=True,
+            registration_deadline=timezone.now() - timedelta(hours=1),
+            capacity=10,
+        )
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.get(reverse('dashboard:event_register', args=[event.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(EventRegistration.objects.filter(event=event, user=self.user).exists())
     
     def test_profile_view(self):
         """Test profile view."""
@@ -369,6 +423,39 @@ class DashboardViewsTest(TestCase):
         self.assertIsNotNone(message.read_at)
         self.assertEqual(message.email_delivery_status, 'sent')
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_dashboard_home_surfaces_bureau_message_notifications(self):
+        sender = User.objects.create_user(
+            username='dashboardbureau',
+            email='dashboardbureau@example.com',
+            password='testpass123',
+            is_staff=True,
+            is_approved=True,
+        )
+        BureauMessage.objects.create(
+            sender=sender,
+            recipient=self.user,
+            subject='Unread membership note',
+            body='Please check the latest membership request update.',
+        )
+        BureauMessage.objects.create(
+            sender=sender,
+            recipient=self.user,
+            subject='Read older note',
+            body='This older message should still remain visible.',
+            is_read=True,
+        )
+        self.client.login(username='testuser', password='testpass123')
+
+        response = self.client.get(reverse('dashboard:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['stats']['unread_messages'], 1)
+        self.assertEqual(response.context['workflow'].unread_bureau_messages, 1)
+        self.assertContains(response, 'Messages from ASCAI bureau')
+        self.assertContains(response, 'Unread membership note')
+        self.assertContains(response, 'Please check the latest membership request update.')
+        self.assertContains(response, 'Open inbox')
 
     def test_user_can_reply_to_bureau_message(self):
         sender = User.objects.create_user(
