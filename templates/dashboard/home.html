@@ -169,7 +169,7 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="empty-state"><p class="text-gray-600">{% trans 'No bureau messages have been sent to you yet.' %}</p></div>
+        <div class="empty-state"><p class="text-gray-600">{% trans 'No bureau messages have been sent to you yet. When the bureau contacts you from admin, the message and email link will open this inbox.' %}</p></div>
         {% endif %}
     </section>
 
@@ -228,7 +228,7 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <p class="text-gray-600">{% trans 'No verified service providers are visible yet. ASCAI will publish partners here after review.' %}</p>
+            <p class="text-gray-600">{% trans 'No reviewed service providers are visible yet. ASCAI can publish trusted partners here after the bureau approves their listing.' %}</p>
         </div>
         {% endif %}
     </section>
@@ -271,7 +271,7 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="empty-state"><p class="text-gray-600">{% trans 'You do not have upcoming event registrations yet.' %}</p></div>
+            <div class="empty-state"><p class="text-gray-600">{% trans 'You do not have upcoming event registrations yet. Register for a published ASCAI event and your ticket will appear here.' %}</p></div>
             {% endif %}
         </div>
     </section>
@@ -286,7 +286,7 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="empty-state"><p class="text-gray-600">{% trans 'You have not opened any support tickets yet.' %}</p></div>
+            <div class="empty-state"><p class="text-gray-600">{% trans 'You have not opened any support tickets yet. Use support when you need help with account, membership, documents, or platform access.' %}</p></div>
             {% endif %}
         </div>
 
@@ -299,7 +299,7 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="empty-state"><p class="text-gray-600">{% trans 'No suggested groups are available right now.' %}</p></div>
+            <div class="empty-state"><p class="text-gray-600">{% trans 'No suggested groups are available right now. Public groups appear here after the bureau creates or features them.' %}</p></div>
             {% endif %}
         </div>
     </section>

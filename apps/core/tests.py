@@ -359,6 +359,34 @@ class CoreEmailUtilsTest(TestCase):
         self.assertIn('web-app-manifest-512x512.png', context['logo_url'])
 
 
+class ClientDemoSeedCommandTest(TestCase):
+    """Ensure the client handoff demo data can be seeded repeatedly."""
+
+    def test_seed_client_demo_is_idempotent(self):
+        from apps.dashboard.models import BureauMessage, EventRegistration
+        from apps.governance.models import MembershipDues
+        from apps.mentorship.models import MentorProfile
+
+        output = StringIO()
+
+        call_command('seed_client_demo', stdout=output)
+        call_command('seed_client_demo', stdout=output)
+
+        self.assertIn('Client demo data is ready', output.getvalue())
+        self.assertEqual(User.objects.filter(username='demo_student').count(), 1)
+        self.assertEqual(User.objects.filter(username='demo_mentor').count(), 1)
+        self.assertEqual(User.objects.filter(username='demo_bureau').count(), 1)
+        self.assertEqual(BureauMessage.objects.filter(subject='Demo membership payment follow-up').count(), 1)
+        self.assertEqual(EventRegistration.objects.filter(user__username='demo_student').count(), 1)
+        self.assertEqual(MentorProfile.objects.get(user__username='demo_mentor').is_approved, True)
+        self.assertTrue(
+            MembershipDues.objects.filter(
+                member__user__username='demo_student',
+                notes__icontains='Payment requested by user',
+            ).exists()
+        )
+
+
 class SetupGoogleOAuthCommandTest(TestCase):
     """Test Google OAuth setup command startup behavior."""
 

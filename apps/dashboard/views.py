@@ -55,22 +55,29 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
     template_name = 'dashboard/home.html'
 
     def get_workflow_checklist(self, user, workflow):
-        checklist = [
-            {
-                'title': _('Complete your profile'),
-                'status': 'done' if not workflow.needs_profile_completion else 'todo',
-                'url': reverse_lazy('dashboard:profile_edit'),
-            },
-            {
-                'title': _('Register ASCAI membership'),
+        checklist = []
+
+        checklist.append({
+            'title': _('Verify your email'),
+            'status': 'done' if user.email_verified else 'todo',
+            'url': reverse_lazy('account_email'),
+        })
+        checklist.append({
+            'title': _('Complete your account profile'),
+            'status': 'done' if not workflow.needs_profile_completion else 'todo',
+            'url': reverse_lazy('dashboard:profile_edit'),
+        })
+
+        if user.email_verified:
+            checklist.append({
+                'title': _('Create or review ASCAI membership'),
                 'status': 'done' if workflow.has_member_profile else 'todo',
                 'url': reverse_lazy('governance:member_portal') if workflow.has_member_profile else reverse_lazy('governance:member_register'),
-            },
-        ]
+            })
 
         if workflow.has_member_profile:
             checklist.append({
-                'title': _('Keep dues and membership active'),
+                'title': _('Complete dues and active member status'),
                 'status': 'done' if workflow.member_active and not workflow.dues_due else 'todo',
                 'url': reverse_lazy('governance:my_dues'),
             })
@@ -140,6 +147,16 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                 'tone': 'green',
             })
 
+        if not user.email_verified:
+            feed.insert(0, {
+                'kicker': _('Email verification'),
+                'title': _('Verify your email before membership starts'),
+                'summary': _('Your account can be reviewed by the bureau, but membership records only become dashboard-visible after email verification.'),
+                'url': reverse_lazy('account_email'),
+                'cta': _('Open email settings'),
+                'tone': 'yellow',
+            })
+
         if workflow.is_student or primary_goal in ('new_student', 'current_student'):
             has_active_orientation = any(
                 session.is_active_request
@@ -182,7 +199,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                 'cta': _('Review dues'),
                 'tone': 'yellow',
             })
-        elif not workflow.has_member_profile:
+        elif user.email_verified and not workflow.has_member_profile:
             feed.append({
                 'kicker': _('Membership'),
                 'title': _('Unlock the member experience'),
