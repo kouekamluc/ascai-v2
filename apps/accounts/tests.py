@@ -8,6 +8,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from apps.governance.models import Member
+
 from .models import User, UserDocument
 
 User = get_user_model()
@@ -279,9 +281,30 @@ class AccountsViewsTest(TestCase):
         email_address.refresh_from_db()
         self.assertTrue(pending_user.email_verified)
         self.assertTrue(email_address.verified)
+        member = Member.objects.get(user=pending_user)
+        self.assertEqual(member.member_type, 'student')
+        self.assertFalse(member.is_active_member)
         self.assertContains(post_response, 'Your email has been successfully verified')
         self.assertContains(post_response, 'Your account is ready to use')
         self.assertContains(post_response, 'Sign In')
+
+    def test_approved_mentor_gets_pending_member_profile(self):
+        mentor = User.objects.create_user(
+            username='mentor_member',
+            email='mentor-member@example.com',
+            password='testpass123',
+            role='mentor',
+            is_approved=False,
+        )
+
+        self.assertFalse(Member.objects.filter(user=mentor).exists())
+
+        mentor.is_approved = True
+        mentor.save()
+
+        member = Member.objects.get(user=mentor)
+        self.assertEqual(member.member_type, 'active')
+        self.assertFalse(member.is_active_member)
 
     def test_password_reset_sends_branded_email(self):
         mail.outbox = []

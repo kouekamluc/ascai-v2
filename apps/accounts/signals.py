@@ -18,6 +18,47 @@ from .models import User
 logger = logging.getLogger(__name__)
 
 
+def _member_type_for_user(user):
+    if user.role == "student":
+        return "student"
+    if user.role == "mentor":
+        return "active"
+    return None
+
+
+def ensure_pending_member_profile(user):
+    """
+    Create the governance member record once an account is real enough to handle.
+
+    Users are login/access records. Member profiles are the association records
+    that continue through verification, dues, and activation. A verified or
+    approved student/mentor account should therefore appear in the member queue
+    even before dues are paid.
+    """
+    if not user.pk or user.is_superuser or user.is_staff:
+        return None
+
+    member_type = _member_type_for_user(user)
+    if not member_type:
+        return None
+
+    if not (user.email_verified or user.is_approved):
+        return None
+
+    try:
+        return user.member_profile
+    except Exception:
+        pass
+
+    from apps.governance.models import Member
+
+    return Member.objects.create(
+        user=user,
+        member_type=member_type,
+        is_active_member=False,
+    )
+
+
 @receiver(pre_save, sender=User)
 def store_previous_approval_status(sender, instance, **kwargs):
     """Keep the previous approval value so we can send approval mail once."""
@@ -81,6 +122,9 @@ def _send_approval_email(user):
 @receiver(post_save, sender=User)
 def send_approval_email(sender, instance, created, **kwargs):
     """Send a single approval email when a user becomes approved."""
+    if not created:
+        ensure_pending_member_profile(instance)
+
     previous_status = getattr(instance, "_previous_is_approved", False)
     if created or previous_status or not instance.is_approved or not instance.email:
         return
@@ -107,6 +151,7 @@ def sync_user_email_verified(sender, email_address, **kwargs):
         EmailAddress.objects.filter(user=user, email=user.email).update(
             verified=True, primary=True
         )
+        ensure_pending_member_profile(user)
     except Exception as exc:
         logger.error(
             "Failed to sync email verification for %s: %s",
