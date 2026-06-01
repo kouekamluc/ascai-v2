@@ -20,6 +20,41 @@
 </div>
 
 <div class="governance-card mb-6">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between mb-5">
+        <div>
+            <h2 class="text-xl font-bold text-gray-900">{% trans "Membership Workflow" %}</h2>
+            <p class="text-sm text-gray-600 mt-1">
+                {% trans "This list is the admin queue. Review new registrations, verify eligibility, confirm dues, then activate the member." %}
+            </p>
+        </div>
+        <a href="{% url 'governance:membership_dues' %}" class="text-sm font-medium text-cameroon-green hover:underline">
+            {% trans "Check dues" %} &rarr;
+        </a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="rounded-xl bg-gray-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{% trans "All records" %}</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900">{{ membership_pipeline.total }}</p>
+        </div>
+        <div class="rounded-xl bg-yellow-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-yellow-800">{% trans "Needs review" %}</p>
+            <p class="mt-2 text-3xl font-bold text-yellow-900">{{ membership_pipeline.pending_review }}</p>
+            <p class="mt-2 text-sm text-yellow-800">{% trans "Verify residence and origin." %}</p>
+        </div>
+        <div class="rounded-xl bg-blue-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-blue-800">{% trans "Awaiting activation" %}</p>
+            <p class="mt-2 text-3xl font-bold text-blue-900">{{ membership_pipeline.awaiting_activation }}</p>
+            <p class="mt-2 text-sm text-blue-800">{% trans "Confirm dues, then activate." %}</p>
+        </div>
+        <div class="rounded-xl bg-green-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-green-800">{% trans "Active" %}</p>
+            <p class="mt-2 text-3xl font-bold text-green-900">{{ membership_pipeline.active }}</p>
+            <p class="mt-2 text-sm text-green-800">{% trans "Full member privileges enabled." %}</p>
+        </div>
+    </div>
+</div>
+
+<div class="governance-card mb-6">
     <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <input type="text" name="search" placeholder="{% trans 'Search by name or email...' %}" 
                value="{{ request.GET.search }}" class="form-input">

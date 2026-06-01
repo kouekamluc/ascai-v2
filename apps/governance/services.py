@@ -252,10 +252,22 @@ def sync_membership_state_from_dues(dues):
     """
     Centralizes dues-driven membership activation and expiry logic.
     """
+    from .models import Contribution
+
     member = dues.member
     today = timezone.now().date()
 
     if dues.status == "paid" and dues.payment_date:
+        Contribution.objects.update_or_create(
+            member=member,
+            contribution_type="annual_dues",
+            purpose=f"Annual membership dues for {dues.year}",
+            defaults={
+                "amount": dues.amount,
+                "date": dues.payment_date,
+            },
+        )
+
         latest_status = member.status_history.first()
         if latest_status:
             latest_status.last_payment_date = dues.payment_date

@@ -9,6 +9,7 @@
     <h2 class="mt-3 text-3xl font-bold text-gray-900">{{ dues.member }}</h2>
     <p class="mt-4 text-sm leading-7 text-gray-600">
         {% blocktrans with year=dues.year amount=dues.amount %}Confirm payment for the {{ year }} dues record in the amount of {{ amount }}.{% endblocktrans %}
+        {% trans "This will also update the member contribution ledger automatically." %}
     </p>
 
     <form method="post" class="mt-8 space-y-5">
@@ -22,7 +23,7 @@
             <select name="payment_method" id="payment_method" class="w-full rounded-xl border border-gray-300 px-4 py-3">
                 <option value="cash">{% trans "Cash" %}</option>
                 <option value="bank_transfer">{% trans "Bank transfer" %}</option>
-                <option value="mobile_money">{% trans "Mobile money" %}</option>
+                <option value="online">{% trans "Online payment" %}</option>
                 <option value="other">{% trans "Other" %}</option>
             </select>
         </div>

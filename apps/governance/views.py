@@ -547,6 +547,19 @@ class MemberListView(GovernanceRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['member_types'] = Member.MEMBER_TYPE_CHOICES
+        verified_members = Member.objects.filter(
+            lazio_residence_verified=True,
+        ).filter(
+            Q(member_type='sympathizer') | Q(cameroonian_origin_verified=True)
+        )
+        context['membership_pipeline'] = {
+            'total': Member.objects.count(),
+            'pending_review': Member.objects.filter(is_active_member=False).exclude(
+                pk__in=verified_members.values('pk')
+            ).count(),
+            'awaiting_activation': verified_members.filter(is_active_member=False).count(),
+            'active': Member.objects.filter(is_active_member=True).count(),
+        }
         return context
 
 
@@ -561,7 +574,9 @@ class MemberDetailView(GovernanceRequiredMixin, DetailView):
         member = self.get_object()
         context['status_history'] = member.status_history.all()[:10]
         context['dues'] = member.dues.all()[:10]
+        context['current_dues'] = member.dues.filter(year=timezone.now().year).first()
         context['contributions'] = member.contributions.all()[:10]
+        context['contribution_total'] = member.contributions.aggregate(total=Sum('amount'))['total'] or 0
         context['assembly_attendances'] = member.user.assembly_attendances.all()[:10]
         return context
 
@@ -606,7 +621,10 @@ def verify_member(request, member_id):
             member.lazio_residence_verified and
             (member.member_type == 'sympathizer' or member.cameroonian_origin_verified)
         )
-        if verification_complete:
+        current_dues = ensure_current_year_dues(member, year=timezone.now().year)
+        dues_paid = current_dues.status == 'paid'
+
+        if verification_complete and dues_paid:
             member.is_active_member = True
             member.save(update_fields=['is_active_member'])
             MembershipStatus.objects.create(
@@ -616,11 +634,13 @@ def verify_member(request, member_id):
                 reason=_('Member activated by {user}').format(user=request.user.get_full_name() or request.user.username)
             )
             messages.success(request, _('Member activated successfully.'))
-        else:
+        elif not verification_complete:
             if member.member_type == 'sympathizer':
                 messages.error(request, _('Cannot activate sympathizer. Please verify residence first.'))
             else:
                 messages.error(request, _('Cannot activate member. Please verify residence and origin first.'))
+        else:
+            messages.error(request, _('Cannot activate member until current-year dues are marked paid.'))
     elif action == 'deactivate':
         member.is_active_member = False
         member.save(update_fields=['is_active_member'])
@@ -1089,6 +1109,13 @@ class MembershipDuesCreateView(FinancialManagementRequiredMixin, CreateView):
     template_name = 'governance/finances/dues_form.html'
     success_url = reverse_lazy('governance:membership_dues')
 
+    def get_initial(self):
+        initial = super().get_initial()
+        member_id = self.request.GET.get('member')
+        if member_id:
+            initial['member'] = member_id
+        return initial
+
 
 class MembershipDuesUpdateView(FinancialManagementRequiredMixin, UpdateView):
     """Update membership dues."""
@@ -1103,6 +1130,104 @@ class MembershipDuesDeleteView(FinancialManagementRequiredMixin, DeleteView):
     model = MembershipDues
     template_name = 'governance/finances/dues_confirm_delete.html'
     success_url = reverse_lazy('governance:membership_dues')
+
+
+class ContributionListView(FinancialManagementRequiredMixin, ListView):
+    """List member contributions."""
+    model = Contribution
+    template_name = 'governance/finances/contributions.html'
+    context_object_name = 'contributions'
+    paginate_by = 30
+
+    def get_queryset(self):
+        queryset = Contribution.objects.select_related('member', 'member__user')
+
+        contribution_type = self.request.GET.get('contribution_type')
+        if contribution_type:
+            queryset = queryset.filter(contribution_type=contribution_type)
+
+        member_id = self.request.GET.get('member')
+        if member_id:
+            queryset = queryset.filter(member_id=member_id)
+
+        year = self.request.GET.get('year')
+        if year:
+            queryset = queryset.filter(date__year=year)
+
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(member__user__username__icontains=search) |
+                Q(member__user__email__icontains=search) |
+                Q(member__user__full_name__icontains=search) |
+                Q(purpose__icontains=search)
+            )
+
+        return queryset.order_by('-date', '-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filtered = self.get_queryset()
+        context['contribution_types'] = Contribution.CONTRIBUTION_TYPE_CHOICES
+        context['current_filters'] = {
+            'contribution_type': self.request.GET.get('contribution_type', ''),
+            'member': self.request.GET.get('member', ''),
+            'year': self.request.GET.get('year', ''),
+            'search': self.request.GET.get('search', ''),
+        }
+        context['totals'] = {
+            'count': filtered.count(),
+            'amount': filtered.aggregate(total=Sum('amount'))['total'] or 0,
+            'annual_dues': filtered.filter(contribution_type='annual_dues').aggregate(total=Sum('amount'))['total'] or 0,
+            'other': filtered.exclude(contribution_type='annual_dues').aggregate(total=Sum('amount'))['total'] or 0,
+        }
+        return context
+
+
+class ContributionCreateView(FinancialManagementRequiredMixin, CreateView):
+    """Create a member contribution."""
+    model = Contribution
+    form_class = ContributionForm
+    template_name = 'governance/finances/contribution_form.html'
+
+    def get_initial(self):
+        initial = super().get_initial()
+        member_id = self.request.GET.get('member')
+        if member_id:
+            initial['member'] = member_id
+        return initial
+
+    def get_success_url(self):
+        if self.object and self.object.member_id:
+            return reverse_lazy('governance:member_detail', kwargs={'pk': self.object.member_id})
+        return reverse_lazy('governance:contribution_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, _('Contribution recorded successfully.'))
+        return super().form_valid(form)
+
+
+class ContributionUpdateView(FinancialManagementRequiredMixin, UpdateView):
+    """Update a member contribution."""
+    model = Contribution
+    form_class = ContributionForm
+    template_name = 'governance/finances/contribution_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('governance:member_detail', kwargs={'pk': self.object.member_id})
+
+    def form_valid(self, form):
+        messages.success(self.request, _('Contribution updated successfully.'))
+        return super().form_valid(form)
+
+
+class ContributionDeleteView(FinancialManagementRequiredMixin, DeleteView):
+    """Delete a member contribution."""
+    model = Contribution
+    template_name = 'governance/shared/confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse_lazy('governance:member_detail', kwargs={'pk': self.object.member_id})
 
 
 class ExpenseApprovalView(ExpenseApprovalRequiredMixin, DetailView):
@@ -1217,9 +1342,18 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
         all_dues_totals = calculate_dues_totals()
         
         # Statistics
+        verified_members = Member.objects.filter(
+            lazio_residence_verified=True,
+        ).filter(
+            Q(member_type='sympathizer') | Q(cameroonian_origin_verified=True)
+        )
         context['stats'] = {
             'total_members': Member.objects.count(),
             'active_members': Member.objects.filter(is_active_member=True).count(),
+            'pending_member_reviews': Member.objects.filter(is_active_member=False).exclude(
+                pk__in=verified_members.values('pk')
+            ).count(),
+            'members_awaiting_activation': verified_members.filter(is_active_member=False).count(),
             'current_board': ExecutiveBoard.objects.filter(status='active').first(),
             'upcoming_assemblies': GeneralAssembly.objects.filter(
                 status='scheduled',
@@ -1238,6 +1372,8 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
             'total_income': total_income,
             'total_expenses': total_expenses,
             'net_balance': net_balance,
+            'total_contributions': Contribution.objects.aggregate(total=Sum('amount'))['total'] or 0,
+            'contribution_count': Contribution.objects.count(),
             'overdue_vote_publications': len(overdue_votes),
             'approaching_deadline_votes': len(approaching_deadline_votes),
         }
@@ -1248,6 +1384,7 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
         # Recent activity
         context['recent_assemblies'] = GeneralAssembly.objects.all().order_by('-date')[:5]
         context['recent_transactions'] = FinancialTransaction.objects.all().order_by('-date')
+        context['recent_contributions'] = Contribution.objects.select_related('member', 'member__user').order_by('-date', '-created_at')[:5]
         context['recent_elections'] = Election.objects.all().order_by('-start_date')[:3]
         context['pending_disciplinary_cases'] = DisciplinaryCase.objects.filter(status='pending').count()
         context['pending_audit_reports'] = AuditReport.objects.filter(financial_verification_status='pending').count()

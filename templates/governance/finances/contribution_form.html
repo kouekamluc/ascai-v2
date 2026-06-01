@@ -1,0 +1,25 @@
+{% extends "governance/base.html" %}
+{% load i18n %}
+
+{% block page_heading %}{% if object %}{% trans "Edit Contribution" %}{% else %}{% trans "Record Contribution" %}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="governance-card max-w-3xl">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">{% if object %}{% trans "Edit Contribution" %}{% else %}{% trans "Record Contribution" %}{% endif %}</h1>
+        <p class="mt-2 text-sm leading-6 text-gray-600">
+            {% trans "Use this form for donations, event contributions, and manual contribution corrections. Annual dues are normally created automatically when dues are marked paid." %}
+        </p>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="space-y-4">
+            {{ form.as_p }}
+        </div>
+        <div class="mt-6 flex flex-wrap gap-4">
+            <button type="submit" class="btn-primary">{% trans "Save Contribution" %}</button>
+            <button type="button" onclick="history.back()" class="btn-secondary">{% trans "Cancel" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

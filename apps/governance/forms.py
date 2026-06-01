@@ -258,8 +258,11 @@ class ContributionForm(forms.ModelForm):
         model = Contribution
         fields = ['member', 'contribution_type', 'amount', 'date', 'purpose']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'purpose': forms.Textarea(attrs={'rows': 3}),
+            'member': forms.Select(attrs={'class': 'form-input'}),
+            'contribution_type': forms.Select(attrs={'class': 'form-input'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'purpose': forms.Textarea(attrs={'rows': 3, 'class': 'form-textarea'}),
         }
 
 

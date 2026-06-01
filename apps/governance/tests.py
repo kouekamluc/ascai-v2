@@ -23,6 +23,7 @@ from .models import (
     AuditorMember,
     AssociationEvent,
     MembershipDues,
+    Contribution,
     ExtraordinaryAssemblyRequest,
 )
 from .services import ensure_current_year_dues, user_has_governance_access
@@ -410,6 +411,35 @@ class GovernanceWorkflowServiceTest(TestCase):
                 reason__icontains='Dues paid',
             ).exists()
         )
+        contribution = Contribution.objects.get(
+            member=self.member,
+            contribution_type='annual_dues',
+            purpose=f'Annual membership dues for {date.today().year}',
+        )
+        self.assertEqual(contribution.amount, Decimal('10.00'))
+        self.assertEqual(contribution.date, date.today())
+
+    def test_paid_dues_update_existing_annual_dues_contribution(self):
+        dues = MembershipDues.objects.create(
+            member=self.member,
+            year=date.today().year,
+            amount=Decimal('10.00'),
+            due_date=date(date.today().year, 3, 31),
+            payment_date=date.today(),
+            payment_method='cash',
+            status='paid',
+        )
+        dues.amount = Decimal('12.00')
+        dues.payment_date = date.today() - timedelta(days=1)
+        dues.save()
+
+        contributions = Contribution.objects.filter(
+            member=self.member,
+            contribution_type='annual_dues',
+            purpose=f'Annual membership dues for {date.today().year}',
+        )
+        self.assertEqual(contributions.count(), 1)
+        self.assertEqual(contributions.first().amount, Decimal('12.00'))
 
     def test_sympathizer_dues_also_expire_on_december_31(self):
         sympathizer_user = User.objects.create_user(

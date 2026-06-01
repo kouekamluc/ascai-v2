@@ -113,7 +113,7 @@
             </div>
             <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                 <dt class="text-sm font-medium text-gray-600">{% trans "Contributions" %}</dt>
-                <dd class="text-lg font-bold text-green-600">{{ contributions|length }}</dd>
+                <dd class="text-lg font-bold text-green-600">EUR {{ contribution_total|floatformat:2 }}</dd>
             </div>
             <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                 <dt class="text-sm font-medium text-gray-600">{% trans "Assembly Attendances" %}</dt>
@@ -122,6 +122,73 @@
         </dl>
     </div>
 </div>
+
+{% if perms.governance.manage_member %}
+<div class="governance-card mb-6">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between mb-5">
+        <div>
+            <h3 class="text-lg font-semibold">{% trans "Next Admin Action" %}</h3>
+            <p class="text-sm text-gray-600 mt-1">
+                {% trans "Follow the membership workflow in order: verify eligibility, confirm dues, then activate the member." %}
+            </p>
+        </div>
+        <a href="{% url 'governance:membership_dues_create' %}?member={{ member.pk }}" class="text-sm text-blue-600 hover:underline">
+            {% trans "Add or update dues" %} &rarr;
+        </a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-xl border {% if member.lazio_residence_verified %}border-green-200 bg-green-50{% else %}border-yellow-200 bg-yellow-50{% endif %} p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide {% if member.lazio_residence_verified %}text-green-800{% else %}text-yellow-800{% endif %}">{% trans "1. Lazio residence" %}</p>
+            <p class="mt-2 text-sm {% if member.lazio_residence_verified %}text-green-800{% else %}text-yellow-800{% endif %}">
+                {% if member.lazio_residence_verified %}{% trans "Verified" %}{% else %}{% trans "Needs admin review" %}{% endif %}
+            </p>
+            {% if not member.lazio_residence_verified %}
+            <form method="post" action="{% url 'governance:verify_member' member.pk %}" class="mt-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="verify_lazio">
+                <button type="submit" class="btn-secondary text-sm">{% trans "Mark residence verified" %}</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="rounded-xl border {% if member.member_type == 'sympathizer' or member.cameroonian_origin_verified %}border-green-200 bg-green-50{% else %}border-yellow-200 bg-yellow-50{% endif %} p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide {% if member.member_type == 'sympathizer' or member.cameroonian_origin_verified %}text-green-800{% else %}text-yellow-800{% endif %}">{% trans "2. Origin requirement" %}</p>
+            <p class="mt-2 text-sm {% if member.member_type == 'sympathizer' or member.cameroonian_origin_verified %}text-green-800{% else %}text-yellow-800{% endif %}">
+                {% if member.member_type == 'sympathizer' %}{% trans "Not required for sympathizers" %}{% elif member.cameroonian_origin_verified %}{% trans "Verified" %}{% else %}{% trans "Needs admin review" %}{% endif %}
+            </p>
+            {% if member.member_type != 'sympathizer' and not member.cameroonian_origin_verified %}
+            <form method="post" action="{% url 'governance:verify_member' member.pk %}" class="mt-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="verify_cameroonian">
+                <button type="submit" class="btn-secondary text-sm">{% trans "Mark origin verified" %}</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="rounded-xl border {% if member.is_active_member %}border-green-200 bg-green-50{% else %}border-blue-200 bg-blue-50{% endif %} p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide {% if member.is_active_member %}text-green-800{% else %}text-blue-800{% endif %}">{% trans "3. Activation" %}</p>
+            <p class="mt-2 text-sm {% if member.is_active_member %}text-green-800{% else %}text-blue-800{% endif %}">
+                {% if member.is_active_member %}
+                    {% trans "Member is active" %}
+                {% elif current_dues %}
+                    {% trans "Current dues:" %} {{ current_dues.get_status_display }}
+                {% else %}
+                    {% trans "Create current-year dues before activation." %}
+                {% endif %}
+            </p>
+            {% if not member.is_active_member and current_dues.status == 'paid' %}
+            <form method="post" action="{% url 'governance:verify_member' member.pk %}" class="mt-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="activate">
+                <button type="submit" class="btn-primary text-sm">{% trans "Activate member" %}</button>
+            </form>
+            {% elif not member.is_active_member %}
+            <a href="{% url 'governance:membership_dues_create' %}?member={{ member.pk }}" class="mt-3 inline-flex text-sm font-semibold text-blue-700 hover:underline">
+                {% trans "Create or confirm dues first" %} &rarr;
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="governance-card">
@@ -161,9 +228,14 @@
     <div class="governance-card">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">{% trans "Contributions" %}</h3>
-            <a href="#" class="text-sm text-blue-600 hover:underline">
-                {% trans "Add Contribution" %}
-            </a>
+            <div class="flex gap-3">
+                <a href="{% url 'governance:contribution_list' %}?member={{ member.pk }}" class="text-sm text-blue-600 hover:underline">
+                    {% trans "View All" %}
+                </a>
+                <a href="{% url 'governance:contribution_create' %}?member={{ member.pk }}" class="text-sm text-blue-600 hover:underline">
+                    {% trans "Add Contribution" %}
+                </a>
+            </div>
         </div>
         {% if contributions %}
         <div class="space-y-2">
@@ -171,9 +243,12 @@
             <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <div>
                     <p class="font-semibold text-gray-900">{{ contribution.get_contribution_type_display }}</p>
-                    <p class="text-sm text-gray-600">{{ contribution.date|date:"d M Y" }}</p>
+                    <p class="text-sm text-gray-600">{{ contribution.date|date:"d M Y" }}{% if contribution.purpose %} · {{ contribution.purpose }}{% endif %}</p>
                 </div>
-                <p class="font-bold text-green-600">€{{ contribution.amount }}</p>
+                <div class="text-right">
+                    <p class="font-bold text-green-600">EUR {{ contribution.amount }}</p>
+                    <a href="{% url 'governance:contribution_edit' contribution.pk %}" class="text-xs text-blue-600 hover:underline">{% trans "Edit" %}</a>
+                </div>
             </div>
             {% endfor %}
         </div>
