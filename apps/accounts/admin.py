@@ -132,15 +132,6 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         """Override save to auto-approve superusers and staff."""
-        # Store previous approval status to detect changes
-        was_approved = False
-        if change and obj.pk:
-            try:
-                old_obj = User.objects.get(pk=obj.pk)
-                was_approved = old_obj.is_approved
-            except User.DoesNotExist:
-                pass
-        
         # Superusers must always be staff and active
         if obj.is_superuser:
             obj.is_staff = True
@@ -151,14 +142,6 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
             obj.is_approved = True
         
         super().save_model(request, obj, form, change)
-        
-        # Send approval email if status changed from False to True
-        # (The signal will handle this, but we ensure it works here too)
-        if change and not was_approved and obj.is_approved and obj.email:
-            try:
-                self._send_approval_email(obj)
-            except Exception as e:
-                logger.error(f"Failed to send approval email in admin save: {str(e)}", exc_info=True)
     
     def approve_users(self, request, queryset):
         """Approve selected users and activate them."""

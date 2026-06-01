@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 import logging
 
@@ -13,6 +14,11 @@ from apps.core.email_utils import send_branded_email
 from .models import MentorshipRequest, MentorshipMessage
 
 logger = logging.getLogger(__name__)
+
+
+def _plain_text(value):
+    """Convert rich text from forms/editors into readable email text."""
+    return strip_tags(value or "").strip()
 
 
 def get_site_url():
@@ -39,6 +45,9 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
             site_url = get_site_url()
             mentor = instance.mentor.user
             student = instance.student
+            if not mentor.email:
+                return
+            request_message = _plain_text(instance.message)
             
             subject = _('New Mentorship Request')
             message = _(
@@ -51,7 +60,7 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
             ).format(
                 student_name=student.get_full_name() or student.username,
                 subject=instance.subject,
-                message=instance.message,
+                message=request_message,
                 dashboard_url=f"{site_url}/dashboard/mentorship/requests/{instance.pk}/",
                 direct_url=f"{site_url}/mentorship/requests/{instance.pk}/"
             )
@@ -68,8 +77,12 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
                             student_name=student.get_full_name() or student.username
                         ),
                         _('Subject: {subject}').format(subject=instance.subject),
-                        _('Message: {message}').format(message=instance.message),
                     ],
+                    'detail_rows': [
+                        {'label': _('Subject'), 'value': instance.subject},
+                        {'label': _('From'), 'value': student.get_full_name() or student.username},
+                    ],
+                    'message_body': request_message,
                     'button_label': _('Open Mentorship Request'),
                     'button_url': f"{site_url}/dashboard/mentorship/requests/{instance.pk}/",
                     'closing_paragraphs': [
@@ -94,6 +107,8 @@ def notify_mentorship_request(sender, instance, created, **kwargs):
             site_url = get_site_url()
             mentor = instance.mentor.user
             student = instance.student
+            if not student.email:
+                return
             
             if instance.status == 'accepted':
                 subject = _('Mentorship Request Accepted')
@@ -195,6 +210,9 @@ def notify_new_message(sender, instance, created, **kwargs):
             else:
                 recipient = request.student
                 sender_name = request.mentor.user.get_full_name() or request.mentor.user.username
+            if not recipient.email:
+                return
+            message_preview = _plain_text(instance.content)[:200]
             
             subject = _('New Message in Mentorship Request')
             message = _(
@@ -207,7 +225,7 @@ def notify_new_message(sender, instance, created, **kwargs):
             ).format(
                 sender_name=sender_name,
                 subject=request.subject,
-                content=instance.content[:200],  # Truncate long messages
+                content=message_preview,
                 dashboard_url=f"{site_url}/dashboard/mentorship/requests/{request.pk}/",
                 direct_url=f"{site_url}/mentorship/requests/{request.pk}/"
             )
@@ -223,9 +241,12 @@ def notify_new_message(sender, instance, created, **kwargs):
                         _('You have received a new message from {sender_name}.').format(
                             sender_name=sender_name
                         ),
-                        _('Request: {subject}').format(subject=request.subject),
-                        _('Message preview: {content}').format(content=instance.content[:200]),
                     ],
+                    'detail_rows': [
+                        {'label': _('Request'), 'value': request.subject},
+                        {'label': _('From'), 'value': sender_name},
+                    ],
+                    'message_body': message_preview,
                     'button_label': _('Reply to Message'),
                     'button_url': f"{site_url}/dashboard/mentorship/requests/{request.pk}/",
                     'closing_paragraphs': [

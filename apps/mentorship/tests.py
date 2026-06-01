@@ -108,6 +108,21 @@ class MentorshipRequestModelTest(TestCase):
         self.assertIn('<img src="', html_body)
         self.assertIn('web-app-manifest-512x512.png', html_body)
 
+    def test_new_request_email_strips_rich_text_from_plain_body(self):
+        MentorshipRequest.objects.create(
+            student=self.student,
+            mentor=self.mentor_profile,
+            subject='Rich Text Request',
+            message='<p>Please <strong>help</strong> with enrollment.</p>',
+        )
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Please help with enrollment.', mail.outbox[0].body)
+        self.assertNotIn('<strong>', mail.outbox[0].body)
+        html_body = mail.outbox[0].alternatives[0][0]
+        self.assertIn('Please help with enrollment.', html_body)
+        self.assertNotIn('&lt;strong&gt;', html_body)
+
 
 class MentorRatingModelTest(TestCase):
     """Test MentorRating model."""
@@ -294,4 +309,22 @@ class DashboardMentorshipWorkflowTest(TestCase):
         self.assertEqual(complete_response.status_code, 302)
         self.request.refresh_from_db()
         self.assertEqual(self.request.status, 'completed')
+
+    def test_mentorship_message_email_strips_rich_text_from_preview(self):
+        self.request.status = 'accepted'
+        self.request.save()
+        mail.outbox = []
+
+        MentorshipMessage.objects.create(
+            request=self.request,
+            sender=self.student,
+            content='<p>Please <em>review</em> my documents.</p>',
+        )
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Please review my documents.', mail.outbox[0].body)
+        self.assertNotIn('<em>', mail.outbox[0].body)
+        html_body = mail.outbox[0].alternatives[0][0]
+        self.assertIn('Please review my documents.', html_body)
+        self.assertNotIn('&lt;em&gt;', html_body)
 
