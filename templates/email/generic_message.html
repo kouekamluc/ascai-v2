@@ -23,7 +23,9 @@
         </table>
     {% endif %}
 
-    {% if message_body %}
+    {% if message_body_html %}
+        <div class="message-box">{{ message_body_html|safe }}</div>
+    {% elif message_body %}
         <div class="message-box">{{ message_body|linebreaksbr }}</div>
     {% endif %}
 

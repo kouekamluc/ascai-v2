@@ -5,6 +5,7 @@ import logging
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils.html import strip_tags
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -25,6 +26,7 @@ def send_bureau_message_notification(message, request=None):
     message_path = reverse('dashboard:message_detail', kwargs={'pk': message.pk})
     message_url = f"{site_url}{message_path}"
     sender_name = message.sender.get_display_name() if message.sender else _('ASCAI Lazio Bureau')
+    plain_message_body = strip_tags(message.body).strip()
     text_body = _(
         'Hello {name},\n\n'
         'You have received a new message from the ASCAI Lazio bureau.\n\n'
@@ -35,7 +37,7 @@ def send_bureau_message_notification(message, request=None):
     ).format(
         name=message.recipient.get_display_name(),
         subject=message.subject,
-        body=message.body,
+        body=plain_message_body,
         url=message_url,
     )
 
@@ -55,7 +57,8 @@ def send_bureau_message_notification(message, request=None):
                     {'label': _('Subject'), 'value': message.subject},
                     {'label': _('From'), 'value': sender_name},
                 ],
-                'message_body': message.body,
+                'message_body': plain_message_body,
+                'message_body_html': message.body,
                 'button_url': message_url,
                 'button_label': _('Open message'),
                 'closing_paragraphs': [_('Thank you, ASCAI Lazio')],

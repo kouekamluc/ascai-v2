@@ -483,6 +483,31 @@ class DashboardViewsTest(TestCase):
         )
         self.assertIn('dashboard message section', mail.outbox[0].body)
 
+    def test_bureau_message_email_renders_admin_rich_text_cleanly(self):
+        sender = User.objects.create_user(
+            username='richbureau',
+            email='richbureau@example.com',
+            password='testpass123',
+            is_staff=True,
+            is_approved=True,
+        )
+
+        BureauMessage.objects.create(
+            sender=sender,
+            recipient=self.user,
+            subject='Rich text notice',
+            body='<p>Please <strong>confirm</strong> your payment.</p><ul><li>Bring receipt</li></ul>',
+        )
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn('Please confirm your payment.', email.body)
+        self.assertNotIn('<p>', email.body)
+        self.assertNotIn('<strong>', email.body)
+        html_body = email.alternatives[0][0]
+        self.assertIn('<strong>confirm</strong>', html_body)
+        self.assertNotIn('&lt;strong&gt;', html_body)
+
     def test_admin_notifications_include_requested_dues_payments(self):
         from config.admin import get_notification_counts
 
