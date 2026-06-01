@@ -10,6 +10,50 @@ from django.utils.text import slugify
 User = get_user_model()
 
 
+class StudentProfile(models.Model):
+    """
+    Operational student profile created from the account role.
+    """
+    ONBOARDING_STATUS_CHOICES = [
+        ('pending', _('Pending Review')),
+        ('in_progress', _('In Progress')),
+        ('completed', _('Completed')),
+    ]
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='student_profile',
+        verbose_name=_('User')
+    )
+    onboarding_status = models.CharField(
+        max_length=20,
+        choices=ONBOARDING_STATUS_CHOICES,
+        default='pending',
+        verbose_name=_('Onboarding Status')
+    )
+    notes = models.TextField(
+        blank=True,
+        verbose_name=_('Internal Notes')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created At')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated At')
+    )
+
+    class Meta:
+        verbose_name = _('Student Profile')
+        verbose_name_plural = _('Student Profiles')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Student: {self.user.get_display_name()}"
+
+
 class ResourceCategory(models.Model):
     """
     Category model for organizing resources.

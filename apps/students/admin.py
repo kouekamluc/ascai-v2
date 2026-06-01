@@ -5,9 +5,67 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from config.admin import BaseAdmin, ModelAdmin
 from .models import (
-    ResourceCategory, ResourceLink,
+    StudentProfile, ResourceCategory, ResourceLink,
     StudentGuideSection, StudentGuideStep, StudentGuideProgress
 )
+
+
+@admin.register(StudentProfile)
+class StudentProfileAdmin(BaseAdmin):
+    """Admin queue for users who selected the student role."""
+    list_display = ['user', 'account_status', 'onboarding_status', 'city', 'university', 'created_at']
+    list_filter = ['onboarding_status', 'user__is_approved', 'user__email_verified', 'created_at']
+    search_fields = ['user__username', 'user__email', 'user__full_name', 'user__field_of_study']
+    raw_id_fields = ['user']
+    readonly_fields = ['created_at', 'updated_at']
+    actions = ['mark_in_progress', 'mark_completed']
+    fieldsets = (
+        (_('Student Account'), {
+            'fields': ('user', 'onboarding_status', 'notes')
+        }),
+        (_('Timestamps'), {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+    def account_status(self, obj):
+        if obj.user.is_approved and obj.user.email_verified:
+            return _('Verified and approved')
+        if obj.user.email_verified:
+            return _('Email verified')
+        if obj.user.is_approved:
+            return _('Account approved')
+        return _('Pending')
+    account_status.short_description = _('Account Status')
+
+    def city(self, obj):
+        return obj.user.get_city_in_lazio_display() if obj.user.city_in_lazio else '-'
+    city.short_description = _('City')
+
+    def university(self, obj):
+        return obj.user.university or '-'
+    university.short_description = _('University')
+
+    def mark_in_progress(self, request, queryset):
+        updated = queryset.update(onboarding_status='in_progress')
+        self.message_user(request, _('{} student profile(s) marked in progress.').format(updated))
+    mark_in_progress.short_description = _('Mark selected student profiles in progress')
+
+    def mark_completed(self, request, queryset):
+        updated = queryset.update(onboarding_status='completed')
+        self.message_user(request, _('{} student profile(s) marked completed.').format(updated))
+    mark_completed.short_description = _('Mark selected student profiles completed')
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        pending_count = StudentProfile.objects.filter(onboarding_status='pending').count()
+        if pending_count:
+            extra_context['notification_count'] = pending_count
+            extra_context['notification_message'] = _('{} student profile(s) pending onboarding review').format(pending_count)
+        return super().changelist_view(request, extra_context)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'user__university')
 
 
 @admin.register(ResourceCategory)

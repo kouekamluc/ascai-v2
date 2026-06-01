@@ -9,6 +9,8 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from apps.governance.models import Member
+from apps.mentorship.models import MentorProfile
+from apps.students.models import StudentProfile
 
 from .models import User, UserDocument
 
@@ -284,6 +286,8 @@ class AccountsViewsTest(TestCase):
         member = Member.objects.get(user=pending_user)
         self.assertEqual(member.member_type, 'student')
         self.assertFalse(member.is_active_member)
+        student_profile = StudentProfile.objects.get(user=pending_user)
+        self.assertEqual(student_profile.onboarding_status, 'pending')
         self.assertContains(post_response, 'Your email has been successfully verified')
         self.assertContains(post_response, 'Your account is ready to use')
         self.assertContains(post_response, 'Sign In')
@@ -305,6 +309,9 @@ class AccountsViewsTest(TestCase):
         member = Member.objects.get(user=mentor)
         self.assertEqual(member.member_type, 'active')
         self.assertFalse(member.is_active_member)
+        mentor_profile = MentorProfile.objects.get(user=mentor)
+        self.assertEqual(mentor_profile.specialization, 'Pending setup')
+        self.assertFalse(mentor_profile.is_approved)
 
     def test_password_reset_sends_branded_email(self):
         mail.outbox = []

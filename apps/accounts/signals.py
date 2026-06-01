@@ -59,6 +59,44 @@ def ensure_pending_member_profile(user):
     )
 
 
+def ensure_role_profile(user):
+    """
+    Create the operational profile that matches the account role.
+
+    These records are what admins review in the student and mentor sections.
+    They are intentionally pending/incomplete until the user or bureau fills in
+    the profile details and approves the relevant workflow.
+    """
+    if not user.pk or user.is_superuser or user.is_staff:
+        return None
+
+    if not (user.email_verified or user.is_approved):
+        return None
+
+    if user.role == "student":
+        from apps.students.models import StudentProfile
+
+        profile, _created = StudentProfile.objects.get_or_create(user=user)
+        return profile
+
+    if user.role == "mentor":
+        from apps.mentorship.models import MentorProfile
+
+        profile, _created = MentorProfile.objects.get_or_create(
+            user=user,
+            defaults={
+                "specialization": "Pending setup",
+                "years_experience": 0,
+                "bio": "Pending mentor profile completion.",
+                "availability_status": "unavailable",
+                "is_approved": False,
+            },
+        )
+        return profile
+
+    return None
+
+
 @receiver(pre_save, sender=User)
 def store_previous_approval_status(sender, instance, **kwargs):
     """Keep the previous approval value so we can send approval mail once."""
@@ -124,6 +162,7 @@ def send_approval_email(sender, instance, created, **kwargs):
     """Send a single approval email when a user becomes approved."""
     if not created:
         ensure_pending_member_profile(instance)
+        ensure_role_profile(instance)
 
     previous_status = getattr(instance, "_previous_is_approved", False)
     if created or previous_status or not instance.is_approved or not instance.email:
@@ -152,6 +191,7 @@ def sync_user_email_verified(sender, email_address, **kwargs):
             verified=True, primary=True
         )
         ensure_pending_member_profile(user)
+        ensure_role_profile(user)
     except Exception as exc:
         logger.error(
             "Failed to sync email verification for %s: %s",

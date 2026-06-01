@@ -348,11 +348,15 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                     is_approved=True,
                     member_profile__isnull=True,
                 ).exclude(is_superuser=True)
+                from apps.mentorship.models import MentorProfile
+                from apps.students.models import StudentProfile
                 context['governance_stats'] = {
                     'total_users': User.objects.count(),
                     'approved_users': User.objects.filter(is_approved=True).count(),
                     'pending_account_approvals': User.objects.filter(is_approved=False, is_active=True).count(),
                     'approved_users_without_member': approved_users_without_member.count(),
+                    'pending_student_profiles': StudentProfile.objects.filter(onboarding_status='pending').count(),
+                    'pending_mentor_profiles': MentorProfile.objects.filter(is_approved=False).count(),
                     'total_members': Member.objects.count(),
                     'active_members': Member.objects.filter(is_active_member=True).count(),
                     'pending_members': Member.objects.filter(is_active_member=False).count(),
