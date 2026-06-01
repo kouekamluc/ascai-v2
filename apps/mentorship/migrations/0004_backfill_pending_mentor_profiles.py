@@ -1,7 +1,4 @@
 from django.db import migrations
-from django.db.models import Q
-
-
 def backfill_mentor_profiles(apps, schema_editor):
     User = apps.get_model("accounts", "User")
     MentorProfile = apps.get_model("mentorship", "MentorProfile")
@@ -9,7 +6,6 @@ def backfill_mentor_profiles(apps, schema_editor):
     existing_user_ids = set(MentorProfile.objects.values_list("user_id", flat=True))
     users = (
         User.objects.filter(is_superuser=False, is_staff=False, role="mentor")
-        .filter(Q(email_verified=True) | Q(is_approved=True))
         .exclude(id__in=existing_user_ids)
     )
 

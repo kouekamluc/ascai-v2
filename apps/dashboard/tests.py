@@ -31,7 +31,8 @@ class SupportTicketModelTest(TestCase):
             username='testuser',
             email='test@example.com',
             password='testpass123',
-            is_approved=True
+            is_approved=True,
+            email_verified=True,
         )
     
     def test_create_support_ticket(self):
@@ -379,13 +380,14 @@ class DashboardViewsTest(TestCase):
         self.assertNotContains(response, 'Member Directory')
 
     def test_active_member_dashboard_shows_member_tools(self):
-        member = Member.objects.create(
-            user=self.user,
-            member_type='student',
-            is_active_member=True,
-            cameroonian_origin_verified=True,
-            lazio_residence_verified=True,
-        )
+        self.user.email_verified = True
+        self.user.save(update_fields=['email_verified'])
+        member = self.user.member_profile
+        member.member_type = 'student'
+        member.is_active_member = True
+        member.cameroonian_origin_verified = True
+        member.lazio_residence_verified = True
+        member.save()
         today = date.today()
         MembershipDues.objects.create(
             member=member,
@@ -416,7 +418,7 @@ class DashboardViewsTest(TestCase):
         response = self.client.get(reverse('dashboard:home'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Create Mentor Profile')
+        self.assertContains(response, 'Update Mentor Profile')
         self.assertNotContains(response, 'Student Questions')
         self.assertNotContains(response, 'Orientation')
 
@@ -428,13 +430,12 @@ class DashboardViewsTest(TestCase):
             role='mentor',
             is_approved=True,
         )
-        MentorProfile.objects.create(
-            user=mentor,
-            specialization='University applications',
-            years_experience=3,
-            bio='I help students navigate applications.',
-            is_approved=True,
-        )
+        mentor_profile = mentor.mentor_profile
+        mentor_profile.specialization = 'University applications'
+        mentor_profile.years_experience = 3
+        mentor_profile.bio = 'I help students navigate applications.'
+        mentor_profile.is_approved = True
+        mentor_profile.save()
         self.client.login(username='availablementor', password='testpass123')
 
         response = self.client.post(

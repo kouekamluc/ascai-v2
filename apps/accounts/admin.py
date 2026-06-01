@@ -170,14 +170,14 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 
     def create_member_profiles(self, request, queryset):
         """
-        Create governance member records for selected approved users that do not have one.
+        Create governance member records for selected approved and verified users.
         """
         from apps.governance.models import Member
 
         created = 0
         skipped = 0
         for user in queryset:
-            if not user.is_approved:
+            if not user.is_approved or not user.email_verified:
                 skipped += 1
                 continue
             if hasattr(user, 'member_profile'):
@@ -194,9 +194,9 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 
         self.message_user(
             request,
-            _('{} member profile(s) created. {} user(s) skipped because they were not approved or already had a member profile.').format(created, skipped),
+            _('{} member profile(s) created. {} user(s) skipped because they were not approved, not email verified, or already had a member profile.').format(created, skipped),
         )
-    create_member_profiles.short_description = _('Create member profiles for selected approved users')
+    create_member_profiles.short_description = _('Create member profiles for selected approved and verified users')
     
     def _send_approval_email(self, user):
         """Helper method to send approval email to a user."""

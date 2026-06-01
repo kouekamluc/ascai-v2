@@ -119,6 +119,15 @@ python manage.py create_admin --update || echo "⚠ Warning: Could not create/up
 echo "Updating Site domain for email confirmation URLs..."
 python manage.py update_site_domain || echo "⚠ Warning: Could not update Site domain, but continuing..."
 
+# Remove stale signups that never verified their email.
+# Set CLEANUP_UNVERIFIED_ACCOUNTS=false to disable.
+if [ "${CLEANUP_UNVERIFIED_ACCOUNTS:-true}" = "true" ]; then
+    echo "Cleaning up unverified accounts older than ${UNVERIFIED_ACCOUNT_RETENTION_DAYS:-7} day(s)..."
+    python manage.py delete_unverified_accounts --days "${UNVERIFIED_ACCOUNT_RETENTION_DAYS:-7}" || echo "Warning: Could not clean up unverified accounts, but continuing..."
+else
+    echo "Unverified account cleanup skipped (set CLEANUP_UNVERIFIED_ACCOUNTS=true to enable)"
+fi
+
 # Populate initial data (universities, scholarships, forum categories, news, events)
 # Set POPULATE_DATA=true to enable automatic population on container startup
 # Set POPULATE_DATA_CLEAR=true to clear existing data before populating
@@ -236,4 +245,3 @@ exec gunicorn config.wsgi:application \
     --error-logfile - \
     --log-level info \
     --capture-output
-

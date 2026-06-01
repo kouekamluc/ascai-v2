@@ -27,25 +27,23 @@ class MentorProfileModelTest(TestCase):
     
     def test_create_mentor_profile(self):
         """Test creating a mentor profile."""
-        profile = MentorProfile.objects.create(
-            user=self.user,
-            specialization='Computer Science',
-            years_experience=5,
-            bio='Test bio',
-            availability_status='available'
-        )
+        profile = self.user.mentor_profile
+        profile.specialization = 'Computer Science'
+        profile.years_experience = 5
+        profile.bio = 'Test bio'
+        profile.availability_status = 'available'
+        profile.save()
         self.assertEqual(profile.user, self.user)
         self.assertEqual(profile.specialization, 'Computer Science')
         self.assertEqual(profile.rating, Decimal('0.00'))
     
     def test_mentor_profile_str(self):
         """Test mentor profile string representation."""
-        profile = MentorProfile.objects.create(
-            user=self.user,
-            specialization='Computer Science',
-            years_experience=5,
-            bio='Test bio'
-        )
+        profile = self.user.mentor_profile
+        profile.specialization = 'Computer Science'
+        profile.years_experience = 5
+        profile.bio = 'Test bio'
+        profile.save()
         self.assertIn('mentor', str(profile).lower())
 
 
@@ -66,12 +64,11 @@ class MentorshipRequestModelTest(TestCase):
             password='testpass123',
             role='mentor'
         )
-        self.mentor_profile = MentorProfile.objects.create(
-            user=self.mentor_user,
-            specialization='Computer Science',
-            years_experience=5,
-            bio='Test bio'
-        )
+        self.mentor_profile = self.mentor_user.mentor_profile
+        self.mentor_profile.specialization = 'Computer Science'
+        self.mentor_profile.years_experience = 5
+        self.mentor_profile.bio = 'Test bio'
+        self.mentor_profile.save()
     
     def test_create_mentorship_request(self):
         """Test creating a mentorship request."""
@@ -166,13 +163,12 @@ class MentorshipViewsTest(TestCase):
             password='testpass123',
             role='mentor'
         )
-        self.mentor_profile = MentorProfile.objects.create(
-            user=self.mentor_user,
-            specialization='Computer Science',
-            years_experience=5,
-            bio='Test bio',
-            is_approved=True
-        )
+        self.mentor_profile = self.mentor_user.mentor_profile
+        self.mentor_profile.specialization = 'Computer Science'
+        self.mentor_profile.years_experience = 5
+        self.mentor_profile.bio = 'Test bio'
+        self.mentor_profile.is_approved = True
+        self.mentor_profile.save()
     
     def test_mentor_list_view(self):
         """Test mentor list view."""
@@ -203,13 +199,12 @@ class MentorshipWorkflowServiceTest(TestCase):
             password='testpass123',
             role='mentor',
         )
-        self.mentor_profile = MentorProfile.objects.create(
-            user=self.mentor_user,
-            specialization='Engineering',
-            years_experience=6,
-            bio='Experienced mentor',
-            is_approved=True,
-        )
+        self.mentor_profile = self.mentor_user.mentor_profile
+        self.mentor_profile.specialization = 'Engineering'
+        self.mentor_profile.years_experience = 6
+        self.mentor_profile.bio = 'Experienced mentor'
+        self.mentor_profile.is_approved = True
+        self.mentor_profile.save()
 
     def test_shared_service_runs_full_request_lifecycle(self):
         mentorship_request = create_request(
@@ -266,13 +261,12 @@ class DashboardMentorshipWorkflowTest(TestCase):
             role='mentor',
             is_approved=True,
         )
-        self.mentor_profile = MentorProfile.objects.create(
-            user=self.mentor_user,
-            specialization='Law',
-            years_experience=4,
-            bio='Mentor bio',
-            is_approved=True,
-        )
+        self.mentor_profile = self.mentor_user.mentor_profile
+        self.mentor_profile.specialization = 'Law'
+        self.mentor_profile.years_experience = 4
+        self.mentor_profile.bio = 'Mentor bio'
+        self.mentor_profile.is_approved = True
+        self.mentor_profile.save()
         self.request = MentorshipRequest.objects.create(
             student=self.student,
             mentor=self.mentor_profile,

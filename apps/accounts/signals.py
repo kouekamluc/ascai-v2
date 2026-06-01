@@ -31,9 +31,8 @@ def ensure_pending_member_profile(user):
     Create the governance member record once an account is real enough to handle.
 
     Users are login/access records. Member profiles are the association records
-    that continue through verification, dues, and activation. A verified or
-    approved student/mentor account should therefore appear in the member queue
-    even before dues are paid.
+    that continue through verification, dues, and activation. Only verified
+    email accounts should appear in member-facing dashboard queues.
     """
     if not user.pk or user.is_superuser or user.is_staff:
         return None
@@ -42,7 +41,7 @@ def ensure_pending_member_profile(user):
     if not member_type:
         return None
 
-    if not (user.email_verified or user.is_approved):
+    if not user.email_verified:
         return None
 
     try:
@@ -68,9 +67,6 @@ def ensure_role_profile(user):
     the profile details and approves the relevant workflow.
     """
     if not user.pk or user.is_superuser or user.is_staff:
-        return None
-
-    if not (user.email_verified or user.is_approved):
         return None
 
     if user.role == "student":
@@ -160,9 +156,9 @@ def _send_approval_email(user):
 @receiver(post_save, sender=User)
 def send_approval_email(sender, instance, created, **kwargs):
     """Send a single approval email when a user becomes approved."""
+    ensure_role_profile(instance)
     if not created:
         ensure_pending_member_profile(instance)
-        ensure_role_profile(instance)
 
     previous_status = getattr(instance, "_previous_is_approved", False)
     if created or previous_status or not instance.is_approved or not instance.email:

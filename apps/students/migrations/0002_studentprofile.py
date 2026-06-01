@@ -1,6 +1,5 @@
 from django.db import migrations, models
 import django.db.models.deletion
-from django.db.models import Q
 from django.conf import settings
 
 
@@ -11,7 +10,6 @@ def backfill_student_profiles(apps, schema_editor):
     existing_user_ids = set(StudentProfile.objects.values_list("user_id", flat=True))
     users = (
         User.objects.filter(is_superuser=False, is_staff=False, role="student")
-        .filter(Q(email_verified=True) | Q(is_approved=True))
         .exclude(id__in=existing_user_ids)
     )
 

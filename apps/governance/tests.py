@@ -515,6 +515,7 @@ class ElectionWorkflowRegressionTest(TestCase):
             email='voter@example.com',
             password='testpass123',
             is_approved=True,
+            email_verified=True,
         )
         self.voter_member = Member.objects.create(
             user=self.voter,
@@ -529,6 +530,7 @@ class ElectionWorkflowRegressionTest(TestCase):
             email='candidate1@example.com',
             password='testpass123',
             is_approved=True,
+            email_verified=True,
         )
         Member.objects.create(
             user=self.candidate_one,
@@ -543,6 +545,7 @@ class ElectionWorkflowRegressionTest(TestCase):
             email='candidate2@example.com',
             password='testpass123',
             is_approved=True,
+            email_verified=True,
         )
         Member.objects.create(
             user=self.candidate_two,

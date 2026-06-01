@@ -260,7 +260,7 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             )
             
             # Check if user is a member
-            is_member = hasattr(user, 'member_profile')
+            is_member = bool(user.email_verified and hasattr(user, 'member_profile'))
             context['is_member'] = is_member
             
             if is_member:
@@ -346,10 +346,12 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                 report_requirement = check_general_report_requirement()
                 approved_users_without_member = User.objects.filter(
                     is_approved=True,
+                    email_verified=True,
                     member_profile__isnull=True,
                 ).exclude(is_superuser=True)
                 from apps.mentorship.models import MentorProfile
                 from apps.students.models import StudentProfile
+                visible_members = Member.objects.filter(user__email_verified=True)
                 context['governance_stats'] = {
                     'total_users': User.objects.count(),
                     'approved_users': User.objects.filter(is_approved=True).count(),
@@ -357,9 +359,9 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
                     'approved_users_without_member': approved_users_without_member.count(),
                     'pending_student_profiles': StudentProfile.objects.filter(onboarding_status='pending').count(),
                     'pending_mentor_profiles': MentorProfile.objects.filter(is_approved=False).count(),
-                    'total_members': Member.objects.count(),
-                    'active_members': Member.objects.filter(is_active_member=True).count(),
-                    'pending_members': Member.objects.filter(is_active_member=False).count(),
+                    'total_members': visible_members.count(),
+                    'active_members': visible_members.filter(is_active_member=True).count(),
+                    'pending_members': visible_members.filter(is_active_member=False).count(),
                     'upcoming_assemblies': GeneralAssembly.objects.filter(
                         status='scheduled',
                         date__gte=timezone.now()

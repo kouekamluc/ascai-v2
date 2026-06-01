@@ -55,13 +55,14 @@ def get_user_workflow_state(user):
     dues_paid = False
     try:
         member = user.member_profile
-        has_member_profile = True
-        member_active = bool(member.is_active_member)
-        today = timezone.now().date()
-        current_dues = member.dues.filter(year=today.year).order_by("-due_date").first()
-        if current_dues:
-            dues_paid = current_dues.status == "paid"
-            dues_due = current_dues.status != "paid"
+        if getattr(user, "email_verified", False):
+            has_member_profile = True
+            member_active = bool(member.is_active_member)
+            today = timezone.now().date()
+            current_dues = member.dues.filter(year=today.year).order_by("-due_date").first()
+            if current_dues:
+                dues_paid = current_dues.status == "paid"
+                dues_due = current_dues.status != "paid"
     except ObjectDoesNotExist:
         pass
 
@@ -104,7 +105,7 @@ def get_user_workflow_state(user):
         dues_paid=dues_paid,
         is_governance_staff=bool(is_staff or is_superuser or has_governance_permission),
         needs_profile_completion=not bool(getattr(user, "full_name", "")),
-        needs_membership_registration=is_approved and not has_member_profile,
+        needs_membership_registration=is_approved and getattr(user, "email_verified", False) and not has_member_profile,
         unread_bureau_messages=unread_bureau_messages,
     )
 

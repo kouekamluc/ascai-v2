@@ -61,6 +61,10 @@ from .forms import (
 )
 
 
+def _has_verified_member_profile(user):
+    return bool(getattr(user, 'email_verified', False) and hasattr(user, 'member_profile'))
+
+
 # ============================================================================
 # USER-FACING MEMBER PORTAL VIEWS
 # ============================================================================
@@ -71,6 +75,9 @@ class MemberPortalView(LoginRequiredMixin, TemplateView):
     
     def dispatch(self, request, *args, **kwargs):
         # Check if user has a member profile, if not redirect to registration
+        if not getattr(request.user, 'email_verified', False):
+            messages.info(request, _('Please verify your email before accessing the member portal.'))
+            return redirect('account_email_verification_notice')
         if not hasattr(request.user, 'member_profile'):
             messages.info(request, _('Please register as an ASCAI member to access the member portal.'))
             return redirect('governance:member_register')
@@ -142,6 +149,9 @@ class MemberSelfRegistrationView(LoginRequiredMixin, CreateView):
     template_name = 'governance/member_portal/register.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not getattr(request.user, 'email_verified', False):
+            messages.info(request, _('Please verify your email before registering as an ASCAI member.'))
+            return redirect('account_email_verification_notice')
         # Check if user already has a member profile
         if hasattr(request.user, 'member_profile'):
             messages.info(request, _('You are already registered as a member.'))
@@ -202,6 +212,10 @@ class MyDuesView(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         """Check if user has a member profile before rendering."""
         user = request.user
+
+        if not getattr(user, 'email_verified', False):
+            messages.warning(request, _('Please verify your email before managing membership dues.'))
+            return redirect('account_email_verification_notice')
         
         try:
             # Try to access member_profile to check if it exists
@@ -238,6 +252,10 @@ class MyDuesView(LoginRequiredMixin, TemplateView):
 @login_required
 def request_dues_payment(request, dues_id):
     """User requests to pay their dues (admin will mark as paid)."""
+    if not getattr(request.user, 'email_verified', False):
+        messages.warning(request, _('Please verify your email before managing membership dues.'))
+        return redirect('account_email_verification_notice')
+
     if request.method != 'POST':
         messages.error(request, _('Invalid request method.'))
         return redirect('governance:my_dues')
@@ -418,7 +436,8 @@ class MemberDirectoryView(LoginRequiredMixin, ListView):
         # Only show active, verified members to regular users
         queryset = Member.objects.filter(
             is_active_member=True,
-            cameroonian_origin_verified=True
+            cameroonian_origin_verified=True,
+            user__email_verified=True,
         ).select_related('user')
         
         # Filtering
@@ -521,7 +540,7 @@ class MemberListView(GovernanceRequiredMixin, ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        queryset = Member.objects.select_related('user').all()
+        queryset = Member.objects.select_related('user').filter(user__email_verified=True)
         
         # Filtering
         member_type = self.request.GET.get('member_type')
@@ -547,18 +566,19 @@ class MemberListView(GovernanceRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['member_types'] = Member.MEMBER_TYPE_CHOICES
-        verified_members = Member.objects.filter(
+        visible_members = Member.objects.filter(user__email_verified=True)
+        verified_members = visible_members.filter(
             lazio_residence_verified=True,
         ).filter(
             Q(member_type='sympathizer') | Q(cameroonian_origin_verified=True)
         )
         context['membership_pipeline'] = {
-            'total': Member.objects.count(),
-            'pending_review': Member.objects.filter(is_active_member=False).exclude(
+            'total': visible_members.count(),
+            'pending_review': visible_members.filter(is_active_member=False).exclude(
                 pk__in=verified_members.values('pk')
             ).count(),
             'awaiting_activation': verified_members.filter(is_active_member=False).count(),
-            'active': Member.objects.filter(is_active_member=True).count(),
+            'active': visible_members.filter(is_active_member=True).count(),
         }
         return context
 
@@ -1342,15 +1362,16 @@ class GovernanceDashboardView(GovernanceRequiredMixin, TemplateView):
         all_dues_totals = calculate_dues_totals()
         
         # Statistics
-        verified_members = Member.objects.filter(
+        visible_members = Member.objects.filter(user__email_verified=True)
+        verified_members = visible_members.filter(
             lazio_residence_verified=True,
         ).filter(
             Q(member_type='sympathizer') | Q(cameroonian_origin_verified=True)
         )
         context['stats'] = {
-            'total_members': Member.objects.count(),
-            'active_members': Member.objects.filter(is_active_member=True).count(),
-            'pending_member_reviews': Member.objects.filter(is_active_member=False).exclude(
+            'total_members': visible_members.count(),
+            'active_members': visible_members.filter(is_active_member=True).count(),
+            'pending_member_reviews': visible_members.filter(is_active_member=False).exclude(
                 pk__in=verified_members.values('pk')
             ).count(),
             'members_awaiting_activation': verified_members.filter(is_active_member=False).count(),
@@ -1506,7 +1527,7 @@ class MemberElectionListView(LoginRequiredMixin, ListView):
     
     def dispatch(self, request, *args, **kwargs):
         # Check if user is a member
-        if not hasattr(request.user, 'member_profile'):
+        if not _has_verified_member_profile(request.user):
             messages.info(request, _('Please register as an ASCAI member to view elections.'))
             return redirect('governance:member_register')
         return super().dispatch(request, *args, **kwargs)
@@ -1635,7 +1656,7 @@ class CandidacyCreateView(LoginRequiredMixin, CreateView):
     
     def dispatch(self, request, *args, **kwargs):
         # Check if user is a member
-        if not hasattr(request.user, 'member_profile'):
+        if not _has_verified_member_profile(request.user):
             messages.error(request, _('You must be a registered member to apply for candidacy.'))
             return redirect('governance:member_register')
         return super().dispatch(request, *args, **kwargs)

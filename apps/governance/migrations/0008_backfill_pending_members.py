@@ -1,7 +1,4 @@
 from django.db import migrations
-from django.db.models import Q
-
-
 def create_pending_members_for_verified_accounts(apps, schema_editor):
     User = apps.get_model("accounts", "User")
     Member = apps.get_model("governance", "Member")
@@ -9,7 +6,7 @@ def create_pending_members_for_verified_accounts(apps, schema_editor):
     existing_user_ids = set(Member.objects.values_list("user_id", flat=True))
     users = (
         User.objects.filter(is_superuser=False, is_staff=False, role__in=["student", "mentor"])
-        .filter(Q(email_verified=True) | Q(is_approved=True))
+        .filter(email_verified=True)
         .exclude(id__in=existing_user_ids)
     )
 

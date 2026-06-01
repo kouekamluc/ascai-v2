@@ -1,12 +1,15 @@
 """Tests for accounts app."""
 import re
+from datetime import timedelta
 
 from allauth.account.models import EmailAddress, get_emailconfirmation_model
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.governance.models import Member
 from apps.mentorship.models import MentorProfile
@@ -176,6 +179,8 @@ class AccountsViewsTest(TestCase):
         signup_html = mail.outbox[0].alternatives[0][0]
         self.assertIn('web-app-manifest-512x512.png', signup_html)
         self.assertIn('Thank you for signing up with ASCAI Lazio.', signup_html)
+        self.assertTrue(StudentProfile.objects.filter(user=created_user).exists())
+        self.assertFalse(Member.objects.filter(user=created_user).exists())
 
     def test_login_flow_redirects_approved_user_to_dashboard(self):
         """Approved users should enter through the dashboard route."""
@@ -292,7 +297,7 @@ class AccountsViewsTest(TestCase):
         self.assertContains(post_response, 'Your account is ready to use')
         self.assertContains(post_response, 'Sign In')
 
-    def test_approved_mentor_gets_pending_member_profile(self):
+    def test_approved_mentor_gets_pending_role_profile_but_not_member_until_verified(self):
         mentor = User.objects.create_user(
             username='mentor_member',
             email='mentor-member@example.com',
@@ -306,12 +311,45 @@ class AccountsViewsTest(TestCase):
         mentor.is_approved = True
         mentor.save()
 
-        member = Member.objects.get(user=mentor)
-        self.assertEqual(member.member_type, 'active')
-        self.assertFalse(member.is_active_member)
+        self.assertFalse(Member.objects.filter(user=mentor).exists())
         mentor_profile = MentorProfile.objects.get(user=mentor)
         self.assertEqual(mentor_profile.specialization, 'Pending setup')
         self.assertFalse(mentor_profile.is_approved)
+
+        mentor.email_verified = True
+        mentor.save()
+
+        member = Member.objects.get(user=mentor)
+        self.assertEqual(member.member_type, 'active')
+        self.assertFalse(member.is_active_member)
+
+    def test_delete_unverified_accounts_removes_only_stale_unverified_users(self):
+        stale_user = User.objects.create_user(
+            username='stale_unverified',
+            email='stale@example.com',
+            password='testpass123',
+            email_verified=False,
+        )
+        fresh_user = User.objects.create_user(
+            username='fresh_unverified',
+            email='fresh@example.com',
+            password='testpass123',
+            email_verified=False,
+        )
+        verified_user = User.objects.create_user(
+            username='verified_old',
+            email='verified-old@example.com',
+            password='testpass123',
+            email_verified=True,
+        )
+        old_joined = timezone.now() - timedelta(days=8)
+        User.objects.filter(pk__in=[stale_user.pk, verified_user.pk]).update(date_joined=old_joined)
+
+        call_command('delete_unverified_accounts', days=7)
+
+        self.assertFalse(User.objects.filter(pk=stale_user.pk).exists())
+        self.assertTrue(User.objects.filter(pk=fresh_user.pk).exists())
+        self.assertTrue(User.objects.filter(pk=verified_user.pk).exists())
 
     def test_password_reset_sends_branded_email(self):
         mail.outbox = []
