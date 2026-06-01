@@ -477,6 +477,43 @@ class DashboardViewsTest(TestCase):
         self.assertIsNotNone(message.read_at)
         self.assertEqual(message.email_delivery_status, 'sent')
         self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(
+            reverse('dashboard:message_detail', kwargs={'pk': message.pk}),
+            mail.outbox[0].body,
+        )
+        self.assertIn('dashboard message section', mail.outbox[0].body)
+
+    def test_admin_notifications_include_requested_dues_payments(self):
+        from config.admin import get_notification_counts
+
+        self.user.email_verified = True
+        self.user.save(update_fields=['email_verified'])
+        member = self.user.member_profile
+        dues = MembershipDues.objects.create(
+            member=member,
+            year=date.today().year,
+            amount='10.00',
+            due_date=date(date.today().year, 3, 31),
+            status='pending',
+            notes='[2026-06-01 12:00] Payment requested by user.',
+        )
+        MembershipDues.objects.create(
+            member=member,
+            year=date.today().year + 1,
+            amount='10.00',
+            due_date=date(date.today().year + 1, 3, 31),
+            status='pending',
+        )
+
+        counts = get_notification_counts()
+
+        self.assertEqual(counts['dues_payments'], 1)
+        self.assertTrue(
+            MembershipDues.objects.filter(
+                pk=dues.pk,
+                notes__icontains='Payment requested by user',
+            ).exists()
+        )
 
     def test_dashboard_home_surfaces_bureau_message_notifications(self):
         sender = User.objects.create_user(

@@ -25,7 +25,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     """
     Custom admin interface for User model.
     """
-    list_display = ['username', 'email', 'full_name', 'role', 'approval_badge', 'membership_badge', 'email_verified', 'is_active', 'date_joined']
+    list_display = ['username', 'email', 'full_name', 'role', 'approval_badge', 'membership_badge', 'email_status_badge', 'is_active', 'date_joined']
     list_filter = ['role', 'is_approved', 'email_verified', 'is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'full_name']
     search_help_text = _('Search by username, email, or full name.')
@@ -70,6 +70,14 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 
     def membership_badge(self, obj):
         """Show whether this login account is connected to an association member record."""
+        if obj.is_superuser:
+            return format_html(
+                '<span style="background:#312e81;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">ADMIN LOGIN</span>'
+            )
+        if obj.is_staff:
+            return format_html(
+                '<span style="background:#1e3a8a;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">BUREAU LOGIN</span>'
+            )
         try:
             member = obj.member_profile
         except Exception:
@@ -89,6 +97,26 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
             '<span style="background:#1d4ed8;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">MEMBER PENDING</span>'
         )
     membership_badge.short_description = _('Membership')
+
+    def email_status_badge(self, obj):
+        """Show email state without making bureau/staff accounts look like verified members."""
+        if obj.is_superuser:
+            return format_html(
+                '<span style="background:#312e81;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">ADMIN ACCESS</span>'
+            )
+        if obj.is_staff:
+            return format_html(
+                '<span style="background:#1e3a8a;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">BUREAU ACCESS</span>'
+            )
+        if obj.email_verified:
+            return format_html(
+                '<span style="background:#166534;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">EMAIL VERIFIED</span>'
+            )
+        return format_html(
+            '<span style="background:#b91c1c;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">EMAIL UNVERIFIED</span>'
+        )
+    email_status_badge.short_description = _('Email Status')
+    email_status_badge.admin_order_field = 'email_verified'
     
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """Override to use CKEditor 5 for bio TextField."""

@@ -259,11 +259,24 @@ class FinancialTransactionAdmin(BaseAdmin):
 class MembershipDuesAdmin(ModelAdmin):
     list_display = ['member', 'year', 'amount', 'due_date', 'payment_date', 'status', 'valid_from', 'valid_until']
     list_filter = ['status', 'year', 'payment_method']
-    search_fields = ['member__user__username', 'member__user__email']
+    search_fields = ['member__user__username', 'member__user__email', 'member__user__full_name', 'notes']
     date_hierarchy = 'due_date'
     readonly_fields = ['valid_from', 'valid_until']
     autocomplete_fields = ['member']
     list_per_page = 30
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        pending_payment_count = MembershipDues.objects.filter(
+            status='pending',
+            notes__icontains='Payment requested by user',
+        ).count()
+        if pending_payment_count:
+            extra_context['notification_count'] = pending_payment_count
+            extra_context['notification_message'] = _(
+                '{} dues payment request(s) need processing'
+            ).format(pending_payment_count)
+        return super().changelist_view(request, extra_context)
 
 
 @admin.register(Contribution)

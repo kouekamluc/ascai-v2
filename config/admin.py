@@ -89,7 +89,7 @@ def dashboard_callback(request, context):
     from apps.scholarships.models import Scholarship
     from apps.downloads.models import Document
     from apps.dashboard.models import SupportTicket, EventWaitlistEntry, BureauMessage
-    from apps.governance.models import Member, Candidacy
+    from apps.governance.models import Member, Candidacy, MembershipDues
     
     # Calculate statistics
     stats = {
@@ -159,7 +159,13 @@ def dashboard_callback(request, context):
         'pending_user_approvals': User.objects.filter(is_approved=False, is_active=True).count(),
         'unverified_user_documents': UserDocument.objects.filter(is_verified=False).count(),
         'pending_member_verifications': Member.objects.filter(
+            user__email_verified=True,
+        ).filter(
             Q(lazio_residence_verified=False) | Q(cameroonian_origin_verified=False)
+        ).count(),
+        'pending_dues_payment_processing': MembershipDues.objects.filter(
+            status='pending',
+            notes__icontains='Payment requested by user',
         ).count(),
         'new_contact_submissions': ContactSubmission.objects.filter(
             status='new'
@@ -228,6 +234,14 @@ def dashboard_callback(request, context):
             'count': notification_counts['pending_member_verifications'],
             'url': reverse('admin:governance_member_changelist'),
             'icon': 'verified_user',
+            'priority': 1,
+        },
+        {
+            'title': _('Process dues payments'),
+            'description': _('Review member payment requests and mark dues paid after confirmation.'),
+            'count': notification_counts['pending_dues_payment_processing'],
+            'url': reverse('admin:governance_membershipdues_changelist') + '?status__exact=pending&q=Payment+requested+by+user',
+            'icon': 'payments',
             'priority': 1,
         },
         {
@@ -332,13 +346,19 @@ def get_notification_counts():
         from apps.accounts.models import User, UserDocument
         from apps.mentorship.models import MentorProfile, MentorshipRequest
         from apps.dashboard.models import OrientationSession, StudentQuestion, SupportTicket, EventWaitlistEntry, BureauMessage
-        from apps.governance.models import Member, Candidacy
+        from apps.governance.models import Member, Candidacy, MembershipDues
         
         counts = {
             'users': User.objects.filter(is_approved=False, is_active=True).count(),
             'documents': UserDocument.objects.filter(is_verified=False).count(),
             'members': Member.objects.filter(
+                user__email_verified=True,
+            ).filter(
                 Q(lazio_residence_verified=False) | Q(cameroonian_origin_verified=False)
+            ).count(),
+            'dues_payments': MembershipDues.objects.filter(
+                status='pending',
+                notes__icontains='Payment requested by user',
             ).count(),
             'contact': ContactSubmission.objects.filter(status='new').count(),
             'mentor_profiles': MentorProfile.objects.filter(is_approved=False).count(),
@@ -368,6 +388,7 @@ def get_notification_counts():
             'bureau_messages': 0,
             'candidacies': 0,
             'total': 0,
+            'dues_payments': 0,
         }
 
 
@@ -417,6 +438,11 @@ def get_notification_navigation(request):
                     "title": format_with_badge(_("Member Eligibility"), counts['members']),
                     "icon": "verified_user",
                     "link": "/admin/governance/member/",
+                },
+                {
+                    "title": format_with_badge(_("Dues Payment Processing"), counts['dues_payments']),
+                    "icon": "payments",
+                    "link": "/admin/governance/membershipdues/?status__exact=pending&q=Payment+requested+by+user",
                 },
                 {
                     "title": format_with_badge(_("Contact Messages"), counts['contact']),
@@ -704,11 +730,14 @@ def get_notification_navigation(request):
     ]
 
 
-# Configure the default admin site (Unfold will automatically style it)
-# These use gettext_lazy so they will be translated based on the current language
-admin.site.site_header = _('ASCAI Lazio Administration')
-admin.site.site_title = _('ASCAI Lazio Admin')
-admin.site.index_title = _('Welcome to ASCAI Lazio Administration')
+# Configure the default admin site (Unfold will automatically style it).
+# Test settings can omit django.contrib.admin, so keep this import-safe.
+try:
+    admin.site.site_header = _('ASCAI Lazio Administration')
+    admin.site.site_title = _('ASCAI Lazio Admin')
+    admin.site.index_title = _('Welcome to ASCAI Lazio Administration')
+except LookupError:
+    pass
 
 # Hide django-allauth social auth models while social authentication is disabled.
 try:
@@ -726,8 +755,6 @@ admin_site = admin.site
 # Export Unfold admin classes for use in app admin.py files
 # This allows apps to use: from config.admin import BaseAdmin, ModelAdmin, TabularInline, StackedInline
 __all__ = ['admin_site', 'BaseAdmin', 'ModelAdmin', 'TabularInline', 'StackedInline', 'dashboard_callback']
-
-
 
 
 

@@ -22,14 +22,15 @@ def send_bureau_message_notification(message, request=None):
         return 0
 
     site_url = get_site_url(request=request)
-    message_url = f"{site_url}{reverse('dashboard:message_detail', kwargs={'pk': message.pk})}"
+    message_path = reverse('dashboard:message_detail', kwargs={'pk': message.pk})
+    message_url = f"{site_url}{message_path}"
     sender_name = message.sender.get_display_name() if message.sender else _('ASCAI Lazio Bureau')
     text_body = _(
         'Hello {name},\n\n'
         'You have received a new message from the ASCAI Lazio bureau.\n\n'
         'Subject: {subject}\n\n'
         '{body}\n\n'
-        'Open it here: {url}\n\n'
+        'Open it in your dashboard message section: {url}\n\n'
         'ASCAI Lazio'
     ).format(
         name=message.recipient.get_display_name(),
@@ -48,7 +49,7 @@ def send_bureau_message_notification(message, request=None):
                 'greeting': _('Hello {}').format(message.recipient.get_display_name()),
                 'body_paragraphs': [
                     _('You have received a new direct message from the ASCAI Lazio bureau.'),
-                    _('You can read it and reply from your dashboard.'),
+                    _('You can read it and reply from your dashboard message section.'),
                 ],
                 'detail_rows': [
                     {'label': _('Subject'), 'value': message.subject},
