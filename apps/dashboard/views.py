@@ -344,9 +344,18 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
             # Admin/staff governance stats
             if user.has_perm('governance.view_member') or user.is_staff:
                 report_requirement = check_general_report_requirement()
+                approved_users_without_member = User.objects.filter(
+                    is_approved=True,
+                    member_profile__isnull=True,
+                ).exclude(is_superuser=True)
                 context['governance_stats'] = {
+                    'total_users': User.objects.count(),
+                    'approved_users': User.objects.filter(is_approved=True).count(),
+                    'pending_account_approvals': User.objects.filter(is_approved=False, is_active=True).count(),
+                    'approved_users_without_member': approved_users_without_member.count(),
                     'total_members': Member.objects.count(),
                     'active_members': Member.objects.filter(is_active_member=True).count(),
+                    'pending_members': Member.objects.filter(is_active_member=False).count(),
                     'upcoming_assemblies': GeneralAssembly.objects.filter(
                         status='scheduled',
                         date__gte=timezone.now()

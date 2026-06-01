@@ -24,12 +24,20 @@
         <div>
             <h2 class="text-xl font-bold text-gray-900">{% trans "Membership Workflow" %}</h2>
             <p class="text-sm text-gray-600 mt-1">
-                {% trans "This list is the admin queue. Review new registrations, verify eligibility, confirm dues, then activate the member." %}
+                {% trans "This list only shows governance member records. A login account appears here after the user self-registers for membership or an admin creates a member profile from the user account list." %}
+            </p>
+            <p class="text-sm text-gray-600 mt-2">
+                {% trans "Flow: approve account, create member profile, verify eligibility, confirm dues, then activate the member." %}
             </p>
         </div>
-        <a href="{% url 'governance:membership_dues' %}" class="text-sm font-medium text-cameroon-green hover:underline">
-            {% trans "Check dues" %} &rarr;
-        </a>
+        <div class="flex flex-wrap gap-3">
+            <a href="/admin/accounts/user/" class="text-sm font-medium text-cameroon-green hover:underline">
+                {% trans "Open user accounts" %} &rarr;
+            </a>
+            <a href="{% url 'governance:membership_dues' %}" class="text-sm font-medium text-cameroon-green hover:underline">
+                {% trans "Check dues" %} &rarr;
+            </a>
+        </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="rounded-xl bg-gray-50 p-4">

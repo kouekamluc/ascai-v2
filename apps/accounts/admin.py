@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.utils import timezone
 from allauth.account.models import EmailAddress
 from unfold.admin import ModelAdmin
 from config.admin import BaseAdmin
@@ -24,7 +25,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     """
     Custom admin interface for User model.
     """
-    list_display = ['username', 'email', 'full_name', 'role', 'approval_badge', 'email_verified', 'is_active', 'date_joined']
+    list_display = ['username', 'email', 'full_name', 'role', 'approval_badge', 'membership_badge', 'email_verified', 'is_active', 'date_joined']
     list_filter = ['role', 'is_approved', 'email_verified', 'is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'full_name']
     search_help_text = _('Search by username, email, or full name.')
@@ -49,7 +50,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         }),
     )
     
-    actions = ['approve_users', 'approve_and_verify_users', 'reject_users', 'verify_emails', 'mark_emails_unverified', 'resend_verification_emails']
+    actions = ['approve_users', 'approve_and_verify_users', 'create_member_profiles', 'reject_users', 'verify_emails', 'mark_emails_unverified', 'resend_verification_emails']
 
     def approval_badge(self, obj):
         """Show the account review state in plain language for bureau members."""
@@ -66,6 +67,28 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         )
     approval_badge.short_description = _('Approval')
     approval_badge.admin_order_field = 'is_approved'
+
+    def membership_badge(self, obj):
+        """Show whether this login account is connected to an association member record."""
+        try:
+            member = obj.member_profile
+        except Exception:
+            if obj.is_approved:
+                return format_html(
+                    '<span style="background:#92400e;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">NO MEMBER RECORD</span>'
+                )
+            return format_html(
+                '<span style="background:#6b7280;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">ACCOUNT ONLY</span>'
+            )
+
+        if member.is_active_member:
+            return format_html(
+                '<span style="background:#166534;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">ACTIVE MEMBER</span>'
+            )
+        return format_html(
+            '<span style="background:#1d4ed8;color:#fff;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">MEMBER PENDING</span>'
+        )
+    membership_badge.short_description = _('Membership')
     
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """Override to use CKEditor 5 for bio TextField."""
@@ -144,6 +167,36 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         self.approve_users(request, queryset)
         self.verify_emails(request, queryset)
     approve_and_verify_users.short_description = _('Approve and verify selected users')
+
+    def create_member_profiles(self, request, queryset):
+        """
+        Create governance member records for selected approved users that do not have one.
+        """
+        from apps.governance.models import Member
+
+        created = 0
+        skipped = 0
+        for user in queryset:
+            if not user.is_approved:
+                skipped += 1
+                continue
+            if hasattr(user, 'member_profile'):
+                skipped += 1
+                continue
+
+            Member.objects.create(
+                user=user,
+                member_type='student' if user.role == 'student' else 'active',
+                membership_start_date=timezone.now().date(),
+                is_active_member=False,
+            )
+            created += 1
+
+        self.message_user(
+            request,
+            _('{} member profile(s) created. {} user(s) skipped because they were not approved or already had a member profile.').format(created, skipped),
+        )
+    create_member_profiles.short_description = _('Create member profiles for selected approved users')
     
     def _send_approval_email(self, user):
         """Helper method to send approval email to a user."""
