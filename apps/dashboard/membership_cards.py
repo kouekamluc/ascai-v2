@@ -75,13 +75,14 @@ def _open_logo(size):
 
 def _member_avatar(member, size):
     avatar = getattr(member.user, "avatar", None)
-    if avatar and getattr(avatar, "path", None):
+    image = None
+    if avatar:
         try:
-            image = Image.open(avatar.path).convert("RGB")
+            avatar.open("rb")
+            image = Image.open(avatar).convert("RGB")
+            avatar.close()
         except Exception:
             image = None
-    else:
-        image = None
 
     if image is None:
         image = Image.new("RGB", (size, size), "#e7efe9")
