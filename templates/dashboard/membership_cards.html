@@ -52,7 +52,7 @@
                     <th class="px-6 py-4 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Card ID' %}</th>
                     <th class="px-6 py-4 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Paid' %}</th>
                     <th class="px-6 py-4 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Valid until' %}</th>
-                    <th class="px-6 py-4 text-right text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Action' %}</th>
+                    <th class="px-6 py-4 text-right text-xs font-extrabold uppercase tracking-[0.16em] text-gray-500">{% trans 'Actions' %}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 bg-white/70">
@@ -74,8 +74,11 @@
                     <td class="px-6 py-5 font-semibold text-gray-700">ASC-{{ due.year }}-{{ due.member.pk|stringformat:"03d" }}</td>
                     <td class="px-6 py-5 text-sm text-gray-600">{{ due.payment_date|date:"d M Y"|default:"-" }}</td>
                     <td class="px-6 py-5 text-sm text-gray-600">{% if due.valid_until %}{{ due.valid_until|date:"d M Y" }}{% else %}31 Dec {{ due.year }}{% endif %}</td>
-                    <td class="px-6 py-5 text-right">
-                        <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary">{% trans 'Generate PDF' %}</a>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-wrap justify-end gap-2">
+                            <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary">{% trans 'Download Membership Card PDF' %}</a>
+                            <a href="{% url 'dashboard:membership_card_print_pdf' due.pk %}" class="btn-secondary">{% trans 'Download Print Version' %}</a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -92,7 +95,10 @@
                 <div><span class="dashboard-kicker text-cameroon-green">{% trans 'Card ID' %}</span><p class="mt-1 font-semibold">ASC-{{ due.year }}-{{ due.member.pk|stringformat:"03d" }}</p></div>
                 <div><span class="dashboard-kicker text-cameroon-yellow">{% trans 'Year' %}</span><p class="mt-1 font-semibold">{{ due.year }}</p></div>
             </div>
-            <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary mt-4 w-full">{% trans 'Generate PDF' %}</a>
+            <div class="mt-4 grid gap-2">
+                <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary w-full">{% trans 'Download Membership Card PDF' %}</a>
+                <a href="{% url 'dashboard:membership_card_print_pdf' due.pk %}" class="btn-secondary w-full">{% trans 'Download Print Version' %}</a>
+            </div>
         </article>
         {% endfor %}
     </div>

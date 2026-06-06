@@ -129,7 +129,12 @@ class MembershipCardDashboardTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/pdf')
         self.assertTrue(response.content.startswith(b'%PDF'))
-        self.assertIn('ASCAI-membership-card-2026', response['Content-Disposition'])
+        self.assertIn('ascai-membership-card-ASC-2026-', response['Content-Disposition'])
+
+        print_response = self.client.get(reverse('dashboard:membership_card_print_pdf', args=[self.paid_dues.pk]))
+        self.assertEqual(print_response.status_code, 200)
+        self.assertEqual(print_response['Content-Type'], 'application/pdf')
+        self.assertTrue(print_response.content.startswith(b'%PDF'))
 
         unpaid_response = self.client.get(reverse('dashboard:membership_card_pdf', args=[self.unpaid_dues.pk]))
         self.assertEqual(unpaid_response.status_code, 404)

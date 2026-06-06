@@ -46,7 +46,9 @@ from apps.mentorship.services import (
     send_message as send_mentorship_message,
     update_availability as update_mentor_availability,
 )
-from .membership_cards import generate_membership_card_pdf
+from .membership_cards import generate_membership_card_pdf, generate_membership_card_print_pdf
+from .membership_cards.data import build_member_card_data
+from .membership_cards.pdf import membership_card_filename
 
 
 def _can_manage_membership_cards(user):
@@ -109,7 +111,7 @@ class MembershipCardAdminView(DashboardRequiredMixin, ListView):
 
 
 class MembershipCardPDFView(DashboardRequiredMixin, DetailView):
-    """Generate a two-page PDF membership card for a paid dues record."""
+    """Generate an A4 preview PDF membership card for a paid dues record."""
     pk_url_kwarg = 'dues_id'
 
     def dispatch(self, request, *args, **kwargs):
@@ -125,7 +127,19 @@ class MembershipCardPDFView(DashboardRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         dues = self.get_object()
         pdf = generate_membership_card_pdf(dues, request)
-        filename = f"ASCAI-membership-card-{dues.year}-{dues.member.pk:03d}.pdf"
+        filename = membership_card_filename(build_member_card_data(dues, request))
+        response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+
+class MembershipCardPrintPDFView(MembershipCardPDFView):
+    """Generate print-ready front/back card pages for a paid dues record."""
+
+    def get(self, request, *args, **kwargs):
+        dues = self.get_object()
+        pdf = generate_membership_card_print_pdf(dues, request)
+        filename = membership_card_filename(build_member_card_data(dues, request))
         response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response

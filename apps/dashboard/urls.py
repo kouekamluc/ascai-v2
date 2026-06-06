@@ -27,6 +27,7 @@ urlpatterns = [
     # Membership Cards
     path('membership-cards/', views.MembershipCardAdminView.as_view(), name='membership_cards'),
     path('membership-cards/<int:dues_id>/pdf/', views.MembershipCardPDFView.as_view(), name='membership_card_pdf'),
+    path('membership-cards/<int:dues_id>/print-pdf/', views.MembershipCardPrintPDFView.as_view(), name='membership_card_print_pdf'),
     
     # Support Tickets
     path('support/tickets/', views.TicketListView.as_view(), name='tickets_list'),

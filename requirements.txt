@@ -33,7 +33,7 @@ babel>=2.17.0
 
 # Utilities
 qrcode[pil]>=7.4.2
+reportlab>=4.2.0
 
 # Email (Brevo/Sendinblue via django-anymail)
 django-anymail[brevo]>=10.2
-
