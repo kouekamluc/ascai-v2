@@ -26,6 +26,7 @@ class MemberCardData:
     association: str = "ASCAI Lazio"
     community: str = "General Community"
     legalName: str = "Association of Cameroonian Students and Academics in Lazio"
+    italianLegalName: str = "Associazione Studenti Camerunesi del Lazio"
     address: str = "Rome and the Lazio region, Italy"
     email: str = "info@ascai.org"
     phone: str = ""
@@ -90,6 +91,7 @@ def _association_contact_defaults() -> dict[str, str]:
     return {
         "association": association,
         "legalName": legal_name,
+        "italianLegalName": "Associazione Studenti Camerunesi del Lazio",
         "address": location,
         "email": email,
         "phone": "",

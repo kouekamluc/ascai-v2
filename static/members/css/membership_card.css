@@ -48,14 +48,14 @@ html, body {
   overflow: hidden;
   position: relative;
   background: var(--paper);
-  border: 0.4pt solid #D8CDBB;
+  border: 0.45pt solid #D8CDBB;
   flex: 0 0 auto;
 }
 
 .card-bg-pattern {
   position: absolute;
   inset: 0;
-  opacity: 0.22;
+  opacity: 0.2;
   background-image:
     linear-gradient(135deg, transparent 46%, var(--pale-gold) 47%, var(--pale-gold) 48%, transparent 49%),
     radial-gradient(circle at 7mm 7mm, var(--pale-gold) 0.35mm, transparent 0.45mm);
@@ -66,20 +66,20 @@ html, body {
 
 .card-watermark {
   position: absolute;
-  width: 34mm;
-  height: 20mm;
-  left: 50%;
-  top: 42%;
+  width: 36mm;
+  height: 21mm;
+  left: 54%;
+  top: 44%;
   transform: translate(-50%, -50%);
   background: center / contain no-repeat;
-  opacity: 0.38;
+  opacity: 0.32;
   pointer-events: none;
   z-index: 0;
 }
 
 .card-watermark--back {
-  left: 62%;
-  top: 38%;
+  left: 64%;
+  top: 40%;
 }
 
 /* ── Cameroon ribbon ── */
@@ -93,46 +93,46 @@ html, body {
 .cameroon-ribbon--front {
   left: 0;
   bottom: 0;
-  width: 48mm;
-  height: 9mm;
+  width: 50mm;
+  height: 8mm;
 }
 
 .cameroon-ribbon--front .ribbon-green,
 .cameroon-ribbon--front .ribbon-red,
 .cameroon-ribbon--front .ribbon-yellow {
   position: absolute;
-  left: -3mm;
-  width: 46mm;
+  left: -4mm;
+  width: 48mm;
   border-radius: 50%;
 }
 
 .cameroon-ribbon--front .ribbon-green {
-  bottom: 0.5mm;
-  height: 4.5mm;
+  bottom: 0.4mm;
+  height: 4.2mm;
   background: var(--green);
-  transform: rotate(-3deg);
+  transform: rotate(-4deg);
 }
 
 .cameroon-ribbon--front .ribbon-red {
-  bottom: 2mm;
-  height: 3.2mm;
+  bottom: 1.8mm;
+  height: 3mm;
   background: var(--red);
   transform: rotate(-2deg);
 }
 
 .cameroon-ribbon--front .ribbon-yellow {
-  bottom: 3.2mm;
-  height: 2mm;
+  bottom: 3mm;
+  height: 1.8mm;
   background: var(--yellow);
   transform: rotate(-1deg);
 }
 
 .cameroon-ribbon--front .ribbon-star {
   position: absolute;
-  left: 13mm;
-  bottom: 2.8mm;
-  width: 2.6mm;
-  height: 2.6mm;
+  left: 14mm;
+  bottom: 2.5mm;
+  width: 2.4mm;
+  height: 2.4mm;
   background: var(--yellow);
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   z-index: 2;
@@ -142,7 +142,7 @@ html, body {
   top: 0;
   left: 0;
   right: 0;
-  height: 5mm;
+  height: 5.5mm;
 }
 
 .cameroon-ribbon--back .ribbon-green,
@@ -155,110 +155,110 @@ html, body {
 
 .cameroon-ribbon--back .ribbon-green {
   top: 0;
-  height: 4.5mm;
+  height: 4.8mm;
   background: var(--green);
-  border-radius: 0 0 40% 40% / 0 0 100% 100%;
+  border-radius: 0 0 45% 45% / 0 0 100% 100%;
 }
 
 .cameroon-ribbon--back .ribbon-red {
-  top: 1.5mm;
-  height: 2.8mm;
+  top: 1.6mm;
+  height: 3mm;
   background: var(--red);
   border-radius: 0 0 50% 50% / 0 0 100% 100%;
 }
 
 .cameroon-ribbon--back .ribbon-yellow {
-  top: 2.8mm;
-  height: 1.6mm;
+  top: 3mm;
+  height: 1.7mm;
   background: var(--yellow);
   border-radius: 0 0 50% 50% / 0 0 100% 100%;
 }
 
-/* ── Front layout ── */
-
-.front-layout {
-  position: relative;
+.cameroon-ribbon--back .ribbon-star {
+  position: absolute;
+  left: 50%;
+  top: 1.8mm;
+  width: 2.2mm;
+  height: 2.2mm;
+  transform: translateX(-50%);
+  background: var(--yellow);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   z-index: 2;
-  display: grid;
-  grid-template-columns: 27mm 1fr 19mm;
-  gap: 1.5mm;
-  padding: 2.2mm 3mm 0;
-  height: 42mm;
 }
 
-.front-logo-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+/* ── Logo ── */
 
 .card-logo {
-  width: 24mm;
-  height: 22mm;
-  border: 0.45pt solid var(--gold);
-  border-radius: 2mm;
+  border: 0.5pt solid var(--gold);
+  border-radius: 2.2mm;
   background: var(--white);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  padding: 1mm;
 }
 
 .card-logo--compact {
-  width: 18mm;
-  height: 13mm;
+  width: 19mm;
+  height: 14mm;
 }
 
 .card-logo-img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }
 
 .logo-fallback {
-  font-size: 8pt;
+  font-size: 9pt;
   font-weight: 700;
   color: var(--red);
 }
 
-.logo-caption {
-  margin: 1mm 0 0;
-  width: 24mm;
-  font-size: 3.2pt;
-  font-weight: 700;
-  line-height: 1.25;
-  text-align: center;
-  color: var(--dark);
+/* ── Front ── */
+
+.front-body {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 26mm 1fr 18.5mm;
+  gap: 1.2mm;
+  padding: 2.4mm 3.2mm 0 3mm;
+  height: 38.5mm;
 }
 
-.front-main {
+.front-logo-col .card-logo {
+  width: 24mm;
+  height: 24mm;
+}
+
+.front-center {
   min-width: 0;
-  padding-top: 0.5mm;
+  padding-top: 0.2mm;
 }
 
 .front-kicker {
   margin: 0;
-  font-size: 6pt;
+  font-size: 5.8pt;
   font-weight: 700;
-  letter-spacing: 0.14mm;
+  letter-spacing: 0.16mm;
   color: var(--gold);
 }
 
 .front-brand {
-  margin: 0.6mm 0 0;
-  font-size: 15pt;
+  margin: 0.5mm 0 0;
+  font-size: 17pt;
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.1mm;
+  line-height: 0.95;
+  letter-spacing: 0.15mm;
 }
 
 .front-community {
-  margin: 0.8mm 0 0;
-  font-size: 7.5pt;
-  font-style: italic;
-  line-height: 1.1;
+  margin: 0.7mm 0 0;
+  font-family: "Brush Script MT", "Segoe Script", "Apple Chancery", cursive;
+  font-size: 8.5pt;
+  line-height: 1;
   color: var(--gold);
   white-space: nowrap;
   overflow: hidden;
@@ -266,14 +266,14 @@ html, body {
 }
 
 .front-legal {
-  margin: 0.6mm 0 0;
-  font-size: 4.2pt;
+  margin: 0.5mm 0 0;
+  font-size: 4pt;
   font-weight: 700;
   line-height: 1.15;
 }
 
 .front-rule {
-  margin: 0.8mm 0 0.8mm;
+  margin: 0.7mm 0 0.6mm;
   border: none;
   border-top: 0.45pt solid var(--gold);
 }
@@ -285,63 +285,64 @@ html, body {
 
 .field-row {
   display: grid;
-  grid-template-columns: 11mm 1fr;
-  gap: 0.5mm;
-  margin: 0 0 0.35mm;
-  line-height: 1.2;
-  font-size: 4.8pt;
+  grid-template-columns: 10.5mm 1fr;
+  gap: 0.4mm;
+  margin: 0 0 0.28mm;
+  line-height: 1.15;
 }
 
 .field-row dt {
   margin: 0;
+  font-size: 4.6pt;
   font-weight: 700;
   color: var(--gold);
 }
 
 .field-row dd {
   margin: 0;
+  font-size: 5.2pt;
   font-weight: 700;
-  font-size: 5.4pt;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.front-media {
+.front-photo-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.2mm;
-  padding-top: 0.5mm;
+  gap: 1mm;
+  padding-top: 0.2mm;
 }
 
 .member-photo {
-  width: 16.5mm;
-  height: 16.5mm;
-  border: 0.45pt solid var(--gold);
-  border-radius: 1.8mm;
+  width: 14.5mm;
+  height: 17.5mm;
+  border: 0.5pt solid var(--gold);
+  border-radius: 1.6mm;
   background: var(--white);
   overflow: hidden;
-  padding: 0.6mm;
-  flex-shrink: 0;
+  padding: 0.5mm;
 }
 
 .member-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 1.2mm;
+  border-radius: 1.1mm;
   display: block;
 }
 
 .card-qr {
-  width: 13.5mm;
-  height: 13.5mm;
-  border: 0.45pt solid var(--gold);
+  border: 0.5pt solid var(--gold);
   border-radius: 1mm;
   background: var(--white);
-  padding: 0.7mm;
-  flex-shrink: 0;
+  padding: 0.6mm;
+}
+
+.card-qr--front {
+  width: 13mm;
+  height: 13mm;
 }
 
 .card-qr img {
@@ -352,24 +353,30 @@ html, body {
 
 .front-signatures {
   position: absolute;
-  z-index: 2;
-  left: 32mm;
+  z-index: 3;
+  left: 30mm;
   right: 3mm;
-  bottom: 2.2mm;
+  bottom: 3mm;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4mm;
+  grid-template-columns: 24mm 1fr;
+  gap: 3mm;
 }
 
 .signature-block {
   text-align: center;
+  min-width: 0;
+}
+
+.signature-block--board {
+  max-width: 26mm;
+  margin-left: auto;
 }
 
 .signature-name {
   margin: 0;
-  font-size: 5.5pt;
+  font-size: 5.2pt;
   font-style: italic;
-  line-height: 1.1;
+  line-height: 1.05;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -377,59 +384,59 @@ html, body {
 
 .signature-name--board {
   font-weight: 700;
-  font-style: italic;
 }
 
 .signature-line {
-  margin: 0.4mm 0;
+  margin: 0.35mm 0;
   border-top: 0.45pt solid var(--gold);
 }
 
 .signature-label {
   margin: 0;
-  font-size: 3pt;
-  line-height: 1.2;
+  font-size: 2.9pt;
+  line-height: 1.15;
 }
 
 .signature-sub {
-  margin: 0.2mm 0 0;
-  font-size: 2.8pt;
-  line-height: 1.2;
+  margin: 0.15mm 0 0;
+  font-size: 2.7pt;
+  line-height: 1.15;
 }
 
-/* ── Back layout ── */
+/* ── Back ── */
 
-.back-layout {
+.back-upper {
   position: relative;
   z-index: 2;
   display: grid;
   grid-template-columns: 22mm 1fr;
-  gap: 2mm;
-  padding: 6mm 3.5mm 0;
-  height: 28mm;
+  gap: 1.5mm;
+  padding: 6.2mm 3.2mm 0 3mm;
+  height: 27mm;
 }
 
-.back-logo-panel {
+.back-logo-col {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 1mm;
+  padding-top: 0.5mm;
 }
 
 .back-benefits {
   min-width: 0;
+  padding-left: 1mm;
 }
 
 .benefits-badge {
   display: inline-block;
-  margin: 0 0 1.2mm;
-  padding: 0.7mm 2mm;
+  margin: 0 0 1mm;
+  padding: 0.65mm 1.8mm;
   background: var(--green);
   color: var(--yellow);
-  font-size: 5pt;
+  font-size: 4.8pt;
   font-weight: 700;
-  letter-spacing: 0.06mm;
-  border-radius: 1.8mm;
+  letter-spacing: 0.05mm;
+  border-radius: 1.6mm;
 }
 
 .benefits-list {
@@ -440,34 +447,33 @@ html, body {
 
 .benefits-list li {
   display: grid;
-  grid-template-columns: 3mm 1fr;
-  gap: 1mm;
+  grid-template-columns: 2.6mm 1fr;
+  gap: 0.8mm;
   align-items: start;
-  margin-bottom: 0.55mm;
-  font-size: 4.2pt;
-  line-height: 1.25;
+  margin-bottom: 0.45mm;
+  font-size: 4pt;
+  line-height: 1.2;
 }
 
 .benefit-icon {
-  width: 2mm;
-  height: 2mm;
-  margin-top: 0.25mm;
+  width: 1.8mm;
+  height: 1.8mm;
+  margin-top: 0.2mm;
   border-radius: 50%;
   background: var(--gold);
 }
 
-.back-bottom {
+.back-lower {
   position: absolute;
   z-index: 2;
   left: 0;
   right: 0;
-  bottom: 4.8mm;
+  bottom: 4.4mm;
   display: grid;
-  grid-template-columns: 1fr 42mm;
-  gap: 1mm;
-  padding: 0 3.5mm;
+  grid-template-columns: 1fr 38mm;
+  gap: 1.5mm;
+  padding: 0.8mm 3.2mm 0;
   border-top: 0.45pt solid var(--gold);
-  padding-top: 1mm;
 }
 
 .contact-section {
@@ -475,53 +481,54 @@ html, body {
 }
 
 .contact-title {
-  margin: 0 0 0.5mm;
-  font-size: 5pt;
+  margin: 0 0 0.4mm;
+  font-size: 4.8pt;
   font-weight: 700;
   color: var(--green);
 }
 
 .contact-row {
-  margin: 0 0 0.15mm;
-  font-size: 3.3pt;
-  line-height: 1.35;
+  margin: 0 0 0.12mm;
+  font-size: 3.15pt;
+  line-height: 1.3;
 }
 
 .verification-section {
   display: grid;
-  grid-template-columns: 11mm 1fr;
-  grid-template-rows: auto auto;
-  gap: 0.5mm 1mm;
+  grid-template-columns: 10.5mm 1fr;
+  gap: 1mm;
   align-items: start;
 }
 
 .card-qr--back {
-  width: 11mm;
-  height: 11mm;
-  grid-row: span 2;
+  width: 10.5mm;
+  height: 10.5mm;
+}
+
+.verification-copy {
+  min-width: 0;
 }
 
 .verification-box {
   background: var(--green);
   color: var(--white);
-  border-radius: 0.8mm;
-  padding: 0.6mm 0.8mm;
-  font-size: 2.7pt;
-  line-height: 1.35;
+  border-radius: 0.7mm;
+  padding: 0.55mm 0.7mm;
+  font-size: 2.55pt;
+  line-height: 1.3;
 }
 
 .verification-box strong {
   display: block;
-  font-size: 2.9pt;
-  margin-bottom: 0.3mm;
+  font-size: 2.75pt;
+  margin-bottom: 0.25mm;
 }
 
 .verification-email {
-  margin: 0;
-  grid-column: 2;
-  font-size: 3pt;
+  margin: 0.35mm 0 0;
+  font-size: 2.85pt;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .back-footer-strip {
@@ -530,13 +537,13 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 4.2mm;
+  height: 4mm;
   background-color: var(--gold);
   background-image:
     linear-gradient(45deg, #C69A3B 25%, transparent 25%, transparent 75%, #C69A3B 75%),
     linear-gradient(45deg, #C69A3B 25%, transparent 25%, transparent 75%, #C69A3B 75%);
-  background-size: 1.8mm 1.8mm;
-  background-position: 0 0, 0.9mm 0.9mm;
+  background-size: 1.6mm 1.6mm;
+  background-position: 0 0, 0.8mm 0.8mm;
 }
 
 /* ── PDF preview sheet ── */
@@ -669,7 +676,7 @@ html, body {
   justify-content: center;
   align-items: flex-start;
   gap: 36px;
-  zoom: 1.45;
+  zoom: 1.5;
 }
 
 @media print {

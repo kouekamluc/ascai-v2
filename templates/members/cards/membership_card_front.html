@@ -11,8 +11,8 @@
     <span class="ribbon-star"></span>
   </div>
 
-  <div class="front-layout">
-    <aside class="front-logo-panel">
+  <div class="front-body">
+    <aside class="front-logo-col">
       <div class="card-logo">
         {% if logo_url %}
         <img class="card-logo-img" src="{{ logo_url }}" alt="ASCAI">
@@ -20,16 +20,15 @@
         <div class="logo-fallback">ASCAI</div>
         {% endif %}
       </div>
-      <p class="logo-caption">{{ card.legalName }}</p>
     </aside>
 
-    <section class="front-main">
+    <section class="front-center">
       <p class="front-kicker">MEMBERSHIP CARD</p>
       <h1 class="front-brand" aria-label="ASCAI">
         <span class="c-green">A</span><span class="c-red">S</span><span class="c-red">C</span><span class="c-yellow">A</span><span class="c-yellow">I</span>
       </h1>
       <p class="front-community">{{ card.community }}</p>
-      <p class="front-legal">{{ card.legalName }}</p>
+      <p class="front-legal">{{ card.italianLegalName }}</p>
       <hr class="front-rule">
 
       <dl class="member-fields">
@@ -42,23 +41,23 @@
       </dl>
     </section>
 
-    <aside class="front-media">
+    <aside class="front-photo-col">
       <div class="member-photo">
         <img src="{{ photo_url }}" alt="{{ card.fullName }}">
       </div>
-      <div class="card-qr">
+      <div class="card-qr card-qr--front">
         <img src="{{ qr_url }}" alt="QR code">
       </div>
     </aside>
   </div>
 
   <footer class="front-signatures">
-    <div class="signature-block">
+    <div class="signature-block signature-block--holder">
       <p class="signature-name">{{ card.fullName }}</p>
       <div class="signature-line"></div>
       <p class="signature-label">Cardholder Signature</p>
     </div>
-    <div class="signature-block">
+    <div class="signature-block signature-block--board">
       <p class="signature-name signature-name--board">ASCAI</p>
       <div class="signature-line"></div>
       <p class="signature-label">Authorized Signature</p>

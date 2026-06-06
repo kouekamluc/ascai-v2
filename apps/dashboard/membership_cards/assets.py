@@ -53,10 +53,11 @@ def _trim_near_white(image: Image.Image) -> Image.Image:
 
 
 def resolve_logo_path() -> str | None:
+    """Card-safe logo only — never favicon/manifest assets (may include coat of arms)."""
     return (
-        finders.find("images/ascai-logo.png")
-        or finders.find("images/apple-touch-icon.png")
-        or finders.find("images/web-app-manifest-512x512.png")
+        finders.find("images/ascai-logo-card.svg")
+        or finders.find("images/ascai-logo-card.png")
+        or finders.find("images/ascai-logo.png")
         or finders.find("images/ascai-logo-placeholder.svg")
     )
 
@@ -74,7 +75,10 @@ def make_logo_data_uri() -> str | None:
 
 
 def resolve_logo_static_url() -> str:
-    """Browser-safe logo URL for preview pages."""
+    if finders.find("images/ascai-logo-card.svg"):
+        return static("images/ascai-logo-card.svg")
+    if finders.find("images/ascai-logo-card.png"):
+        return static("images/ascai-logo-card.png")
     if finders.find("images/ascai-logo.png"):
         return static("images/ascai-logo.png")
     return static("images/ascai-logo-placeholder.svg")

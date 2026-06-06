@@ -163,6 +163,14 @@ class MembershipCardDashboardTest(TestCase):
         self.assertNotIn(".it", card.email)
         self.assertNotIn(".it", card.website)
 
+    def test_membership_card_logo_excludes_favicon_assets(self):
+        from apps.dashboard.membership_cards.assets import resolve_logo_path
+
+        path = resolve_logo_path() or ""
+        self.assertNotIn("apple-touch-icon", path)
+        self.assertNotIn("web-app-manifest", path)
+        self.assertIn("ascai-logo-card", path)
+
 
 class TicketReplyModelTest(TestCase):
     """Test TicketReply model."""

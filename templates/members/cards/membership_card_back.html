@@ -8,10 +8,11 @@
     <span class="ribbon-green"></span>
     <span class="ribbon-red"></span>
     <span class="ribbon-yellow"></span>
+    <span class="ribbon-star"></span>
   </div>
 
-  <div class="back-layout">
-    <aside class="back-logo-panel">
+  <div class="back-upper">
+    <aside class="back-logo-col">
       <div class="card-logo card-logo--compact">
         {% if logo_url %}
         <img class="card-logo-img" src="{{ logo_url }}" alt="ASCAI">
@@ -24,16 +25,16 @@
     <section class="back-benefits">
       <h2 class="benefits-badge">CARD BENEFITS</h2>
       <ul class="benefits-list">
-        <li><span class="benefit-icon"></span>Access to ASCAI events and programs</li>
-        <li><span class="benefit-icon"></span>Participation in meetings and workshops</li>
-        <li><span class="benefit-icon"></span>Networking opportunities with members</li>
-        <li><span class="benefit-icon"></span>Community support and cultural activities</li>
-        <li><span class="benefit-icon"></span>Academic and career development resources</li>
+        <li><span class="benefit-icon"></span><span>Access to ASCAI events and programs</span></li>
+        <li><span class="benefit-icon"></span><span>Participation in meetings and workshops</span></li>
+        <li><span class="benefit-icon"></span><span>Networking opportunities with members</span></li>
+        <li><span class="benefit-icon"></span><span>Community support and cultural activities</span></li>
+        <li><span class="benefit-icon"></span><span>Academic and career development resources</span></li>
       </ul>
     </section>
   </div>
 
-  <div class="back-bottom">
+  <div class="back-lower">
     <section class="contact-section">
       <h3 class="contact-title">CONTACT US</h3>
       <p class="contact-row">Location: {{ card.address }}</p>
@@ -49,11 +50,13 @@
       <div class="card-qr card-qr--back">
         <img src="{{ qr_url }}" alt="Verification QR code">
       </div>
-      <div class="verification-box">
-        <strong>This card remains the property of ASCAI Lazio.</strong>
-        If found, please return it to the contact email above.
+      <div class="verification-copy">
+        <div class="verification-box">
+          <strong>This card remains the property of ASCAI Lazio.</strong>
+          If found, please return it to the contact email above.
+        </div>
+        <p class="verification-email">Verification: {{ card.verificationEmail }}</p>
       </div>
-      <p class="verification-email">Verification: {{ card.verificationEmail }}</p>
     </section>
   </div>
 

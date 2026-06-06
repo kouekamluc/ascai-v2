@@ -1,12 +1,22 @@
-# ASCAI Official Logo Asset
+# ASCAI Logo Assets for Membership Cards
 
-Membership card PDFs and previews load the logo from this directory in order:
+Membership cards use **coat-of-arms-free** logo files only.
 
-1. **`ascai-logo.png`** — preferred official ASCAI logo (add your production asset here)
-2. **`apple-touch-icon.png`** — favicon fallback
-3. **`web-app-manifest-512x512.png`** — manifest icon fallback
-4. **`ascai-logo-placeholder.svg`** — development placeholder (no coat of arms)
+## Card logo (required for cards)
 
-Replace `ascai-logo.png` with the real association logo. Do **not** use Cameroon or Italy coat-of-arms imagery in the logo asset.
+1. **`ascai-logo-card.svg`** — default card logo (Colosseum + ASCAI wordmark, no coat of arms)
+2. **`ascai-logo-card.png`** — optional high-resolution card logo (same rules)
+3. **`ascai-logo.png`** — optional general logo if it contains **no** Cameroon or Italy coat of arms
 
-Recommended: PNG with transparent background, at least 512×512 px.
+## Not used on membership cards
+
+These favicon/manifest assets are **excluded** from card PDFs because they may include coat-of-arms imagery:
+
+- `apple-touch-icon.png`
+- `web-app-manifest-512x512.png`
+
+## Rules
+
+- Do **not** include the coat of arms of Cameroon or Italy on the card logo.
+- Cameroon flag **colors** (green, red, yellow) are used in ribbons and typography only.
+- Replace `ascai-logo-card.svg` with your final official artwork when ready.
