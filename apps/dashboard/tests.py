@@ -58,6 +58,83 @@ class SupportTicketModelTest(TestCase):
         self.assertIn('Test Subject', str(ticket))
 
 
+class MembershipCardDashboardTest(TestCase):
+    """Test membership card generation from paid dues."""
+
+    def setUp(self):
+        self.client = Client()
+        self.admin = User.objects.create_superuser(
+            username='cardadmin',
+            email='cardadmin@example.com',
+            password='testpass123',
+        )
+        self.member_user = User.objects.create_user(
+            username='kevin',
+            email='kevin@example.com',
+            password='testpass123',
+            full_name='Kevin Kouekam',
+            is_approved=True,
+            email_verified=True,
+        )
+        self.unpaid_user = User.objects.create_user(
+            username='pendingmember',
+            email='pending@example.com',
+            password='testpass123',
+            full_name='Pending Member',
+            is_approved=True,
+            email_verified=True,
+        )
+        self.member = Member.objects.create(
+            user=self.member_user,
+            member_type='student',
+            is_active_member=True,
+        )
+        self.unpaid_member = Member.objects.create(
+            user=self.unpaid_user,
+            member_type='student',
+        )
+        self.paid_dues = MembershipDues.objects.create(
+            member=self.member,
+            year=2026,
+            amount=10,
+            due_date=date(2026, 3, 31),
+            payment_date=date(2026, 6, 1),
+            valid_from=date(2026, 1, 1),
+            valid_until=date(2026, 12, 31),
+            status='paid',
+        )
+        self.unpaid_dues = MembershipDues.objects.create(
+            member=self.unpaid_member,
+            year=2026,
+            amount=10,
+            due_date=date(2026, 3, 31),
+            status='pending',
+        )
+
+    def test_membership_cards_page_lists_only_paid_dues(self):
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse('dashboard:membership_cards'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Kevin Kouekam')
+        self.assertContains(response, 'ASC-2026-')
+        self.assertNotContains(response, 'Pending Member')
+
+    def test_membership_card_pdf_requires_paid_dues(self):
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse('dashboard:membership_card_pdf', args=[self.paid_dues.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/pdf')
+        self.assertTrue(response.content.startswith(b'%PDF'))
+        self.assertIn('ASCAI-membership-card-2026', response['Content-Disposition'])
+
+        unpaid_response = self.client.get(reverse('dashboard:membership_card_pdf', args=[self.unpaid_dues.pk]))
+        self.assertEqual(unpaid_response.status_code, 404)
+
+
 class TicketReplyModelTest(TestCase):
     """Test TicketReply model."""
     

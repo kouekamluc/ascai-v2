@@ -23,6 +23,10 @@ urlpatterns = [
     path('messages/', views.BureauMessageListView.as_view(), name='messages_list'),
     path('messages/<int:pk>/', views.BureauMessageDetailView.as_view(), name='message_detail'),
     path('messages/<int:pk>/reply/', views.BureauMessageReplyView.as_view(), name='message_reply'),
+
+    # Membership Cards
+    path('membership-cards/', views.MembershipCardAdminView.as_view(), name='membership_cards'),
+    path('membership-cards/<int:dues_id>/pdf/', views.MembershipCardPDFView.as_view(), name='membership_card_pdf'),
     
     # Support Tickets
     path('support/tickets/', views.TicketListView.as_view(), name='tickets_list'),

@@ -73,6 +73,9 @@
                 <a href="{% url 'governance:financial_transactions' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and 'financial' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Finances' %}</a>
                 <a href="{% url 'governance:contribution_list' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and 'contribution' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Contributions' %}</a>
                 {% endif %}
+                {% if perms.governance.view_member or perms.governance.manage_finances or user.is_staff %}
+                <a href="{% url 'dashboard:membership_cards' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'dashboard' and 'membership_card' in request.resolver_match.url_name %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Membership Cards' %}</a>
+                {% endif %}
             </div>
         </div>
         {% endif %}

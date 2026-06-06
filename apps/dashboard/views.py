@@ -46,6 +46,89 @@ from apps.mentorship.services import (
     send_message as send_mentorship_message,
     update_availability as update_mentor_availability,
 )
+from .membership_cards import generate_membership_card_pdf
+
+
+def _can_manage_membership_cards(user):
+    return user.is_staff or user.has_perm('governance.view_member') or user.has_perm('governance.manage_finances')
+
+
+class MembershipCardAdminView(DashboardRequiredMixin, ListView):
+    """Dashboard page for generating membership cards from paid dues."""
+    template_name = 'dashboard/membership_cards.html'
+    context_object_name = 'paid_dues'
+    paginate_by = 24
+
+    def dispatch(self, request, *args, **kwargs):
+        if not _can_manage_membership_cards(request.user):
+            messages.error(request, _('You do not have permission to manage membership cards.'))
+            return redirect('dashboard:home')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        from apps.governance.models import MembershipDues
+
+        queryset = (
+            MembershipDues.objects
+            .filter(status='paid')
+            .select_related('member', 'member__user')
+            .order_by('-year', 'member__user__full_name', 'member__user__username')
+        )
+        year = self.request.GET.get('year')
+        search = self.request.GET.get('q')
+
+        if year:
+            queryset = queryset.filter(year=year)
+        if search:
+            queryset = queryset.filter(
+                Q(member__user__full_name__icontains=search) |
+                Q(member__user__first_name__icontains=search) |
+                Q(member__user__last_name__icontains=search) |
+                Q(member__user__username__icontains=search) |
+                Q(member__user__email__icontains=search)
+            )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        from apps.governance.models import MembershipDues
+
+        context = super().get_context_data(**kwargs)
+        years = (
+            MembershipDues.objects
+            .filter(status='paid')
+            .order_by('-year')
+            .values_list('year', flat=True)
+            .distinct()
+        )
+        context['years'] = years
+        context['selected_year'] = self.request.GET.get('year', '')
+        context['search_query'] = self.request.GET.get('q', '')
+        context['paid_count'] = self.get_queryset().count()
+        context['breadcrumbs'] = [{'name': _('Membership Cards'), 'url': None}]
+        return context
+
+
+class MembershipCardPDFView(DashboardRequiredMixin, DetailView):
+    """Generate a two-page PDF membership card for a paid dues record."""
+    pk_url_kwarg = 'dues_id'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not _can_manage_membership_cards(request.user):
+            messages.error(request, _('You do not have permission to generate membership cards.'))
+            return redirect('dashboard:home')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        from apps.governance.models import MembershipDues
+        return MembershipDues.objects.filter(status='paid').select_related('member', 'member__user')
+
+    def get(self, request, *args, **kwargs):
+        dues = self.get_object()
+        pdf = generate_membership_card_pdf(dues, request)
+        filename = f"ASCAI-membership-card-{dues.year}-{dues.member.pk:03d}.pdf"
+        response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
 
 
 class DashboardHomeView(DashboardRequiredMixin, TemplateView):
@@ -477,6 +560,8 @@ class DashboardHomeView(DashboardRequiredMixin, TemplateView):
 
         if workflow.is_governance_staff:
             quick_actions.append({'title': _('Governance Dashboard'), 'url': reverse_lazy('governance:dashboard'), 'icon': 'governance'})
+            if _can_manage_membership_cards(user):
+                quick_actions.append({'title': _('Membership Cards'), 'url': reverse_lazy('dashboard:membership_cards'), 'icon': 'membership'})
             if user.has_perm('governance.manage_finances') or user.is_staff:
                 quick_actions.append({'title': _('Financial Transactions'), 'url': reverse_lazy('governance:financial_transactions'), 'icon': 'finance'})
 
