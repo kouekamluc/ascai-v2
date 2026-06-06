@@ -151,6 +151,18 @@ class MembershipCardDashboardTest(TestCase):
         self.assertContains(response, 'CARD BENEFITS')
         self.assertContains(response, 'Download Membership Card PDF')
 
+    def test_membership_card_uses_site_contact_defaults(self):
+        from apps.dashboard.membership_cards.data import build_member_card_data
+
+        card = build_member_card_data(self.paid_dues)
+
+        self.assertEqual(card.email, "info@ascai.org")
+        self.assertEqual(card.website, "ascai.org")
+        self.assertEqual(card.verificationEmail, "info@ascai.org")
+        self.assertIn("Rome", card.address)
+        self.assertNotIn(".it", card.email)
+        self.assertNotIn(".it", card.website)
+
 
 class TicketReplyModelTest(TestCase):
     """Test TicketReply model."""

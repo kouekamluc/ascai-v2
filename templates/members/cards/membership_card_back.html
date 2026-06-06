@@ -36,9 +36,11 @@
   <div class="back-bottom">
     <section class="contact-section">
       <h3 class="contact-title">CONTACT US</h3>
-      <p class="contact-row">Address: {{ card.address }}</p>
+      <p class="contact-row">Location: {{ card.address }}</p>
       <p class="contact-row">Email: {{ card.email }}</p>
+      {% if card.phone %}
       <p class="contact-row">Phone: {{ card.phone }}</p>
+      {% endif %}
       <p class="contact-row">Website: {{ card.website }}</p>
       <p class="contact-row">Social: {{ card.social }}</p>
     </section>
@@ -48,8 +50,8 @@
         <img src="{{ qr_url }}" alt="Verification QR code">
       </div>
       <div class="verification-box">
-        <strong>This card remains the property of ASCAI.</strong>
-        If found, please return it to the address above.
+        <strong>This card remains the property of ASCAI Lazio.</strong>
+        If found, please return it to the contact email above.
       </div>
       <p class="verification-email">Verification: {{ card.verificationEmail }}</p>
     </section>
