@@ -10,7 +10,14 @@ from pathlib import Path
 from django.conf import settings
 from django.template.loader import render_to_string
 
-from .assets import make_photo_data_uri, make_qr_data_uri, resolve_css_path, resolve_logo_url
+from .assets import (
+    make_logo_data_uri,
+    make_photo_data_uri,
+    make_qr_data_uri,
+    resolve_css_path,
+    resolve_logo_static_url,
+    resolve_watermark_data_uri,
+)
 from .data import MemberCardData, build_member_card_data
 
 logger = logging.getLogger(__name__)
@@ -23,11 +30,14 @@ def membership_card_filename(card_data: MemberCardData) -> str:
 def build_card_context(dues, request=None) -> dict:
     card = build_member_card_data(dues, request)
     css_path = resolve_css_path()
+    logo_data_uri = make_logo_data_uri()
     return {
         "card": card,
-        "logo_url": resolve_logo_url(),
+        "logo_url": logo_data_uri,
+        "logo_static_url": resolve_logo_static_url(),
         "photo_url": make_photo_data_uri(card.photoField, card.fullName),
         "qr_url": make_qr_data_uri(card.qrCodeData),
+        "watermark_url": resolve_watermark_data_uri(),
         "css_path": Path(css_path).resolve().as_uri(),
     }
 
