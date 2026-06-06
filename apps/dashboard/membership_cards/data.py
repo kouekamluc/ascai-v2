@@ -3,10 +3,10 @@ Data adapter for ASCAI membership card PDFs.
 """
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import date
 
-from django.urls import reverse
 from django.utils import timezone
 
 
@@ -36,7 +36,7 @@ def _month_year(value: date | None, fallback: date) -> str:
     return (value or fallback).strftime("%m/%Y")
 
 
-def build_member_card_data(dues, request) -> MemberCardData:
+def build_member_card_data(dues, request=None) -> MemberCardData:
     member = dues.member
     user = member.user
     full_name = user.get_display_name()
@@ -46,18 +46,13 @@ def build_member_card_data(dues, request) -> MemberCardData:
     status = "active"
     role = "Member" if member.member_type != "sympathizer" else "Sympathizer"
 
-    verification_url = request.build_absolute_uri(
-        reverse("dashboard:membership_card_pdf", kwargs={"dues_id": dues.pk})
-    )
-    qr_data = (
-        "{"
-        f'"association":"ASCAI",'
-        f'"member_id":"{member_id}",'
-        f'"name":"{full_name}",'
-        f'"status":"{status}",'
-        f'"verify":"{verification_url}"'
-        "}"
-    )
+    qr_payload = {
+        "association": "ASCAI",
+        "member_id": member_id,
+        "name": full_name,
+        "status": status,
+    }
+    qr_data = json.dumps(qr_payload, separators=(",", ":"))
 
     return MemberCardData(
         fullName=full_name,

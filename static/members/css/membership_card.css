@@ -1,0 +1,732 @@
+/* ASCAI membership card — print/PDF styles (WeasyPrint) */
+
+:root {
+  --green: #007A3D;
+  --red: #CE1126;
+  --yellow: #FCD116;
+  --gold: #B68A2C;
+  --white: #FFFFFF;
+  --dark: #222222;
+  --muted: #6A5A42;
+  --paper: #FCFAF4;
+  --pale-gold: #E8D9B8;
+  --card-w: 85.6mm;
+  --card-h: 54mm;
+}
+
+@page preview-sheet {
+  size: A4 landscape;
+  margin: 12mm;
+}
+
+@page print-card {
+  size: 85.6mm 54mm;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  color: var(--dark);
+}
+
+/* ── Card shell ── */
+
+.card {
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: 3mm;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  background: var(--paper);
+  border: 0.55pt solid #D8CDBB;
+  flex-shrink: 0;
+}
+
+.card-bg-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(135deg, transparent 46%, var(--pale-gold) 47%, var(--pale-gold) 48%, transparent 49%),
+    radial-gradient(circle at 8mm 8mm, var(--pale-gold) 0.4mm, transparent 0.5mm);
+  background-size: 8mm 8mm, 9mm 9mm;
+  pointer-events: none;
+}
+
+.card-watermark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 38mm;
+  height: 22mm;
+  transform: translate(-50%, -50%);
+  opacity: 0.45;
+  background: url("../images/colosseum-watermark.svg") center / contain no-repeat;
+  pointer-events: none;
+}
+
+.card-front .card-watermark {
+  left: 58%;
+  top: 46%;
+}
+
+.card-back .card-watermark {
+  left: 68%;
+  top: 52%;
+  width: 36mm;
+}
+
+/* ── Cameroon ribbon ── */
+
+.cameroon-ribbon {
+  position: absolute;
+  pointer-events: none;
+}
+
+.cameroon-ribbon--front {
+  left: 0;
+  bottom: 0;
+  width: 52mm;
+  height: 10mm;
+  overflow: hidden;
+}
+
+.cameroon-ribbon--front::before,
+.cameroon-ribbon--front::after {
+  content: "";
+  position: absolute;
+  left: -4mm;
+  border-radius: 50%;
+}
+
+.cameroon-ribbon--front::before {
+  bottom: 1mm;
+  width: 52mm;
+  height: 5mm;
+  background: var(--green);
+  transform: rotate(-4deg);
+}
+
+.cameroon-ribbon--front .ribbon-red,
+.cameroon-ribbon--front .ribbon-yellow {
+  position: absolute;
+  left: -4mm;
+  border-radius: 50%;
+}
+
+.cameroon-ribbon--front .ribbon-red {
+  bottom: 2.5mm;
+  width: 52mm;
+  height: 3.8mm;
+  background: var(--red);
+  transform: rotate(-2deg);
+}
+
+.cameroon-ribbon--front .ribbon-yellow {
+  bottom: 4mm;
+  width: 52mm;
+  height: 2.4mm;
+  background: var(--yellow);
+  transform: rotate(-1deg);
+}
+
+.cameroon-ribbon--front .ribbon-star {
+  position: absolute;
+  left: 14mm;
+  bottom: 3.2mm;
+  width: 3mm;
+  height: 3mm;
+  background: var(--yellow);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  z-index: 2;
+}
+
+.cameroon-ribbon--back {
+  top: -2mm;
+  left: -3mm;
+  width: calc(100% + 6mm);
+  height: 8mm;
+}
+
+.cameroon-ribbon--back .ribbon-green,
+.cameroon-ribbon--back .ribbon-red,
+.cameroon-ribbon--back .ribbon-yellow {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+
+.cameroon-ribbon--back .ribbon-green {
+  top: 0;
+  height: 7mm;
+  background: var(--green);
+}
+
+.cameroon-ribbon--back .ribbon-red {
+  top: 2mm;
+  height: 4.5mm;
+  background: var(--red);
+  opacity: 0.95;
+}
+
+.cameroon-ribbon--back .ribbon-yellow {
+  top: 4mm;
+  height: 2.8mm;
+  background: var(--yellow);
+}
+
+/* ── Logo block ── */
+
+.card-logo {
+  position: absolute;
+  border: 0.55pt solid var(--gold);
+  border-radius: 2.5mm;
+  background: var(--white);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-logo img {
+  max-width: 64%;
+  max-height: 42%;
+  object-fit: contain;
+}
+
+.card-logo--front {
+  left: 5.5mm;
+  top: 7.6mm;
+  width: 25.5mm;
+  height: 24.2mm;
+}
+
+.card-logo--back {
+  left: 7mm;
+  top: 8mm;
+  width: 20mm;
+  height: 15mm;
+}
+
+.logo-placeholder {
+  text-align: center;
+  font-size: 5pt;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1.3;
+  padding: 1mm;
+}
+
+.logo-letters {
+  position: absolute;
+  bottom: 6mm;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0.15mm;
+}
+
+.logo-letters .l-a1 { color: var(--green); }
+.logo-letters .l-s { color: var(--red); }
+.logo-letters .l-c { color: var(--red); }
+.logo-letters .l-a2 { color: var(--yellow); }
+.logo-letters .l-i { color: var(--yellow); }
+
+.logo-banner {
+  position: absolute;
+  bottom: 2.4mm;
+  left: 3.5mm;
+  right: 3.5mm;
+  background: #FFF8E7;
+  border: 0.55pt solid var(--gold);
+  border-radius: 1mm;
+  font-size: 3.6pt;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.6mm 0.5mm;
+  line-height: 1.2;
+}
+
+/* ── Front header / title ── */
+
+.front-header {
+  position: absolute;
+  left: 35.2mm;
+  top: 8mm;
+  font-size: 6.8pt;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.12mm;
+}
+
+.front-title {
+  position: absolute;
+  left: 35mm;
+  top: 17.5mm;
+  font-size: 20pt;
+  font-weight: 700;
+  letter-spacing: 0.2mm;
+}
+
+.front-title .l-a1 { color: var(--green); }
+.front-title .l-s { color: var(--red); }
+.front-title .l-c { color: var(--red); }
+.front-title .l-a2 { color: var(--yellow); }
+.front-title .l-i { color: var(--yellow); }
+
+.front-community {
+  position: absolute;
+  left: 35.3mm;
+  top: 21.7mm;
+  width: 29mm;
+  font-size: 9.2pt;
+  font-style: italic;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.front-legal {
+  position: absolute;
+  left: 35.3mm;
+  top: 24.4mm;
+  width: 30mm;
+  font-size: 4.8pt;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.front-divider {
+  position: absolute;
+  left: 35.3mm;
+  top: 25.3mm;
+  width: 30.3mm;
+  height: 0;
+  border-top: 0.55pt solid var(--gold);
+}
+
+/* ── Member fields ── */
+
+.member-fields {
+  position: absolute;
+  left: 35.3mm;
+  top: 28.3mm;
+  width: 32mm;
+  font-size: 5.2pt;
+}
+
+.member-fields .field-row {
+  display: flex;
+  margin-bottom: 0.4mm;
+  line-height: 1.35;
+}
+
+.member-fields .field-label {
+  width: 11.2mm;
+  font-weight: 700;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.member-fields .field-value {
+  flex: 1;
+  font-size: 6.3pt;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Photo & QR ── */
+
+.member-photo {
+  position: absolute;
+  right: 5.8mm;
+  top: 21mm;
+  width: 17.8mm;
+  height: 17.8mm;
+  border: 0.55pt solid var(--gold);
+  border-radius: 2mm;
+  background: var(--white);
+  overflow: hidden;
+  padding: 0.8mm;
+}
+
+.member-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1.2mm;
+}
+
+.card-qr {
+  position: absolute;
+  border: 0.55pt solid var(--gold);
+  border-radius: 1.1mm;
+  background: var(--white);
+  padding: 1mm;
+}
+
+.card-qr img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-qr--front {
+  right: 4.7mm;
+  bottom: 28.8mm;
+  width: 14.5mm;
+  height: 14.5mm;
+}
+
+.card-qr--back {
+  right: 14.5mm;
+  bottom: 4.9mm;
+  width: 12mm;
+  height: 12mm;
+}
+
+/* ── Signatures ── */
+
+.signatures {
+  position: absolute;
+  left: 35mm;
+  right: 4.5mm;
+  bottom: 4mm;
+  display: flex;
+  justify-content: space-between;
+}
+
+.signature-block {
+  text-align: center;
+}
+
+.signature-block--holder {
+  width: 18.6mm;
+}
+
+.signature-block--auth {
+  width: 21mm;
+}
+
+.signature-name {
+  font-size: 7pt;
+  font-style: italic;
+  margin-bottom: 0.3mm;
+}
+
+.signature-line {
+  border-top: 0.55pt solid var(--gold);
+  margin-bottom: 0.4mm;
+}
+
+.signature-label {
+  font-size: 3.2pt;
+  color: var(--dark);
+}
+
+.signature-sub {
+  font-size: 2.9pt;
+  margin-top: 0.2mm;
+}
+
+/* ── Back: benefits ── */
+
+.benefits-badge {
+  position: absolute;
+  right: 5.5mm;
+  top: 5.7mm;
+  background: var(--green);
+  color: var(--yellow);
+  font-size: 5.2pt;
+  font-weight: 700;
+  padding: 1mm 2mm;
+  border-radius: 2.1mm;
+  letter-spacing: 0.08mm;
+}
+
+.benefits-list {
+  position: absolute;
+  right: 5mm;
+  top: 11mm;
+  width: 34mm;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2mm;
+  margin-bottom: 0.8mm;
+  font-size: 4.6pt;
+  line-height: 1.25;
+}
+
+.benefit-icon {
+  width: 2.4mm;
+  height: 2.4mm;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  margin-top: 0.3mm;
+}
+
+/* ── Back: contact ── */
+
+.contact-section {
+  position: absolute;
+  left: 5.8mm;
+  bottom: 5mm;
+  width: 44mm;
+}
+
+.contact-title {
+  font-size: 5.5pt;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 0.8mm;
+}
+
+.contact-row {
+  font-size: 3.6pt;
+  line-height: 1.45;
+  margin-bottom: 0.2mm;
+}
+
+.contact-divider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14.4mm;
+  border-top: 0.55pt solid var(--gold);
+}
+
+.back-footer-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4.6mm;
+  background: var(--gold);
+  background-image:
+    linear-gradient(45deg, #C69A3B 25%, transparent 25%, transparent 75%, #C69A3B 75%),
+    linear-gradient(45deg, #C69A3B 25%, transparent 25%, transparent 75%, #C69A3B 75%);
+  background-size: 2mm 2mm;
+  background-position: 0 0, 1mm 1mm;
+}
+
+.verification-box {
+  position: absolute;
+  right: 4mm;
+  bottom: 5.1mm;
+  width: 11.8mm;
+  height: 12mm;
+  background: var(--green);
+  border-radius: 1.1mm;
+  color: var(--white);
+  padding: 1mm;
+  font-size: 3pt;
+  line-height: 1.35;
+}
+
+.verification-box strong {
+  display: block;
+  font-size: 3.2pt;
+  margin-bottom: 0.5mm;
+}
+
+.verification-email {
+  position: absolute;
+  right: 4mm;
+  bottom: 2.8mm;
+  font-size: 3.4pt;
+  font-weight: 700;
+  max-width: 25mm;
+}
+
+.back-split {
+  position: absolute;
+  right: 28.8mm;
+  bottom: 4.6mm;
+  height: 8.8mm;
+  border-left: 0.55pt solid var(--gold);
+}
+
+/* ── PDF preview sheet ── */
+
+.pdf-sheet {
+  page: preview-sheet;
+}
+
+.pdf-sheet-header {
+  text-align: center;
+  margin-bottom: 6mm;
+}
+
+.pdf-sheet-header h1 {
+  font-size: 12pt;
+  margin: 0 0 2mm;
+}
+
+.pdf-sheet-header p {
+  font-size: 8pt;
+  margin: 0;
+  color: var(--muted);
+}
+
+.card-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16mm;
+}
+
+.card-label {
+  text-align: center;
+  font-size: 7pt;
+  color: var(--muted);
+  margin-top: 2mm;
+}
+
+.card-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Print layout (exact card pages) ── */
+
+.print-page {
+  page: print-card;
+  width: var(--card-w);
+  height: var(--card-h);
+  page-break-after: always;
+}
+
+.print-page:last-child {
+  page-break-after: auto;
+}
+
+/* ── Browser preview page ── */
+
+.preview-page {
+  min-height: 100vh;
+  background: #ece7dc;
+  padding: 24px;
+}
+
+.preview-toolbar {
+  max-width: 980px;
+  margin: 0 auto 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.preview-toolbar h1 {
+  font-size: 1.35rem;
+  margin: 0;
+  color: var(--dark);
+}
+
+.preview-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.preview-actions a,
+.preview-actions button {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.preview-actions .btn-download {
+  background: var(--green);
+  color: var(--white);
+}
+
+.preview-actions .btn-print {
+  background: var(--gold);
+  color: var(--white);
+}
+
+.preview-actions .btn-back {
+  background: var(--white);
+  color: var(--dark);
+  border: 1px solid #ccc;
+}
+
+.preview-stage {
+  max-width: 980px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: 16px;
+  padding: 32px 24px 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.preview-note {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+.preview-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px;
+}
+
+.preview-cards .card-wrap {
+  transform: scale(1.38);
+  transform-origin: top center;
+  margin-bottom: 48px;
+}
+
+@media print {
+  .preview-page {
+    background: white;
+    padding: 0;
+  }
+
+  .preview-toolbar,
+  .preview-note {
+    display: none;
+  }
+
+  .preview-stage {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .preview-cards .card-wrap {
+    transform: none;
+    margin-bottom: 0;
+  }
+}

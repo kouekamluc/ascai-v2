@@ -1,0 +1,57 @@
+{% load static %}
+<div class="card card-back">
+  <div class="card-bg-pattern"></div>
+  <div class="card-watermark"></div>
+
+  <div class="cameroon-ribbon cameroon-ribbon--back">
+    <span class="ribbon-green"></span>
+    <span class="ribbon-red"></span>
+    <span class="ribbon-yellow"></span>
+  </div>
+
+  <div class="card-logo card-logo--back">
+    {% if logo_url %}
+    <img src="{{ logo_url }}" alt="ASCAI logo">
+    {% else %}
+    <div class="logo-placeholder">ASCAI</div>
+    {% endif %}
+    <div class="logo-letters" style="font-size: 8pt; bottom: 4mm;">
+      <span class="l-a1">A</span><span class="l-s">S</span><span class="l-c">C</span><span class="l-a2">A</span><span class="l-i">I</span>
+    </div>
+  </div>
+
+  <div class="benefits-badge">CARD BENEFITS</div>
+  <ul class="benefits-list">
+    <li><span class="benefit-icon"></span><span>Access to ASCAI events and programs</span></li>
+    <li><span class="benefit-icon"></span><span>Participation in meetings and workshops</span></li>
+    <li><span class="benefit-icon"></span><span>Networking opportunities with members</span></li>
+    <li><span class="benefit-icon"></span><span>Community support and cultural activities</span></li>
+    <li><span class="benefit-icon"></span><span>Academic and career development resources</span></li>
+  </ul>
+
+  <div class="contact-divider"></div>
+
+  <div class="contact-section">
+    <div class="contact-title">CONTACT US</div>
+    <div class="contact-row">Address: {{ card.address }}</div>
+    <div class="contact-row">Email: {{ card.email }}</div>
+    <div class="contact-row">Phone: {{ card.phone }}</div>
+    <div class="contact-row">Website: {{ card.website }}</div>
+    <div class="contact-row">Social: {{ card.social }}</div>
+  </div>
+
+  <div class="back-split"></div>
+
+  <div class="card-qr card-qr--back">
+    <img src="{{ qr_url }}" alt="Verification QR code">
+  </div>
+
+  <div class="verification-box">
+    <strong>This card remains the property of ASCAI.</strong>
+    If found, please return it to the address above.
+  </div>
+
+  <div class="verification-email">Verification: {{ card.verificationEmail }}</div>
+
+  <div class="back-footer-strip"></div>
+</div>

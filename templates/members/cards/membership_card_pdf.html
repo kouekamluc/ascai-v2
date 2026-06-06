@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ASCAI Membership Card — {{ card.fullName }}</title>
+  <link rel="stylesheet" href="{{ css_path }}">
+</head>
+<body class="pdf-sheet">
+  <div class="pdf-sheet-header">
+    <h1>ASCAI Membership Card Preview</h1>
+    <p>Preview is enlarged for review. Use Download Print Version for exact 85.6mm × 54mm card pages.</p>
+  </div>
+
+  <div class="card-row">
+    <div class="card-wrap">
+      {% include "members/cards/membership_card_front.html" %}
+      <div class="card-label">FRONT</div>
+    </div>
+    <div class="card-wrap">
+      {% include "members/cards/membership_card_back.html" %}
+      <div class="card-label">BACK</div>
+    </div>
+  </div>
+</body>
+</html>

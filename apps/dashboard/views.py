@@ -46,9 +46,13 @@ from apps.mentorship.services import (
     send_message as send_mentorship_message,
     update_availability as update_mentor_availability,
 )
-from .membership_cards import generate_membership_card_pdf, generate_membership_card_print_pdf
+from .membership_cards import (
+    build_card_context,
+    generate_membership_card_pdf,
+    generate_membership_card_print_pdf,
+    membership_card_filename,
+)
 from .membership_cards.data import build_member_card_data
-from .membership_cards.pdf import membership_card_filename
 
 
 def _can_manage_membership_cards(user):
@@ -107,6 +111,31 @@ class MembershipCardAdminView(DashboardRequiredMixin, ListView):
         context['search_query'] = self.request.GET.get('q', '')
         context['paid_count'] = self.get_queryset().count()
         context['breadcrumbs'] = [{'name': _('Membership Cards'), 'url': None}]
+        return context
+
+
+class MembershipCardPreviewView(DashboardRequiredMixin, DetailView):
+    """Browser preview of the membership card using the same HTML/CSS as the PDF."""
+    template_name = 'members/cards/membership_card_preview.html'
+    pk_url_kwarg = 'dues_id'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not _can_manage_membership_cards(request.user):
+            messages.error(request, _('You do not have permission to preview membership cards.'))
+            return redirect('dashboard:home')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        from apps.governance.models import MembershipDues
+        return MembershipDues.objects.filter(status='paid').select_related('member', 'member__user')
+
+    def get_context_data(self, **kwargs):
+        dues = self.get_object()
+        context = super().get_context_data(**kwargs)
+        context.update(build_card_context(dues, self.request))
+        context['pdf_download_url'] = reverse('dashboard:membership_card_pdf', kwargs={'dues_id': dues.pk})
+        context['print_download_url'] = reverse('dashboard:membership_card_print_pdf', kwargs={'dues_id': dues.pk})
+        context['back_url'] = reverse('dashboard:membership_cards')
         return context
 
 

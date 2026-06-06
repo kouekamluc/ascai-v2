@@ -1,0 +1,63 @@
+{% load static %}
+<div class="card card-front">
+  <div class="card-bg-pattern"></div>
+  <div class="card-watermark"></div>
+
+  <div class="cameroon-ribbon cameroon-ribbon--front">
+    <span class="ribbon-red"></span>
+    <span class="ribbon-yellow"></span>
+    <span class="ribbon-star"></span>
+  </div>
+
+  <div class="card-logo card-logo--front">
+    {% if logo_url %}
+    <img src="{{ logo_url }}" alt="ASCAI logo">
+    {% else %}
+    <div class="logo-placeholder">ADD OFFICIAL<br>ASCAI LOGO</div>
+    {% endif %}
+    <div class="logo-letters">
+      <span class="l-a1">A</span><span class="l-s">S</span><span class="l-c">C</span><span class="l-a2">A</span><span class="l-i">I</span>
+    </div>
+    <div class="logo-banner">ASSOCIAZIONE STUDENTI CAMERUNESI DEL LAZIO</div>
+  </div>
+
+  <div class="front-header">MEMBERSHIP CARD</div>
+
+  <div class="front-title">
+    <span class="l-a1">A</span><span class="l-s">S</span><span class="l-c">C</span><span class="l-a2">A</span><span class="l-i">I</span>
+  </div>
+  <div class="front-community">{{ card.community }}</div>
+  <div class="front-legal">{{ card.legalName }}</div>
+  <div class="front-divider"></div>
+
+  <div class="member-fields">
+    <div class="field-row"><span class="field-label">Name:</span><span class="field-value">{{ card.fullName }}</span></div>
+    <div class="field-row"><span class="field-label">Member ID:</span><span class="field-value">{{ card.memberId }}</span></div>
+    <div class="field-row"><span class="field-label">Role:</span><span class="field-value">{{ card.role }}</span></div>
+    <div class="field-row"><span class="field-label">Nationality:</span><span class="field-value">{{ card.nationality }}</span></div>
+    <div class="field-row"><span class="field-label">Issued:</span><span class="field-value">{{ card.issuedDate }}</span></div>
+    <div class="field-row"><span class="field-label">Expires:</span><span class="field-value">{{ card.expiryDate }}</span></div>
+  </div>
+
+  <div class="member-photo">
+    <img src="{{ photo_url }}" alt="{{ card.fullName }}">
+  </div>
+
+  <div class="card-qr card-qr--front">
+    <img src="{{ qr_url }}" alt="Membership QR code">
+  </div>
+
+  <div class="signatures">
+    <div class="signature-block signature-block--holder">
+      <div class="signature-name">{{ card.fullName }}</div>
+      <div class="signature-line"></div>
+      <div class="signature-label">Cardholder Signature</div>
+    </div>
+    <div class="signature-block signature-block--auth">
+      <div class="signature-name">ASCAI</div>
+      <div class="signature-line"></div>
+      <div class="signature-label">Authorized Signature</div>
+      <div class="signature-sub">ASCAI Executive Board</div>
+    </div>
+  </div>
+</div>

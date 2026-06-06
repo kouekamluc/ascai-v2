@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="ASCAI logo placeholder">
+  <rect width="120" height="120" rx="8" fill="#FCFAF4" stroke="#B68A2C" stroke-width="1.5"/>
+  <path d="M20 78 Q60 42 100 78" fill="none" stroke="#DDD2BD" stroke-width="2"/>
+  <path d="M24 72 L96 72" stroke="#DDD2BD" stroke-width="1"/>
+  <g fill="none" stroke="#DDD2BD" stroke-width="1">
+    <rect x="30" y="58" width="8" height="14" rx="1"/>
+    <rect x="42" y="58" width="8" height="14" rx="1"/>
+    <rect x="54" y="58" width="8" height="14" rx="1"/>
+    <rect x="66" y="58" width="8" height="14" rx="1"/>
+    <rect x="78" y="58" width="8" height="14" rx="1"/>
+  </g>
+  <text x="60" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#007A3D">A</text>
+  <text x="72" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#CE1126">S</text>
+  <text x="84" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#CE1126">C</text>
+  <text x="96" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#FCD116">A</text>
+  <text x="108" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#FCD116">I</text>
+  <rect x="8" y="96" width="104" height="14" rx="3" fill="#FFF8E7" stroke="#B68A2C" stroke-width="0.8"/>
+  <text x="60" y="106" text-anchor="middle" font-family="Arial,sans-serif" font-size="5.5" font-weight="700" fill="#222222">ASSOCIAZIONE STUDENTI CAMERUNESI DEL LAZIO</text>
+</svg>

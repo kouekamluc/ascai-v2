@@ -1,5 +1,6 @@
 """
-Server-side ReportLab PDF generation for ASCAI membership cards.
+ReportLab fallback PDF generation for ASCAI membership cards.
+Used only when WeasyPrint is unavailable.
 """
 from __future__ import annotations
 
@@ -12,14 +13,10 @@ from reportlab.pdfgen import canvas
 from .assets import load_logo_reader
 from .data import build_member_card_data
 from .drawing import CARD_H, CARD_W, draw_membership_card_back, draw_membership_card_front
-
-
-def membership_card_filename(card_data) -> str:
-    return f"ascai-membership-card-{card_data.memberId}.pdf"
+from .membership_card_pdf import membership_card_filename
 
 
 def generate_membership_card_pdf(dues, request) -> BytesIO:
-    """Generate an A4 landscape preview with front/back side-by-side."""
     card_data = build_member_card_data(dues, request)
     logo = load_logo_reader()
     output = BytesIO()
@@ -36,7 +33,11 @@ def generate_membership_card_pdf(dues, request) -> BytesIO:
     pdf.setFont("Helvetica-Bold", 12)
     pdf.drawCentredString(page_w / 2, page_h - 18 * mm, "ASCAI Membership Card Preview")
     pdf.setFont("Helvetica", 8)
-    pdf.drawCentredString(page_w / 2, page_h - 23 * mm, "Preview is enlarged for review. Use Download Print Version for exact 85.6mm x 54mm card pages.")
+    pdf.drawCentredString(
+        page_w / 2,
+        page_h - 23 * mm,
+        "Preview is enlarged for review. Use Download Print Version for exact 85.6mm x 54mm card pages.",
+    )
     pdf.saveState()
     pdf.translate(start_x, card_y)
     pdf.scale(preview_scale, preview_scale)
@@ -57,7 +58,6 @@ def generate_membership_card_pdf(dues, request) -> BytesIO:
 
 
 def generate_membership_card_print_pdf(dues, request) -> BytesIO:
-    """Generate print-ready card pages: page 1 front, page 2 back."""
     card_data = build_member_card_data(dues, request)
     logo = load_logo_reader()
     output = BytesIO()

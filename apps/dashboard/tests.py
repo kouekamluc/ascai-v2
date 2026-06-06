@@ -139,6 +139,18 @@ class MembershipCardDashboardTest(TestCase):
         unpaid_response = self.client.get(reverse('dashboard:membership_card_pdf', args=[self.unpaid_dues.pk]))
         self.assertEqual(unpaid_response.status_code, 404)
 
+    def test_membership_card_preview_renders(self):
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse('dashboard:membership_card_preview', args=[self.paid_dues.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Kevin Kouekam')
+        self.assertContains(response, 'ASC-2026-')
+        self.assertContains(response, 'MEMBERSHIP CARD')
+        self.assertContains(response, 'CARD BENEFITS')
+        self.assertContains(response, 'Download Membership Card PDF')
+
 
 class TicketReplyModelTest(TestCase):
     """Test TicketReply model."""

@@ -1,0 +1,34 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans 'Membership Card Preview' %} — {{ card.fullName }}</title>
+  <link rel="stylesheet" href="{% static 'members/css/membership_card.css' %}">
+</head>
+<body class="preview-page">
+  <div class="preview-toolbar">
+    <h1>{% trans 'Membership Card Preview' %} — {{ card.fullName }}</h1>
+    <div class="preview-actions">
+      <a class="btn-download" href="{{ pdf_download_url }}">{% trans 'Download Membership Card PDF' %}</a>
+      <a class="btn-print" href="{{ print_download_url }}">{% trans 'Download Print Version' %}</a>
+      <a class="btn-back" href="{{ back_url }}">{% trans 'Back to Membership Cards' %}</a>
+    </div>
+  </div>
+
+  <div class="preview-stage">
+    <p class="preview-note">{% trans 'Front and back use the same HTML/CSS as the generated PDF. Cards are scaled for on-screen review.' %}</p>
+    <div class="preview-cards">
+      <div class="card-wrap">
+        {% include "members/cards/membership_card_front.html" %}
+        <div class="card-label">FRONT</div>
+      </div>
+      <div class="card-wrap">
+        {% include "members/cards/membership_card_back.html" %}
+        <div class="card-label">BACK</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

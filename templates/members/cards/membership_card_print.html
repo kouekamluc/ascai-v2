@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ASCAI Membership Card Print — {{ card.fullName }}</title>
+  <link rel="stylesheet" href="{{ css_path }}">
+</head>
+<body>
+  <div class="print-page">
+    {% include "members/cards/membership_card_front.html" %}
+  </div>
+  <div class="print-page">
+    {% include "members/cards/membership_card_back.html" %}
+  </div>
+</body>
+</html>

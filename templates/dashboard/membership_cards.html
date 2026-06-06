@@ -76,6 +76,7 @@
                     <td class="px-6 py-5 text-sm text-gray-600">{% if due.valid_until %}{{ due.valid_until|date:"d M Y" }}{% else %}31 Dec {{ due.year }}{% endif %}</td>
                     <td class="px-6 py-5">
                         <div class="flex flex-wrap justify-end gap-2">
+                            <a href="{% url 'dashboard:membership_card_preview' due.pk %}" class="btn-secondary">{% trans 'Preview Membership Card' %}</a>
                             <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary">{% trans 'Download Membership Card PDF' %}</a>
                             <a href="{% url 'dashboard:membership_card_print_pdf' due.pk %}" class="btn-secondary">{% trans 'Download Print Version' %}</a>
                         </div>
@@ -96,6 +97,7 @@
                 <div><span class="dashboard-kicker text-cameroon-yellow">{% trans 'Year' %}</span><p class="mt-1 font-semibold">{{ due.year }}</p></div>
             </div>
             <div class="mt-4 grid gap-2">
+                <a href="{% url 'dashboard:membership_card_preview' due.pk %}" class="btn-secondary w-full">{% trans 'Preview Membership Card' %}</a>
                 <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary w-full">{% trans 'Download Membership Card PDF' %}</a>
                 <a href="{% url 'dashboard:membership_card_print_pdf' due.pk %}" class="btn-secondary w-full">{% trans 'Download Print Version' %}</a>
             </div>
