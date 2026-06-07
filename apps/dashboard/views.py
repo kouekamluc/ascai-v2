@@ -50,6 +50,7 @@ from .membership_cards import (
     build_card_context,
     generate_membership_card_pdf,
     generate_membership_card_print_pdf,
+    MembershipCardPDFError,
     membership_card_filename,
 )
 from .membership_cards.data import build_member_card_data
@@ -57,6 +58,16 @@ from .membership_cards.data import build_member_card_data
 
 def _can_manage_membership_cards(user):
     return user.is_staff or user.has_perm('governance.view_member') or user.has_perm('governance.manage_finances')
+
+
+def _membership_card_dues_queryset():
+    from apps.governance.models import MembershipDues
+
+    return (
+        MembershipDues.objects
+        .filter(status='paid')
+        .select_related('member', 'member__user')
+    )
 
 
 class MembershipCardAdminView(DashboardRequiredMixin, ListView):
@@ -72,12 +83,8 @@ class MembershipCardAdminView(DashboardRequiredMixin, ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        from apps.governance.models import MembershipDues
-
         queryset = (
-            MembershipDues.objects
-            .filter(status='paid')
-            .select_related('member', 'member__user')
+            _membership_card_dues_queryset()
             .order_by('-year', 'member__user__full_name', 'member__user__username')
         )
         year = self.request.GET.get('year')
@@ -96,12 +103,9 @@ class MembershipCardAdminView(DashboardRequiredMixin, ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
-        from apps.governance.models import MembershipDues
-
         context = super().get_context_data(**kwargs)
         years = (
-            MembershipDues.objects
-            .filter(status='paid')
+            _membership_card_dues_queryset()
             .order_by('-year')
             .values_list('year', flat=True)
             .distinct()
@@ -126,8 +130,7 @@ class MembershipCardPreviewView(DashboardRequiredMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        from apps.governance.models import MembershipDues
-        return MembershipDues.objects.filter(status='paid').select_related('member', 'member__user')
+        return _membership_card_dues_queryset()
 
     def get_context_data(self, **kwargs):
         dues = self.get_object()
@@ -150,12 +153,18 @@ class MembershipCardPDFView(DashboardRequiredMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        from apps.governance.models import MembershipDues
-        return MembershipDues.objects.filter(status='paid').select_related('member', 'member__user')
+        return _membership_card_dues_queryset()
 
     def get(self, request, *args, **kwargs):
         dues = self.get_object()
-        pdf = generate_membership_card_pdf(dues, request)
+        try:
+            pdf = generate_membership_card_pdf(dues, request)
+        except MembershipCardPDFError:
+            messages.error(
+                request,
+                _('Membership card PDF generation is temporarily unavailable. Please contact the site administrator.'),
+            )
+            return redirect('dashboard:membership_cards')
         filename = membership_card_filename(build_member_card_data(dues, request))
         response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
@@ -167,8 +176,15 @@ class MembershipCardPrintPDFView(MembershipCardPDFView):
 
     def get(self, request, *args, **kwargs):
         dues = self.get_object()
-        pdf = generate_membership_card_print_pdf(dues, request)
-        filename = membership_card_filename(build_member_card_data(dues, request))
+        try:
+            pdf = generate_membership_card_print_pdf(dues, request)
+        except MembershipCardPDFError:
+            messages.error(
+                request,
+                _('Membership card print PDF generation is temporarily unavailable. Please contact the site administrator.'),
+            )
+            return redirect('dashboard:membership_cards')
+        filename = membership_card_filename(build_member_card_data(dues, request), print_ready=True)
         response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response

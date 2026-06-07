@@ -62,7 +62,7 @@ def generate_membership_card_print_pdf(dues, request) -> BytesIO:
     logo = load_logo_reader()
     output = BytesIO()
     pdf = canvas.Canvas(output, pagesize=(CARD_W, CARD_H))
-    pdf.setTitle(membership_card_filename(card_data))
+    pdf.setTitle(membership_card_filename(card_data, print_ready=True))
 
     draw_membership_card_front(pdf, 0, 0, card_data, logo)
     pdf.showPage()

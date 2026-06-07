@@ -23,8 +23,13 @@ from .data import MemberCardData, build_member_card_data
 logger = logging.getLogger(__name__)
 
 
-def membership_card_filename(card_data: MemberCardData) -> str:
-    return f"ascai-membership-card-{card_data.memberId}.pdf"
+class MembershipCardPDFError(RuntimeError):
+    """Raised when the card PDF engines are unavailable or fail."""
+
+
+def membership_card_filename(card_data: MemberCardData, *, print_ready: bool = False) -> str:
+    suffix = "-print" if print_ready else ""
+    return f"ascai-membership-card-{card_data.memberId}{suffix}.pdf"
 
 
 def build_card_context(dues, request=None) -> dict:
@@ -71,7 +76,14 @@ def generate_membership_card_pdf(dues, request=None) -> BytesIO:
         logger.warning("WeasyPrint failed, falling back to ReportLab: %s", exc)
         from .pdf_reportlab import generate_membership_card_pdf as reportlab_generate
 
-        return reportlab_generate(dues, request)
+        try:
+            return reportlab_generate(dues, request)
+        except Exception as fallback_exc:
+            logger.exception("ReportLab membership card PDF fallback failed.")
+            raise MembershipCardPDFError(
+                "Membership card PDF generation failed. Install WeasyPrint or ReportLab "
+                "and confirm static/media files are readable."
+            ) from fallback_exc
 
     output = BytesIO(pdf_bytes)
     output.seek(0)
@@ -88,7 +100,14 @@ def generate_membership_card_print_pdf(dues, request=None) -> BytesIO:
         logger.warning("WeasyPrint print PDF failed, falling back to ReportLab: %s", exc)
         from .pdf_reportlab import generate_membership_card_print_pdf as reportlab_generate
 
-        return reportlab_generate(dues, request)
+        try:
+            return reportlab_generate(dues, request)
+        except Exception as fallback_exc:
+            logger.exception("ReportLab membership card print PDF fallback failed.")
+            raise MembershipCardPDFError(
+                "Membership card print PDF generation failed. Install WeasyPrint or ReportLab "
+                "and confirm static/media files are readable."
+            ) from fallback_exc
 
     output = BytesIO(pdf_bytes)
     output.seek(0)

@@ -135,9 +135,43 @@ class MembershipCardDashboardTest(TestCase):
         self.assertEqual(print_response.status_code, 200)
         self.assertEqual(print_response['Content-Type'], 'application/pdf')
         self.assertTrue(print_response.content.startswith(b'%PDF'))
+        self.assertIn('ascai-membership-card-ASC-2026-', print_response['Content-Disposition'])
+        self.assertIn('-print.pdf', print_response['Content-Disposition'])
 
         unpaid_response = self.client.get(reverse('dashboard:membership_card_pdf', args=[self.unpaid_dues.pk]))
         self.assertEqual(unpaid_response.status_code, 404)
+
+    def test_membership_card_search_and_year_filters(self):
+        previous_year_dues = MembershipDues.objects.create(
+            member=self.member,
+            year=2025,
+            amount=10,
+            due_date=date(2025, 3, 31),
+            payment_date=date(2025, 4, 1),
+            valid_from=date(2025, 1, 1),
+            valid_until=date(2025, 12, 31),
+            status='paid',
+        )
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse('dashboard:membership_cards'), {'year': '2025'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'ASC-2025-{self.member.pk:03d}')
+        self.assertNotContains(response, f'ASC-2026-{self.member.pk:03d}')
+
+        search_response = self.client.get(reverse('dashboard:membership_cards'), {'q': 'pending'})
+        self.assertEqual(search_response.status_code, 200)
+        self.assertNotContains(search_response, 'Pending Member')
+        self.assertNotContains(search_response, f'ASC-{previous_year_dues.year}-{self.member.pk:03d}')
+
+    def test_membership_card_requires_manager_permission(self):
+        self.client.force_login(self.member_user)
+
+        response = self.client.get(reverse('dashboard:membership_cards'), follow=True)
+
+        self.assertRedirects(response, reverse('dashboard:home'))
+        self.assertContains(response, 'You do not have permission to manage membership cards.')
 
     def test_membership_card_preview_renders(self):
         self.client.force_login(self.admin)
