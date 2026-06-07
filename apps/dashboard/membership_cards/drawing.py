@@ -26,13 +26,19 @@ PAPER = colors.HexColor("#FCFAF4")
 PALE_GOLD = colors.HexColor("#E8D9B8")
 
 
-def _fit_text(canvas, text, x, y, max_width, font="Helvetica-Bold", size=7.4, color=DARK):
+def _fit_text(canvas, text, x, y, max_width, font="Helvetica-Bold", size=7.4, color=DARK, min_size=4.2):
+    text = str(text)
     current = size
-    while current > 4.5 and stringWidth(str(text), font, current) > max_width:
+    while current > min_size and stringWidth(text, font, current) > max_width:
         current -= 0.25
+    if stringWidth(text, font, current) > max_width:
+        ellipsis = "..."
+        while text and stringWidth(text + ellipsis, font, current) > max_width:
+            text = text[:-1]
+        text = (text + ellipsis) if text else ellipsis
     canvas.setFillColor(color)
     canvas.setFont(font, current)
-    canvas.drawString(x, y, str(text))
+    canvas.drawString(x, y, text)
 
 
 def _center_text(canvas, text, x, y, width, font="Helvetica-Bold", size=8, color=DARK):
@@ -170,27 +176,27 @@ def draw_membership_card_front(canvas, x, y, card_data, logo_reader=None):
     _draw_colosseum_watermark(canvas, x + 27 * mm, y + 12 * mm, 44 * mm)
     _draw_cameroon_ribbon(canvas, x, y, front=True)
 
-    _draw_logo(canvas, x + 4.2 * mm, y + 23 * mm, 29 * mm, 31 * mm, logo_reader)
-    _draw_photo(canvas, card_data, x + 68 * mm, y + 28.2 * mm)
-    _draw_qr(canvas, card_data, x + 70.4 * mm, y + 10.5 * mm, 12.8 * mm)
+    _draw_logo(canvas, x + 4 * mm, y + 23.2 * mm, 27 * mm, 30 * mm, logo_reader)
+    _draw_photo(canvas, card_data, x + 69 * mm, y + 28.8 * mm)
+    _draw_qr(canvas, card_data, x + 71 * mm, y + 10.8 * mm, 12 * mm)
 
     canvas.setFillColor(GOLD)
     canvas.setFont("Helvetica-Bold", 6.8)
-    canvas.drawString(x + 35.5 * mm, y + 49.8 * mm, "MEMBERSHIP CARD")
-    canvas.setFont("Helvetica-Bold", 23)
+    canvas.drawString(x + 32.2 * mm, y + 49.8 * mm, "MEMBERSHIP CARD")
+    canvas.setFont("Helvetica-Bold", 21)
     letters = [("A", GREEN), ("S", RED), ("C", RED), ("A", YELLOW), ("I", YELLOW)]
-    cursor = x + 35.2 * mm
+    cursor = x + 32.2 * mm
     for letter, color in letters:
         canvas.setFillColor(color)
-        canvas.drawString(cursor, y + 39.8 * mm, letter)
-        cursor += stringWidth(letter, "Helvetica-Bold", 23) + 0.45 * mm
+        canvas.drawString(cursor, y + 40.2 * mm, letter)
+        cursor += stringWidth(letter, "Helvetica-Bold", 21) + 0.35 * mm
 
-    _fit_text(canvas, card_data.community, x + 35.4 * mm, y + 35.7 * mm, 29 * mm, font="Helvetica-Oblique", size=9.8, color=GOLD)
+    _fit_text(canvas, card_data.community, x + 32.3 * mm, y + 36 * mm, 33 * mm, font="Helvetica-Oblique", size=9.2, color=GOLD)
     canvas.setFillColor(DARK)
     canvas.setFont("Helvetica-Bold", 4.8)
-    canvas.drawString(x + 35.4 * mm, y + 32.9 * mm, card_data.italianLegalName)
+    _fit_text(canvas, card_data.italianLegalName, x + 32.3 * mm, y + 33.1 * mm, 33.5 * mm, font="Helvetica-Bold", size=4.4, min_size=3.6)
     canvas.setStrokeColor(GOLD)
-    canvas.line(x + 35.4 * mm, y + 31.9 * mm, x + 64.8 * mm, y + 31.9 * mm)
+    canvas.line(x + 32.3 * mm, y + 32.1 * mm, x + 66.5 * mm, y + 32.1 * mm)
 
     rows = [
         ("Name:", card_data.fullName),
@@ -200,20 +206,19 @@ def draw_membership_card_front(canvas, x, y, card_data, logo_reader=None):
         ("Issued:", card_data.issuedDate),
         ("Expires:", card_data.expiryDate),
     ]
-    row_y = y + 28.5 * mm
+    row_y = y + 28.7 * mm
     for label, value in rows:
         canvas.setFillColor(GOLD)
-        canvas.setFont("Helvetica-Bold", 5.2)
-        canvas.drawString(x + 35.4 * mm, row_y, label)
-        _fit_text(canvas, value, x + 47 * mm, row_y, 20.5 * mm, size=6.1)
+        canvas.setFont("Helvetica-Bold", 4.9)
+        canvas.drawString(x + 32.3 * mm, row_y, label)
+        _fit_text(canvas, value, x + 46 * mm, row_y, 20.5 * mm, size=5.9, min_size=4.1)
         row_y -= 3.05 * mm
 
     canvas.setStrokeColor(GOLD)
     canvas.setFillColor(DARK)
-    canvas.setFont("Helvetica-Oblique", 7)
-    canvas.drawString(x + 35.2 * mm, y + 7.1 * mm, card_data.fullName)
-    canvas.line(x + 35 * mm, y + 5.9 * mm, x + 53.6 * mm, y + 5.9 * mm)
-    _center_text(canvas, "Cardholder Signature", x + 35 * mm, y + 4.5 * mm, 18.6 * mm, font="Helvetica", size=3.2)
+    _fit_text(canvas, card_data.fullName, x + 32.2 * mm, y + 7.1 * mm, 23 * mm, font="Helvetica-Oblique", size=6.4, color=DARK, min_size=3.8)
+    canvas.line(x + 32.2 * mm, y + 5.9 * mm, x + 55.2 * mm, y + 5.9 * mm)
+    _center_text(canvas, "Cardholder Signature", x + 32.2 * mm, y + 4.5 * mm, 23 * mm, font="Helvetica", size=3.2)
     canvas.setFont("Helvetica-Oblique", 7)
     canvas.drawString(x + 60 * mm, y + 6.9 * mm, "ASCAI")
     canvas.line(x + 59.5 * mm, y + 5.7 * mm, x + 80.5 * mm, y + 5.7 * mm)

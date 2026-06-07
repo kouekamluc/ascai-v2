@@ -221,15 +221,15 @@ html, body {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 30mm 1fr 18mm;
-  gap: 1.3mm;
-  padding: 3mm 3mm 0 3.2mm;
+  grid-template-columns: 27mm minmax(0, 1fr) 16mm;
+  gap: 1.5mm;
+  padding: 3mm 2.6mm 0 3mm;
   height: 39mm;
 }
 
 .front-logo-col .card-logo {
-  width: 29mm;
-  height: 31mm;
+  width: 27mm;
+  height: 30mm;
 }
 
 .front-center {
@@ -239,24 +239,24 @@ html, body {
 
 .front-kicker {
   margin: 0;
-  font-size: 6.2pt;
+  font-size: 5.8pt;
   font-weight: 700;
   letter-spacing: 0.16mm;
   color: var(--gold);
 }
 
 .front-brand {
-  margin: 2.2mm 0 0;
-  font-size: 22pt;
+  margin: 1.9mm 0 0;
+  font-size: 20pt;
   font-weight: 700;
   line-height: 0.95;
   letter-spacing: 0.12mm;
 }
 
 .front-community {
-  margin: 0.9mm 0 0;
+  margin: 0.7mm 0 0;
   font-family: "Brush Script MT", "Segoe Script", "Apple Chancery", cursive;
-  font-size: 9.4pt;
+  font-size: 8.7pt;
   line-height: 1;
   color: var(--gold);
   white-space: nowrap;
@@ -265,8 +265,12 @@ html, body {
 }
 
 .front-legal {
-  margin: 0.8mm 0 0;
-  font-size: 4.4pt;
+  margin: 0.7mm 0 0;
+  font-size: 4.05pt;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-weight: 700;
   line-height: 1.15;
 }
@@ -284,39 +288,42 @@ html, body {
 
 .field-row {
   display: grid;
-  grid-template-columns: 11.2mm 1fr;
-  gap: 0.7mm;
-  margin: 0 0 0.7mm;
+  grid-template-columns: 13.2mm minmax(0, 1fr);
+  gap: 0.45mm;
+  margin: 0 0 0.55mm;
   line-height: 1.08;
+  min-width: 0;
 }
 
 .field-row dt {
   margin: 0;
-  font-size: 4.9pt;
+  font-size: 4.55pt;
   font-weight: 700;
   color: var(--gold);
+  white-space: nowrap;
 }
 
 .field-row dd {
   margin: 0;
-  font-size: 5.8pt;
+  font-size: 5.35pt;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .front-photo-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.7mm;
-  padding-top: 5.2mm;
+  gap: 1.6mm;
+  padding-top: 5.7mm;
 }
 
 .member-photo {
-  width: 16.7mm;
-  height: 21.2mm;
+  width: 15.6mm;
+  height: 20mm;
   border: 0.6pt solid var(--gold);
   border-radius: 2mm;
   background: var(--white);
@@ -340,8 +347,8 @@ html, body {
 }
 
 .card-qr--front {
-  width: 12.3mm;
-  height: 12.3mm;
+  width: 11.8mm;
+  height: 11.8mm;
 }
 
 .card-qr img {
@@ -353,12 +360,12 @@ html, body {
 .front-signatures {
   position: absolute;
   z-index: 3;
-  left: 32.5mm;
-  right: 6mm;
+  left: 31.4mm;
+  right: 6.8mm;
   bottom: 3.2mm;
   display: grid;
-  grid-template-columns: 22mm 24mm;
-  gap: 5.5mm;
+  grid-template-columns: minmax(0, 24mm) minmax(0, 24mm);
+  gap: 4mm;
 }
 
 .signature-block {
@@ -373,7 +380,7 @@ html, body {
 
 .signature-name {
   margin: 0;
-  font-size: 5.2pt;
+  font-size: 4.7pt;
   font-style: italic;
   line-height: 1.05;
   white-space: nowrap;
@@ -406,8 +413,8 @@ html, body {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 28mm 1fr;
-  gap: 3mm;
+  grid-template-columns: 27mm minmax(0, 1fr);
+  gap: 2.8mm;
   padding: 6mm 4mm 0 4mm;
   height: 32mm;
 }
@@ -443,12 +450,20 @@ html, body {
 
 .benefits-list li {
   display: grid;
-  grid-template-columns: 4.1mm 1fr;
+  grid-template-columns: 4.1mm minmax(0, 1fr);
   gap: 1mm;
   align-items: start;
   margin-bottom: 1.2mm;
   font-size: 4.2pt;
   line-height: 1.2;
+  min-width: 0;
+}
+
+.benefits-list span:last-child {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .benefit-icon {
@@ -466,8 +481,8 @@ html, body {
   right: 0;
   bottom: 4.3mm;
   display: grid;
-  grid-template-columns: 31mm 1fr;
-  gap: 2.2mm;
+  grid-template-columns: 30mm minmax(0, 1fr);
+  gap: 2mm;
   padding: 1mm 3.8mm 0;
   border-top: 0.45pt solid var(--gold);
 }
@@ -487,11 +502,14 @@ html, body {
   margin: 0 0 0.12mm;
   font-size: 3.25pt;
   line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .verification-section {
   display: grid;
-  grid-template-columns: 12mm 1fr;
+  grid-template-columns: 12mm minmax(0, 1fr);
   gap: 1.4mm;
   align-items: start;
 }
@@ -525,6 +543,9 @@ html, body {
   font-size: 3.05pt;
   font-weight: 700;
   line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .back-footer-strip {
