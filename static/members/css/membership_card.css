@@ -1,4 +1,4 @@
-/* ASCAI membership card — WeasyPrint + browser preview */
+/* ASCAI membership card - WeasyPrint + browser preview */
 
 :root {
   --green: #007A3D;
@@ -8,7 +8,7 @@
   --white: #FFFFFF;
   --dark: #222222;
   --muted: #6A5A42;
-  --paper: #FCFAF4;
+  --paper: #FBFAF5;
   --pale-gold: #E8D9B8;
   --card-w: 85.6mm;
   --card-h: 54mm;
@@ -39,23 +39,21 @@ html, body {
 .c-red { color: var(--red); }
 .c-yellow { color: var(--yellow); }
 
-/* ── Card shell ── */
-
 .card {
   width: var(--card-w);
   height: var(--card-h);
-  border-radius: 3mm;
+  border-radius: 3.6mm;
   overflow: hidden;
   position: relative;
   background: var(--paper);
-  border: 0.45pt solid #D8CDBB;
+  border: 0.45pt solid #d6c5a4;
   flex: 0 0 auto;
 }
 
 .card-bg-pattern {
   position: absolute;
   inset: 0;
-  opacity: 0.2;
+  opacity: 0.16;
   background-image:
     linear-gradient(135deg, transparent 46%, var(--pale-gold) 47%, var(--pale-gold) 48%, transparent 49%),
     radial-gradient(circle at 7mm 7mm, var(--pale-gold) 0.35mm, transparent 0.45mm);
@@ -66,23 +64,23 @@ html, body {
 
 .card-watermark {
   position: absolute;
-  width: 36mm;
-  height: 21mm;
-  left: 54%;
-  top: 44%;
+  width: 43mm;
+  height: 25mm;
+  left: 50%;
+  top: 59%;
   transform: translate(-50%, -50%);
   background: center / contain no-repeat;
-  opacity: 0.32;
+  opacity: 0.18;
   pointer-events: none;
   z-index: 0;
 }
 
 .card-watermark--back {
-  left: 64%;
-  top: 40%;
+  left: 76%;
+  top: 47%;
+  width: 36mm;
+  height: 22mm;
 }
-
-/* ── Cameroon ribbon ── */
 
 .cameroon-ribbon {
   position: absolute;
@@ -93,46 +91,47 @@ html, body {
 .cameroon-ribbon--front {
   left: 0;
   bottom: 0;
-  width: 50mm;
-  height: 8mm;
+  width: 43mm;
+  height: 22mm;
 }
 
 .cameroon-ribbon--front .ribbon-green,
 .cameroon-ribbon--front .ribbon-red,
 .cameroon-ribbon--front .ribbon-yellow {
   position: absolute;
-  left: -4mm;
-  width: 48mm;
-  border-radius: 50%;
+  left: -13mm;
+  width: 56mm;
+  border-radius: 100% 100% 0 0;
+  transform-origin: left bottom;
 }
 
 .cameroon-ribbon--front .ribbon-green {
-  bottom: 0.4mm;
-  height: 4.2mm;
+  bottom: 2mm;
+  height: 8.5mm;
   background: var(--green);
-  transform: rotate(-4deg);
+  transform: rotate(30deg);
 }
 
 .cameroon-ribbon--front .ribbon-red {
-  bottom: 1.8mm;
-  height: 3mm;
+  bottom: -1.5mm;
+  height: 8mm;
   background: var(--red);
-  transform: rotate(-2deg);
+  transform: rotate(30deg);
 }
 
 .cameroon-ribbon--front .ribbon-yellow {
-  bottom: 3mm;
-  height: 1.8mm;
+  bottom: -4.4mm;
+  height: 5.5mm;
   background: var(--yellow);
-  transform: rotate(-1deg);
+  transform: rotate(30deg);
 }
 
 .cameroon-ribbon--front .ribbon-star {
   position: absolute;
-  left: 14mm;
-  bottom: 2.5mm;
-  width: 2.4mm;
-  height: 2.4mm;
+  left: 13mm;
+  bottom: 3.3mm;
+  width: 3.2mm;
+  height: 3.2mm;
   background: var(--yellow);
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   z-index: 2;
@@ -142,7 +141,8 @@ html, body {
   top: 0;
   left: 0;
   right: 0;
-  height: 5.5mm;
+  height: 8mm;
+  overflow: hidden;
 }
 
 .cameroon-ribbon--back .ribbon-green,
@@ -155,52 +155,53 @@ html, body {
 
 .cameroon-ribbon--back .ribbon-green {
   top: 0;
-  height: 4.8mm;
+  height: 6.5mm;
   background: var(--green);
-  border-radius: 0 0 45% 45% / 0 0 100% 100%;
+  transform: skewX(-22deg) translateX(-10mm);
+  border-radius: 0 0 40% 40% / 0 0 100% 100%;
 }
 
 .cameroon-ribbon--back .ribbon-red {
-  top: 1.6mm;
-  height: 3mm;
+  top: 0.3mm;
+  height: 5.8mm;
   background: var(--red);
-  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  transform: skewX(-22deg) translateX(10mm);
+  border-radius: 0 0 45% 45% / 0 0 100% 100%;
 }
 
 .cameroon-ribbon--back .ribbon-yellow {
-  top: 3mm;
-  height: 1.7mm;
+  top: 4.2mm;
+  height: 2.2mm;
   background: var(--yellow);
+  transform: skewX(-22deg) translateX(21mm);
   border-radius: 0 0 50% 50% / 0 0 100% 100%;
 }
 
 .cameroon-ribbon--back .ribbon-star {
   position: absolute;
-  left: 50%;
-  top: 1.8mm;
-  width: 2.2mm;
-  height: 2.2mm;
+  left: 51%;
+  top: 1mm;
+  width: 2.1mm;
+  height: 2.1mm;
   transform: translateX(-50%);
   background: var(--yellow);
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   z-index: 2;
 }
 
-/* ── Logo ── */
-
 .card-logo {
-  border: 0.5pt solid var(--gold);
-  border-radius: 2.2mm;
-  background: var(--white);
-  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .card-logo--compact {
-  width: 19mm;
-  height: 14mm;
+  width: 21mm;
+  height: 22mm;
 }
 
 .card-logo-img {
@@ -216,48 +217,46 @@ html, body {
   color: var(--red);
 }
 
-/* ── Front ── */
-
 .front-body {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 26mm 1fr 18.5mm;
-  gap: 1.2mm;
-  padding: 2.4mm 3.2mm 0 3mm;
-  height: 38.5mm;
+  grid-template-columns: 30mm 1fr 18mm;
+  gap: 1.3mm;
+  padding: 3mm 3mm 0 3.2mm;
+  height: 39mm;
 }
 
 .front-logo-col .card-logo {
-  width: 24mm;
-  height: 24mm;
+  width: 29mm;
+  height: 31mm;
 }
 
 .front-center {
   min-width: 0;
-  padding-top: 0.2mm;
+  padding-top: 0;
 }
 
 .front-kicker {
   margin: 0;
-  font-size: 5.8pt;
+  font-size: 6.2pt;
   font-weight: 700;
   letter-spacing: 0.16mm;
   color: var(--gold);
 }
 
 .front-brand {
-  margin: 0.5mm 0 0;
-  font-size: 17pt;
+  margin: 2.2mm 0 0;
+  font-size: 22pt;
   font-weight: 700;
   line-height: 0.95;
-  letter-spacing: 0.15mm;
+  letter-spacing: 0.12mm;
 }
 
 .front-community {
-  margin: 0.7mm 0 0;
+  margin: 0.9mm 0 0;
   font-family: "Brush Script MT", "Segoe Script", "Apple Chancery", cursive;
-  font-size: 8.5pt;
+  font-size: 9.4pt;
   line-height: 1;
   color: var(--gold);
   white-space: nowrap;
@@ -266,14 +265,14 @@ html, body {
 }
 
 .front-legal {
-  margin: 0.5mm 0 0;
-  font-size: 4pt;
+  margin: 0.8mm 0 0;
+  font-size: 4.4pt;
   font-weight: 700;
   line-height: 1.15;
 }
 
 .front-rule {
-  margin: 0.7mm 0 0.6mm;
+  margin: 0.7mm 0 1mm;
   border: none;
   border-top: 0.45pt solid var(--gold);
 }
@@ -285,22 +284,22 @@ html, body {
 
 .field-row {
   display: grid;
-  grid-template-columns: 10.5mm 1fr;
-  gap: 0.4mm;
-  margin: 0 0 0.28mm;
-  line-height: 1.15;
+  grid-template-columns: 11.2mm 1fr;
+  gap: 0.7mm;
+  margin: 0 0 0.7mm;
+  line-height: 1.08;
 }
 
 .field-row dt {
   margin: 0;
-  font-size: 4.6pt;
+  font-size: 4.9pt;
   font-weight: 700;
   color: var(--gold);
 }
 
 .field-row dd {
   margin: 0;
-  font-size: 5.2pt;
+  font-size: 5.8pt;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -311,15 +310,15 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1mm;
-  padding-top: 0.2mm;
+  gap: 1.7mm;
+  padding-top: 5.2mm;
 }
 
 .member-photo {
-  width: 14.5mm;
-  height: 17.5mm;
-  border: 0.5pt solid var(--gold);
-  border-radius: 1.6mm;
+  width: 16.7mm;
+  height: 21.2mm;
+  border: 0.6pt solid var(--gold);
+  border-radius: 2mm;
   background: var(--white);
   overflow: hidden;
   padding: 0.5mm;
@@ -329,20 +328,20 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 1.1mm;
+  border-radius: 1.2mm;
   display: block;
 }
 
 .card-qr {
-  border: 0.5pt solid var(--gold);
+  border: 0.6pt solid var(--gold);
   border-radius: 1mm;
   background: var(--white);
   padding: 0.6mm;
 }
 
 .card-qr--front {
-  width: 13mm;
-  height: 13mm;
+  width: 12.3mm;
+  height: 12.3mm;
 }
 
 .card-qr img {
@@ -354,12 +353,12 @@ html, body {
 .front-signatures {
   position: absolute;
   z-index: 3;
-  left: 30mm;
-  right: 3mm;
-  bottom: 3mm;
+  left: 32.5mm;
+  right: 6mm;
+  bottom: 3.2mm;
   display: grid;
-  grid-template-columns: 24mm 1fr;
-  gap: 3mm;
+  grid-template-columns: 22mm 24mm;
+  gap: 5.5mm;
 }
 
 .signature-block {
@@ -403,40 +402,37 @@ html, body {
   line-height: 1.15;
 }
 
-/* ── Back ── */
-
 .back-upper {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 22mm 1fr;
-  gap: 1.5mm;
-  padding: 6.2mm 3.2mm 0 3mm;
-  height: 27mm;
+  grid-template-columns: 28mm 1fr;
+  gap: 3mm;
+  padding: 6mm 4mm 0 4mm;
+  height: 32mm;
 }
 
 .back-logo-col {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 0.5mm;
+  padding-top: 2mm;
 }
 
 .back-benefits {
   min-width: 0;
-  padding-left: 1mm;
 }
 
 .benefits-badge {
   display: inline-block;
-  margin: 0 0 1mm;
-  padding: 0.65mm 1.8mm;
+  margin: 0 0 2mm;
+  padding: 0.75mm 2.6mm;
   background: var(--green);
   color: var(--yellow);
-  font-size: 4.8pt;
+  font-size: 5.1pt;
   font-weight: 700;
   letter-spacing: 0.05mm;
-  border-radius: 1.6mm;
+  border-radius: 2.1mm;
 }
 
 .benefits-list {
@@ -447,18 +443,18 @@ html, body {
 
 .benefits-list li {
   display: grid;
-  grid-template-columns: 2.6mm 1fr;
-  gap: 0.8mm;
+  grid-template-columns: 4.1mm 1fr;
+  gap: 1mm;
   align-items: start;
-  margin-bottom: 0.45mm;
-  font-size: 4pt;
+  margin-bottom: 1.2mm;
+  font-size: 4.2pt;
   line-height: 1.2;
 }
 
 .benefit-icon {
-  width: 1.8mm;
-  height: 1.8mm;
-  margin-top: 0.2mm;
+  width: 3.4mm;
+  height: 3.4mm;
+  margin-top: -0.35mm;
   border-radius: 50%;
   background: var(--gold);
 }
@@ -468,11 +464,11 @@ html, body {
   z-index: 2;
   left: 0;
   right: 0;
-  bottom: 4.4mm;
+  bottom: 4.3mm;
   display: grid;
-  grid-template-columns: 1fr 38mm;
-  gap: 1.5mm;
-  padding: 0.8mm 3.2mm 0;
+  grid-template-columns: 31mm 1fr;
+  gap: 2.2mm;
+  padding: 1mm 3.8mm 0;
   border-top: 0.45pt solid var(--gold);
 }
 
@@ -482,27 +478,27 @@ html, body {
 
 .contact-title {
   margin: 0 0 0.4mm;
-  font-size: 4.8pt;
+  font-size: 4.9pt;
   font-weight: 700;
   color: var(--green);
 }
 
 .contact-row {
   margin: 0 0 0.12mm;
-  font-size: 3.15pt;
+  font-size: 3.25pt;
   line-height: 1.3;
 }
 
 .verification-section {
   display: grid;
-  grid-template-columns: 10.5mm 1fr;
-  gap: 1mm;
+  grid-template-columns: 12mm 1fr;
+  gap: 1.4mm;
   align-items: start;
 }
 
 .card-qr--back {
-  width: 10.5mm;
-  height: 10.5mm;
+  width: 11.5mm;
+  height: 11.5mm;
 }
 
 .verification-copy {
@@ -512,21 +508,21 @@ html, body {
 .verification-box {
   background: var(--green);
   color: var(--white);
-  border-radius: 0.7mm;
-  padding: 0.55mm 0.7mm;
-  font-size: 2.55pt;
+  border-radius: 0.9mm;
+  padding: 0.8mm 1mm;
+  font-size: 3pt;
   line-height: 1.3;
 }
 
 .verification-box strong {
   display: block;
-  font-size: 2.75pt;
+  font-size: 3.2pt;
   margin-bottom: 0.25mm;
 }
 
 .verification-email {
   margin: 0.35mm 0 0;
-  font-size: 2.85pt;
+  font-size: 3.05pt;
   font-weight: 700;
   line-height: 1.15;
 }
@@ -545,8 +541,6 @@ html, body {
   background-size: 1.6mm 1.6mm;
   background-position: 0 0, 0.8mm 0.8mm;
 }
-
-/* ── PDF preview sheet ── */
 
 .pdf-sheet {
   page: preview-sheet;
@@ -598,8 +592,6 @@ html, body {
 .print-page:last-child {
   page-break-after: auto;
 }
-
-/* ── Browser preview ── */
 
 .preview-page {
   min-height: 100vh;

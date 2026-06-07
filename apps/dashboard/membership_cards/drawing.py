@@ -99,30 +99,17 @@ def _draw_card_shell(canvas, x, y):
 
 def _draw_logo(canvas, x, y, w, h, logo_reader, compact=False):
     canvas.saveState()
-    canvas.setStrokeColor(GOLD)
-    canvas.setLineWidth(0.55)
-    canvas.setFillColor(WHITE)
-    canvas.roundRect(x, y, w, h, 2.5 * mm, stroke=1, fill=1)
     if logo_reader:
-        canvas.drawImage(logo_reader, x + w * 0.18, y + h * 0.28, w * 0.64, h * 0.42, preserveAspectRatio=True, mask="auto")
+        canvas.drawImage(logo_reader, x, y, w, h, preserveAspectRatio=True, mask="auto")
     else:
+        canvas.setStrokeColor(GOLD)
+        canvas.setLineWidth(0.55)
+        canvas.setFillColor(WHITE)
+        canvas.roundRect(x, y, w, h, 2.5 * mm, stroke=1, fill=1)
         canvas.setFont("Helvetica-Bold", 5.5)
         canvas.setFillColor(RED)
         canvas.drawCentredString(x + w / 2, y + h * 0.52, "ADD OFFICIAL")
         canvas.drawCentredString(x + w / 2, y + h * 0.37, "ASCAI LOGO")
-    canvas.setFont("Helvetica-Bold", 8 if compact else 10)
-    letters = [("A", GREEN), ("S", RED), ("C", RED), ("A", YELLOW), ("I", YELLOW)]
-    total = sum(stringWidth(l, "Helvetica-Bold", 8 if compact else 10) for l, _ in letters) + (len(letters) - 1) * 0.45 * mm
-    start = x + (w - total) / 2
-    for letter, color in letters:
-        canvas.setFillColor(color)
-        canvas.drawString(start, y + h - (5.3 if compact else 6.3) * mm, letter)
-        start += stringWidth(letter, "Helvetica-Bold", 8 if compact else 10) + 0.45 * mm
-    if not compact:
-        canvas.setFillColor(colors.HexColor("#FFF8E7"))
-        canvas.setStrokeColor(GOLD)
-        canvas.roundRect(x + 3.5 * mm, y + 2.4 * mm, w - 7 * mm, 5.2 * mm, 1 * mm, stroke=1, fill=1)
-        _center_text(canvas, "ASSOCIAZIONE STUDENTI", x + 3.5 * mm, y + 3.9 * mm, w - 7 * mm, size=3.6)
     canvas.restoreState()
 
 
@@ -180,30 +167,30 @@ def _draw_qr(canvas, card_data, x, y, size):
 def draw_membership_card_front(canvas, x, y, card_data, logo_reader=None):
     logo_reader = logo_reader if logo_reader is not None else load_logo_reader()
     _draw_card_shell(canvas, x, y)
-    _draw_colosseum_watermark(canvas, x + 34 * mm, y + 9.5 * mm, 38 * mm)
+    _draw_colosseum_watermark(canvas, x + 27 * mm, y + 12 * mm, 44 * mm)
     _draw_cameroon_ribbon(canvas, x, y, front=True)
 
-    _draw_logo(canvas, x + 5.5 * mm, y + 22.2 * mm, 25.5 * mm, 24.2 * mm, logo_reader)
-    _draw_photo(canvas, card_data, x + 68 * mm, y + 28.5 * mm)
-    _draw_qr(canvas, card_data, x + 70.4 * mm, y + 10.7 * mm, 14.5 * mm)
+    _draw_logo(canvas, x + 4.2 * mm, y + 23 * mm, 29 * mm, 31 * mm, logo_reader)
+    _draw_photo(canvas, card_data, x + 68 * mm, y + 28.2 * mm)
+    _draw_qr(canvas, card_data, x + 70.4 * mm, y + 10.5 * mm, 12.8 * mm)
 
     canvas.setFillColor(GOLD)
     canvas.setFont("Helvetica-Bold", 6.8)
-    canvas.drawString(x + 35.2 * mm, y + 46 * mm, "MEMBERSHIP CARD")
-    canvas.setFont("Helvetica-Bold", 20)
+    canvas.drawString(x + 35.5 * mm, y + 49.8 * mm, "MEMBERSHIP CARD")
+    canvas.setFont("Helvetica-Bold", 23)
     letters = [("A", GREEN), ("S", RED), ("C", RED), ("A", YELLOW), ("I", YELLOW)]
-    cursor = x + 35 * mm
+    cursor = x + 35.2 * mm
     for letter, color in letters:
         canvas.setFillColor(color)
-        canvas.drawString(cursor, y + 36.5 * mm, letter)
-        cursor += stringWidth(letter, "Helvetica-Bold", 20) + 0.6 * mm
+        canvas.drawString(cursor, y + 39.8 * mm, letter)
+        cursor += stringWidth(letter, "Helvetica-Bold", 23) + 0.45 * mm
 
-    _fit_text(canvas, card_data.community, x + 35.3 * mm, y + 32.3 * mm, 29 * mm, font="Helvetica-Oblique", size=9.2, color=GOLD)
+    _fit_text(canvas, card_data.community, x + 35.4 * mm, y + 35.7 * mm, 29 * mm, font="Helvetica-Oblique", size=9.8, color=GOLD)
     canvas.setFillColor(DARK)
     canvas.setFont("Helvetica-Bold", 4.8)
-    canvas.drawString(x + 35.3 * mm, y + 29.6 * mm, card_data.legalName)
+    canvas.drawString(x + 35.4 * mm, y + 32.9 * mm, card_data.italianLegalName)
     canvas.setStrokeColor(GOLD)
-    canvas.line(x + 35.3 * mm, y + 28.7 * mm, x + 65.6 * mm, y + 28.7 * mm)
+    canvas.line(x + 35.4 * mm, y + 31.9 * mm, x + 64.8 * mm, y + 31.9 * mm)
 
     rows = [
         ("Name:", card_data.fullName),
@@ -213,20 +200,20 @@ def draw_membership_card_front(canvas, x, y, card_data, logo_reader=None):
         ("Issued:", card_data.issuedDate),
         ("Expires:", card_data.expiryDate),
     ]
-    row_y = y + 25.7 * mm
+    row_y = y + 28.5 * mm
     for label, value in rows:
         canvas.setFillColor(GOLD)
         canvas.setFont("Helvetica-Bold", 5.2)
-        canvas.drawString(x + 35.3 * mm, row_y, label)
-        _fit_text(canvas, value, x + 46.5 * mm, row_y, 21 * mm, size=6.3)
-        row_y -= 3.0 * mm
+        canvas.drawString(x + 35.4 * mm, row_y, label)
+        _fit_text(canvas, value, x + 47 * mm, row_y, 20.5 * mm, size=6.1)
+        row_y -= 3.05 * mm
 
     canvas.setStrokeColor(GOLD)
     canvas.setFillColor(DARK)
     canvas.setFont("Helvetica-Oblique", 7)
-    canvas.drawString(x + 35.2 * mm, y + 6.9 * mm, card_data.fullName)
-    canvas.line(x + 35 * mm, y + 5.7 * mm, x + 53.6 * mm, y + 5.7 * mm)
-    _center_text(canvas, "Cardholder Signature", x + 35 * mm, y + 4.3 * mm, 18.6 * mm, font="Helvetica", size=3.2)
+    canvas.drawString(x + 35.2 * mm, y + 7.1 * mm, card_data.fullName)
+    canvas.line(x + 35 * mm, y + 5.9 * mm, x + 53.6 * mm, y + 5.9 * mm)
+    _center_text(canvas, "Cardholder Signature", x + 35 * mm, y + 4.5 * mm, 18.6 * mm, font="Helvetica", size=3.2)
     canvas.setFont("Helvetica-Oblique", 7)
     canvas.drawString(x + 60 * mm, y + 6.9 * mm, "ASCAI")
     canvas.line(x + 59.5 * mm, y + 5.7 * mm, x + 80.5 * mm, y + 5.7 * mm)
@@ -270,12 +257,12 @@ def draw_membership_card_back(canvas, x, y, card_data, logo_reader=None):
     logo_reader = logo_reader if logo_reader is not None else load_logo_reader()
     _draw_card_shell(canvas, x, y)
     _draw_cameroon_ribbon(canvas, x, y, front=False)
-    _draw_colosseum_watermark(canvas, x + 52 * mm, y + 20 * mm, 39 * mm)
+    _draw_colosseum_watermark(canvas, x + 54 * mm, y + 18 * mm, 36 * mm)
 
-    _draw_logo(canvas, x + 7 * mm, y + 31 * mm, 20 * mm, 15 * mm, logo_reader, compact=True)
+    _draw_logo(canvas, x + 7.5 * mm, y + 30.4 * mm, 23 * mm, 21 * mm, logo_reader, compact=True)
     canvas.setFillColor(GREEN)
-    canvas.roundRect(x + 47 * mm, y + 43.4 * mm, 21 * mm, 4.9 * mm, 2.1 * mm, stroke=0, fill=1)
-    _center_text(canvas, "CARD BENEFITS", x + 47 * mm, y + 44.7 * mm, 21 * mm, size=5.2, color=YELLOW)
+    canvas.roundRect(x + 45 * mm, y + 43.2 * mm, 23 * mm, 4.9 * mm, 2.1 * mm, stroke=0, fill=1)
+    _center_text(canvas, "CARD BENEFITS", x + 45 * mm, y + 44.5 * mm, 23 * mm, size=5.2, color=YELLOW)
 
     benefits = [
         "Access to ASCAI events and programs",
@@ -284,10 +271,10 @@ def draw_membership_card_back(canvas, x, y, card_data, logo_reader=None):
         "Community support and cultural activities",
         "Academic and career development resources",
     ]
-    benefit_y = y + 38.8 * mm
+    benefit_y = y + 38.3 * mm
     for index, benefit in enumerate(benefits):
-        _benefit_icon(canvas, x + 46.5 * mm, benefit_y + 0.8 * mm, index)
-        _fit_text(canvas, benefit, x + 51.4 * mm, benefit_y, 30.5 * mm, font="Helvetica", size=4.6)
+        _benefit_icon(canvas, x + 44.8 * mm, benefit_y + 0.8 * mm, index)
+        _fit_text(canvas, benefit, x + 50 * mm, benefit_y, 30.5 * mm, font="Helvetica", size=4.5)
         benefit_y -= 5.2 * mm
 
     canvas.setStrokeColor(GOLD)

@@ -55,7 +55,8 @@ def _trim_near_white(image: Image.Image) -> Image.Image:
 def resolve_logo_path() -> str | None:
     """Card-safe logo only — never favicon/manifest assets (may include coat of arms)."""
     return (
-        finders.find("images/ascai-logo-card.svg")
+        finders.find("images/ascai-logo-card-reference.png")
+        or finders.find("images/ascai-logo-card.svg")
         or finders.find("images/ascai-logo-card.png")
         or finders.find("images/ascai-logo.png")
         or finders.find("images/ascai-logo-placeholder.svg")
@@ -75,6 +76,8 @@ def make_logo_data_uri() -> str | None:
 
 
 def resolve_logo_static_url() -> str:
+    if finders.find("images/ascai-logo-card-reference.png"):
+        return static("images/ascai-logo-card-reference.png")
     if finders.find("images/ascai-logo-card.svg"):
         return static("images/ascai-logo-card.svg")
     if finders.find("images/ascai-logo-card.png"):
