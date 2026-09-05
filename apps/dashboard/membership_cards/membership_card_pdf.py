@@ -1,5 +1,5 @@
 """
-WeasyPrint HTML/CSS membership card PDF generation for ASCAI.
+Portable membership card PDF generation for ASCAI.
 """
 from __future__ import annotations
 
@@ -7,8 +7,6 @@ import logging
 from io import BytesIO
 from pathlib import Path
 
-from django.conf import settings
-from django.template.loader import render_to_string
 
 from .assets import (
     make_logo_data_uri,
@@ -47,68 +45,26 @@ def build_card_context(dues, request=None) -> dict:
     }
 
 
-def _weasyprint_base_url(request) -> str:
-    if request is not None:
-        return request.build_absolute_uri("/")
-    return settings.BASE_DIR.as_uri() + "/"
-
-
-def _render_pdf(html_string: str, request) -> bytes:
+def _generate_pdf(dues, request, *, print_ready=False) -> BytesIO:
+    """Use one portable renderer so preview and downloads do not vary by server."""
     try:
-        from weasyprint import CSS, HTML
-    except (ImportError, OSError) as exc:
-        raise RuntimeError(f"WeasyPrint unavailable: {exc}") from exc
+        from . import pdf_reportlab
 
-    css_path = resolve_css_path()
-    return HTML(
-        string=html_string,
-        base_url=_weasyprint_base_url(request),
-    ).write_pdf(stylesheets=[CSS(filename=css_path)])
+        renderer = (
+            pdf_reportlab.generate_membership_card_print_pdf
+            if print_ready else pdf_reportlab.generate_membership_card_pdf
+        )
+        return renderer(dues, request)
+    except Exception as exc:
+        logger.exception("Membership card PDF generation failed.")
+        raise MembershipCardPDFError("Membership card PDF generation failed.") from exc
 
 
 def generate_membership_card_pdf(dues, request=None) -> BytesIO:
-    """Generate an A4 landscape preview PDF with front/back side-by-side."""
-    context = build_card_context(dues, request)
-    html_string = render_to_string("members/cards/membership_card_pdf.html", context)
-    try:
-        pdf_bytes = _render_pdf(html_string, request)
-    except Exception as exc:
-        logger.warning("WeasyPrint failed, falling back to ReportLab: %s", exc)
-        from .pdf_reportlab import generate_membership_card_pdf as reportlab_generate
-
-        try:
-            return reportlab_generate(dues, request)
-        except Exception as fallback_exc:
-            logger.exception("ReportLab membership card PDF fallback failed.")
-            raise MembershipCardPDFError(
-                "Membership card PDF generation failed. Install WeasyPrint or ReportLab "
-                "and confirm static/media files are readable."
-            ) from fallback_exc
-
-    output = BytesIO(pdf_bytes)
-    output.seek(0)
-    return output
+    """Generate a compact digital PDF showing both sides at actual card size."""
+    return _generate_pdf(dues, request)
 
 
 def generate_membership_card_print_pdf(dues, request=None) -> BytesIO:
-    """Generate print-ready card pages at exact 85.6mm × 54mm."""
-    context = build_card_context(dues, request)
-    html_string = render_to_string("members/cards/membership_card_print.html", context)
-    try:
-        pdf_bytes = _render_pdf(html_string, request)
-    except Exception as exc:
-        logger.warning("WeasyPrint print PDF failed, falling back to ReportLab: %s", exc)
-        from .pdf_reportlab import generate_membership_card_print_pdf as reportlab_generate
-
-        try:
-            return reportlab_generate(dues, request)
-        except Exception as fallback_exc:
-            logger.exception("ReportLab membership card print PDF fallback failed.")
-            raise MembershipCardPDFError(
-                "Membership card print PDF generation failed. Install WeasyPrint or ReportLab "
-                "and confirm static/media files are readable."
-            ) from fallback_exc
-
-    output = BytesIO(pdf_bytes)
-    output.seek(0)
-    return output
+    """Generate two pages at exactly 85.6mm x 54mm for future card printing."""
+    return _generate_pdf(dues, request, print_ready=True)

@@ -2,7 +2,7 @@
 <header class="sticky top-0 z-40 border-b border-white/30 bg-white/72 backdrop-blur-xl shadow-[0_12px_40px_rgba(17,35,29,0.06)]">
     <div class="mx-auto flex h-20 max-w-[92rem] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div class="flex min-w-0 items-center gap-3">
-            <button @click="sidebarOpen = !sidebarOpen" class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-black/5 bg-white text-ascai-ink shadow-sm lg:hidden">
+            <button @click="sidebarOpen = !sidebarOpen" :aria-expanded="sidebarOpen" aria-label="{% trans 'Open navigation' %}" class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-black/5 bg-white text-ascai-ink shadow-sm lg:hidden">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>

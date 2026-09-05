@@ -1,5 +1,9 @@
 {% load i18n %}
-<div class="flex min-h-0 flex-1 flex-col">
+<div class="flex min-h-0 flex-1 flex-col" data-nav-search>
+    <div class="nav-search-box">
+        <label>{% trans 'Find a page' %}<input type="search" class="nav-search" placeholder="{% trans 'Search navigation...' %}" autocomplete="off"></label>
+    </div>
+    <p data-nav-empty hidden role="status" class="px-4 py-3 text-sm text-gray-600">{% trans 'No matching pages. Try another word.' %}</p>
     <nav class="flex-1 space-y-6 overflow-y-auto px-4 py-5">
         <div class="space-y-1">
             <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.url_name == 'home' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'Dashboard' %}</a>
@@ -10,6 +14,7 @@
         <div>
             <p class="px-4 text-xs font-extrabold uppercase tracking-[0.2em] text-gray-500">{% trans 'Membership' %}</p>
             <div class="mt-2 space-y-1">
+                <a href="{% url 'dashboard:my_membership_card' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-white hover:text-cameroon-green">{% trans 'My digital card' %}</a>
                 {% if workflow.has_member_profile %}
                 <a href="{% url 'governance:member_portal' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and request.resolver_match.url_name == 'member_portal' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'My Membership' %}</a>
                 <a href="{% url 'governance:my_dues' %}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition {% if request.resolver_match.namespace == 'governance' and request.resolver_match.url_name == 'my_dues' %}bg-cameroon-green text-white shadow-md{% else %}text-gray-700 hover:bg-white hover:text-cameroon-green{% endif %}">{% trans 'My Dues' %}</a>

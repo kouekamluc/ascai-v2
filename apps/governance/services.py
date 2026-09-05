@@ -21,7 +21,7 @@ from .models import (
 
 
 def get_active_board():
-    today = timezone.now().date()
+    today = timezone.localdate()
     return (
         ExecutiveBoard.objects.filter(
             status="active",

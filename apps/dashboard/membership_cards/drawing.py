@@ -149,8 +149,7 @@ def _draw_cameroon_ribbon(canvas, x, y, front=True):
 
 
 def _draw_photo(canvas, card_data, x, y):
-    initials = "".join(part[:1] for part in card_data.fullName.split()[:2]).upper() or "A"
-    reader = load_photo_reader(card_data.photoField, initials)
+    reader = load_photo_reader(card_data.photoField, card_data.fullName)
     size = 17.8 * mm
     canvas.saveState()
     canvas.setFillColor(WHITE)
@@ -177,7 +176,7 @@ def draw_membership_card_front(canvas, x, y, card_data, logo_reader=None):
     _draw_cameroon_ribbon(canvas, x, y, front=True)
 
     _draw_logo(canvas, x + 4 * mm, y + 23.2 * mm, 27 * mm, 30 * mm, logo_reader)
-    _draw_photo(canvas, card_data, x + 69 * mm, y + 28.8 * mm)
+    _draw_photo(canvas, card_data, x + 66.8 * mm, y + 28.8 * mm)
     _draw_qr(canvas, card_data, x + 71 * mm, y + 10.8 * mm, 12 * mm)
 
     canvas.setFillColor(GOLD)
@@ -313,10 +312,10 @@ def draw_membership_card_back(canvas, x, y, card_data, logo_reader=None):
     canvas.roundRect(x + 72.2 * mm, y + 5.1 * mm, 11.8 * mm, 12 * mm, 1.1 * mm, stroke=0, fill=1)
     canvas.setFillColor(WHITE)
     canvas.setFont("Helvetica-Bold", 3.2)
-    canvas.drawString(x + 73.1 * mm, y + 13.3 * mm, "This card remains")
-    canvas.drawString(x + 73.1 * mm, y + 11.7 * mm, "the property of ASCAI.")
+    _fit_text(canvas, "This card remains", x + 73.1 * mm, y + 13.3 * mm, 10 * mm, size=3.2, min_size=2.5, color=WHITE)
+    _fit_text(canvas, "the property of ASCAI.", x + 73.1 * mm, y + 11.7 * mm, 10 * mm, size=3.2, min_size=2.5, color=WHITE)
     canvas.setFont("Helvetica", 3)
-    canvas.drawString(x + 73.1 * mm, y + 9.4 * mm, "If found, please return")
-    canvas.drawString(x + 73.1 * mm, y + 7.9 * mm, "to the address above.")
+    _fit_text(canvas, "If found, please return", x + 73.1 * mm, y + 9.4 * mm, 10 * mm, font="Helvetica", size=3, min_size=2.5, color=WHITE)
+    _fit_text(canvas, "to the address above.", x + 73.1 * mm, y + 7.9 * mm, 10 * mm, font="Helvetica", size=3, min_size=2.5, color=WHITE)
     canvas.setFillColor(DARK)
     _fit_text(canvas, f"Verification: {card_data.verificationEmail}", x + 59 * mm, y + 2.8 * mm, 25 * mm, font="Helvetica-Bold", size=3.4)

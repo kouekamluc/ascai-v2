@@ -382,17 +382,19 @@
         }
     </style>
 
+    <link rel="stylesheet" href="{% static 'css/workspace-refresh.css' %}">
     {% block extra_css %}{% endblock %}
     {% if form %}{{ form.media.css }}{% endif %}
 </head>
 <body class="dashboard-shell" x-data="{ sidebarOpen: false }">
+    <a class="skip-link" href="#main-content">{% trans 'Skip to content' %}</a>
     {% include 'includes/messages.html' %}
 
     <div class="relative z-10 flex min-h-screen overflow-x-hidden">
         {% include 'dashboard/partials/sidebar.html' %}
         <div class="flex min-w-0 flex-1 flex-col">
             {% include 'dashboard/partials/header.html' %}
-            <main class="relative z-10 flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+            <main id="main-content" tabindex="-1" class="relative z-10 flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
                 {% if breadcrumbs %}
                 <nav class="mb-6" aria-label="Breadcrumb">
                     <ol class="flex flex-wrap items-center gap-2 text-sm">
@@ -427,6 +429,7 @@
         <span>{% trans 'Loading...' %}</span>
     </div>
 
+    <script defer src="{% static 'js/workspace-navigation.js' %}"></script>
     {% block extra_js %}{% endblock %}
     {% if form %}{{ form.media.js }}{% endif %}
 </body>

@@ -1,34 +1,22 @@
-{% load static i18n %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% trans 'Membership Card Preview' %} — {{ card.fullName }}</title>
-  <link rel="stylesheet" href="{% static 'members/css/membership_card.css' %}">
-</head>
-<body class="preview-page">
-  <div class="preview-toolbar">
-    <h1>{% trans 'Membership Card Preview' %} — {{ card.fullName }}</h1>
-    <div class="preview-actions">
-      <a class="btn-download" href="{{ pdf_download_url }}">{% trans 'Download Membership Card PDF' %}</a>
-      <a class="btn-print" href="{{ print_download_url }}">{% trans 'Download Print Version' %}</a>
-      <a class="btn-back" href="{{ back_url }}">{% trans 'Back to Membership Cards' %}</a>
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Digital membership card' %} - ASCAI Lazio{% endblock %}
+{% block page_heading %}{% trans 'Your card, ready to go.' %}{% endblock %}
+{% block page_description %}{% trans 'Preview the actual PDF, then save a copy to your phone or computer.' %}{% endblock %}
+{% block content %}
+<section class="dashboard-card p-5 sm:p-8">
+    <div class="flex flex-wrap items-center justify-between gap-5 mb-6">
+        <div><span class="ui-eyebrow">{{ card.memberId }}</span><h2 class="mt-2 text-2xl font-bold">{{ card.fullName }}</h2><p class="mt-2 text-sm text-gray-600">{% trans 'Valid until' %}: {{ card.expiryDate }}</p></div>
+        <a class="btn-primary" href="{{ pdf_download_url }}">{% trans 'Download Membership Card PDF' %} <span aria-hidden="true">↓</span></a>
     </div>
-  </div>
-
-  <div class="preview-stage">
-    <p class="preview-note">{% trans 'Front and back use the same HTML/CSS as the generated PDF. Cards are scaled for on-screen review.' %}</p>
-    <div class="preview-cards">
-      <div class="card-wrap">
-        {% include "members/cards/membership_card_front.html" %}
-        <div class="card-label">FRONT</div>
-      </div>
-      <div class="card-wrap">
-        {% include "members/cards/membership_card_back.html" %}
-        <div class="card-label">BACK</div>
-      </div>
+    {% if card_expired %}<p class="mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900" role="status">{% trans 'This card has expired. You can download it for your records. Renew your dues to receive a current card.' %}</p>{% endif %}
+    <div class="rounded-2xl border border-gray-200 bg-gray-50 overflow-hidden">
+        <object data="{{ pdf_download_url }}?view=1#toolbar=0&navpanes=0&view=FitH" type="application/pdf" aria-label="{% trans 'Membership card PDF preview' %}" style="display:block;width:100%;height:clamp(260px,42vw,540px)">
+            <div class="p-8 text-center"><p class="mb-4">{% trans 'Your browser cannot display this PDF here. Open it directly or download your copy.' %}</p><a class="btn-primary" href="{{ pdf_download_url }}?view=1" target="_blank" rel="noopener">{% trans 'Open PDF' %}</a></div>
+        </object>
     </div>
-  </div>
-</body>
-</html>
+    <div class="flex flex-wrap justify-between gap-4 mt-5 text-sm"><p class="text-gray-600">{% trans 'Both sides are included in one PDF. No printer needed.' %}</p><a class="font-semibold text-cameroon-green" href="{{ pdf_download_url }}?view=1" target="_blank" rel="noopener">{% trans 'Open PDF in a new tab' %} ↗</a></div>
+    <details class="mt-7 border-t border-gray-200 pt-5"><summary class="cursor-pointer font-semibold">{% trans 'Need a physical card later?' %}</summary><p class="my-4 text-sm text-gray-600">{% trans 'The print file has two pages at 85.6 × 54 mm: front, then back. Print at actual size (100%) with no scaling.' %}</p><a class="btn-secondary" href="{{ print_download_url }}">{% trans 'Download Print Version' %}</a></details>
+</section>
+<a href="{{ back_url }}" class="inline-flex mt-6 font-semibold text-cameroon-green">← {% trans 'Back to workspace' %}</a>
+{% endblock %}

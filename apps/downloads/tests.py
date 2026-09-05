@@ -195,7 +195,8 @@ class DownloadsViewsTest(TestCase):
         unpaid_user = User.objects.create_user(
             username='unpaidmember',
             email='unpaid@example.com',
-            password='testpass123'
+            password='testpass123',
+            email_verified=True,
         )
         self.create_unpaid_member(unpaid_user)
         self.client.force_login(unpaid_user)

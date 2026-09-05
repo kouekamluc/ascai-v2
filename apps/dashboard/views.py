@@ -47,7 +47,6 @@ from apps.mentorship.services import (
     update_availability as update_mentor_availability,
 )
 from .membership_cards import (
-    build_card_context,
     generate_membership_card_pdf,
     generate_membership_card_print_pdf,
     MembershipCardPDFError,
@@ -91,7 +90,9 @@ class MembershipCardAdminView(DashboardRequiredMixin, ListView):
         search = self.request.GET.get('q')
 
         if year:
-            queryset = queryset.filter(year=year)
+            if not year.isascii() or not year.isdigit() or not 1900 <= int(year) <= 9999:
+                return queryset.none()
+            queryset = queryset.filter(year=int(year))
         if search:
             queryset = queryset.filter(
                 Q(member__user__full_name__icontains=search) |
@@ -118,42 +119,44 @@ class MembershipCardAdminView(DashboardRequiredMixin, ListView):
         return context
 
 
-class MembershipCardPreviewView(DashboardRequiredMixin, DetailView):
-    """Browser preview of the membership card using the same HTML/CSS as the PDF."""
+class MyMembershipCardView(DashboardRequiredMixin, TemplateView):
+    """Give members a direct entry point to their own latest paid card."""
+    template_name = 'dashboard/my_membership_card.html'
+
+    def get(self, request, *args, **kwargs):
+        dues = _membership_card_dues_queryset().filter(member__user=request.user).order_by('-year', '-pk').first()
+        if dues:
+            return redirect('dashboard:membership_card_preview', dues_id=dues.pk)
+        return super().get(request, *args, **kwargs)
+
+
+class MembershipCardAccessMixin(DashboardRequiredMixin):
+    def get_queryset(self):
+        queryset = _membership_card_dues_queryset()
+        if not _can_manage_membership_cards(self.request.user):
+            queryset = queryset.filter(member__user=self.request.user)
+        return queryset
+
+
+class MembershipCardPreviewView(MembershipCardAccessMixin, DetailView):
+    """Display the downloadable PDF inside the member workspace."""
     template_name = 'members/cards/membership_card_preview.html'
     pk_url_kwarg = 'dues_id'
-
-    def dispatch(self, request, *args, **kwargs):
-        if not _can_manage_membership_cards(request.user):
-            messages.error(request, _('You do not have permission to preview membership cards.'))
-            return redirect('dashboard:home')
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return _membership_card_dues_queryset()
 
     def get_context_data(self, **kwargs):
         dues = self.get_object()
         context = super().get_context_data(**kwargs)
-        context.update(build_card_context(dues, self.request))
+        context['card'] = build_member_card_data(dues, self.request)
+        context['card_expired'] = (dues.valid_until or timezone.datetime(dues.year, 12, 31).date()) < timezone.localdate()
         context['pdf_download_url'] = reverse('dashboard:membership_card_pdf', kwargs={'dues_id': dues.pk})
         context['print_download_url'] = reverse('dashboard:membership_card_print_pdf', kwargs={'dues_id': dues.pk})
-        context['back_url'] = reverse('dashboard:membership_cards')
+        context['back_url'] = reverse('dashboard:membership_cards' if _can_manage_membership_cards(self.request.user) else 'dashboard:home')
         return context
 
 
-class MembershipCardPDFView(DashboardRequiredMixin, DetailView):
-    """Generate an A4 preview PDF membership card for a paid dues record."""
+class MembershipCardPDFView(MembershipCardAccessMixin, DetailView):
+    """Generate a compact digital membership card for a paid dues record."""
     pk_url_kwarg = 'dues_id'
-
-    def dispatch(self, request, *args, **kwargs):
-        if not _can_manage_membership_cards(request.user):
-            messages.error(request, _('You do not have permission to generate membership cards.'))
-            return redirect('dashboard:home')
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return _membership_card_dues_queryset()
 
     def get(self, request, *args, **kwargs):
         dues = self.get_object()
@@ -164,10 +167,13 @@ class MembershipCardPDFView(DashboardRequiredMixin, DetailView):
                 request,
                 _('Membership card PDF generation is temporarily unavailable. Please contact the site administrator.'),
             )
-            return redirect('dashboard:membership_cards')
+            return HttpResponse(_('Your card could not be generated. Please try again later or contact support.'), status=503)
         filename = membership_card_filename(build_member_card_data(dues, request))
         response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        disposition = 'inline' if request.GET.get('view') == '1' else 'attachment'
+        response['Content-Disposition'] = f'{disposition}; filename="{filename}"'
+        response['Cache-Control'] = 'private, no-store'
+        response['X-Frame-Options'] = 'SAMEORIGIN'
         return response
 
 
@@ -183,10 +189,11 @@ class MembershipCardPrintPDFView(MembershipCardPDFView):
                 request,
                 _('Membership card print PDF generation is temporarily unavailable. Please contact the site administrator.'),
             )
-            return redirect('dashboard:membership_cards')
+            return HttpResponse(_('Your card could not be generated. Please try again later or contact support.'), status=503)
         filename = membership_card_filename(build_member_card_data(dues, request), print_ready=True)
         response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response['Cache-Control'] = 'private, no-store'
         return response
 
 

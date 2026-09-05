@@ -365,14 +365,16 @@
     </style>
 
     {% block extra_head %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/workspace-refresh.css' %}">
     {% block extra_css %}{% endblock %}
     {% if form %}{{ form.media.css }}{% endif %}
 </head>
 <body class="site-shell">
     {% include 'includes/navbar.html' %}
+    <a class="skip-link" href="#main-content">{% trans 'Skip to content' %}</a>
     {% include 'includes/messages.html' %}
 
-    <main class="site-main">
+    <main id="main-content" tabindex="-1" class="site-main">
         {% block content %}{% endblock %}
     </main>
 

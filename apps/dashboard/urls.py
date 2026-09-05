@@ -25,6 +25,7 @@ urlpatterns = [
     path('messages/<int:pk>/reply/', views.BureauMessageReplyView.as_view(), name='message_reply'),
 
     # Membership Cards
+    path('my-membership-card/', views.MyMembershipCardView.as_view(), name='my_membership_card'),
     path('membership-cards/', views.MembershipCardAdminView.as_view(), name='membership_cards'),
     path('membership-cards/<int:dues_id>/preview/', views.MembershipCardPreviewView.as_view(), name='membership_card_preview'),
     path('membership-cards/<int:dues_id>/pdf/', views.MembershipCardPDFView.as_view(), name='membership_card_pdf'),

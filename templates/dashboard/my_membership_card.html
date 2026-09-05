@@ -1,0 +1,11 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+{% block page_heading %}{% trans 'My digital card' %}{% endblock %}
+{% block page_description %}{% trans 'Your ASCAI membership ID, available as a PDF.' %}{% endblock %}
+{% block content %}
+<section class="dashboard-card p-8 sm:p-12">
+    <span class="task-symbol" aria-hidden="true">▣</span><h2 class="mt-5 text-2xl font-bold">{% trans 'Your card is not ready yet' %}</h2>
+    <p class="mt-3 max-w-xl text-gray-600 leading-7">{% trans 'A digital card becomes available once your membership dues are recorded as paid. If you have already paid, contact the team to check your record.' %}</p>
+    <div class="welcome-actions">{% if workflow.has_member_profile %}<a class="btn-primary" href="{% url 'governance:my_dues' %}">{% trans 'Review my dues' %}</a>{% else %}<a class="btn-primary" href="{% url 'governance:member_register' %}">{% trans 'Become a member' %}</a>{% endif %}<a class="btn-secondary" href="{% url 'dashboard:tickets_create' %}">{% trans 'Contact support' %}</a></div>
+</section>
+{% endblock %}

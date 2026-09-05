@@ -181,9 +181,42 @@ class MembershipCardDashboardTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Kevin Kouekam')
         self.assertContains(response, 'ASC-2026-')
-        self.assertContains(response, 'MEMBERSHIP CARD')
-        self.assertContains(response, 'CARD BENEFITS')
+        self.assertContains(response, 'type="application/pdf"')
+        self.assertContains(response, '?view=1')
         self.assertContains(response, 'Download Membership Card PDF')
+
+    def test_member_can_download_own_card_but_not_another_members_card(self):
+        self.client.force_login(self.member_user)
+        entry = self.client.get(reverse('dashboard:my_membership_card'))
+        self.assertRedirects(entry, reverse('dashboard:membership_card_preview', args=[self.paid_dues.pk]))
+        for route in ('membership_card_pdf', 'membership_card_print_pdf', 'membership_card_preview'):
+            response = self.client.get(reverse('dashboard:' + route, args=[self.paid_dues.pk]))
+            self.assertEqual(response.status_code, 200)
+        self.client.force_login(self.unpaid_user)
+        for route in ('membership_card_pdf', 'membership_card_print_pdf', 'membership_card_preview'):
+            response = self.client.get(reverse('dashboard:' + route, args=[self.paid_dues.pk]))
+            self.assertEqual(response.status_code, 404)
+        self.assertContains(self.client.get(reverse('dashboard:my_membership_card')), 'Your card is not ready yet')
+
+    def test_pdf_inline_view_is_private(self):
+        self.client.force_login(self.member_user)
+        response = self.client.get(reverse('dashboard:membership_card_pdf', args=[self.paid_dues.pk]), {'view': '1'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response['Content-Disposition'].startswith('inline;'))
+        self.assertEqual(response['Cache-Control'], 'private, no-store')
+        self.assertEqual(response['X-Frame-Options'], 'SAMEORIGIN')
+
+    def test_card_endpoints_require_login(self):
+        for route in ('membership_card_pdf', 'membership_card_print_pdf', 'membership_card_preview'):
+            response = self.client.get(reverse('dashboard:' + route, args=[self.paid_dues.pk]))
+            self.assertRedirects(response, reverse('account_login'))
+
+    def test_invalid_card_year_does_not_crash(self):
+        self.client.force_login(self.admin)
+        for year in ('invalid', '99999999999999999999999999999999999999999', '²'):
+            response = self.client.get(reverse('dashboard:membership_cards'), {'year': year})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.context['paid_count'], 0)
 
     def test_membership_card_uses_site_contact_defaults(self):
         from apps.dashboard.membership_cards.data import build_member_card_data
