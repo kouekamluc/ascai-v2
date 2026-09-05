@@ -3,20 +3,15 @@
 
 {% block title %}{% trans 'Membership Cards' %} - ASCAI Lazio{% endblock %}
 {% block page_heading %}{% trans 'Membership Cards' %}{% endblock %}
-{% block page_description %}{% trans 'Find a member, check their card, and download a digital ID.' %}{% endblock %}
+{% block page_description %}{% trans 'Generate official ASCAI membership card PDFs for members whose annual dues are marked as paid.' %}{% endblock %}
 
 {% block content %}
-<section class="print-steps" aria-label="{% trans 'How to create a digital card' %}">
-    <article><strong>01 · {% trans 'Find a member' %}</strong><p>{% trans 'Search by name or email. Only paid dues are eligible.' %}</p></article>
-    <article><strong>02 · {% trans 'Review the card' %}</strong><p>{% trans 'Check the name, photo and validity dates in the PDF preview.' %}</p></article>
-    <article><strong>03 · {% trans 'Save the PDF' %}</strong><p>{% trans 'Download both sides in one file, ready to keep on a phone.' %}</p></article>
-</section>
 <section class="dashboard-card p-6 sm:p-8">
     <div class="dashboard-card-header flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
             <p class="dashboard-kicker text-cameroon-green">{% trans 'Paid dues only' %}</p>
             <h2 class="mt-3 text-3xl font-bold text-ascai-ink">{% trans 'Eligible members' %}</h2>
-            <p class="mt-2 text-sm leading-7 text-gray-600">{% trans 'Select a paid membership record to preview or download its digital card.' %}</p>
+            <p class="mt-2 text-sm leading-7 text-gray-600">{% trans 'Cards are available only when the dues status is paid. The PDF contains the front and back card model with photo, QR verification, validity dates, and ASCAI contact details.' %}</p>
         </div>
         <div class="rounded-2xl bg-stone-50 px-5 py-4 text-right">
             <p class="dashboard-kicker text-cameroon-yellow">{% trans 'Matches' %}</p>
@@ -81,8 +76,9 @@
                     <td class="px-6 py-5 text-sm text-gray-600">{% if due.valid_until %}{{ due.valid_until|date:"d M Y" }}{% else %}31 Dec {{ due.year }}{% endif %}</td>
                     <td class="px-6 py-5">
                         <div class="flex flex-wrap justify-end gap-2">
-                            <a href="{% url 'dashboard:membership_card_preview' due.pk %}" class="btn-secondary">{% trans 'Review card' %}</a>
-                            <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary">{% trans 'Download PDF' %}</a>
+                            <a href="{% url 'dashboard:membership_card_preview' due.pk %}" class="btn-secondary">{% trans 'Preview Membership Card' %}</a>
+                            <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary">{% trans 'Download Membership Card PDF' %}</a>
+                            <a href="{% url 'dashboard:membership_card_print_pdf' due.pk %}" class="btn-secondary">{% trans 'Download Print Version' %}</a>
                         </div>
                     </td>
                 </tr>
@@ -101,8 +97,9 @@
                 <div><span class="dashboard-kicker text-cameroon-yellow">{% trans 'Year' %}</span><p class="mt-1 font-semibold">{{ due.year }}</p></div>
             </div>
             <div class="mt-4 grid gap-2">
-                <a href="{% url 'dashboard:membership_card_preview' due.pk %}" class="btn-secondary w-full">{% trans 'Review card' %}</a>
-                <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary w-full">{% trans 'Download PDF' %}</a>
+                <a href="{% url 'dashboard:membership_card_preview' due.pk %}" class="btn-secondary w-full">{% trans 'Preview Membership Card' %}</a>
+                <a href="{% url 'dashboard:membership_card_pdf' due.pk %}" class="btn-primary w-full">{% trans 'Download Membership Card PDF' %}</a>
+                <a href="{% url 'dashboard:membership_card_print_pdf' due.pk %}" class="btn-secondary w-full">{% trans 'Download Print Version' %}</a>
             </div>
         </article>
         {% endfor %}
@@ -113,10 +110,10 @@
         <p class="text-sm text-gray-500">{% blocktrans with page=page_obj.number total=page_obj.paginator.num_pages %}Page {{ page }} of {{ total }}{% endblocktrans %}</p>
         <div class="flex gap-2">
             {% if page_obj.has_previous %}
-            <a class="btn-secondary" href="?page={{ page_obj.previous_page_number }}&q={{ search_query|urlencode }}&year={{ selected_year }}">{% trans 'Previous' %}</a>
+            <a class="btn-secondary" href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&year={{ selected_year }}">{% trans 'Previous' %}</a>
             {% endif %}
             {% if page_obj.has_next %}
-            <a class="btn-secondary" href="?page={{ page_obj.next_page_number }}&q={{ search_query|urlencode }}&year={{ selected_year }}">{% trans 'Next' %}</a>
+            <a class="btn-secondary" href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&year={{ selected_year }}">{% trans 'Next' %}</a>
             {% endif %}
         </div>
     </div>

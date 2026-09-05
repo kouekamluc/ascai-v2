@@ -6,7 +6,7 @@
 {% block content %}
 <section class="dashboard-card p-5 sm:p-8">
     <div class="flex flex-wrap items-center justify-between gap-5 mb-6">
-        <div><span class="ui-eyebrow">{{ card.memberId }}</span><h2 class="mt-2 text-2xl font-bold">{{ card.fullName }}</h2><p class="mt-2 text-sm text-gray-600">{% trans 'Valid until' %}: {{ card.expiryDate }}</p></div>
+        <div><span class="dashboard-kicker text-cameroon-green">{{ card.memberId }}</span><h2 class="mt-2 text-2xl font-bold">{{ card.fullName }}</h2><p class="mt-2 text-sm text-gray-600">{% trans 'Valid until' %}: {{ card.expiryDate }}</p></div>
         <a class="btn-primary" href="{{ pdf_download_url }}">{% trans 'Download Membership Card PDF' %} <span aria-hidden="true">↓</span></a>
     </div>
     {% if card_expired %}<p class="mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900" role="status">{% trans 'This card has expired. You can download it for your records. Renew your dues to receive a current card.' %}</p>{% endif %}

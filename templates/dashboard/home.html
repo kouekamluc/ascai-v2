@@ -6,7 +6,36 @@
 
 {% block content %}
 <div class="space-y-8">
-    {% include 'dashboard/partials/welcome.html' %}
+    <section class="dashboard-hero">
+        <div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+            <div>
+                <p class="dashboard-kicker text-white/70">{% trans 'Reserved Area' %}</p>
+                <h2 class="mt-4 text-4xl md:text-5xl font-bold">{% trans 'Keep your ASCAI journey organized in one place.' %}</h2>
+                <p class="mt-4 max-w-2xl text-sm leading-8 text-white/82">
+                    {% trans 'Track what matters most: your membership standing, dues, events, mentorship activity, support requests, and the association processes that need your attention.' %}
+                </p>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                <div class="rounded-[1.5rem] border border-white/18 bg-white/12 p-5 backdrop-blur">
+                    <p class="dashboard-kicker text-white/64">{% trans 'Quick summary' %}</p>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div><p class="text-3xl font-bold">{{ stats.saved_universities }}</p><p class="mt-1 text-sm text-white/72">{% trans 'Saved universities' %}</p></div>
+                        <div><p class="text-3xl font-bold">{{ stats.saved_scholarships }}</p><p class="mt-1 text-sm text-white/72">{% trans 'Saved scholarships' %}</p></div>
+                        <div><p class="text-3xl font-bold">{{ stats.open_tickets }}</p><p class="mt-1 text-sm text-white/72">{% trans 'Open tickets' %}</p></div>
+                        <div><p class="text-3xl font-bold">{{ stats.unread_messages }}</p><p class="mt-1 text-sm text-white/72">{% trans 'Unread messages' %}</p></div>
+                    </div>
+                </div>
+                <div class="rounded-[1.5rem] border border-white/18 bg-[#0f2b23]/78 p-5 shadow-glow">
+                    <p class="dashboard-kicker text-cameroon-yellow">{% trans 'Association rules' %}</p>
+                    <ul class="mt-4 space-y-3 text-sm text-white/78">
+                        <li>{% trans 'General assemblies require at least 10 days notice.' %}</li>
+                        <li>{% trans 'Annual dues are due by March 31.' %}</li>
+                        <li>{% trans 'Active membership depends on dues and participation.' %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
     {% if personal_opportunity_feed %}
     <section class="dashboard-card p-7">
